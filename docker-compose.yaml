@@ -1,0 +1,31 @@
+version: "3.8"
+services:
+  fortapro-postgres:
+    image: postgres:15.3-alpine
+    container_name: fortapro-postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_USER: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+  fortapro-pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: fortapro-pgadmin
+    restart: always
+    depends_on:
+      - fortapro-postgres
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - 8089:80
+    volumes:
+      - ./data/pgadmin:/var/lib/pgadmin
+
+networks:
+  default:
+    name: local-network
+    external: true
