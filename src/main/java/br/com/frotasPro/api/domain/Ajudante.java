@@ -7,24 +7,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(
-        name = "tb_motorista",
-        //garantindo que certos campos sejam únicos
+        name = "tb_ajudante",
         uniqueConstraints = {
                 @UniqueConstraint(name = "uk_motorista_codigo", columnNames = "codigo"),
-                @UniqueConstraint(name = "uk_motorista_cnh", columnNames = "cnh"),
-                @UniqueConstraint(name = "uk_motorista_email", columnNames = "email")
         }
 )
-public class Motorista extends AuditoriaBase{
+public class Ajudante extends AuditoriaBase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -40,18 +36,6 @@ public class Motorista extends AuditoriaBase{
     @Column(nullable = false, length = 150)
     private String nome;
 
-    @Column(nullable = false, length = 150, unique = true)
-    private String email;
-
-    @Column(name = "data_nascimento", nullable = false)
-    private LocalDate dataNascimento;
-
-    @Column(nullable = false, unique = true, length = 11)
-    private String cnh;
-
-    @Column(name = "validade_cnh", nullable = false)
-    private LocalDate validadeCnh;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private Status status = Status.DISPONIVEL;
@@ -59,17 +43,11 @@ public class Motorista extends AuditoriaBase{
     @Column(nullable = false)
     private boolean ativo = true;
 
-//    @OneToOne(fetch = FetchType.LAZY, optional = true)
-//    @JoinColumn(name = "usuario_id", unique = true)
-//    private Usuario usuario;
-
     @PrePersist
     @PreUpdate
-    private void normalize() {
-        if (email != null) email = email.trim().toLowerCase();
+    private void normalize(){
         if (codigo != null) codigo = codigo.trim();
         if (codigoExterno != null) codigoExterno = codigoExterno.trim();
-        if (cnh != null) cnh = cnh.replaceAll("\\D", "");
         if (nome != null) nome = nome.trim();
     }
 }
