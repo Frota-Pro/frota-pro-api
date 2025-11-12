@@ -84,6 +84,9 @@ public class Caminhao extends AuditoriaBase{
     @Column(nullable = false)
     private boolean ativo = true;
 
+    @OneToMany(mappedBy = "carga", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<Carga> cargas = new ArrayList<>();
+
     @PrePersist
     @PreUpdate
     private void normalize() {

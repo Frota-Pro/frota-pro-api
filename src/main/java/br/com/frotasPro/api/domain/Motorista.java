@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -59,9 +61,12 @@ public class Motorista extends AuditoriaBase{
     @Column(nullable = false)
     private boolean ativo = true;
 
-//    @OneToOne(fetch = FetchType.LAZY, optional = true)
-//    @JoinColumn(name = "usuario_id", unique = true)
-//    private Usuario usuario;
+    @OneToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "usuario_id", unique = true)
+    private Usuario usuario;
+
+    @OneToMany(mappedBy = "motorista", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<Carga> cargas = new ArrayList<>();
 
     @PrePersist
     @PreUpdate

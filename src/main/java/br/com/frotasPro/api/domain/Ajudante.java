@@ -43,6 +43,10 @@ public class Ajudante extends AuditoriaBase {
     @Column(nullable = false)
     private boolean ativo = true;
 
+    @ManyToOne
+    @JoinColumn(name = "carga_id", nullable = false)
+    private Carga carga;
+
     @PrePersist
     @PreUpdate
     private void normalize(){
