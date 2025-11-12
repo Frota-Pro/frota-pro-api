@@ -1,3 +1,14 @@
+CREATE SEQUENCE IF NOT EXISTS seq_motorista_codigo START 1;
+
+CREATE OR REPLACE FUNCTION gerar_codigo_motorista()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.codigo := 'MTR-' || LPAD(nextval('seq_motorista_codigo')::TEXT, 6, '0');
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
 CREATE TABLE IF NOT EXISTS tb_motorista(
     id UUID PRIMARY KEY,
     codigo VARCHAR(50) NOT NULL,
@@ -28,3 +39,8 @@ CREATE TABLE IF NOT EXISTS tb_motorista(
         --ON UPDATE NO ACTION
         --ON DELETE SET NULL
 );
+
+CREATE TRIGGER tg_motorista_codigo
+BEFORE INSERT ON tb_motorista
+FOR EACH ROW
+EXECUTE FUNCTION gerar_codigo_motorista();
