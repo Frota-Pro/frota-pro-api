@@ -14,17 +14,23 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "tb_pneu")
-public class Pneu {
+public class Pneu extends AuditoriaBase{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "uuid")
     private UUID id;
 
+    @Column(length = 20)
     private String posicao;
 
+    @Column(name = "data_ultima_troca")
     private LocalDate ultimaTroca;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "eixo_id", nullable = false)
     private Eixo eixo;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "manutencao_id")
+    private Manutencao manutencao;
 }

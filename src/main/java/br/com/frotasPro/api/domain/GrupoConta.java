@@ -12,8 +12,13 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "tb_grupo_conta")
-public class GrupoConta {
+@Table(
+        name = "tb_grupo_conta",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_grupo_conta_codigo", columnNames = "codigo")
+        }
+)
+public class GrupoConta extends AuditoriaBase{
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -29,9 +34,11 @@ public class GrupoConta {
     @Column(nullable = false, length = 150)
     private String nome;
 
-    @OneToOne(mappedBy = "grupoConta")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "conta_id", unique = true)
     private Conta conta;
 
-    @OneToOne(mappedBy = "grupoConta")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "caminhao_id", unique = true)
     private Caminhao caminhao;
 }

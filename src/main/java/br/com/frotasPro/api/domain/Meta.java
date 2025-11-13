@@ -18,7 +18,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "tb_meta")
-public class Meta {
+public class Meta extends AuditoriaBase{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "uuid")
@@ -31,6 +31,7 @@ public class Meta {
     private LocalDate dataFim;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_meta", length = 30, nullable = false)
     private TipoMeta tipoMeta;
 
     @Column(name = "valor_meta", precision = 15, scale = 3)
@@ -39,18 +40,21 @@ public class Meta {
     @Column(name = "valor_realizado", precision = 15, scale = 3)
     private BigDecimal valorRealizado;
 
+    @Column(length = 50)
     private String unidade;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "status_meta", length = 20, nullable = false)
     private StatusMeta statusMeta;
 
     @Column(length = 150)
     private String descricao;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "caminhao_id")
     private Caminhao caminhao;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "motorista_id")
     private Motorista motorista;
-
 }

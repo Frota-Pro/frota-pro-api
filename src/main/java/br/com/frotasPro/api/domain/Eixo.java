@@ -15,18 +15,19 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "tb_eixo")
-public class Eixo {
+public class Eixo extends AuditoriaBase{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "uuid")
     private UUID id;
 
+    @Column(nullable = false)
     private int numero;
 
     @OneToMany(mappedBy = "eixo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pneu> pneus = new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "caminhao_id", nullable = false)
     private Caminhao caminhao;
 }

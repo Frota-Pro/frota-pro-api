@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "tb_manutencao")
-public class Manutencao {
+public class Manutencao extends AuditoriaBase{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "uuid")
@@ -28,22 +29,33 @@ public class Manutencao {
     @Column(length = 150)
     private String descricao;
 
+    @Column(name = "data_inicio_manutencao", nullable = false)
     private LocalDate dataInicioManutencao;
+
+    @Column(name = "data_fim_manutencao")
     private LocalDate dataFimManutencao;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_manutencao", length = 20, nullable = false)
     private TipoManutencao tipoManutencao;
 
-    private List<String> itensTrocados;
+    @ElementCollection
+    @CollectionTable(name = "tb_manutencao_item_trocado",
+            joinColumns = @JoinColumn(name = "manutencao_id"))
+    @Column(name = "item", length = 150, nullable = false)
+    private List<String> itensTrocados = new ArrayList<>();
 
+    @Column(length = 500)
     private String observacoes;
 
-    private double valor;
+    @Column(name = "valor", precision = 12, scale = 2)
+    private BigDecimal valor;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "status_manutencao", length = 20, nullable = false)
     private StatusManutencao statusManutencao;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "caminhao_id", nullable = false)
     private Caminhao caminhao;
 
@@ -51,10 +63,10 @@ public class Manutencao {
     @JoinColumn(name = "oficina_id")
     private Oficina oficina;
 
-    @OneToMany(mappedBy = "manutencao", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Pneu> pneus = new ArrayList<>();
-
     @OneToOne(mappedBy = "manutencao", fetch = FetchType.LAZY)
     private ParadaCarga paradaCarga;
+
+    @OneToMany(mappedBy = "manutencao", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<Pneu> pneus = new ArrayList<>();
 
 }

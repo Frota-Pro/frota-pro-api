@@ -1,8 +1,18 @@
 package br.com.frotasPro.api.domain.enums;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
+
+@AllArgsConstructor
+@Getter
+@ToString
 public enum StatusMeta {
-    NAO_INICIADA,
-    EM_ANDAMENTO,
-    CONCLUIDA,
-    CANCELADA
+    NAO_INICIADA("Meta não iniciada"),
+    EM_ANDAMENTO("meta em andamento"),
+    CONCLUIDA("meta concluida"),
+    CANCELADA("meta cancelada");
+
+    private final String descricao;
+
 }
