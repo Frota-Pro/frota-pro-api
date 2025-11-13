@@ -78,6 +78,9 @@ public class Caminhao extends AuditoriaBase{
     @OneToMany(mappedBy = "caminhao", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Eixo> eixos = new ArrayList<>();
 
+    @OneToMany(mappedBy = "caminhao", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Meta> metas = new ArrayList<>();
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private Status status = Status.DISPONIVEL;

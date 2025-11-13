@@ -67,4 +67,7 @@ public class Motorista extends AuditoriaBase{
 
     @OneToMany(mappedBy = "motorista", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<Carga> cargas = new ArrayList<>();
+
+    @OneToMany(mappedBy = "motorista", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Meta> metas = new ArrayList<>();
 }
