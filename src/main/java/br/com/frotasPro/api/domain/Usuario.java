@@ -15,7 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "tb_usuario")
-public class Usuario {
+public class Usuario extends AuditoriaBase{
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -28,16 +28,9 @@ public class Usuario {
     @Column(nullable = false, length = 150)
     private String senha;
 
-    @OneToMany(mappedBy = "usuario",fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "tb_usuario_acesso",
+        joinColumns = @JoinColumn(name = "usuario_id"),
+        inverseJoinColumns = @JoinColumn(name = "acesso_id"))
     private List<Acesso> acesso= new ArrayList<>();
-
-    @OneToOne(mappedBy = "usuario")
-    private Motorista motorista;
-
-    @PrePersist
-    @PreUpdate
-    private void normalize() {
-        if (login != null) login = login.trim();
-        if (senha != null) senha = senha.trim();
-    }
 }

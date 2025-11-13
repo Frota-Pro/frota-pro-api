@@ -13,22 +13,23 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "tb_acesso")
+@Table(
+        name = "tb_acesso",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_acesso_nome", columnNames = "nome"),
+        }
+)
 public class Acesso {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "uuid")
     private UUID id;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 50, unique = true)
     private String nome;
 
     @Column(nullable = false, length = 150)
     private String descrisao;
-
-    @ManyToOne
-    @JoinColumn(name = "usuario_id", nullable = false)
-    private Usuario usuario;
 
     @PrePersist
     @PreUpdate

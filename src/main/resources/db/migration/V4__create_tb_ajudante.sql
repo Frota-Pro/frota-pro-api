@@ -1,3 +1,4 @@
+
 CREATE SEQUENCE IF NOT EXISTS seq_ajudante_codigo START 1 INCREMENT 1;
 
 CREATE OR REPLACE FUNCTION gerar_codigo_ajudante()
@@ -11,7 +12,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TABLE IF NOT EXISTS tb_ajudante (
-    id              uuid PRIMARY KEY,
+    id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     codigo          varchar(50)  NOT NULL,
     codigo_externo  varchar(50),
     nome            varchar(150) NOT NULL,

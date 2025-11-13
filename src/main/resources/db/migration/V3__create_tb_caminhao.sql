@@ -1,15 +1,18 @@
-CREATE SEQUENCE IF NOT EXISTS seq_caminhao_codigo START 1;
+
+CREATE SEQUENCE IF NOT EXISTS seq_caminhao_codigo START 1 INCREMENT 1;
 
 CREATE OR REPLACE FUNCTION gerar_codigo_caminhao()
 RETURNS TRIGGER AS $$
 BEGIN
-    NEW.codigo := 'CAM-' || LPAD(nextval('seq_caminhao_codigo')::TEXT, 6, '0');
+    IF NEW.codigo IS NULL OR NEW.codigo = '' THEN
+        NEW.codigo := 'CAM-' || LPAD(nextval('seq_caminhao_codigo')::TEXT, 6, '0');
+    END IF;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
 CREATE TABLE IF NOT EXISTS tb_caminhao (
-    id                  uuid PRIMARY KEY,
+    id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     codigo              varchar(50)  NOT NULL,
     codigo_externo      varchar(50),
     descricao           varchar(255),
@@ -20,8 +23,10 @@ CREATE TABLE IF NOT EXISTS tb_caminhao (
     antt                varchar(20),
     renavam             varchar(20),
     chassi              varchar(50),
-    tara                double precision,
-    max_peso            double precision,
+
+    tara                numeric(10,3),
+    max_peso            numeric(10,3),
+
     data_licenciamento  date,
     seguro              varchar(100),
 

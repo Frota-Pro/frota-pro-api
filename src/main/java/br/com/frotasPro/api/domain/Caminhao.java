@@ -7,9 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -63,10 +62,10 @@ public class Caminhao extends AuditoriaBase{
     @Column(length = 50, unique = true)
     private String chassi;
 
-    private Double tara;
+    private BigDecimal tara;
 
-    @Column(name = "max_peso")
-    private Double maxPeso;
+    @Column(name = "max_peso", precision = 10, scale = 3)
+    private BigDecimal maxPeso;
 
     @Column(name = "data_licenciamento")
     private LocalDate dataLicenciamento;
@@ -83,17 +82,4 @@ public class Caminhao extends AuditoriaBase{
 
     @Column(nullable = false)
     private boolean ativo = true;
-
-    @OneToMany(mappedBy = "carga", cascade = CascadeType.ALL, orphanRemoval = false)
-    private List<Carga> cargas = new ArrayList<>();
-
-    @PrePersist
-    @PreUpdate
-    private void normalize() {
-        if (placa != null) placa = placa.trim().toUpperCase();
-        if (marca != null) marca = marca.trim();
-        if (modelo != null) modelo = modelo.trim();
-        if (codigo != null) codigo = codigo.trim();
-        if (codigoExterno != null) codigoExterno = codigoExterno.trim();
-    }
 }

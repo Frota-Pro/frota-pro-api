@@ -67,14 +67,4 @@ public class Motorista extends AuditoriaBase{
 
     @OneToMany(mappedBy = "motorista", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<Carga> cargas = new ArrayList<>();
-
-    @PrePersist
-    @PreUpdate
-    private void normalize() {
-        if (email != null) email = email.trim().toLowerCase();
-        if (codigo != null) codigo = codigo.trim();
-        if (codigoExterno != null) codigoExterno = codigoExterno.trim();
-        if (cnh != null) cnh = cnh.replaceAll("\\D", "");
-        if (nome != null) nome = nome.trim();
-    }
 }
