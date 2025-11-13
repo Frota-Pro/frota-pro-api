@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -48,4 +50,7 @@ public class ParadaCarga extends AuditoriaBase{
 
     @Column(length = 500)
     private String observacao;
+
+    @OneToMany(mappedBy = "paradaCarga", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DespesaParada> despesaParadas = new ArrayList<>();
 }
