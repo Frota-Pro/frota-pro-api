@@ -30,11 +30,4 @@ public class Acesso {
 
     @Column(nullable = false, length = 150)
     private String descrisao;
-
-    @PrePersist
-    @PreUpdate
-    private void normalize() {
-        if (nome != null) nome = nome.trim();
-        if (descrisao != null) descrisao = descrisao.trim();
-    }
 }

@@ -19,12 +19,20 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "tb_manutencao")
+@Table(
+        name = "tb_manutencao",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_caminhao_codigo", columnNames = "codigo")
+        }
+)
 public class Manutencao extends AuditoriaBase{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "uuid")
     private UUID id;
+
+    @Column(nullable = false, length = 50, unique = true)
+    private String codigo;
 
     @Column(length = 150)
     private String descricao;

@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 @Getter
 @Setter
@@ -34,9 +36,8 @@ public class GrupoConta extends AuditoriaBase{
     @Column(nullable = false, length = 150)
     private String nome;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "conta_id", unique = true)
-    private Conta conta;
+    @OneToMany(mappedBy = "grupoConta", cascade = CascadeType.ALL, orphanRemoval = false)
+    List<Conta> contas = new ArrayList<>();
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "caminhao_id", unique = true)

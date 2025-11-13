@@ -90,6 +90,9 @@ public class Carga extends AuditoriaBase{
     @JoinColumn(name = "rota_id", nullable = false)
     private Rota rota;
 
+    @OneToMany(mappedBy = "carga", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ParadaCarga> paradas = new ArrayList<>();
+
     public long calcularAtraso() {
         if (dtPrevista == null || dtChegada == null) return 0;
         long dias = ChronoUnit.DAYS.between(dtPrevista, dtChegada);

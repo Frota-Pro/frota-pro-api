@@ -33,6 +33,7 @@ public class Conta extends AuditoriaBase{
     @Column(nullable = false, length = 150)
     private String nome;
 
-    @OneToOne(mappedBy = "conta", fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "grupo_conta_id")
     private GrupoConta grupoConta;
 }
