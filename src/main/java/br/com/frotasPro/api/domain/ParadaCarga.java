@@ -53,4 +53,8 @@ public class ParadaCarga extends AuditoriaBase{
 
     @OneToMany(mappedBy = "paradaCarga", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DespesaParada> despesaParadas = new ArrayList<>();
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "manutencao_id", referencedColumnName = "id")
+    private Manutencao manutencao;
 }
