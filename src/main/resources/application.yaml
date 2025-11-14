@@ -2,8 +2,7 @@ spring:
   application:
     name: frotaPro
   profiles:
-    active:
-      - dev
+    active: dev
 
   jackson:
     mapper:
@@ -12,3 +11,12 @@ spring:
 server:
   error:
     include-message: always
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
