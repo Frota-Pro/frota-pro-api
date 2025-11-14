@@ -33,4 +33,8 @@ public class Usuario extends AuditoriaBase{
         joinColumns = @JoinColumn(name = "usuario_id"),
         inverseJoinColumns = @JoinColumn(name = "acesso_id"))
     private List<Acesso> acesso= new ArrayList<>();
+
+    public void adicionarAcesso(Acesso acesso){
+        this.acesso.add(acesso);
+    }
 }
