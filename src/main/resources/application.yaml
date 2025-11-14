@@ -20,3 +20,9 @@ management:
   endpoint:
     health:
       show-details: always
+
+jwt:
+  public:
+    key: classpath:authz.pub
+  private:
+    key: classpath:authz.pem
