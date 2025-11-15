@@ -27,14 +27,14 @@ public class MotoristaService {
 
     @Transactional(readOnly = true)
     public Page<MotoristaResponse> todosMotoristas(Pageable pageable) {
-        Page<Motorista> motoristas = motoristaRepository.findAll(pageable);
+        Page<Motorista> motoristas = motoristaRepository.findByAtivoTrue(pageable);
         return motoristas.map(MotoristaMapper::toResponse);
     }
 
     @Transactional(readOnly = true)
-    public MotoristaResponse MotoristaPorId(String codigo){
-        Motorista motorista = motoristaRepository.findByCodigo(codigo)
-                .orElseThrow(() -> new ObjectNotFound("ERRO: Motorista não Encontrado " + codigo));
+    public MotoristaResponse motoristaPorCodigo(String codigo){
+        Motorista motorista = motoristaRepository.findByCodigoAndAtivoTrue(codigo)
+                .orElseThrow(() -> new ObjectNotFound("ERRO: Motorista não encontrado: " + codigo));
         return toResponse(motorista);
     }
 
@@ -62,6 +62,16 @@ public class MotoristaService {
         motorista = motoristaRepository.save(motorista);
 
         return toResponse(motorista);
+    }
+
+    @Transactional
+    public void deletarMotorista(String codigo) {
+        Motorista motorista = motoristaRepository.findByCodigoAndAtivoTrue(codigo)
+                .orElseThrow(() -> new ObjectNotFound("ERRO: Motorista não encontrado: " + codigo));
+
+        motorista.setAtivo(false);
+
+        motoristaRepository.save(motorista);
     }
 
     private void copyDtoToEntity(MotoristaRequest request, Motorista motorista) {

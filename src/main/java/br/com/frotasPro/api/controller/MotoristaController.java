@@ -22,7 +22,7 @@ public class MotoristaController {
 
     @GetMapping("/{codigo}")
     public ResponseEntity<MotoristaResponse> buscarPorCodigo(@PathVariable String codigo) {
-        MotoristaResponse motorista = motoristaService.MotoristaPorId(codigo);
+        MotoristaResponse motorista = motoristaService.motoristaPorCodigo(codigo);
         return ResponseEntity.ok(motorista);
     }
 
@@ -51,5 +51,11 @@ public class MotoristaController {
                 motoristaService.atualizarMotorista(codigo, request);
 
         return ResponseEntity.ok(motoristaAtualizado);
+    }
+
+    @DeleteMapping("/{codigo}")
+    public ResponseEntity<Void> deletar(@PathVariable String codigo) {
+        motoristaService.deletarMotorista(codigo);
+        return ResponseEntity.noContent().build();
     }
 }
