@@ -2,7 +2,7 @@ package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.UsuarioRequest;
 import br.com.frotasPro.api.controller.response.UsuarioResponse;
-import br.com.frotasPro.api.service.UsuarioService;
+import br.com.frotasPro.api.service.usuario.UsuarioService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

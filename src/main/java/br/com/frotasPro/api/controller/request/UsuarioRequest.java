@@ -16,6 +16,9 @@ public class UsuarioRequest {
     @Size(min = 3, max = 50, message = "Login deve ter entre 3 e 50 caracteres")
     private String login;
 
+    @NotBlank
+    private String nome;
+
     @NotBlank(message = "Senha é obrigatória")
     @Size(min = 6, max = 100, message = "Senha deve ter entre 6 e 100 caracteres")
     private String senha;

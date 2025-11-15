@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.service;
+package br.com.frotasPro.api.service.usuario;
 
 import br.com.frotasPro.api.controller.request.UsuarioRequest;
 import br.com.frotasPro.api.controller.response.UsuarioResponse;
@@ -10,7 +10,10 @@ import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.repository.UsuarioRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -20,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static br.com.frotasPro.api.mapper.UsuarioMapper.toResponse;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @Service
 @AllArgsConstructor
@@ -37,12 +41,13 @@ public class UsuarioService {
 
         Usuario usuario = new Usuario();
         usuario.setLogin(request.getLogin());
+        usuario.setNome(request.getNome());
         usuario.setSenha(passwordEncoder.encode(request.getSenha()));
 
-        Acesso acessoPadrao = acessoRepository.findByNome("ROLE_USER")
+        Acesso acessoPadrao = acessoRepository.findByNome("ROLE_ADMIN")
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.INTERNAL_SERVER_ERROR,
-                        "Acesso padrão ROLE_USER não encontrado."
+                        "Acesso padrão ROLE_ADMIN não encontrado."
                 ));
 
         usuario.adicionarAcesso(acessoPadrao);
