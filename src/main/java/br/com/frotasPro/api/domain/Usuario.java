@@ -14,13 +14,21 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "tb_usuario")
+@Table(
+        name = "tb_usuario",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_usuario_nome", columnNames = "nome"),
+        }
+)
 public class Usuario extends AuditoriaBase{
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "uuid")
     private UUID id;
+
+    @Column(nullable = false, length = 150, unique = true)
+    private String nome;
 
     @Column(nullable = false, length = 50, unique = true)
     private String login;

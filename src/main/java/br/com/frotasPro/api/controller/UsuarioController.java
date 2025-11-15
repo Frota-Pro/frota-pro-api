@@ -5,7 +5,11 @@ import br.com.frotasPro.api.controller.response.UsuarioResponse;
 import br.com.frotasPro.api.service.UsuarioService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/usuario")
@@ -17,5 +21,11 @@ public class UsuarioController {
     @PostMapping
     public UsuarioResponse registar(@Valid @RequestBody UsuarioRequest request){
         return usuarioService.registar(request);
+    }
+
+    @PostMapping("/motoristas")
+    public ResponseEntity<List<String>> criarUsuariosPelosMotoristas(@RequestParam("matriculas") List<String> codigo) {
+        List<String> resultado = usuarioService.criarUsuariosPelosMotoristas(codigo);
+        return ResponseEntity.status(HttpStatus.CREATED).body(resultado);
     }
 }
