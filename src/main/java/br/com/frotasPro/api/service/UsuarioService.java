@@ -72,10 +72,15 @@ public class UsuarioService {
                     continue;
                 }
 
+                Acesso acessoPadrao = acessoRepository.findByNome("ROLE_MOTORISTA")
+                        .orElseThrow(() -> new IllegalStateException("Acesso ROLE_MOTORISTA não encontrado"));
+
                 Usuario usuario = new Usuario();
                 usuario.setNome(motorista.getNome());
                 usuario.setLogin(gerarLoginUnico(motorista.getNome()));
                 usuario.setSenha(passwordEncoder.encode("padrao123"));
+
+                usuario.adicionarAcesso(acessoPadrao);
 
                 usuarioRepository.save(usuario);
 
