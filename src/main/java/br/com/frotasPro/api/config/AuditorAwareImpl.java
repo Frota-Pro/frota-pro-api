@@ -1,6 +1,8 @@
 package br.com.frotasPro.api.config;
 
 import org.springframework.data.domain.AuditorAware;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -11,9 +13,16 @@ public class AuditorAwareImpl implements AuditorAware<String> {
 
     @Override
     public Optional<String> getCurrentAuditor() {
-        // Integrar com Spring Security futuramente
-        // Aqui iremos buscar pelo usuario autenticado e retornar o nome dele
-        // return Optional.of(SecurityContextHolder.getContext().getAuthentication().getName());
-        return Optional.of("Sistema"); //valor padrão por enquanto
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || authentication.getPrincipal().equals("anonymousUser")) {
+            return Optional.of("Sistema");
+        }
+
+        return Optional.of(authentication.getName());
     }
+
 }

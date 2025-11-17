@@ -21,6 +21,8 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -42,7 +44,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
         return http
-                // CSRF is disabled safely: this is a stateless JWT API (no session cookies)
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
@@ -50,15 +51,16 @@ public class SecurityConfig {
                         .requestMatchers("/").permitAll()
                         .requestMatchers(new RegexRequestMatcher(".*/publico$", null)).permitAll()
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/usuario").permitAll()
                         .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                         .requestMatchers("/actuator/prometheus").permitAll()
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(Customizer.withDefaults()))
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                )
                 .build();
     }
+
 
     @Bean
     public JwtEncoder jwtEncoder() {
@@ -75,5 +77,16 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter converter = new JwtGrantedAuthoritiesConverter();
+        converter.setAuthorityPrefix("");
+        converter.setAuthoritiesClaimName("scope");
+
+        JwtAuthenticationConverter jwtAuthConverter = new JwtAuthenticationConverter();
+        jwtAuthConverter.setJwtGrantedAuthoritiesConverter(converter);
+        return jwtAuthConverter;
     }
 }

@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -21,18 +22,21 @@ public class CaminhaoController {
     private final CaminhaoService caminhaoService;
 
 
+    @PreAuthorize("hasAnyAuthority(\'ROLE_CONSULTA\',)")
     @GetMapping
     public ResponseEntity<Page<CaminhaoResponse>> listar(Pageable pageable) {
         Page<CaminhaoResponse> caminhoes = caminhaoService.todosCaminhoes(pageable);
         return ResponseEntity.ok(caminhoes);
     }
 
+    @PreAuthorize("hasAnyAuthority(\'ROLE_CONSULTA\',)")
     @GetMapping("/{codigo}")
     public ResponseEntity<CaminhaoResponse> buscarPorCodigo(@PathVariable String codigo) {
         CaminhaoResponse caminhao = caminhaoService.caminhaoPorCodigo(codigo);
         return ResponseEntity.ok(caminhao);
     }
 
+    @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
     @PostMapping
     public ResponseEntity<CaminhaoResponse> registrar(
             @Valid @RequestBody CaminhaoRequest request) {
@@ -47,6 +51,7 @@ public class CaminhaoController {
         return ResponseEntity.created(location).body(caminhao);
     }
 
+    @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
     @PutMapping("/{codigo}")
     public ResponseEntity<CaminhaoResponse> atualizar(
             @PathVariable String codigo,
@@ -56,6 +61,7 @@ public class CaminhaoController {
         return ResponseEntity.ok(caminhaoAtualizado);
     }
 
+    @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
     @DeleteMapping("/{codigo}")
     public ResponseEntity<Void> deletar(@PathVariable String codigo) {
         caminhaoService.deletarCaminhao(codigo);

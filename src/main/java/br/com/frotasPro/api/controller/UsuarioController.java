@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,11 +19,13 @@ public class UsuarioController {
 
     private final UsuarioService usuarioService;
 
+    @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
     @PostMapping
     public UsuarioResponse registar(@Valid @RequestBody UsuarioRequest request){
         return usuarioService.registar(request);
     }
 
+    @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
     @PostMapping("/motoristas")
     public ResponseEntity<List<String>> criarUsuariosPelosMotoristas(@RequestParam("matriculas") List<String> codigo) {
         List<String> resultado = usuarioService.criarUsuariosPelosMotoristas(codigo);
