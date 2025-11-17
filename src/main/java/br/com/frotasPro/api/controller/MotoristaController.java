@@ -2,7 +2,7 @@ package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.MotoristaRequest;
 import br.com.frotasPro.api.controller.response.MotoristaResponse;
-import br.com.frotasPro.api.service.MotoristaService;
+import br.com.frotasPro.api.service.motorista.*;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,20 +19,24 @@ import java.net.URI;
 @AllArgsConstructor
 public class MotoristaController {
 
-    private final MotoristaService motoristaService;
+    private final ListarMotoristaService listarMotoristaService;
+    private final BuscarMotoristaService buscarMotoristaService;
+    private final CriarMotoristaService criarMotoristaService;
+    private final AtualizarMotoristaService atualizarMotoristaService;
+    private final DeletarMotoristaService deletarMotoristaService;
 
 
     @PreAuthorize("hasAnyAuthority(\'ROLE_CONSULTA\')")
     @GetMapping("/{codigo}")
     public ResponseEntity<MotoristaResponse> buscarPorCodigo(@PathVariable String codigo) {
-        MotoristaResponse motorista = motoristaService.motoristaPorCodigo(codigo);
+        MotoristaResponse motorista = buscarMotoristaService.buscar(codigo);
         return ResponseEntity.ok(motorista);
     }
 
     @PreAuthorize("hasAnyAuthority(\'ROLE_CONSULTA\',)")
     @GetMapping
     public ResponseEntity<Page<MotoristaResponse>> listar(Pageable pageable) {
-        Page<MotoristaResponse> motoristas = motoristaService.todosMotoristas(pageable);
+        Page<MotoristaResponse> motoristas = listarMotoristaService.listar(pageable);
         return ResponseEntity.ok(motoristas);
     }
 
@@ -40,7 +44,7 @@ public class MotoristaController {
     @PostMapping
     public ResponseEntity<MotoristaResponse> registar(@Valid @RequestBody MotoristaRequest request){
 
-        MotoristaResponse motorista = motoristaService.criarMotorista(request);
+        MotoristaResponse motorista = criarMotoristaService.criar(request);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
@@ -54,7 +58,7 @@ public class MotoristaController {
     public ResponseEntity<MotoristaResponse> atualizar(@PathVariable String codigo, @Valid @RequestBody MotoristaRequest request) {
 
         MotoristaResponse motoristaAtualizado =
-                motoristaService.atualizarMotorista(codigo, request);
+                atualizarMotoristaService.atualizar(codigo, request);
 
         return ResponseEntity.ok(motoristaAtualizado);
     }
@@ -62,7 +66,7 @@ public class MotoristaController {
     @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
     @DeleteMapping("/{codigo}")
     public ResponseEntity<Void> deletar(@PathVariable String codigo) {
-        motoristaService.deletarMotorista(codigo);
+        deletarMotoristaService.deletar(codigo);
         return ResponseEntity.noContent().build();
     }
 }

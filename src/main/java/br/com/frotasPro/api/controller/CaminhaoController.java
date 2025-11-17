@@ -2,7 +2,7 @@ package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.CaminhaoRequest;
 import br.com.frotasPro.api.controller.response.CaminhaoResponse;
-import br.com.frotasPro.api.service.CaminhaoService;
+import br.com.frotasPro.api.service.caminhao.*;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,20 +19,24 @@ import java.net.URI;
 @AllArgsConstructor
 public class CaminhaoController {
 
-    private final CaminhaoService caminhaoService;
+    private final ListarCaminhaoService listarCaminhaoService;
+    private final BuscarCaminhaoService buscarCaminhaoService;
+    private final CriarCaminhaoService criarCaminhaoService;
+    private final AtualizarCaminhaoService atualizarCaminhaoService;
+    private final DeletarCaminhaoService deletarCaminhaoService;
 
 
     @PreAuthorize("hasAnyAuthority(\'ROLE_CONSULTA\',)")
     @GetMapping
     public ResponseEntity<Page<CaminhaoResponse>> listar(Pageable pageable) {
-        Page<CaminhaoResponse> caminhoes = caminhaoService.todosCaminhoes(pageable);
+        Page<CaminhaoResponse> caminhoes = listarCaminhaoService.listar(pageable);
         return ResponseEntity.ok(caminhoes);
     }
 
     @PreAuthorize("hasAnyAuthority(\'ROLE_CONSULTA\',)")
     @GetMapping("/{codigo}")
     public ResponseEntity<CaminhaoResponse> buscarPorCodigo(@PathVariable String codigo) {
-        CaminhaoResponse caminhao = caminhaoService.caminhaoPorCodigo(codigo);
+        CaminhaoResponse caminhao = buscarCaminhaoService.porCodigo(codigo);
         return ResponseEntity.ok(caminhao);
     }
 
@@ -41,7 +45,7 @@ public class CaminhaoController {
     public ResponseEntity<CaminhaoResponse> registrar(
             @Valid @RequestBody CaminhaoRequest request) {
 
-        CaminhaoResponse caminhao = caminhaoService.criarCaminhao(request);
+        CaminhaoResponse caminhao = criarCaminhaoService.criar(request);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{codigo}")
@@ -57,14 +61,14 @@ public class CaminhaoController {
             @PathVariable String codigo,
             @Valid @RequestBody CaminhaoRequest request) {
 
-        CaminhaoResponse caminhaoAtualizado = caminhaoService.atualizarCaminhao(codigo, request);
+        CaminhaoResponse caminhaoAtualizado = atualizarCaminhaoService.atualizar(codigo, request);
         return ResponseEntity.ok(caminhaoAtualizado);
     }
 
     @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
     @DeleteMapping("/{codigo}")
     public ResponseEntity<Void> deletar(@PathVariable String codigo) {
-        caminhaoService.deletarCaminhao(codigo);
+        deletarCaminhaoService.deletar(codigo);
         return ResponseEntity.noContent().build();
     }
 }
