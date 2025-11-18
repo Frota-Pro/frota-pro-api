@@ -6,6 +6,8 @@ import br.com.frotasPro.api.domain.*;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,9 @@ public class CriarCargaService {
     private final CaminhaoRepository caminhaoRepository;
     private final RotaRepository rotaRepository;
     private final AjudanteRepository ajudanteRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Transactional
     public CargaResponse criar(CargaRequest request) {
@@ -47,6 +52,9 @@ public class CriarCargaService {
         Carga carga = CargaMapper.toEntity(request, motorista, caminhao, rota, ajudantes);
 
         carga = cargaRepository.save(carga);
+
+        entityManager.flush();
+        entityManager.refresh(carga);
 
         return CargaMapper.toResponse(carga);
     }

@@ -8,6 +8,25 @@ spring:
     mapper:
       accept-case-insensitive-enums: true
 
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
+    consumer:
+      group-id: frota-pro-api-v2
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        # confiar nos dois pacotes (da API e da integradora)
+        spring.json.trusted.packages: "br.com.frotasPro.api.integracao.dto,br.com.frotasPro.integradora.winthor.dto"
+        # ignorar o tipo do header e usar SEMPRE o tipo local abaixo
+        spring.json.use.type.headers: false
+        spring.json.value.default.type: br.com.frotasPro.api.integracao.dto.CargaSyncResponseEvent
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
 server:
   error:
     include-message: always
@@ -21,6 +40,12 @@ management:
   endpoint:
     health:
       show-details: always
+
+frotapro:
+  kafka:
+    topics:
+      carga-sync-request: frotapro.carga.sync.request
+      carga-sync-response: frotapro.carga.sync.response
 
 jwt:
   public:
