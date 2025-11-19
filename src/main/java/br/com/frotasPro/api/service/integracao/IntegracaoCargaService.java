@@ -1,7 +1,8 @@
-package br.com.frotasPro.api.service;
+package br.com.frotasPro.api.service.integracao;
 
 import br.com.frotasPro.api.integracao.dto.CargaSyncRequestEvent;
 import br.com.frotasPro.api.integracao.kafka.CargaSyncRequestProducer;
+import br.com.frotasPro.api.service.CargaSyncJobService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

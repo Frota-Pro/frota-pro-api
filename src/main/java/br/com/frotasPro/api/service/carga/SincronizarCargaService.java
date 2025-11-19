@@ -43,11 +43,11 @@ public class SincronizarCargaService {
     private void upsertCargaFromWinThor(CargaWinThorDto dto) {
 
         Carga carga = cargaRepository
-                .findByNumeroCargaExterno(dto.getNumMdfe().toString())
+                .findByNumeroCargaExterno(dto.getNumCar().toString())
                 .orElseGet(Carga::new);
 
         if (carga.getId() == null) {
-            carga.setNumeroCargaExterno(dto.getNumMdfe().toString());
+            carga.setNumeroCargaExterno(dto.getNumCar().toString());
         } else {
             if (carga.getClientes() != null) carga.getClientes().clear();
             if (carga.getNotas() != null) carga.getNotas().clear();
