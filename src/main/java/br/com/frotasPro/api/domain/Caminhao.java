@@ -22,7 +22,6 @@ import java.util.UUID;
         name = "tb_caminhao",
         uniqueConstraints = {
                 @UniqueConstraint(name = "uk_caminhao_codigo", columnNames = "codigo"),
-                @UniqueConstraint(name = "uk_caminhao_placa", columnNames = "placa"),
                 @UniqueConstraint(name = "uk_caminhao_renavam", columnNames = "renavam"),
                 @UniqueConstraint(name = "uk_caminhao_chassi", columnNames = "chassi")
         }
@@ -52,7 +51,7 @@ public class Caminhao extends AuditoriaBase{
     @Column(length = 100)
     private String marca;
 
-    @Column(length = 10, unique = true)
+    @Column(length = 10)
     private String placa;
 
     @Column(length = 20)

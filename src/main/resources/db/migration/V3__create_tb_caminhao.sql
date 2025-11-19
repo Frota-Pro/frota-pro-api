@@ -39,7 +39,6 @@ CREATE TABLE IF NOT EXISTS tb_caminhao (
     atualizado_em       timestamp without time zone,
 
     CONSTRAINT uk_caminhao_codigo  UNIQUE (codigo),
-    CONSTRAINT uk_caminhao_placa   UNIQUE (placa),
     CONSTRAINT uk_caminhao_renavam UNIQUE (renavam),
     CONSTRAINT uk_caminhao_chassi  UNIQUE (chassi)
 );

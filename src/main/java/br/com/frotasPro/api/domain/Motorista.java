@@ -42,16 +42,16 @@ public class Motorista extends AuditoriaBase{
     @Column(nullable = false, length = 150)
     private String nome;
 
-    @Column(nullable = false, length = 150, unique = true)
+    @Column(length = 150, unique = true)
     private String email;
 
-    @Column(name = "data_nascimento", nullable = false)
+    @Column(name = "data_nascimento")
     private LocalDate dataNascimento;
 
-    @Column(nullable = false, unique = true, length = 11)
+    @Column(unique = true, length = 11)
     private String cnh;
 
-    @Column(name = "validade_cnh", nullable = false)
+    @Column(name = "validade_cnh")
     private LocalDate validadeCnh;
 
     @Enumerated(EnumType.STRING)

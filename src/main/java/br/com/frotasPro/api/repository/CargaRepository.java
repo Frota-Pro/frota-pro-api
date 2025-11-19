@@ -15,4 +15,6 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
     Optional<Carga> findByNumeroCarga(String numeroCarga);
 
     boolean existsByNumeroCarga(String numeroCarga);
+
+    Optional<Carga> findByNumeroCargaExterno(String string);
 }

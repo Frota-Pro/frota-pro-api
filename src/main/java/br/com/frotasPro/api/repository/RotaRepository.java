@@ -15,4 +15,7 @@ public interface RotaRepository extends JpaRepository<Rota, UUID> {
     Optional<Rota> findByCodigo(String codigo);
 
     boolean existsByCodigo(String codigo);
+
+    Optional<Rota> findByCidadeInicio(String cidadeInicio);
+
 }

@@ -18,7 +18,10 @@ public class CargaSyncResponseConsumer {
 
     @KafkaListener(
             topics = "${frotapro.kafka.topics.carga-sync-response}",
-            groupId = "${spring.kafka.consumer.group-id}"
+            groupId = "${spring.kafka.consumer.group-id}",
+            properties = {
+                    "spring.json.value.default.type=br.com.frotasPro.api.integracao.dto.CargaSyncResponseEvent"
+            }
     )
     public void consumir(CargaSyncResponseEvent event) {
         log.info("📥 [API] Resposta de sync recebida. jobId={} totalCargas={}",
