@@ -43,10 +43,34 @@ public class IntegracaoWinThorController {
     @PostMapping("/cargas/sincronizar")
     public ResponseEntity<?> sincronizar(
             @RequestParam("empresaId") UUID empresaId,
-            @RequestParam("data")
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
+            @RequestParam(value = "data", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate data) {
+
+        LocalDate hoje = LocalDate.now();
+
+        if (data == null) {
+            data = hoje;
+        }
+
+        if (data.isBefore(hoje)) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of(
+                            "erro", "A data da sincronização não pode ser inferior a hoje.",
+                            "hoje", hoje.toString()
+                    ));
+        }
+
+        if (data.isAfter(hoje)) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of(
+                            "erro", "A data da sincronização não pode ser futura.",
+                            "hoje", hoje.toString()
+                    ));
+        }
 
         UUID jobId = integracaoCargaService.solicitarSincronizacao(empresaId, data);
         return ResponseEntity.accepted().body(Map.of("jobId", jobId));
     }
+
 }
