@@ -8,10 +8,7 @@ import br.com.frotasPro.api.domain.enums.Status;
 import br.com.frotasPro.api.integracao.dto.CargaSyncResponseEvent;
 import br.com.frotasPro.api.integracao.dto.CargaWinThorDto;
 import br.com.frotasPro.api.integracao.dto.ClienteCargaWinThorDto;
-import br.com.frotasPro.api.repository.CaminhaoRepository;
-import br.com.frotasPro.api.repository.CargaRepository;
-import br.com.frotasPro.api.repository.MotoristaRepository;
-import br.com.frotasPro.api.repository.RotaRepository;
+import br.com.frotasPro.api.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,6 +28,8 @@ public class SincronizarCargaService {
     private final MotoristaRepository motoristaRepository;
     private final CaminhaoRepository caminhaoRepository;
     private final RotaRepository rotaRepository;
+    private final CargaClienteRepository cargaClienteRepository;
+    private final CargaNotaRepository cargaNotaRepository;
 
     @Transactional
     public void sincronizarCargasWinThor(CargaSyncResponseEvent event) {
@@ -46,18 +45,23 @@ public class SincronizarCargaService {
                 .findByNumeroCargaExterno(dto.getNumCar().toString())
                 .orElseGet(Carga::new);
 
-        if (carga.getId() == null) {
+        boolean nova = carga.getId() == null;
+
+        if (nova) {
             carga.setNumeroCargaExterno(dto.getNumCar().toString());
         } else {
-            if (carga.getClientes() != null) carga.getClientes().clear();
-            if (carga.getNotas() != null) carga.getNotas().clear();
+            cargaClienteRepository.deleteByCargaId(carga.getId());
+            cargaNotaRepository.deleteByCargaId(carga.getId());
+
+            carga.getClientes().clear();
+            carga.getNotas().clear();
         }
 
         var motoristaOpt = motoristaRepository
                 .findByCodigoExterno(String.valueOf(dto.getCodMotorista()));
 
         if (motoristaOpt.isEmpty()) {
-            log.warn("Motorista WinThor {} não encontrado na base FrotaPRO. Carga MDF-e {} ignorada.",
+            log.warn("Motorista WinThor {} não encontrado. Ignorando MDF-e {}",
                     dto.getCodMotorista(), dto.getNumMdfe());
             return;
         }
@@ -67,57 +71,52 @@ public class SincronizarCargaService {
                 .findByCodigoExterno(String.valueOf(dto.getCodVeiculo()));
 
         if (caminhaoOpt.isEmpty()) {
-            log.warn("Caminhão WinThor {} não encontrado na base FrotaPRO. Carga MDF-e {} ignorada.",
+            log.warn("Caminhão WinThor {} não encontrado. Ignorando MDF-e {}",
                     dto.getCodVeiculo(), dto.getNumMdfe());
             return;
         }
         carga.setCaminhao(caminhaoOpt.get());
 
         String destino = dto.getDestino();
-
         var rota = rotaRepository.findByCidadeInicio(destino)
                 .orElseGet(() -> {
-                    Rota nova = new Rota();
-                    nova.setCidadeInicio(destino);
-                    return rotaRepository.save(nova);
+                    Rota novaRota = new Rota();
+                    novaRota.setCidadeInicio(destino);
+                    return rotaRepository.save(novaRota);
                 });
-
         carga.setRota(rota);
 
-        if (dto.getPesoTotalKg() != null) {
-            carga.setPesoCarga(BigDecimal.valueOf(dto.getPesoTotalKg()));
-        } else {
-            carga.setPesoCarga(null);
-        }
+        carga.setPesoCarga(dto.getPesoTotalKg() != null
+                ? BigDecimal.valueOf(dto.getPesoTotalKg())
+                : null);
 
         carga.setStatusCarga(Status.SINCRONIZADA);
 
-        for (ClienteCargaWinThorDto cliDto : dto.getClientes()) {
-            String label = cliDto.getCodCli() + " - " + cliDto.getNomeCli();
-
+        for (ClienteCargaWinThorDto cli : dto.getClientes()) {
             CargaCliente cc = new CargaCliente();
             cc.setCarga(carga);
-            cc.setCliente(label);
-
+            cc.setCliente(cli.getCodCli() + " - " + cli.getNomeCli());
             carga.getClientes().add(cc);
         }
 
-        Set<String> notasUnicas = dto.getClientes().stream()
-                .flatMap(cli -> cli.getNotas().stream())
+        Set<String> notas = dto.getClientes().stream()
+                .flatMap(c -> c.getNotas().stream())
                 .map(String::valueOf)
                 .collect(Collectors.toCollection(HashSet::new));
 
-        for (String numNota : notasUnicas) {
+        for (String nota : notas) {
             CargaNota cn = new CargaNota();
             cn.setCarga(carga);
-            cn.setNota(numNota);
-
+            cn.setNota(nota);
             carga.getNotas().add(cn);
         }
 
         cargaRepository.save(carga);
 
-        log.info("Carga externa={} sincronizada com {} clientes e {} notas",
-                dto.getNumMdfe(), carga.getClientes().size(), carga.getNotas().size());
+        log.info("Carga {} sincronizada. {} clientes, {} notas",
+                dto.getNumMdfe(),
+                carga.getClientes().size(),
+                carga.getNotas().size());
     }
+
 }
