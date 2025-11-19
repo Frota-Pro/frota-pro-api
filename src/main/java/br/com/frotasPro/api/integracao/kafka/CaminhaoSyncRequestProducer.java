@@ -20,21 +20,13 @@ public class CaminhaoSyncRequestProducer {
     @Value("${frotapro.kafka.topics.caminhao-sync-request}")
     private String topic;
 
-    public UUID enviarPedidoSync(UUID empresaId) {
+    public void enviar(CaminhaoSyncRequestEvent event) {
 
-        UUID jobId = UUID.randomUUID();
+        log.info("📤 Enviando pedido de sync de caminhões. jobId={} empresaId={} codFilial={}",
+                event.getJobId(), event.getEmpresaId(), event.getCodFilial());
 
-        CaminhaoSyncRequestEvent event = CaminhaoSyncRequestEvent.builder()
-                .jobId(jobId)
-                .empresaId(empresaId)
-                .codFilial(null) // se quiser filtrar depois
-                .timestampSolicitacao(OffsetDateTime.now())
-                .build();
-
-        kafkaTemplate.send(topic, jobId.toString(), event);
-
-        log.info("📤 Enviando pedido de sync de caminhões. jobId={} empresaId={}", jobId, empresaId);
-
-        return jobId;
+        kafkaTemplate.send(topic, event.getJobId().toString(), event);
     }
 }
+
+

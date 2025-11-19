@@ -1,6 +1,6 @@
 package br.com.frotasPro.api.domain.enums;
 
-public enum StatusCargaSyncJob {
+public enum StatusSincronizacao {
     PENDENTE,
     PROCESSANDO,
     CONCLUIDO,

@@ -20,18 +20,13 @@ public class MotoristaSyncRequestProducer {
     @Value("${frotapro.kafka.topics.motorista-sync-request}")
     private String topic;
 
-    public UUID enviar(UUID empresaId) {
-        UUID jobId = UUID.randomUUID();
+    public void enviar(MotoristaSyncRequestEvent event) {
 
-        MotoristaSyncRequestEvent event = MotoristaSyncRequestEvent.builder()
-                .jobId(jobId)
-                .empresaId(empresaId)
-                .timestampSolicitacao(OffsetDateTime.now())
-                .build();
+        log.info("📤 Enviando pedido de sync de motoristas. jobId={} empresaId={}",
+                event.getJobId(), event.getEmpresaId());
 
-        log.info("📤 Enviando pedido de sync de motoristas. jobId={} empresaId={}", jobId, empresaId);
-        kafkaTemplate.send(topic, jobId.toString(), event);
-
-        return jobId;
+        kafkaTemplate.send(topic, event.getJobId().toString(), event);
     }
 }
+
+

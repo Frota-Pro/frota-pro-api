@@ -1,26 +1,24 @@
-package br.com.frotasPro.api.service;
+package br.com.frotasPro.api.service.caminhao;
 
-import br.com.frotasPro.api.domain.CargaSyncJob;
-import br.com.frotasPro.api.domain.enums.StatusCargaSyncJob;
-import br.com.frotasPro.api.repository.CargaSyncJobRepository;
+import br.com.frotasPro.api.domain.enums.StatusSincronizacao;
+import br.com.frotasPro.api.domain.integracao.CaminhaoSyncJob;
+import br.com.frotasPro.api.repository.integracao.CaminhaoSyncJobRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class CargaSyncJobService {
+public class CaminhaoSyncJobService {
 
-    private final CargaSyncJobRepository repository;
+    private final CaminhaoSyncJobRepository repository;
 
-    public CargaSyncJob criarJob(UUID empresaId, LocalDate dataReferencia) {
-        CargaSyncJob job = new CargaSyncJob();
+    public CaminhaoSyncJob criarJob(UUID empresaId) {
+        CaminhaoSyncJob job = new CaminhaoSyncJob();
         job.setEmpresaId(empresaId);
-        job.setDataReferencia(dataReferencia);
-        job.setStatus(StatusCargaSyncJob.PENDENTE);
+        job.setStatus(StatusSincronizacao.PENDENTE);
         job.setCriadoEm(OffsetDateTime.now());
         job.setAtualizadoEm(OffsetDateTime.now());
         return repository.save(job);
@@ -28,16 +26,16 @@ public class CargaSyncJobService {
 
     public void marcarProcessando(UUID jobId) {
         repository.findById(jobId).ifPresent(job -> {
-            job.setStatus(StatusCargaSyncJob.PROCESSANDO);
+            job.setStatus(StatusSincronizacao.PROCESSANDO);
             job.setAtualizadoEm(OffsetDateTime.now());
             repository.save(job);
         });
     }
 
-    public void concluirJob(UUID jobId, int totalCargas) {
+    public void concluirJob(UUID jobId, int totalCaminhoes) {
         repository.findById(jobId).ifPresent(job -> {
-            job.setStatus(StatusCargaSyncJob.CONCLUIDO);
-            job.setTotalCargas(totalCargas);
+            job.setStatus(StatusSincronizacao.CONCLUIDO);
+            job.setTotalCaminhoes(totalCaminhoes);
             job.setAtualizadoEm(OffsetDateTime.now());
             repository.save(job);
         });
@@ -45,10 +43,11 @@ public class CargaSyncJobService {
 
     public void marcarErro(UUID jobId, String mensagemErro) {
         repository.findById(jobId).ifPresent(job -> {
-            job.setStatus(StatusCargaSyncJob.ERRO);
+            job.setStatus(StatusSincronizacao.ERRO);
             job.setMensagemErro(mensagemErro);
             job.setAtualizadoEm(OffsetDateTime.now());
             repository.save(job);
         });
     }
 }
+

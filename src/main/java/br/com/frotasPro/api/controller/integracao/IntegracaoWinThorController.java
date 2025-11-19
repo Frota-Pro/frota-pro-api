@@ -1,8 +1,8 @@
 package br.com.frotasPro.api.controller.integracao;
 
 import br.com.frotasPro.api.service.integracao.IntegracaoCargaService;
-import br.com.frotasPro.api.service.integracao.SincronizarCaminhaoIntegracaoService;
-import br.com.frotasPro.api.service.integracao.SincronizarMotoristaIntegracaoService;
+import br.com.frotasPro.api.service.integracao.IntegracaoCaminhaoService;
+import br.com.frotasPro.api.service.integracao.IntegracaoMotoristaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -18,22 +18,25 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class IntegracaoWinThorController {
 
-    private final SincronizarMotoristaIntegracaoService motoristaIntegracaoService;
-    private final SincronizarCaminhaoIntegracaoService caminhaoIntegracaoService;
+    private final IntegracaoMotoristaService motoristaIntegracaoService;
+    private final IntegracaoCaminhaoService caminhaoIntegracaoService;
     private final IntegracaoCargaService integracaoCargaService;
 
     @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
     @PostMapping("/motoristas/sincronizar")
-    public ResponseEntity<Void> sincronizarMotoristas(@RequestParam UUID empresaId) {
-        motoristaIntegracaoService.dispararSincronizacao(empresaId);
-        return ResponseEntity.accepted().build();
+    public ResponseEntity<?> sincronizarMotoristas(@RequestParam UUID empresaId) {
+        UUID jobId = motoristaIntegracaoService.solicitarSincronizacao(empresaId);
+        return ResponseEntity.accepted().body(Map.of("jobId", jobId));
     }
 
     @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
     @PostMapping("/caminhoes/sincronizar")
-    public ResponseEntity<Void> sincronizarCaminhoes(@RequestParam UUID empresaId) {
-        caminhaoIntegracaoService.sincronizar(empresaId);
-        return ResponseEntity.accepted().build();
+    public ResponseEntity<?> sincronizarCaminhoes(
+            @RequestParam UUID empresaId,
+            @RequestParam(required = false) Integer codFilial
+    ) {
+        UUID jobId = caminhaoIntegracaoService.solicitarSincronizacao(empresaId, codFilial);
+        return ResponseEntity.accepted().body(Map.of("jobId", jobId));
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")

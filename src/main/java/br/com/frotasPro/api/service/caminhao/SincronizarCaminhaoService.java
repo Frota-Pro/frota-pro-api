@@ -41,8 +41,6 @@ public class SincronizarCaminhaoService {
 
         if (novo) {
             caminhao.setCodigoExterno(codigoExterno);
-            // gera um código interno amigável
-            caminhao.setCodigo("CAM-" + String.format("%06d", dto.getCodVeiculo()));
             caminhao.setAtivo(true);
             caminhao.setStatus(Status.DISPONIVEL);
         }

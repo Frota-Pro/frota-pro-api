@@ -1,7 +1,7 @@
 package br.com.frotasPro.api.integracao.kafka;
 
 import br.com.frotasPro.api.integracao.dto.CargaSyncResponseEvent;
-import br.com.frotasPro.api.service.CargaSyncJobService;
+import br.com.frotasPro.api.service.carga.CargaSyncJobService;
 import br.com.frotasPro.api.service.carga.SincronizarCargaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

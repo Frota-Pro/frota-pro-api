@@ -1,6 +1,7 @@
 package br.com.frotasPro.api.integracao.kafka;
 
 import br.com.frotasPro.api.integracao.dto.CaminhaoSyncResponseEvent;
+import br.com.frotasPro.api.service.caminhao.CaminhaoSyncJobService;
 import br.com.frotasPro.api.service.caminhao.SincronizarCaminhaoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +13,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CaminhaoSyncResponseConsumer {
 
-    private final SincronizarCaminhaoService sincronizarCaminhaoService;
+    private final SincronizarCaminhaoService caminhaoService;
+    private final CaminhaoSyncJobService jobService;
 
     @KafkaListener(
             topics = "${frotapro.kafka.topics.caminhao-sync-response}",
@@ -22,11 +24,15 @@ public class CaminhaoSyncResponseConsumer {
             }
     )
     public void consumir(CaminhaoSyncResponseEvent event) {
-
         log.info("📥 [API] Resposta de sync de caminhões recebida. jobId={} total={}",
                 event.getJobId(),
                 event.getCaminhoes() != null ? event.getCaminhoes().size() : 0);
 
-        sincronizarCaminhaoService.sincronizar(event);
+        caminhaoService.sincronizar(event);
+        jobService.concluirJob(
+                event.getJobId(),
+                event.getCaminhoes() != null ? event.getCaminhoes().size() : 0
+        );
     }
 }
+

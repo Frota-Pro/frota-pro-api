@@ -53,51 +53,36 @@ public class SincronizarCargaService {
             if (carga.getNotas() != null) carga.getNotas().clear();
         }
 
-        // ---------- MOTORISTA ----------
         var motoristaOpt = motoristaRepository
                 .findByCodigoExterno(String.valueOf(dto.getCodMotorista()));
 
         if (motoristaOpt.isEmpty()) {
             log.warn("Motorista WinThor {} não encontrado na base FrotaPRO. Carga MDF-e {} ignorada.",
                     dto.getCodMotorista(), dto.getNumMdfe());
-            return; // não salva a carga sem motorista
+            return;
         }
         carga.setMotorista(motoristaOpt.get());
 
-        // ---------- CAMINHÃO ----------
         var caminhaoOpt = caminhaoRepository
                 .findByCodigoExterno(String.valueOf(dto.getCodVeiculo()));
 
         if (caminhaoOpt.isEmpty()) {
             log.warn("Caminhão WinThor {} não encontrado na base FrotaPRO. Carga MDF-e {} ignorada.",
                     dto.getCodVeiculo(), dto.getNumMdfe());
-            return; // não salva a carga sem caminhão
+            return;
         }
         carga.setCaminhao(caminhaoOpt.get());
 
-        // ---------- ROTA (cria se não existir) ----------
-        String destino = dto.getDestino(); // vem da query WinThor
+        String destino = dto.getDestino();
 
         var rota = rotaRepository.findByCidadeInicio(destino)
                 .orElseGet(() -> {
                     Rota nova = new Rota();
                     nova.setCidadeInicio(destino);
-                    // codigo é gerado pelo trigger
-                    // quantidadeDias pode ficar null por enquanto
                     return rotaRepository.save(nova);
                 });
 
         carga.setRota(rota);
-
-        // ---------- CAMPOS PRINCIPAIS DA CARGA ----------
-
-        // ajusta aqui para o nome real do setter da sua entidade: setDataSaida / setDtSaida
-        if (dto.getDtSaida() != null) {
-            // se tua entidade for "dataSaida"
-            // carga.setDataSaida(dto.getDtSaida().toLocalDate());
-            // se for "dtSaida", use:
-            // carga.setDtSaida(dto.getDtSaida().toLocalDate());
-        }
 
         if (dto.getPesoTotalKg() != null) {
             carga.setPesoCarga(BigDecimal.valueOf(dto.getPesoTotalKg()));
@@ -107,9 +92,6 @@ public class SincronizarCargaService {
 
         carga.setStatusCarga(Status.SINCRONIZADA);
 
-        // TODO: mapear motorista / caminhao / rota (vou falar disso já já)
-
-        // ---------- CLIENTES -------------
         for (ClienteCargaWinThorDto cliDto : dto.getClientes()) {
             String label = cliDto.getCodCli() + " - " + cliDto.getNomeCli();
 
@@ -120,8 +102,6 @@ public class SincronizarCargaService {
             carga.getClientes().add(cc);
         }
 
-        // ---------- NOTAS -------------
-        // junta todas as notas de todos os clientes e tira duplicadas
         Set<String> notasUnicas = dto.getClientes().stream()
                 .flatMap(cli -> cli.getNotas().stream())
                 .map(String::valueOf)

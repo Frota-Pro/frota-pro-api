@@ -1,6 +1,7 @@
 package br.com.frotasPro.api.integracao.kafka;
 
 import br.com.frotasPro.api.integracao.dto.MotoristaSyncResponseEvent;
+import br.com.frotasPro.api.service.motorista.MotoristaSyncJobService;
 import br.com.frotasPro.api.service.motorista.SincronizarMotoristaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +13,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class MotoristaSyncResponseConsumer {
 
-    private final SincronizarMotoristaService sincronizarMotoristaService;
+    private final SincronizarMotoristaService motoristaService;
+    private final MotoristaSyncJobService jobService;
 
     @KafkaListener(
             topics = "${frotapro.kafka.topics.motorista-sync-response}",
@@ -23,8 +25,14 @@ public class MotoristaSyncResponseConsumer {
     )
     public void consumir(MotoristaSyncResponseEvent event) {
         log.info("📥 [API] Resposta de sync de motoristas recebida. jobId={} total={}",
-                event.getJobId(), event.getMotoristas().size());
+                event.getJobId(),
+                event.getMotoristas() != null ? event.getMotoristas().size() : 0);
 
-        sincronizarMotoristaService.sincronizar(event);
+        motoristaService.sincronizar(event);
+        jobService.concluirJob(
+                event.getJobId(),
+                event.getMotoristas() != null ? event.getMotoristas().size() : 0
+        );
     }
 }
+

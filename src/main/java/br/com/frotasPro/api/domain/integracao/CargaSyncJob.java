@@ -1,6 +1,6 @@
-package br.com.frotasPro.api.domain;
+package br.com.frotasPro.api.domain.integracao;
 
-import br.com.frotasPro.api.domain.enums.StatusCargaSyncJob;
+import br.com.frotasPro.api.domain.enums.StatusSincronizacao;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,7 +28,7 @@ public class CargaSyncJob {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 20, nullable = false)
-    private StatusCargaSyncJob status = StatusCargaSyncJob.PENDENTE;
+    private StatusSincronizacao status = StatusSincronizacao.PENDENTE;
 
     @Column(name = "total_cargas")
     private Integer totalCargas;
