@@ -16,6 +16,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/carga")
@@ -27,6 +28,7 @@ public class CargaController {
     private final CriarCargaService criarCargaService;
     private final AtualizarCargaService atualizarCargaService;
     private final DeletarCargaService deletarCargaService;
+    private final IniciarCargaService iniciarCargaService;
 
     // ========= BUSCA ÚNICA =========
 
@@ -112,6 +114,17 @@ public class CargaController {
     ) {
         Page<CargaResponse> cargas = buscarCargaService.porCaminhao(codigoCaminhao, pageable);
         return ResponseEntity.ok(cargas);
+    }
+    //========== INICIAR CARGA ========
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
+    @PatchMapping
+    public ResponseEntity<String> iniciarCarga(
+            @RequestParam("carga") String numeroCarga,
+            @RequestParam(value = "ajudantes", required = false) List<String> ajudanteCodigos
+    ) {
+        String resposta = iniciarCargaService.iniciarCarga(numeroCarga, ajudanteCodigos);
+        return ResponseEntity.ok(resposta);
     }
 
     // ========= CRUD =========
