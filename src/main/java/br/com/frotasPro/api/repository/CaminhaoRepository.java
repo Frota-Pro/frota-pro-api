@@ -17,4 +17,9 @@ public interface CaminhaoRepository extends JpaRepository<Caminhao, UUID> {
     Optional<Caminhao> findByCodigo(String codigo);
 
     Optional<Caminhao> findByCodigoExterno(String codigoExterno);
+
+    Optional<Caminhao> findByCodigoExternoAndAtivoTrue(String codigoExterno);
+
+    Optional<Caminhao> findByPlacaAndAtivoTrue(String placa);
 }
+
