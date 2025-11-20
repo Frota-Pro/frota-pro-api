@@ -38,6 +38,9 @@ public class Carga extends AuditoriaBase{
     @Column(name = "numero_carga_externo", length = 50)
     private String numeroCargaExterno;
 
+    @Column(name = "data_faturamento")
+    private LocalDate dtFaturamento;
+
     @Column(name = "data_saida")
     private LocalDate dtSaida;
 

@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS tb_carga (
     numero_carga        varchar(50)  NOT NULL,
     numero_carga_externo varchar(50),
 
+    data_faturamento    date,
     data_saida          date,
     data_prevista       date,
     data_chegada        date,

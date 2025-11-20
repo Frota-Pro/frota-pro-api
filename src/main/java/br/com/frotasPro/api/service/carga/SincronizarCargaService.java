@@ -86,6 +86,8 @@ public class SincronizarCargaService {
                 });
         carga.setRota(rota);
 
+        carga.setDtFaturamento(dto.getDtSaida().toLocalDate());
+
         carga.setPesoCarga(dto.getPesoTotalKg() != null
                 ? BigDecimal.valueOf(dto.getPesoTotalKg())
                 : null);

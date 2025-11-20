@@ -7,12 +7,15 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/carga")
@@ -25,12 +28,23 @@ public class CargaController {
     private final AtualizarCargaService atualizarCargaService;
     private final DeletarCargaService deletarCargaService;
 
+    // ========= BUSCA ÚNICA =========
+
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/{numeroCarga}")
     public ResponseEntity<CargaResponse> buscarPorNumero(@PathVariable String numeroCarga) {
-        CargaResponse carga = buscarCargaService.buscar(numeroCarga);
+        CargaResponse carga = buscarCargaService.porCodigo(numeroCarga);
         return ResponseEntity.ok(carga);
     }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @GetMapping("/externo/{codigoExterno}")
+    public ResponseEntity<CargaResponse> buscarPorCodigoExterno(@PathVariable String codigoExterno) {
+        CargaResponse carga = buscarCargaService.porCodigoExterno(codigoExterno);
+        return ResponseEntity.ok(carga);
+    }
+
+    // ========= LISTAGEM GERAL =========
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping
@@ -38,6 +52,69 @@ public class CargaController {
         Page<CargaResponse> cargas = listarCargaService.listar(pageable);
         return ResponseEntity.ok(cargas);
     }
+
+    // ========= BUSCAS POR DATA =========
+
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @GetMapping("/data-saida")
+    public ResponseEntity<Page<CargaResponse>> buscarPorDataSaida(
+            @RequestParam("data")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataSaida,
+            Pageable pageable
+    ) {
+        Page<CargaResponse> cargas = buscarCargaService.porDataSaida(dataSaida, pageable);
+        return ResponseEntity.ok(cargas);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @GetMapping("/periodo-saida")
+    public ResponseEntity<Page<CargaResponse>> buscarPorPeriodoSaida(
+            @RequestParam("inicio")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam("fim")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim,
+            Pageable pageable
+    ) {
+        Page<CargaResponse> cargas = buscarCargaService.porPeriodoSaida(inicio, fim, pageable);
+        return ResponseEntity.ok(cargas);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @GetMapping("/periodo-criacao")
+    public ResponseEntity<Page<CargaResponse>> buscarPorPeriodoCriacao(
+            @RequestParam("inicio")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
+            @RequestParam("fim")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim,
+            Pageable pageable
+    ) {
+        Page<CargaResponse> cargas = buscarCargaService.porPeriodoCriacao(inicio, fim, pageable);
+        return ResponseEntity.ok(cargas);
+    }
+
+    // ========= BUSCAS POR MOTORISTA / CAMINHÃO =========
+
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @GetMapping("/motorista")
+    public ResponseEntity<Page<CargaResponse>> buscarPorMotorista(
+            @RequestParam("codigo") String codigoMotorista,
+            Pageable pageable
+    ) {
+        Page<CargaResponse> cargas = buscarCargaService.porMotorista(codigoMotorista, pageable);
+        return ResponseEntity.ok(cargas);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @GetMapping("/caminhao")
+    public ResponseEntity<Page<CargaResponse>> buscarPorCaminhao(
+            @RequestParam("codigo") String codigoCaminhao,
+            Pageable pageable
+    ) {
+        Page<CargaResponse> cargas = buscarCargaService.porCaminhao(codigoCaminhao, pageable);
+        return ResponseEntity.ok(cargas);
+    }
+
+    // ========= CRUD =========
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @PostMapping
