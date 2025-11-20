@@ -14,4 +14,6 @@ public interface MotoristaRepository extends JpaRepository<Motorista, UUID> {
     Optional<Motorista> findByCodigoAndAtivoTrue(String codigo);
 
     Optional<Motorista> findByCodigo(String codigo);
+
+    Optional<Motorista> findByCodigoExterno(String codigoExterno);
 }

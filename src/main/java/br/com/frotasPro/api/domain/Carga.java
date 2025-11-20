@@ -38,6 +38,9 @@ public class Carga extends AuditoriaBase{
     @Column(name = "numero_carga_externo", length = 50)
     private String numeroCargaExterno;
 
+    @Column(name = "data_faturamento")
+    private LocalDate dtFaturamento;
+
     @Column(name = "data_saida")
     private LocalDate dtSaida;
 
@@ -56,15 +59,11 @@ public class Carga extends AuditoriaBase{
     @Column(name = "km_final")
     private Integer kmFinal;
 
-    @ElementCollection
-    @CollectionTable(name = "tb_carga_cliente", joinColumns = @JoinColumn(name = "carga_id"))
-    @Column(name = "cliente", length = 150, nullable = false)
-    private List<String> clientes = new ArrayList<>();
+    @OneToMany(mappedBy = "carga", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CargaCliente> clientes = new ArrayList<>();
 
-    @ElementCollection
-    @CollectionTable(name = "tb_carga_nota", joinColumns = @JoinColumn(name = "carga_id"))
-    @Column(name = "nota", length = 30, nullable = false)
-    private List<String> notas = new ArrayList<>();
+    @OneToMany(mappedBy = "carga", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CargaNota> notas = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status_carga", nullable = false, length = 20)

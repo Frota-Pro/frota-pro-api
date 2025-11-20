@@ -26,21 +26,39 @@ public class CaminhaoController {
     private final DeletarCaminhaoService deletarCaminhaoService;
 
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_CONSULTA\',)")
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping
     public ResponseEntity<Page<CaminhaoResponse>> listar(Pageable pageable) {
         Page<CaminhaoResponse> caminhoes = listarCaminhaoService.listar(pageable);
         return ResponseEntity.ok(caminhoes);
     }
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_CONSULTA\',)")
+
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/{codigo}")
     public ResponseEntity<CaminhaoResponse> buscarPorCodigo(@PathVariable String codigo) {
         CaminhaoResponse caminhao = buscarCaminhaoService.porCodigo(codigo);
         return ResponseEntity.ok(caminhao);
     }
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
+
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @GetMapping("/placa/{placa}")
+    public ResponseEntity<CaminhaoResponse> buscarPorPlaca(@PathVariable String placa) {
+        CaminhaoResponse caminhao = buscarCaminhaoService.porPlaca(placa);
+        return ResponseEntity.ok(caminhao);
+    }
+
+
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @GetMapping("/codigo-externo/{codigoExterno}")
+    public ResponseEntity<CaminhaoResponse> buscarPorCodigoExterno(@PathVariable String codigoExterno) {
+        CaminhaoResponse caminhao = buscarCaminhaoService.porCodigoExterno(codigoExterno);
+        return ResponseEntity.ok(caminhao);
+    }
+
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @PostMapping
     public ResponseEntity<CaminhaoResponse> registrar(
             @Valid @RequestBody CaminhaoRequest request) {
@@ -55,7 +73,8 @@ public class CaminhaoController {
         return ResponseEntity.created(location).body(caminhao);
     }
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @PutMapping("/{codigo}")
     public ResponseEntity<CaminhaoResponse> atualizar(
             @PathVariable String codigo,
@@ -65,7 +84,8 @@ public class CaminhaoController {
         return ResponseEntity.ok(caminhaoAtualizado);
     }
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @DeleteMapping("/{codigo}")
     public ResponseEntity<Void> deletar(@PathVariable String codigo) {
         deletarCaminhaoService.deletar(codigo);

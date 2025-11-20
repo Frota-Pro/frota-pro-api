@@ -24,12 +24,6 @@ public class CargaRequest {
     private Integer kmInicial;
     private Integer kmFinal;
 
-    @NotEmpty
-    private List<@Size(max = 150) String> clientes;
-
-    @NotEmpty
-    private List<@Size(max = 30) String> notas;
-
     private Status statusCarga = Status.EM_ROTA;
 
     @NotBlank

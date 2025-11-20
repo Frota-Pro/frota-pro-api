@@ -8,6 +8,20 @@ spring:
     mapper:
       accept-case-insensitive-enums: true
 
+  kafka:
+    consumer:
+      group-id: frota-pro-api-v2
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "br.com.frotasPro.api.integracao.dto,br.com.frotasPro.integradora.winthor.dto"
+        spring.json.use.type.headers: false
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
 server:
   error:
     include-message: always
@@ -21,6 +35,17 @@ management:
   endpoint:
     health:
       show-details: always
+
+frotapro:
+  kafka:
+    topics:
+      carga-sync-request: frotapro.carga.sync.request
+      carga-sync-response: frotapro.carga.sync.response
+      motorista-sync-request: frotapro.motorista.sync.request
+      motorista-sync-response: frotapro.motorista.sync.response
+      caminhao-sync-request: frotapro.caminhao.sync.request
+      caminhao-sync-response: frotapro.caminhao.sync.response
+
 
 jwt:
   public:

@@ -21,8 +21,6 @@ public class CargaMapper {
         carga.setPesoCarga(request.getPesoCarga());
         carga.setKmInicial(request.getKmInicial());
         carga.setKmFinal(request.getKmFinal());
-        carga.setClientes(request.getClientes());
-        carga.setNotas(request.getNotas());
         carga.setStatusCarga(request.getStatusCarga());
 
         carga.setMotorista(motorista);
@@ -45,8 +43,6 @@ public class CargaMapper {
         carga.setPesoCarga(request.getPesoCarga());
         carga.setKmInicial(request.getKmInicial());
         carga.setKmFinal(request.getKmFinal());
-        carga.setClientes(request.getClientes());
-        carga.setNotas(request.getNotas());
         carga.setStatusCarga(request.getStatusCarga());
 
         carga.setMotorista(motorista);
@@ -72,8 +68,16 @@ public class CargaMapper {
                 .kmFinal(carga.getKmFinal())
                 .kmTotal(kmTotal)
                 .diasAtraso(atraso)
-                .clientes(carga.getClientes())
-                .notas(carga.getNotas())
+                .clientes(
+                        carga.getClientes().stream()
+                                .map(CargaCliente::getCliente)
+                                .toList()
+                )
+                .notas(
+                        carga.getNotas().stream()
+                                .map(CargaNota::getNota)
+                                .toList()
+                )
                 .statusCarga(carga.getStatusCarga())
                 .codigoMotorista(carga.getMotorista().getCodigo())
                 .nomeMotorista(carga.getMotorista().getNome())
