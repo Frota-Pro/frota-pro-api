@@ -19,11 +19,7 @@ public class ManutencaoMapper {
                 .valor(manutencao.getValor())
                 .statusManutencao(manutencao.getStatusManutencao())
                 .caminhaoId(manutencao.getCaminhao().getId())
-                .oficinaId(
-                        manutencao.getOficina() != null
-                                ? manutencao.getOficina().getId()
-                                : null
-                )
+                .oficinaId(manutencao.getOficina().getId())
                 .build();
     }
 }
