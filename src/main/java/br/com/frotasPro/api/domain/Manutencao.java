@@ -3,10 +3,7 @@ package br.com.frotasPro.api.domain;
 import br.com.frotasPro.api.domain.enums.StatusManutencao;
 import br.com.frotasPro.api.domain.enums.TipoManutencao;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -16,6 +13,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
