@@ -2,10 +2,7 @@ package br.com.frotasPro.api.domain;
 
 import br.com.frotasPro.api.domain.enums.TipoDespesa;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -15,6 +12,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity
 @Table(name = "tb_despesa_parada")
 public class DespesaParada extends AuditoriaBase {

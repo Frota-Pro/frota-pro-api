@@ -1,13 +1,9 @@
 package br.com.frotasPro.api.domain;
 
-import br.com.frotasPro.api.domain.enums.Status;
 import br.com.frotasPro.api.domain.enums.StatusMeta;
 import br.com.frotasPro.api.domain.enums.TipoMeta;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -16,6 +12,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity
 @Table(name = "tb_meta")
 public class Meta extends AuditoriaBase{
