@@ -18,8 +18,10 @@ public class ManutencaoMapper {
                 .observacoes(manutencao.getObservacoes())
                 .valor(manutencao.getValor())
                 .statusManutencao(manutencao.getStatusManutencao())
-                .caminhaoId(manutencao.getCaminhao().getId())
-                .oficinaId(manutencao.getOficina().getId())
+                .codigoCaminhao(manutencao.getCaminhao().getCodigo())
+                .caminhao(manutencao.getCaminhao().getDescricao())
+                .codigoOficina(manutencao.getOficina().getCodigo())
+                .oficina(manutencao.getOficina().getNome())
                 .build();
     }
 }

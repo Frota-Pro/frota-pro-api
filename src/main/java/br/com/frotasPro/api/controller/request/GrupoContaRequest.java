@@ -11,5 +11,5 @@ public class GrupoContaRequest {
     private String codigo;
     private String codigoExterno;
     private String nome;
-    private UUID caminhaoId;
+    private String Codigocaminhao;
 }

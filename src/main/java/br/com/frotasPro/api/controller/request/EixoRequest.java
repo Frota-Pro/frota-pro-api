@@ -9,5 +9,5 @@ import java.util.UUID;
 public class EixoRequest {
 
     private int numero;
-    private UUID caminhaoId;
+    private String codigoCaminhao;
 }

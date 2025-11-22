@@ -16,5 +16,5 @@ public class MecanicoRequest {
     @NotBlank(message = "Código é obrigatório")
     private String codigo;
 
-    private UUID oficinaId;
+    private String oficina;
 }

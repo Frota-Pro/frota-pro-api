@@ -13,5 +13,6 @@ public class ContaResponse {
     private String codigo;
     private String codigoExterno;
     private String nome;
-    private UUID grupoContaId;
+    private String grupoConta;
+    private String nomeGrupoConta;
 }

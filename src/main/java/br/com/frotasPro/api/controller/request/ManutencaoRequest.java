@@ -10,14 +10,11 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 
 @Getter @Setter
 public class ManutencaoRequest {
 
     @NotBlank
-    private String codigo;
-
     private String descricao;
 
     @NotNull
@@ -38,8 +35,8 @@ public class ManutencaoRequest {
     private StatusManutencao statusManutencao;
 
     @NotNull
-    private UUID caminhaoId;
+    private String caminhao;
 
-    private UUID oficinaId;
+    private String oficina;
 
 }

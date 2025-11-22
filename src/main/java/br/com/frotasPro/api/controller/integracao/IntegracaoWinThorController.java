@@ -53,21 +53,21 @@ public class IntegracaoWinThorController {
             data = hoje;
         }
 
-        if (data.isBefore(hoje)) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of(
-                            "erro", "A data da sincronização não pode ser inferior a hoje.",
-                            "hoje", hoje.toString()
-                    ));
-        }
-
-        if (data.isAfter(hoje)) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of(
-                            "erro", "A data da sincronização não pode ser futura.",
-                            "hoje", hoje.toString()
-                    ));
-        }
+//        if (data.isBefore(hoje)) {
+//            return ResponseEntity.badRequest()
+//                    .body(Map.of(
+//                            "erro", "A data da sincronização não pode ser inferior a hoje.",
+//                            "hoje", hoje.toString()
+//                    ));
+//        }
+//
+//        if (data.isAfter(hoje)) {
+//            return ResponseEntity.badRequest()
+//                    .body(Map.of(
+//                            "erro", "A data da sincronização não pode ser futura.",
+//                            "hoje", hoje.toString()
+//                    ));
+//        }
 
         UUID jobId = integracaoCargaService.solicitarSincronizacao(empresaId, data);
         return ResponseEntity.accepted().body(Map.of("jobId", jobId));

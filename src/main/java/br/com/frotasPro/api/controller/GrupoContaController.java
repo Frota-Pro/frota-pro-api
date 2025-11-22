@@ -4,6 +4,7 @@ import br.com.frotasPro.api.controller.request.GrupoContaRequest;
 import br.com.frotasPro.api.controller.response.GrupoContaResponse;
 import br.com.frotasPro.api.service.grupoConta.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class GrupoContaController {
     private final CriarGrupoContaService criarService;
     private final ListarGrupoContaService listarService;
     private final BuscarGrupoContaPorIdService buscarPorIdService;
+    private final BuscarGrupoContaPorCodigoService buscarGrupoContaPorCodigoService;
     private final AtualizarGrupoContaService atualizarService;
     private final DeletarGrupoContaService deletarService;
 
@@ -35,6 +37,12 @@ public class GrupoContaController {
     @GetMapping("/{id}")
     public GrupoContaResponse buscarPorId(@PathVariable UUID id) {
         return buscarPorIdService.buscarPorId(id);
+    }
+
+    @GetMapping("/codigo")
+    public ResponseEntity<GrupoContaResponse> buscarGrupoContaPorCodigo(@RequestParam("codigo") String codigo){
+        GrupoContaResponse grupoConta = buscarGrupoContaPorCodigoService.buscarPorCodigo(codigo);
+        return ResponseEntity.ok(grupoConta);
     }
 
     @PutMapping("/{id}")

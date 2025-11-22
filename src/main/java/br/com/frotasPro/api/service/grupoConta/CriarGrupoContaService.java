@@ -4,6 +4,7 @@ import br.com.frotasPro.api.controller.request.GrupoContaRequest;
 import br.com.frotasPro.api.controller.response.GrupoContaResponse;
 import br.com.frotasPro.api.domain.Caminhao;
 import br.com.frotasPro.api.domain.GrupoConta;
+import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.mapper.GrupoContaMapper;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.GrupoContaRepository;
@@ -21,8 +22,8 @@ public class CriarGrupoContaService {
 
     public GrupoContaResponse criar(GrupoContaRequest request) {
 
-        validaSeCaminhaoExiste.validar(request.getCaminhaoId());
-        Caminhao caminhao = caminhaoRepository.findById(request.getCaminhaoId()).get();
+        Caminhao caminhao = caminhaoRepository.findByCaminhaoPorCodigoOuPorCodigoExterno(request.getCodigocaminhao())
+                .orElseThrow(() -> new ObjectNotFound("Caminhao não encontrado"));
 
         GrupoConta grupo = GrupoConta.builder()
                 .codigo(request.getCodigo())

@@ -1,10 +1,13 @@
 package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.EixoRequest;
+import br.com.frotasPro.api.controller.response.ContaResponse;
 import br.com.frotasPro.api.controller.response.EixoResponse;
+import br.com.frotasPro.api.domain.Eixo;
 import br.com.frotasPro.api.service.eixo.*;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,10 +35,12 @@ public class EixoController {
     public List<EixoResponse> listarEixo() {
         return listarEixosService.listar();
     }
+
     @GetMapping("/{id}")
     public EixoResponse buscar(@PathVariable UUID id) {
         return buscarEixoPorIdService.buscar(id);
     }
+
     @PutMapping("/{id}")
     public EixoResponse atualizar(
             @PathVariable UUID id,

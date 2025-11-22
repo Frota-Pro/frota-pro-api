@@ -4,6 +4,7 @@ import br.com.frotasPro.api.controller.request.EixoRequest;
 import br.com.frotasPro.api.controller.response.EixoResponse;
 import br.com.frotasPro.api.domain.Caminhao;
 import br.com.frotasPro.api.domain.Eixo;
+import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.EixoRepository;
 import br.com.frotasPro.api.validator.ValidaSeCaminhaoExiste;
@@ -18,13 +19,10 @@ public class CriarEixoService {
 
     private final EixoRepository eixoRepository;
     private final CaminhaoRepository caminhaoRepository;
-    private final ValidaSeCaminhaoExiste validaSeCaminhaoExiste;
-
     public EixoResponse criar(EixoRequest request) {
 
-        validaSeCaminhaoExiste.validar(request.getCaminhaoId());
-
-        Caminhao caminhao = caminhaoRepository.findById(request.getCaminhaoId()).get();
+        Caminhao caminhao = caminhaoRepository.findByCaminhaoPorCodigoOuPorCodigoExterno(request.getCodigoCaminhao())
+                .orElseThrow(() -> new ObjectNotFound("Caminhão não encontrado"));
 
         Eixo eixo = Eixo.builder()
                 .numero(request.getNumero())

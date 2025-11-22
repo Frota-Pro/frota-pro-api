@@ -11,7 +11,8 @@ public class ContaMapper {
                 .codigo(conta.getCodigo())
                 .codigoExterno(conta.getCodigoExterno())
                 .nome(conta.getNome())
-                .grupoContaId(conta.getGrupoConta().getId())
+                .grupoConta(conta.getGrupoConta().getCodigo())
+                .nomeGrupoConta(conta.getGrupoConta().getNome())
                 .build();
     }
 }

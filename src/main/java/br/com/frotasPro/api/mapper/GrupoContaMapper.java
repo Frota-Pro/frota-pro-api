@@ -11,7 +11,8 @@ public class GrupoContaMapper {
                 .codigo(grupo.getCodigo())
                 .codigoExterno(grupo.getCodigoExterno())
                 .nome(grupo.getNome())
-                .caminhaoId(grupo.getCaminhao().getId())
+                .codigoCaminhao(grupo.getCaminhao().getCodigo())
+                .caminhao(grupo.getCaminhao().getDescricao())
                 .build();
     }
 }

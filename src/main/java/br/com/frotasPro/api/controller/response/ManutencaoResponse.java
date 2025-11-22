@@ -24,6 +24,8 @@ public class ManutencaoResponse {
     private String observacoes;
     private BigDecimal valor;
     private StatusManutencao statusManutencao;
-    private UUID caminhaoId;
-    private UUID oficinaId;
+    private String codigoCaminhao;
+    private String caminhao;
+    private String codigoOficina;
+    private String oficina;
 }

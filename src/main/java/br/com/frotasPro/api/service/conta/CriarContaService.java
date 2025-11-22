@@ -4,6 +4,7 @@ import br.com.frotasPro.api.controller.request.ContaRequest;
 import br.com.frotasPro.api.controller.response.ContaResponse;
 import br.com.frotasPro.api.domain.Conta;
 import br.com.frotasPro.api.domain.GrupoConta;
+import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.mapper.ContaMapper;
 import br.com.frotasPro.api.repository.ContaRepository;
 import br.com.frotasPro.api.repository.GrupoContaRepository;
@@ -23,9 +24,9 @@ public class CriarContaService {
 
     public ContaResponse criar(ContaRequest request) {
 
-        GrupoConta grupo = grupoContaRepository.findById(request.getGrupoContaId())
-                .orElseThrow(() -> new ResponseStatusException(
-                        NOT_FOUND, "Grupo conta não encontrada"
+        GrupoConta grupo = grupoContaRepository.findByGrupoContaPorCodigoOuCodigoExterno(request.getGrupoConta())
+                .orElseThrow(() -> new ObjectNotFound(
+                        "Grupo conta não encontrada"
                 ));
 
         Conta conta = Conta.builder()

@@ -14,5 +14,6 @@ public class GrupoContaResponse {
     private String codigo;
     private String codigoExterno;
     private String nome;
-    private UUID caminhaoId;
+    private String codigoCaminhao;
+    private String caminhao;
 }
