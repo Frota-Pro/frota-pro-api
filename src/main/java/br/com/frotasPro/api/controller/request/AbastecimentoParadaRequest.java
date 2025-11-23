@@ -2,33 +2,22 @@ package br.com.frotasPro.api.controller.request;
 
 import br.com.frotasPro.api.domain.enums.FormaPagamento;
 import br.com.frotasPro.api.domain.enums.TipoCombustivel;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Getter
 @Setter
-public class AbastecimentoRequest {
+public class AbastecimentoParadaRequest {
 
-    private UUID paradaId;
-
-    @NotNull(message = "ID do caminhão é obrigatório")
-    private String caminhao;
-
-    private String motorista;
-
-    @NotNull(message = "Data do abastecimento é obrigatória")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime dtAbastecimento;
-
-    private Integer kmOdometro;
+    @NotNull(message = "Quantidade de litros é obrigatória")
     private BigDecimal qtLitros;
+
+    @NotNull(message = "Valor do litro é obrigatório")
     private BigDecimal valorLitro;
+
     private BigDecimal valorTotal;
 
     @NotNull(message = "Tipo de combustível é obrigatório")
@@ -40,6 +29,6 @@ public class AbastecimentoRequest {
     private String posto;
     private String cidade;
     private String uf;
-
     private String numNotaOuCupom;
 }
+

@@ -5,6 +5,7 @@ import br.com.frotasPro.api.controller.response.ParadaCargaResponse;
 import br.com.frotasPro.api.domain.Carga;
 import br.com.frotasPro.api.domain.ParadaCarga;
 import br.com.frotasPro.api.domain.enums.TipoParada;
+import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,13 +27,13 @@ public class AtualizarParadaCargaService {
     public ParadaCargaResponse atualizar(UUID id, ParadaCargaRequest request) {
 
         ParadaCarga entity = repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Parada não encontrada"));
+                .orElseThrow(() -> new ObjectNotFound("Parada não encontrada"));
 
-        Carga carga = cargaRepository.findById(request.getCargaId())
-                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Carga não encontrada"));
+        Carga carga = cargaRepository.findByNumeroCarga(request.getCarga())
+                .orElseThrow(() -> new ObjectNotFound("Carga não encontrada"));
 
         entity.setCarga(carga);
-        entity.setTipoParada(TipoParada.valueOf(request.getTipoParada()));
+        entity.setTipoParada(request.getTipoParada());
         entity.setDtInicio(request.getDtInicio());
         entity.setDtFim(request.getDtFim());
         entity.setCidade(request.getCidade());

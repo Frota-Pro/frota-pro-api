@@ -1,9 +1,75 @@
 package br.com.frotasPro.api.repository;
 
 import br.com.frotasPro.api.domain.Abastecimento;
+import br.com.frotasPro.api.domain.enums.FormaPagamento;
+import br.com.frotasPro.api.domain.enums.TipoCombustivel;
+import br.com.frotasPro.api.projections.AbastecimentoResumoCaminhao;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface AbastecimentoRepository extends JpaRepository<Abastecimento, UUID> {
+    Optional<Abastecimento> findBycodigo(String codigo);
+
+    @Query("""
+       select a
+       from Abastecimento a
+       where (a.caminhao.codigo = :codigo
+              or a.caminhao.codigoExterno = :codigo)
+         and a.dtAbastecimento between :inicio and :fim
+       order by a.dtAbastecimento desc
+       """)
+    Page<Abastecimento> buscarPorCodigoCaminhaoEPeriodo(
+            @Param("codigo") String codigo,
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fim") LocalDateTime fim,
+            Pageable pageable
+    );
+
+    Page<Abastecimento> findByDtAbastecimentoBetween(
+            LocalDateTime inicio,
+            LocalDateTime fim,
+            Pageable pageable
+    );
+
+    Page<Abastecimento> findByTipoCombustivelAndDtAbastecimentoBetween(
+            TipoCombustivel tipoCombustivel,
+            LocalDateTime inicio,
+            LocalDateTime fim,
+            Pageable pageable
+    );
+
+    Page<Abastecimento> findByFormaPagamentoAndDtAbastecimentoBetween(
+            FormaPagamento formaPagamento,
+            LocalDateTime inicio,
+            LocalDateTime fim,
+            Pageable pageable
+    );
+
+    @Query("""
+       select a.caminhao.descricao as caminhao,
+              sum(a.qtLitros) as totalLitros,
+              sum(a.valorTotal) as totalValor
+       from Abastecimento a
+       where a.dtAbastecimento between :inicio and :fim
+       group by a.caminhao.id
+       """)
+    List<AbastecimentoResumoCaminhao> resumoPorCaminhaoNoPeriodo(
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fim") LocalDateTime fim
+    );
+
+
+
+
+
+
+
 }

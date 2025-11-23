@@ -4,7 +4,7 @@ CREATE OR REPLACE FUNCTION gerar_codigo_manutencao()
 RETURNS TRIGGER AS $$
 BEGIN
     IF NEW.codigo IS NULL OR NEW.codigo = '' THEN
-        NEW.codigo := 'AJU-' || LPAD(nextval('seq_manutencao_codigo')::TEXT, 6, '0');
+        NEW.codigo := 'MAN-' || LPAD(nextval('seq_manutencao_codigo')::TEXT, 6, '0');
     END IF;
     RETURN NEW;
 END;

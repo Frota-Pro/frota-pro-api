@@ -28,16 +28,16 @@ public class AbastecimentoUpdateService {
     private final MotoristaRepository motoristaRepository;
     private final ParadaCargaRepository paradaRepository;
 
-    public AbastecimentoResponse atualizar(UUID id, AbastecimentoRequest request) {
+    public AbastecimentoResponse atualizar(String codigo, AbastecimentoRequest request) {
 
-        Abastecimento abastecimento = repository.findById(id)
+        Abastecimento abastecimento = repository.findBycodigo(codigo)
                 .orElseThrow(() -> new RuntimeException("Abastecimento não encontrado"));
 
 
-        Caminhao caminhao = caminhaoRepository.findById(request.getCaminhaoId())
+        Caminhao caminhao = caminhaoRepository.findByCaminhaoPorCodigoOuPorCodigoExterno(request.getCaminhao())
                 .orElseThrow(() -> new RuntimeException("Caminhão não encontrado"));
 
-        Motorista motorista = motoristaRepository.findById(request.getMotoristaId())
+        Motorista motorista = motoristaRepository.findByMotoristaPorCodigoOuPorCodigoExterno(request.getMotorista())
                     .orElseThrow(() -> new RuntimeException("Motorista não encontrado"));
 
 
@@ -45,7 +45,6 @@ public class AbastecimentoUpdateService {
                     .orElseThrow(() -> new RuntimeException("Parada não encontrada"));
 
 
-        abastecimento.setCodigo(request.getCodigo());
         abastecimento.setParadaCarga(parada);
         abastecimento.setCaminhao(caminhao);
         abastecimento.setMotorista(motorista);
@@ -54,8 +53,8 @@ public class AbastecimentoUpdateService {
         abastecimento.setQtLitros(request.getQtLitros());
         abastecimento.setValorLitro(request.getValorLitro());
         abastecimento.setValorTotal(request.getValorTotal());
-        abastecimento.setTipoCombustivel(TipoCombustivel.valueOf(request.getTipoCombustivel()));
-        abastecimento.setFormaPagamento(FormaPagamento.valueOf(request.getFormaPagamento()));
+        abastecimento.setTipoCombustivel(request.getTipoCombustivel());
+        abastecimento.setFormaPagamento(request.getFormaPagamento());
         abastecimento.setPosto(request.getPosto());
         abastecimento.setCidade(request.getCidade());
         abastecimento.setUf(request.getUf());

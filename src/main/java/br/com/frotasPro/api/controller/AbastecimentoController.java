@@ -15,7 +15,7 @@ import java.util.UUID;
 public class AbastecimentoController {
 
     private final CriarAbastecimentoService criarService;
-    private final BuscarAbastecimentoPorIdService buscarPorIdService;
+    private final BuscarAbastecimentoPorCodigoService buscarAbastecimentoPorCodigoService;
     private final ListarAbastecimentosService listarService;
     private final AbastecimentoUpdateService atualizarService;
     private final DeletarAbastecimentoService deletarService;
@@ -26,8 +26,8 @@ public class AbastecimentoController {
     }
 
     @GetMapping("/{id}")
-    public AbastecimentoResponse buscarPorId(@PathVariable UUID id) {
-        return buscarPorIdService.buscar(id);
+    public AbastecimentoResponse buscarPorCodigo(@PathVariable String codigo) {
+        return buscarAbastecimentoPorCodigoService.buscar(codigo);
     }
 
     @GetMapping
@@ -36,9 +36,9 @@ public class AbastecimentoController {
     }
 
     @PutMapping("/{id}")
-    public AbastecimentoResponse atualizar(@PathVariable UUID id,
+    public AbastecimentoResponse atualizar(@PathVariable String codigo,
                                            @RequestBody AbastecimentoRequest request) {
-        return atualizarService.atualizar(id, request);
+        return atualizarService.atualizar(codigo, request);
     }
 
     @DeleteMapping("/{id}")

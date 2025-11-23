@@ -27,7 +27,7 @@ public class AtualizarMecanicoService {
         Mecanico mecanico = mecanicoRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "mecanico não encontrado"));
 
-        Oficina oficina = oficinaRepository.findById(request.getOficinaId())
+        Oficina oficina = oficinaRepository.findByCodigo(request.getOficina())
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Oficina não encontrado"));
 
 

@@ -29,7 +29,7 @@ public class AtualizarContaService {
                         NOT_FOUND, "Conta não encontrada"
                 ));
 
-        GrupoConta grupo = grupoContaRepository.findById(request.getGrupoContaId())
+        GrupoConta grupo = grupoContaRepository.findByGrupoContaPorCodigoOuCodigoExterno(request.getGrupoConta())
                 .orElseThrow(() -> new ResponseStatusException(
                         NOT_FOUND, "Grupo conta não encontrada"
                 ));

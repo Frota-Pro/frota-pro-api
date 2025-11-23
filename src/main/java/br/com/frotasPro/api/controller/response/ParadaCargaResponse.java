@@ -12,7 +12,7 @@ import java.util.UUID;
 public class ParadaCargaResponse {
 
     private UUID id;
-    private UUID cargaId;
+    private String Codigocarga;
 
     private String tipoParada;
     private LocalDateTime dtInicio;
@@ -23,7 +23,7 @@ public class ParadaCargaResponse {
     private Integer kmOdometro;
     private String observacao;
 
-    //private List<DespesaParadaResponse> despesaParadas;
+    private List<DespesaParadaResponse> despesaParadas;
     //private List<AnexoParadaResponse> anexos;
     private ManutencaoResponse manutencao;
 }

@@ -25,3 +25,9 @@ FROM tb_usuario u
 JOIN tb_acesso a ON a.nome = 'ROLE_ADMIN'
 WHERE u.login = 'admin';
 
+INSERT INTO tb_usuario_acesso (usuario_id, acesso_id)
+SELECT u.id, a.id
+FROM tb_usuario u
+JOIN tb_acesso a ON a.nome = 'ROLE_CONSULTA'
+WHERE u.login = 'admin';
+

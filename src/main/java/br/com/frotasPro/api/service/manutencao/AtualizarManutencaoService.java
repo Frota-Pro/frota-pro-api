@@ -5,6 +5,7 @@ import br.com.frotasPro.api.controller.response.ManutencaoResponse;
 import br.com.frotasPro.api.domain.Caminhao;
 import br.com.frotasPro.api.domain.Manutencao;
 import br.com.frotasPro.api.domain.Oficina;
+import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
 import br.com.frotasPro.api.repository.OficinaRepository;
@@ -28,18 +29,17 @@ public class AtualizarManutencaoService {
     public ManutencaoResponse atualizar(UUID id, ManutencaoRequest request) {
 
         Manutencao manutencao = manutencaoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Manutenção não encontrada"));
+                .orElseThrow(() -> new ObjectNotFound("Manutenção não encontrada"));
 
-        Caminhao caminhao = caminhaoRepository.findById(request.getCaminhaoId())
-                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Caminhão não encontrado"));
+        Caminhao caminhao = caminhaoRepository.findByCaminhaoPorCodigoOuPorCodigoExterno(request.getCaminhao())
+                .orElseThrow(() -> new ObjectNotFound("Caminhão não encontrado"));
 
         Oficina oficina = null;
-        if (request.getOficinaId() != null) {
-            oficina = oficinaRepository.findById(request.getOficinaId())
-                    .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Oficina não encontrada"));
+        if (request.getOficina() != null) {
+            oficina = oficinaRepository.findByCodigo(request.getOficina())
+                    .orElseThrow(() -> new ObjectNotFound("Oficina não encontrada"));
         }
 
-        manutencao.setCodigo(request.getCodigo());
         manutencao.setDescricao(request.getDescricao());
         manutencao.setDataInicioManutencao(request.getDataInicioManutencao());
         manutencao.setDataFimManutencao(request.getDataFimManutencao());

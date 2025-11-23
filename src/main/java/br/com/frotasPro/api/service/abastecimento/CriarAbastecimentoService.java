@@ -21,10 +21,10 @@ public class CriarAbastecimentoService {
 
     public AbastecimentoResponse criar(AbastecimentoRequest request) {
 
-        Caminhao caminhao = caminhaoRepository.findById(request.getCaminhaoId())
+        Caminhao caminhao = caminhaoRepository.findByCaminhaoPorCodigoOuPorCodigoExterno(request.getCaminhao())
                 .orElseThrow(() -> new RuntimeException("Caminhão não encontrado"));
 
-        Motorista motorista = motoristaRepository.findById(request.getMotoristaId())
+        Motorista motorista = motoristaRepository.findByMotoristaPorCodigoOuPorCodigoExterno(request.getMotorista())
                     .orElseThrow(() -> new RuntimeException("Motorista não encontrado"));
 
 
@@ -33,7 +33,6 @@ public class CriarAbastecimentoService {
 
 
         Abastecimento a = new Abastecimento();
-        a.setCodigo(request.getCodigo());
         a.setParadaCarga(parada);
         a.setCaminhao(caminhao);
         a.setMotorista(motorista);
@@ -42,8 +41,8 @@ public class CriarAbastecimentoService {
         a.setQtLitros(request.getQtLitros());
         a.setValorLitro(request.getValorLitro());
         a.setValorTotal(request.getValorTotal());
-        a.setTipoCombustivel(TipoCombustivel.valueOf(request.getTipoCombustivel()));
-        a.setFormaPagamento(FormaPagamento.valueOf(request.getFormaPagamento()));
+        a.setTipoCombustivel(request.getTipoCombustivel());
+        a.setFormaPagamento(request.getFormaPagamento());
         a.setPosto(request.getPosto());
         a.setCidade(request.getCidade());
         a.setUf(request.getUf());

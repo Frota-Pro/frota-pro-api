@@ -49,11 +49,17 @@ public class ParadaCarga extends AuditoriaBase{
     @Column(length = 500)
     private String observacao;
 
+    @Builder.Default
     @OneToMany(mappedBy = "paradaCarga", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DespesaParada> despesaParadas = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "parada", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AnexoParada> anexos = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "paradaCarga", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Abastecimento> abastecimentos = new ArrayList<>();
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "manutencao_id", referencedColumnName = "id")

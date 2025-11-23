@@ -22,7 +22,7 @@ public class CriarMecanicoService {
 
     public MecanicoResponse criar(MecanicoRequest request) {
 
-        Oficina oficina = oficinaRepository.findById(request.getOficinaId())
+        Oficina oficina = oficinaRepository.findByCodigo(request.getOficina())
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Oficina não encontrado"));
 
         Mecanico mecanico = Mecanico.builder()
