@@ -121,11 +121,13 @@ public class CargaController {
     @PatchMapping
     public ResponseEntity<String> iniciarCarga(
             @RequestParam("carga") String numeroCarga,
+            @RequestParam("km") Integer kmInicial,
             @RequestParam(value = "ajudantes", required = false) List<String> ajudanteCodigos
     ) {
-        String resposta = iniciarCargaService.iniciarCarga(numeroCarga, ajudanteCodigos);
+        String resposta = iniciarCargaService.iniciarCarga(numeroCarga, kmInicial, ajudanteCodigos);
         return ResponseEntity.ok(resposta);
     }
+
 
     // ========= CRUD =========
 

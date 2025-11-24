@@ -22,13 +22,17 @@ public class IniciarCargaService {
     private final AjudanteRepository ajudanteRepository;
 
     @Transactional
-    public String iniciarCarga(String numCarga, List<String> ajudanteCodigos) {
+    public String iniciarCarga(String numCarga, Integer kmInicial, List<String> ajudanteCodigos) {
 
         Carga carga = cargaRepository.findByNumeroCarga(numCarga)
                 .orElseThrow(() -> new ObjectNotFound("Carga não encontrada"));
 
         if (carga.getDtSaida() != null) {
             return "Carga já iniciada";
+        }
+
+        if (kmInicial == null || kmInicial <= 0) {
+            throw new IllegalArgumentException("KM inicial inválido");
         }
 
         if (ajudanteCodigos != null && !ajudanteCodigos.isEmpty()) {
@@ -49,6 +53,7 @@ public class IniciarCargaService {
         }
 
         carga.setDtSaida(LocalDate.now());
+        carga.setKmInicial(kmInicial);
         carga.setStatusCarga(Status.EM_ROTA);
 
         cargaRepository.save(carga);
