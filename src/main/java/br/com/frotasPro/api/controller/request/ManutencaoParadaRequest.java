@@ -1,8 +1,9 @@
-package br.com.frotasPro.api.controller.response;
+package br.com.frotasPro.api.controller.request;
 
 import br.com.frotasPro.api.domain.enums.StatusManutencao;
 import br.com.frotasPro.api.domain.enums.TipoManutencao;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -11,13 +12,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class ManutencaoResponse {
-
-    private UUID id;
-    private String codigo;
+public class ManutencaoParadaRequest {
     private String descricao;
     private LocalDate dataInicioManutencao;
     private LocalDate dataFimManutencao;
@@ -26,8 +21,5 @@ public class ManutencaoResponse {
     private String observacoes;
     private BigDecimal valor;
     private StatusManutencao statusManutencao;
-    private String codigoCaminhao;
-    private String caminhao;
-    private String codigoOficina;
-    private String oficina;
+    private UUID oficinaId;
 }

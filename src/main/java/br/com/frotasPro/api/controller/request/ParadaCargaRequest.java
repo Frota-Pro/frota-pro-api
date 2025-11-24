@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -40,5 +41,7 @@ public class ParadaCargaRequest {
     private String descricaoDespesa;
 
     private AbastecimentoParadaRequest abastecimento;
+
+    private ManutencaoParadaRequest manutencao;
 
 }

@@ -24,6 +24,5 @@ public class ParadaCargaResponse {
     private String observacao;
 
     private List<DespesaParadaResponse> despesaParadas;
-    //private List<AnexoParadaResponse> anexos;
     private ManutencaoResponse manutencao;
 }

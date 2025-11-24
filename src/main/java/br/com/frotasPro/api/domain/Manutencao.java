@@ -69,8 +69,10 @@ public class Manutencao extends AuditoriaBase{
     @JoinColumn(name = "oficina_id")
     private Oficina oficina;
 
-    @OneToOne(mappedBy = "manutencao", fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parada_id")
     private ParadaCarga paradaCarga;
+
 
     @OneToMany(mappedBy = "manutencao", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<Pneu> pneus = new ArrayList<>();

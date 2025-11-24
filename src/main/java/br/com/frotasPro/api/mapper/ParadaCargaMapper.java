@@ -2,11 +2,12 @@ package br.com.frotasPro.api.mapper;
 
 import br.com.frotasPro.api.controller.request.ParadaCargaRequest;
 import br.com.frotasPro.api.controller.response.DespesaParadaResponse;
+import br.com.frotasPro.api.controller.response.ManutencaoResponse;
 import br.com.frotasPro.api.controller.response.ParadaCargaResponse;
 import br.com.frotasPro.api.domain.Carga;
 import br.com.frotasPro.api.domain.DespesaParada;
+import br.com.frotasPro.api.domain.Manutencao;
 import br.com.frotasPro.api.domain.ParadaCarga;
-import br.com.frotasPro.api.domain.enums.TipoParada;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,9 +51,13 @@ public class ParadaCargaMapper {
                     .collect(Collectors.toList());
 
             r.setDespesaParadas(despesas);
-        } else {
-            r.setDespesaParadas(List.of()); // se preferir lista vazia em vez de null
         }
+
+        if (entity.getManutencoes() != null && !entity.getManutencoes().isEmpty()) {
+            Manutencao primeira = entity.getManutencoes().get(0);
+            r.setManutencao(toManutencaoResponse(primeira));
+        }
+
         return r;
     }
 
@@ -67,5 +72,21 @@ public class ParadaCargaMapper {
         r.setUf(d.getUf());
         return r;
     }
-}
 
+    private static ManutencaoResponse toManutencaoResponse(Manutencao m) {
+        ManutencaoResponse r = new ManutencaoResponse();
+        r.setId(m.getId());
+        r.setCodigo(m.getCodigo());
+        r.setDescricao(m.getDescricao());
+        r.setDataInicioManutencao(m.getDataInicioManutencao());
+        r.setDataFimManutencao(m.getDataFimManutencao());
+
+        r.setTipoManutencao(m.getTipoManutencao());
+        r.setItensTrocados(m.getItensTrocados());
+        r.setObservacoes(m.getObservacoes());
+        r.setValor(m.getValor());
+        r.setStatusManutencao(m.getStatusManutencao());
+
+        return r;
+    }
+}
