@@ -129,7 +129,7 @@ public class CargaController {
         return ResponseEntity.ok(resposta);
     }
 
-    //========== INICIAR CARGA ========
+    //========== FINALIZAR CARGA ========
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
     @PatchMapping
