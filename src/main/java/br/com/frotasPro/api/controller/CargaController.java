@@ -119,7 +119,7 @@ public class CargaController {
     //========== INICIAR CARGA ========
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
-    @PatchMapping
+    @PatchMapping("/iniciar")
     public ResponseEntity<String> iniciarCarga(
             @RequestParam("carga") String numeroCarga,
             @RequestParam("km") Integer kmInicial,
@@ -132,7 +132,7 @@ public class CargaController {
     //========== FINALIZAR CARGA ========
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
-    @PatchMapping
+    @PatchMapping("/finalizar")
     public ResponseEntity<String> finalizarCarga(
             @RequestParam("carga") String numeroCarga,
             @RequestParam("km") Integer kmfinal

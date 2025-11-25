@@ -12,5 +12,6 @@ public class MecanicoResponse {
     private UUID id;
     private String nome;
     private String codigo;
-    private UUID oficinaId;
+    private String codigoOficina;
+    private String oficina;
 }

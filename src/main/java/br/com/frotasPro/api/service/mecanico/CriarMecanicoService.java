@@ -4,14 +4,15 @@ import br.com.frotasPro.api.controller.request.MecanicoRequest;
 import br.com.frotasPro.api.controller.response.MecanicoResponse;
 import br.com.frotasPro.api.domain.Mecanico;
 import br.com.frotasPro.api.domain.Oficina;
+import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.mapper.MecanicoMapper;
 import br.com.frotasPro.api.repository.MecanicoRepository;
 import br.com.frotasPro.api.repository.OficinaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.transaction.annotation.Transactional;
 
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -20,19 +21,33 @@ public class CriarMecanicoService {
     private final MecanicoRepository mecanicoRepository;
     private final OficinaRepository oficinaRepository;
 
+    @Transactional
     public MecanicoResponse criar(MecanicoRequest request) {
 
-        Oficina oficina = oficinaRepository.findByCodigo(request.getOficina())
-                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Oficina não encontrado"));
+        Oficina oficina = null;
+
+        if (request.getOficina() != null && !request.getOficina().isBlank()) {
+            oficina = buscarOficinaPorCodigoOuId(request.getOficina());
+        }
 
         Mecanico mecanico = Mecanico.builder()
                 .nome(request.getNome())
-                .codigo(request.getCodigo())
                 .oficina(oficina)
                 .build();
 
-        mecanicoRepository.save(mecanico);
+        mecanico = mecanicoRepository.save(mecanico);
 
         return MecanicoMapper.toResponse(mecanico);
     }
+
+    private Oficina buscarOficinaPorCodigoOuId(String valor) {
+        try {
+            return oficinaRepository.findById(UUID.fromString(valor))
+                    .orElseThrow(() -> new ObjectNotFound("Oficina não encontrada: " + valor));
+        } catch (Exception ignored) {}
+
+        return oficinaRepository.findByCodigo(valor)
+                .orElseThrow(() -> new ObjectNotFound("Oficina não encontrada: " + valor));
+    }
 }
+

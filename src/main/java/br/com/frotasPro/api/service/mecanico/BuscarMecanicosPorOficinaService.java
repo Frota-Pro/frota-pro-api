@@ -9,17 +9,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
-public class BuscarTodosMecanicosService {
+public class BuscarMecanicosPorOficinaService {
 
     private final MecanicoRepository mecanicoRepository;
 
     @Transactional(readOnly = true)
-    public Page<MecanicoResponse> listar(Pageable pageable) {
-        return mecanicoRepository.findAll(pageable)
+    public Page<MecanicoResponse> listarPorOficina(String codigoOficina, Pageable pageable) {
+        return mecanicoRepository.findByOficina_Codigo(codigoOficina, pageable)
                 .map(MecanicoMapper::toResponse);
     }
 }
