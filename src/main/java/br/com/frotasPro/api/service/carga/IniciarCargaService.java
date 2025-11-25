@@ -1,7 +1,9 @@
 package br.com.frotasPro.api.service.carga;
 
 import br.com.frotasPro.api.domain.Ajudante;
+import br.com.frotasPro.api.domain.Caminhao;
 import br.com.frotasPro.api.domain.Carga;
+import br.com.frotasPro.api.domain.Motorista;
 import br.com.frotasPro.api.domain.enums.Status;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.AjudanteRepository;
@@ -52,11 +54,18 @@ public class IniciarCargaService {
             carga.getAjudantes().addAll(ajudantes);
         }
 
+        Motorista motorista = carga.getMotorista();
+        motorista.setStatus(Status.EM_ROTA);
+
+        Caminhao caminhao = carga.getCaminhao();
+        caminhao.setStatus(Status.EM_ROTA);
+
         carga.setDtSaida(LocalDate.now());
         carga.setKmInicial(kmInicial);
         carga.setStatusCarga(Status.EM_ROTA);
 
         cargaRepository.save(carga);
+
         return "Carga iniciada! Boa viagem 🚚";
     }
 }

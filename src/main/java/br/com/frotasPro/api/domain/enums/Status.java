@@ -10,7 +10,8 @@ import lombok.ToString;
 public enum Status {
     DISPONIVEL("Disponivel"),
     EM_ROTA("Em Rota"),
-    SINCRONIZADA("Sincronizada");
+    SINCRONIZADA("Sincronizada"),
+    FINALIZADA("Finalizada");
 
     private final String descricao;
 

@@ -29,6 +29,7 @@ public class CargaController {
     private final AtualizarCargaService atualizarCargaService;
     private final DeletarCargaService deletarCargaService;
     private final IniciarCargaService iniciarCargaService;
+    private final FinalizarCargaService finalizarCargaService;
 
     // ========= BUSCA ÚNICA =========
 
@@ -125,6 +126,18 @@ public class CargaController {
             @RequestParam(value = "ajudantes", required = false) List<String> ajudanteCodigos
     ) {
         String resposta = iniciarCargaService.iniciarCarga(numeroCarga, kmInicial, ajudanteCodigos);
+        return ResponseEntity.ok(resposta);
+    }
+
+    //========== INICIAR CARGA ========
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
+    @PatchMapping
+    public ResponseEntity<String> finalizarCarga(
+            @RequestParam("carga") String numeroCarga,
+            @RequestParam("km") Integer kmfinal
+    ) {
+        String resposta = finalizarCargaService.finalizarCarga(numeroCarga, kmfinal);
         return ResponseEntity.ok(resposta);
     }
 
