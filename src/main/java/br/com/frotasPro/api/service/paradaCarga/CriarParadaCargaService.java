@@ -14,6 +14,7 @@ import br.com.frotasPro.api.excption.BusinessException;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;
+import br.com.frotasPro.api.util.CalcularMediaKmLitroService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +33,8 @@ public class CriarParadaCargaService {
 
     private final ParadaCargaRepository repository;
     private final CargaRepository cargaRepository;
+    private final CalcularMediaKmLitroService calcularMediaKmLitroService;
+
 
     @Transactional
     public ParadaCargaResponse criar(ParadaCargaRequest request) {
@@ -100,6 +103,14 @@ public class CriarParadaCargaService {
             abastecimento.setCidade(abReq.getCidade());
             abastecimento.setUf(abReq.getUf());
             abastecimento.setNumNotaOuCupom(abReq.getNumNotaOuCupom());
+
+            BigDecimal media = calcularMediaKmLitroService.calcular(
+                    carga.getCaminhao(),
+                    request.getKmOdometro(),
+                    abReq.getQtLitros()
+            );
+
+            abastecimento.setMediaKmLitro(media);
 
             parada.getAbastecimentos().add(abastecimento);
 

@@ -3,6 +3,7 @@ package br.com.frotasPro.api.repository;
 import br.com.frotasPro.api.domain.Abastecimento;
 import br.com.frotasPro.api.domain.enums.FormaPagamento;
 import br.com.frotasPro.api.domain.enums.TipoCombustivel;
+import br.com.frotasPro.api.projections.AbastecimentoGastoPorCombustivel;
 import br.com.frotasPro.api.projections.AbastecimentoResumoCaminhao;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -54,22 +55,32 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, UU
     );
 
     @Query("""
-       select a.caminhao.descricao as caminhao,
+       select c.descricao as caminhao,
               sum(a.qtLitros) as totalLitros,
               sum(a.valorTotal) as totalValor
        from Abastecimento a
+       join a.caminhao c
        where a.dtAbastecimento between :inicio and :fim
-       group by a.caminhao.id
+       group by c.id, c.descricao
        """)
     List<AbastecimentoResumoCaminhao> resumoPorCaminhaoNoPeriodo(
             @Param("inicio") LocalDateTime inicio,
             @Param("fim") LocalDateTime fim
     );
 
+    @Query("""
+           select a.tipoCombustivel as tipoCombustivel,
+                  sum(a.qtLitros)     as totalLitros,
+                  sum(a.valorTotal)   as totalValor
+           from Abastecimento a
+           where a.dtAbastecimento between :inicio and :fim
+           group by a.tipoCombustivel
+           """)
+    List<AbastecimentoGastoPorCombustivel> gastoPorTipoCombustivelNoPeriodo(
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fim") LocalDateTime fim
+    );
 
-
-
-
-
+    Optional<Abastecimento> findFirstByCaminhaoIdOrderByDtAbastecimentoDesc(UUID caminhaoId);
 
 }

@@ -8,20 +8,23 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class ListarAbastecimentosService {
+public class BuscarAbastecimentoPorPeriodoService {
 
     private final AbastecimentoRepository repository;
 
-    @Transactional(readOnly = true)
-    public Page<AbastecimentoResponse> listar(Pageable pageable) {
-        Page<Abastecimento> page = repository.findAll(pageable);
+    public Page<AbastecimentoResponse> buscar(
+            LocalDateTime inicio,
+            LocalDateTime fim,
+            Pageable pageable
+    ) {
+        Page<Abastecimento> page = repository
+                .findByDtAbastecimentoBetween(inicio, fim, pageable);
+
         return page.map(AbastecimentoMapper::toResponse);
     }
 }
-

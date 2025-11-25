@@ -15,9 +15,14 @@ public class AbastecimentoResponse {
 
     private UUID id;
     private String codigo;
+
     private UUID paradaId;
-    private UUID caminhaoId;
-    private UUID motoristaId;
+
+    // em vez de UUID:
+    private String caminhaoCodigo;
+    private String caminhaoPlaca;
+
+    private String motoristaCodigo;
 
     private LocalDateTime dtAbastecimento;
     private Integer kmOdometro;
@@ -25,6 +30,7 @@ public class AbastecimentoResponse {
     private BigDecimal qtLitros;
     private BigDecimal valorLitro;
     private BigDecimal valorTotal;
+    private BigDecimal mediaKmLitro;
 
     private String tipoCombustivel;
     private String formaPagamento;

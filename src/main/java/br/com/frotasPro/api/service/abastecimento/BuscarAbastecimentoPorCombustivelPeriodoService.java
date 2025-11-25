@@ -2,26 +2,31 @@ package br.com.frotasPro.api.service.abastecimento;
 
 import br.com.frotasPro.api.controller.response.AbastecimentoResponse;
 import br.com.frotasPro.api.domain.Abastecimento;
+import br.com.frotasPro.api.domain.enums.TipoCombustivel;
 import br.com.frotasPro.api.mapper.AbastecimentoMapper;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class ListarAbastecimentosService {
+public class BuscarAbastecimentoPorCombustivelPeriodoService {
 
     private final AbastecimentoRepository repository;
 
-    @Transactional(readOnly = true)
-    public Page<AbastecimentoResponse> listar(Pageable pageable) {
-        Page<Abastecimento> page = repository.findAll(pageable);
+    public Page<AbastecimentoResponse> buscar(
+            TipoCombustivel tipoCombustivel,
+            LocalDateTime inicio,
+            LocalDateTime fim,
+            Pageable pageable
+    ) {
+        Page<Abastecimento> page = repository
+                .findByTipoCombustivelAndDtAbastecimentoBetween(tipoCombustivel, inicio, fim, pageable);
+
         return page.map(AbastecimentoMapper::toResponse);
     }
 }
-

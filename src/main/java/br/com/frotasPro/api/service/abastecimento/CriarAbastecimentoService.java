@@ -7,8 +7,11 @@ import br.com.frotasPro.api.domain.enums.FormaPagamento;
 import br.com.frotasPro.api.domain.enums.TipoCombustivel;
 import br.com.frotasPro.api.mapper.AbastecimentoMapper;
 import br.com.frotasPro.api.repository.*;
+import br.com.frotasPro.api.util.CalcularMediaKmLitroService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
@@ -17,7 +20,7 @@ public class CriarAbastecimentoService {
     private final AbastecimentoRepository repository;
     private final CaminhaoRepository caminhaoRepository;
     private final MotoristaRepository motoristaRepository;
-    private final ParadaCargaRepository paradaRepository;
+    private final CalcularMediaKmLitroService calcularMediaKmLitroService;
 
     public AbastecimentoResponse criar(AbastecimentoRequest request) {
 
@@ -28,12 +31,7 @@ public class CriarAbastecimentoService {
                     .orElseThrow(() -> new RuntimeException("Motorista não encontrado"));
 
 
-        ParadaCarga parada = paradaRepository.findById(request.getParadaId())
-                    .orElseThrow(() -> new RuntimeException("Parada não encontrada"));
-
-
         Abastecimento a = new Abastecimento();
-        a.setParadaCarga(parada);
         a.setCaminhao(caminhao);
         a.setMotorista(motorista);
         a.setDtAbastecimento(request.getDtAbastecimento());
@@ -47,6 +45,15 @@ public class CriarAbastecimentoService {
         a.setCidade(request.getCidade());
         a.setUf(request.getUf());
         a.setNumNotaOuCupom(request.getNumNotaOuCupom());
+
+        BigDecimal media = calcularMediaKmLitroService.calcular(
+                caminhao,
+                request.getKmOdometro(),
+                request.getQtLitros()
+        );
+
+        a.setMediaKmLitro(media);
+
 
         repository.save(a);
 

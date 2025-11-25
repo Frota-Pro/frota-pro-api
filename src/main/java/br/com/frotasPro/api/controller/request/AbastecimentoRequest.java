@@ -15,8 +15,6 @@ import java.util.UUID;
 @Setter
 public class AbastecimentoRequest {
 
-    private UUID paradaId;
-
     @NotNull(message = "ID do caminhão é obrigatório")
     private String caminhao;
 

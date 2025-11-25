@@ -39,13 +39,7 @@ public class AbastecimentoUpdateService {
 
         Motorista motorista = motoristaRepository.findByMotoristaPorCodigoOuPorCodigoExterno(request.getMotorista())
                     .orElseThrow(() -> new RuntimeException("Motorista não encontrado"));
-
-
-        ParadaCarga parada = paradaRepository.findById(request.getParadaId())
-                    .orElseThrow(() -> new RuntimeException("Parada não encontrada"));
-
-
-        abastecimento.setParadaCarga(parada);
+        
         abastecimento.setCaminhao(caminhao);
         abastecimento.setMotorista(motorista);
         abastecimento.setDtAbastecimento(request.getDtAbastecimento());
