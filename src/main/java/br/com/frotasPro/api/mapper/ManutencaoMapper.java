@@ -5,24 +5,44 @@ import br.com.frotasPro.api.domain.Manutencao;
 
 public class ManutencaoMapper {
 
-    public static ManutencaoResponse toResponse(Manutencao manutencao) {
+    private ManutencaoMapper() {
+    }
+
+    public static ManutencaoResponse toResponse(Manutencao entity) {
+        if (entity == null) {
+            return null;
+        }
+
+        String caminhaoCodigo = null;
+        String caminhaoDescricao = null;
+        if (entity.getCaminhao() != null) {
+            caminhaoCodigo = entity.getCaminhao().getCodigo();
+            caminhaoDescricao = entity.getCaminhao().getDescricao();
+        }
+
+        String oficinaCodigo = null;
+        String oficinaNome = null;
+        if (entity.getOficina() != null) {
+            oficinaCodigo = entity.getOficina().getCodigo();
+            oficinaNome = entity.getOficina().getNome();
+        }
 
         return ManutencaoResponse.builder()
-                .id(manutencao.getId())
-                .codigo(manutencao.getCodigo())
-                .descricao(manutencao.getDescricao())
-                .dataInicioManutencao(manutencao.getDataInicioManutencao())
-                .dataFimManutencao(manutencao.getDataFimManutencao())
-                .tipoManutencao(manutencao.getTipoManutencao())
-                .itensTrocados(manutencao.getItensTrocados())
-                .observacoes(manutencao.getObservacoes())
-                .valor(manutencao.getValor())
-                .statusManutencao(manutencao.getStatusManutencao())
-                .codigoCaminhao(manutencao.getCaminhao().getCodigo())
-                .caminhao(manutencao.getCaminhao().getDescricao())
-                .codigoOficina(manutencao.getOficina().getCodigo())
-                .oficina(manutencao.getOficina().getNome())
+                .id(entity.getId())
+                .codigo(entity.getCodigo())
+                .descricao(entity.getDescricao())
+                .dataInicioManutencao(entity.getDataInicioManutencao())
+                .dataFimManutencao(entity.getDataFimManutencao())
+                .tipoManutencao(entity.getTipoManutencao())
+                .itensTrocados(entity.getItensTrocados())
+                .observacoes(entity.getObservacoes())
+                .valor(entity.getValor())
+                .statusManutencao(entity.getStatusManutencao())
+
+                .codigoCaminhao(caminhaoCodigo)
+                .caminhao(caminhaoDescricao)
+                .codigoOficina(oficinaCodigo)
+                .oficina(oficinaNome)
                 .build();
     }
 }
-

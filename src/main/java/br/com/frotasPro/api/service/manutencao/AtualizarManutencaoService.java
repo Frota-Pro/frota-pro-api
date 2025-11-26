@@ -11,12 +11,8 @@ import br.com.frotasPro.api.repository.ManutencaoRepository;
 import br.com.frotasPro.api.repository.OficinaRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.UUID;
 
 import static br.com.frotasPro.api.mapper.ManutencaoMapper.toResponse;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
 @AllArgsConstructor
@@ -26,10 +22,10 @@ public class AtualizarManutencaoService {
     private final CaminhaoRepository caminhaoRepository;
     private final OficinaRepository oficinaRepository;
 
-    public ManutencaoResponse atualizar(UUID id, ManutencaoRequest request) {
+    public ManutencaoResponse atualizar(String codigo, ManutencaoRequest request) {
 
-        Manutencao manutencao = manutencaoRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFound("Manutenção não encontrada"));
+        Manutencao manutencao = manutencaoRepository.findByCodigo(codigo)
+                .orElseThrow(() -> new ObjectNotFound("Manutenção não encontrada para o código: " + codigo));
 
         Caminhao caminhao = caminhaoRepository.findByCaminhaoPorCodigoOuPorCodigoExterno(request.getCaminhao())
                 .orElseThrow(() -> new ObjectNotFound("Caminhão não encontrado"));

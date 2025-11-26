@@ -15,7 +15,7 @@ public class BuscarManutencaoPorCodigoService {
 
     private final ManutencaoRepository manutencaoRepository;
 
-    public ManutencaoResponse buscarManutencaoCodigo(String codigo) {
+    public ManutencaoResponse buscar(String codigo) {
         Manutencao manutencao = manutencaoRepository.findByCodigo(codigo)
                 .orElseThrow(() -> new ObjectNotFound("Manutenção não encontrada"));
         return toResponse(manutencao);
