@@ -8,14 +8,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
-public class ListarPneusService {
+public class ListarPneusPorEixoService {
 
     private final PneuRepository pneuRepository;
 
-    public Page<PneuResponse> listar(Pageable pageable) {
-        return pneuRepository.findAll(pageable)
+    public Page<PneuResponse> listarPorEixo(UUID eixoId, Pageable pageable) {
+        return pneuRepository.findByEixoId(eixoId, pageable)
                 .map(PneuMapper::toResponse);
     }
 }

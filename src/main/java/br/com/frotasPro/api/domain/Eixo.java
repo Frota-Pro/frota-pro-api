@@ -6,13 +6,24 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor @Builder
+@NoArgsConstructor
+@Builder
 @Entity
-@Table(name = "tb_eixo")
-public class Eixo extends AuditoriaBase{
+@Table(
+        name = "tb_eixo",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_eixo_caminhao_numero",
+                        columnNames = {"caminhao_id", "numero"}
+                )
+        }
+)
+public class Eixo extends AuditoriaBase {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "uuid")

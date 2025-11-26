@@ -2,18 +2,16 @@ package br.com.frotasPro.api.service.paradaCarga;
 
 import br.com.frotasPro.api.controller.request.ParadaCargaRequest;
 import br.com.frotasPro.api.controller.response.ParadaCargaResponse;
-import br.com.frotasPro.api.domain.Abastecimento;
-import br.com.frotasPro.api.domain.Carga;
-import br.com.frotasPro.api.domain.DespesaParada;
-import br.com.frotasPro.api.domain.Manutencao;
-import br.com.frotasPro.api.domain.ParadaCarga;
+import br.com.frotasPro.api.domain.*;
 import br.com.frotasPro.api.domain.enums.TipoDespesa;
 import br.com.frotasPro.api.domain.enums.TipoParada;
 import br.com.frotasPro.api.domain.enums.TipoManutencao;
 import br.com.frotasPro.api.excption.BusinessException;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.CargaRepository;
+import br.com.frotasPro.api.repository.EixoRepository;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;
+import br.com.frotasPro.api.repository.PneuRepository;
 import br.com.frotasPro.api.util.CalcularMediaKmLitroService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,6 +32,8 @@ public class CriarParadaCargaService {
     private final ParadaCargaRepository repository;
     private final CargaRepository cargaRepository;
     private final CalcularMediaKmLitroService calcularMediaKmLitroService;
+    private final EixoRepository eixoRepository;
+    private final PneuRepository pneuRepository;
 
 
     @Transactional
@@ -150,6 +150,51 @@ public class CriarParadaCargaService {
             manutencao.setParadaCarga(parada);
             manutencao.setOficina(null);
 
+            if (mReq.getTrocasPneu() != null && !mReq.getTrocasPneu().isEmpty()) {
+
+                var trocas = new ArrayList<TrocaPneuManutencao>();
+
+                mReq.getTrocasPneu().forEach(tpReq -> {
+
+                    var eixo = eixoRepository
+                            .findByCaminhaoIdAndNumero(carga.getCaminhao().getId(), tpReq.getEixoNumero())
+                            .orElseThrow(() -> new ObjectNotFound(
+                                    "Eixo " + tpReq.getEixoNumero() + " não encontrado para o caminhão")
+                            );
+
+                    var pneu = pneuRepository.findByCodigo(tpReq.getPneu())
+                            .orElseThrow(() -> new ObjectNotFound(
+                                    "Pneu não encontrado para código: " + tpReq.getPneu())
+                            );
+
+                    Integer kmTroca = tpReq.getKmOdometro() != null
+                            ? tpReq.getKmOdometro()
+                            : request.getKmOdometro();
+
+                    TrocaPneuManutencao troca = TrocaPneuManutencao.builder()
+                            .manutencao(manutencao)
+                            .pneu(pneu)
+                            .eixo(eixo)
+                            .lado(tpReq.getLado())
+                            .posicao(tpReq.getPosicao())
+                            .kmOdometro(kmTroca)
+                            .tipoTroca(tpReq.getTipoTroca())
+                            .build();
+
+                    if (tpReq.getTipoTroca().name().equals("INSTALACAO")) {
+                        pneu.setEixo(eixo);
+                        pneu.setLadoAtual(tpReq.getLado());
+                        pneu.setPosicaoAtual(tpReq.getPosicao());
+                        pneu.setUltimaTroca(java.time.LocalDate.now());
+                        pneu.setKmUltimaTroca(kmTroca);
+                    }
+
+                    trocas.add(troca);
+                });
+
+                manutencao.setTrocasPneu(trocas);
+            }
+
             parada.getManutencoes().add(manutencao);
 
             DespesaParada despesaManutencao = DespesaParada.builder()
@@ -166,6 +211,7 @@ public class CriarParadaCargaService {
 
             parada.getDespesaParadas().add(despesaManutencao);
         }
+
 
         repository.save(parada);
 

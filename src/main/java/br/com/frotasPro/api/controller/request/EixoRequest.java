@@ -5,7 +5,8 @@ import lombok.Setter;
 
 import java.util.UUID;
 
-@Getter @Setter
+@Getter
+@Setter
 public class EixoRequest {
 
     private int numero;

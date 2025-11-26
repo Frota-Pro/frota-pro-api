@@ -10,17 +10,22 @@ public class PneuMapper {
     public static Pneu toEntity(PneuRequest request, Eixo eixo) {
         return Pneu.builder()
                 .posicao(request.getPosicao())
-                .ultimaTroca(request.getUltimaTroca())
                 .eixo(eixo)
+                .ladoAtual(request.getLadoAtual())
+                .posicaoAtual(request.getPosicaoAtual())
                 .build();
     }
 
     public static PneuResponse toResponse(Pneu pneu) {
         return PneuResponse.builder()
                 .id(pneu.getId())
+                .codigo(pneu.getCodigo())
                 .posicao(pneu.getPosicao())
                 .ultimaTroca(pneu.getUltimaTroca())
+                .kmUltimaTroca(pneu.getKmUltimaTroca())
                 .eixoId(pneu.getEixo().getId())
+                .ladoAtual(pneu.getLadoAtual())
+                .posicaoAtual(pneu.getPosicaoAtual())
                 .build();
     }
 }

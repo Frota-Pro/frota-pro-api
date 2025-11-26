@@ -10,12 +10,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ListarPneusService {
+public class ListarPneusPorCaminhaoService {
 
     private final PneuRepository pneuRepository;
 
-    public Page<PneuResponse> listar(Pageable pageable) {
-        return pneuRepository.findAll(pageable)
+    public Page<PneuResponse> listarPorCaminhao(String codigoCaminhao, Pageable pageable) {
+        return pneuRepository.findByEixoCaminhaoCodigo(codigoCaminhao, pageable)
                 .map(PneuMapper::toResponse);
     }
 }

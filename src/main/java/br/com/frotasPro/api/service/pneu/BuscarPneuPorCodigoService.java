@@ -1,23 +1,22 @@
 package br.com.frotasPro.api.service.pneu;
 
+import br.com.frotasPro.api.controller.response.PneuResponse;
 import br.com.frotasPro.api.domain.Pneu;
 import br.com.frotasPro.api.excption.ObjectNotFound;
+import br.com.frotasPro.api.mapper.PneuMapper;
 import br.com.frotasPro.api.repository.PneuRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class DeletarPneuService {
+public class BuscarPneuPorCodigoService {
 
     private final PneuRepository pneuRepository;
 
-    @Transactional
-    public void deletar(String codigo) {
+    public PneuResponse buscar(String codigo) {
         Pneu pneu = pneuRepository.findByCodigo(codigo)
                 .orElseThrow(() -> new ObjectNotFound("Pneu não encontrado para o código: " + codigo));
-
-        pneuRepository.delete(pneu);
+        return PneuMapper.toResponse(pneu);
     }
 }

@@ -5,24 +5,25 @@ import br.com.frotasPro.api.controller.response.EixoResponse;
 import br.com.frotasPro.api.domain.Caminhao;
 import br.com.frotasPro.api.domain.Eixo;
 import br.com.frotasPro.api.excption.ObjectNotFound;
+import br.com.frotasPro.api.mapper.EixoMapper;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.EixoRepository;
-import br.com.frotasPro.api.validator.ValidaSeCaminhaoExiste;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import static br.com.frotasPro.api.mapper.EixoMapper.toResponse;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CriarEixoService {
 
     private final EixoRepository eixoRepository;
     private final CaminhaoRepository caminhaoRepository;
+
+    @Transactional
     public EixoResponse criar(EixoRequest request) {
 
-        Caminhao caminhao = caminhaoRepository.findByCaminhaoPorCodigoOuPorCodigoExterno(request.getCodigoCaminhao())
-                .orElseThrow(() -> new ObjectNotFound("Caminhão não encontrado"));
+        Caminhao caminhao = caminhaoRepository.findByCodigo(request.getCodigoCaminhao())
+                .orElseThrow(() -> new ObjectNotFound("Caminhão não encontrado para o código: " + request.getCodigoCaminhao()));
 
         Eixo eixo = Eixo.builder()
                 .numero(request.getNumero())
@@ -31,6 +32,6 @@ public class CriarEixoService {
 
         eixoRepository.save(eixo);
 
-        return toResponse(eixo);
+        return EixoMapper.toResponse(eixo);
     }
 }

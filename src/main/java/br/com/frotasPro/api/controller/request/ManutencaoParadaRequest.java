@@ -22,4 +22,5 @@ public class ManutencaoParadaRequest {
     private BigDecimal valor;
     private StatusManutencao statusManutencao;
     private UUID oficinaId;
+    private List<TrocaPneuManutencaoRequest> trocasPneu;
 }

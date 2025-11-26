@@ -30,4 +30,5 @@ public class ManutencaoResponse {
     private String caminhao;
     private String codigoOficina;
     private String oficina;
+    private List<TrocaPneuManutencaoResponse> trocasPneu;
 }

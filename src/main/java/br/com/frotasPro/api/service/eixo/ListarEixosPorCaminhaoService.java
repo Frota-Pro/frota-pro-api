@@ -3,22 +3,19 @@ package br.com.frotasPro.api.service.eixo;
 import br.com.frotasPro.api.controller.response.EixoResponse;
 import br.com.frotasPro.api.mapper.EixoMapper;
 import br.com.frotasPro.api.repository.EixoRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
-@AllArgsConstructor
-public class ListarEixosService {
+@RequiredArgsConstructor
+public class ListarEixosPorCaminhaoService {
 
     private final EixoRepository eixoRepository;
 
-    public Page<EixoResponse> listar(Pageable pageable) {
-        return eixoRepository.findAll(pageable)
+    public Page<EixoResponse> listarPorCaminhao(String codigoCaminhao, Pageable pageable) {
+        return eixoRepository.findByCaminhaoCodigo(codigoCaminhao, pageable)
                 .map(EixoMapper::toResponse);
     }
 }
-

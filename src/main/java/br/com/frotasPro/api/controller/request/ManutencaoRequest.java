@@ -39,4 +39,7 @@ public class ManutencaoRequest {
 
     private String oficina;
 
+    private List<TrocaPneuManutencaoRequest> trocasPneu;
+
+
 }

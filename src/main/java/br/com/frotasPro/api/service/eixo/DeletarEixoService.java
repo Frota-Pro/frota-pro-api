@@ -1,26 +1,30 @@
 package br.com.frotasPro.api.service.eixo;
 
+import br.com.frotasPro.api.domain.Eixo;
+import br.com.frotasPro.api.excption.BusinessException;
+import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.EixoRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class DeletarEixoService {
 
     private final EixoRepository eixoRepository;
 
+    @Transactional
     public void deletar(UUID id) {
+        Eixo eixo = eixoRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFound("Eixo não encontrado para o id: " + id));
 
-        if (!eixoRepository.existsById(id)) {
-            throw new ResponseStatusException(NOT_FOUND, "Eixo não encontrado");
+        if (!eixo.getPneus().isEmpty()) {
+            throw new BusinessException("Não é possível deletar eixo com pneus vinculados.");
         }
 
-        eixoRepository.deleteById(id);
+        eixoRepository.delete(eixo);
     }
 }

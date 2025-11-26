@@ -2,6 +2,8 @@ package br.com.frotasPro.api.service.eixo;
 
 import br.com.frotasPro.api.controller.response.EixoResponse;
 import br.com.frotasPro.api.domain.Eixo;
+import br.com.frotasPro.api.excption.ObjectNotFound;
+import br.com.frotasPro.api.mapper.EixoMapper;
 import br.com.frotasPro.api.repository.EixoRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,10 +21,8 @@ public class BuscarEixoPorIdService {
     private final EixoRepository eixoRepository;
 
     public EixoResponse buscar(UUID id) {
-
         Eixo eixo = eixoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Eixo não encontrado"));
-
-        return toResponse(eixo);
+                .orElseThrow(() -> new ObjectNotFound("Eixo não encontrado para o id: " + id));
+        return EixoMapper.toResponse(eixo);
     }
 }

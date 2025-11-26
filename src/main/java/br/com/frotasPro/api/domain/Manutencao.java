@@ -73,8 +73,6 @@ public class Manutencao extends AuditoriaBase{
     @JoinColumn(name = "parada_id")
     private ParadaCarga paradaCarga;
 
-
-    @OneToMany(mappedBy = "manutencao", cascade = CascadeType.ALL, orphanRemoval = false)
-    private List<Pneu> pneus = new ArrayList<>();
-
+    @OneToMany(mappedBy = "manutencao", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TrocaPneuManutencao> trocasPneu = new ArrayList<>();
 }
