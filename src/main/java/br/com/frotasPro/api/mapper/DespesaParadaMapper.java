@@ -7,16 +7,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class DespesaParadaMapper {
 
-    public static DespesaParadaResponse toResponse(DespesaParada d) {
-        return DespesaParadaResponse.builder()
-                .id(d.getId())
-                .paradaId(d.getParadaCarga().getId())
-                .tipoDespesa(d.getTipoDespesa().name())
-                .dataHora(d.getDataHora())
-                .valor(d.getValor())
-                .descricao(d.getDescricao())
-                .cidade(d.getCidade())
-                .uf(d.getUf())
-                .build();
+    public static DespesaParadaResponse toResponse(DespesaParada entity) {
+        if (entity == null) return null;
+
+        DespesaParadaResponse r = new DespesaParadaResponse();
+        r.setId(entity.getId());
+        r.setTipoDespesa(entity.getTipoDespesa().getDescricao());
+        r.setDataHora(entity.getDataHora());
+        r.setValor(entity.getValor());
+        r.setDescricao(entity.getDescricao());
+        r.setCidade(entity.getCidade());
+        r.setUf(entity.getUf());
+
+        return r;
     }
 }

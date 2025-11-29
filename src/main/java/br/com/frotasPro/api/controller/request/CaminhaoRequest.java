@@ -38,6 +38,8 @@ public class CaminhaoRequest {
     private BigDecimal tara;
     private BigDecimal maxPeso;
 
+    private String categoria;
+
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate dtLicenciamento;
 }

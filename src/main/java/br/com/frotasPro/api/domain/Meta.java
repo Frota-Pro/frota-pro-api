@@ -52,6 +52,10 @@ public class Meta extends AuditoriaBase{
     private Caminhao caminhao;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "categoria_caminhao_id")
+    private CategoriaCaminhao categoria;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "motorista_id")
     private Motorista motorista;
 }

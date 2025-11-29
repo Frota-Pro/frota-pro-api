@@ -3,18 +3,18 @@ package br.com.frotasPro.api.service.meta;
 import br.com.frotasPro.api.controller.request.MetaRequest;
 import br.com.frotasPro.api.controller.response.MetaResponse;
 import br.com.frotasPro.api.domain.Caminhao;
+import br.com.frotasPro.api.domain.CategoriaCaminhao;
 import br.com.frotasPro.api.domain.Meta;
 import br.com.frotasPro.api.domain.Motorista;
+import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.mapper.MetaMapper;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
+import br.com.frotasPro.api.repository.CategoriaCaminhaoRepository;
 import br.com.frotasPro.api.repository.MetaRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
-import static br.com.frotasPro.api.mapper.MetaMapper.toResponse;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,30 +22,58 @@ public class CriarMetaService {
 
     private final MetaRepository metaRepository;
     private final CaminhaoRepository caminhaoRepository;
+    private final CategoriaCaminhaoRepository categoriaCaminhaoRepository;
     private final MotoristaRepository motoristaRepository;
 
+    @Transactional
     public MetaResponse criar(MetaRequest request) {
 
-        Caminhao caminhao = caminhaoRepository.findById(request.getCaminhaoId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Caminhão não encontrado"));
+        boolean temCaminhao = temTexto(request.getCaminhao());
+        boolean temCategoria = temTexto(request.getCategoria());
+        boolean temMotorista = temTexto(request.getMotorista());
 
-        Motorista motorista = motoristaRepository.findById(request.getMotoristaId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Motorista não encontrado"));
+        int count = (temCaminhao ? 1 : 0) + (temCategoria ? 1 : 0) + (temMotorista ? 1 : 0);
 
-        Meta meta = Meta.builder()
-                .dataIncio(request.getDataIncio())
-                .dataFim(request.getDataFim())
-                .tipoMeta(request.getTipoMeta())
-                .valorMeta(request.getValorMeta())
-                .valorRealizado(request.getValorRealizado())
-                .unidade(request.getUnidade())
-                .statusMeta(request.getStatusMeta())
-                .descricao(request.getDescricao())
-                .caminhao(caminhao)
-                .motorista(motorista)
-                .build();
+        if (count == 0) {
+            throw new IllegalArgumentException("Meta deve ser associada a um caminhão, categoria ou motorista.");
+        }
+        if (count > 1) {
+            throw new IllegalArgumentException("Meta não pode ser associada a mais de um alvo ao mesmo tempo (caminhão, categoria ou motorista).");
+        }
 
-        metaRepository.save(meta);
-        return toResponse(meta);
+        Meta meta = new Meta();
+        meta.setDataIncio(request.getDataIncio());
+        meta.setDataFim(request.getDataFim());
+        meta.setTipoMeta(request.getTipoMeta());
+        meta.setValorMeta(request.getValorMeta());
+        meta.setValorRealizado(request.getValorRealizado());
+        meta.setUnidade(request.getUnidade());
+        meta.setStatusMeta(request.getStatusMeta());
+        meta.setDescricao(request.getDescricao());
+
+        meta.setCaminhao(null);
+        meta.setCategoria(null);
+        meta.setMotorista(null);
+
+        if (temCaminhao) {
+            Caminhao caminhao = caminhaoRepository.findByCodigo(request.getCaminhao())
+                    .orElseThrow(() -> new ObjectNotFound("Caminhão não encontrado para o código: " + request.getCaminhao()));
+            meta.setCaminhao(caminhao);
+        } else if (temCategoria) {
+            CategoriaCaminhao categoria = categoriaCaminhaoRepository.findByCodigo(request.getCategoria())
+                    .orElseThrow(() -> new ObjectNotFound("Categoria de caminhão não encontrada para o código: " + request.getCategoria()));
+            meta.setCategoria(categoria);
+        } else {
+            Motorista motorista = motoristaRepository.findByCodigo(request.getMotorista())
+                    .orElseThrow(() -> new ObjectNotFound("Motorista não encontrado para o código: " + request.getMotorista()));
+            meta.setMotorista(motorista);
+        }
+
+        Meta salva = metaRepository.save(meta);
+        return MetaMapper.toResponse(salva);
+    }
+
+    private boolean temTexto(String s) {
+        return s != null && !s.trim().isEmpty();
     }
 }

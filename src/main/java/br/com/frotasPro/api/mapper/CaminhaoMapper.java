@@ -10,7 +10,7 @@ public class CaminhaoMapper {
             return null;
         }
 
-        return CaminhaoResponse.builder()
+        CaminhaoResponse.CaminhaoResponseBuilder builder = CaminhaoResponse.builder()
                 .codigo(caminhao.getCodigo())
                 .codigoExterno(caminhao.getCodigoExterno())
                 .descricao(caminhao.getDescricao())
@@ -25,7 +25,14 @@ public class CaminhaoMapper {
                 .maxPeso(caminhao.getMaxPeso())
                 .dtLicenciamento(caminhao.getDataLicenciamento())
                 .status(caminhao.getStatus())
-                .ativo(caminhao.isAtivo())
-                .build();
+                .ativo(caminhao.isAtivo());
+
+        if (caminhao.getCategoria() != null) {
+            builder
+                    .categoriaCodigo(caminhao.getCategoria().getCodigo())
+                    .categoriaDescricao(caminhao.getCategoria().getDescricao());
+        }
+
+        return builder.build();
     }
 }

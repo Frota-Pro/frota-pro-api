@@ -74,6 +74,10 @@ public class Caminhao extends AuditoriaBase{
     @Column(length = 100)
     private String seguro;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "categoria_caminhao_id")
+    private CategoriaCaminhao categoria;
+
     @OneToMany(mappedBy = "caminhao", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Eixo> eixos = new ArrayList<>();
 

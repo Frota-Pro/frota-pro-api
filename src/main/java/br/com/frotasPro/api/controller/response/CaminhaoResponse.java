@@ -27,6 +27,9 @@ public class CaminhaoResponse {
     private BigDecimal tara;
     private BigDecimal maxPeso;
 
+    private String categoriaCodigo;
+    private String categoriaDescricao;
+
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate dtLicenciamento;
 

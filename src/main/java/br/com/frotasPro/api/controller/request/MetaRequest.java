@@ -23,6 +23,7 @@ public class MetaRequest {
     private StatusMeta statusMeta;
     private String descricao;
 
-    private UUID caminhaoId;
-    private UUID motoristaId;
+    private String caminhao;
+    private String categoria;
+    private String motorista;
 }

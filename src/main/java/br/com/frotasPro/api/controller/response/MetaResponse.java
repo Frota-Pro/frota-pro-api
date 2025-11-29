@@ -23,6 +23,12 @@ public class MetaResponse {
     private StatusMeta statusMeta;
     private String descricao;
 
-    private UUID caminhaoId;
-    private UUID motoristaId;
+    private String caminhaoCodigo;
+    private String caminhaoDescricao;
+
+    private String categoriaCodigo;
+    private String categoriaDescricao;
+
+    private String motoristaCodigo;
+    private String motoristaDescricao;
 }
