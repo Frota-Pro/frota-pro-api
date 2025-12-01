@@ -19,7 +19,9 @@ public class MetaMapper {
                 .valorRealizado(meta.getValorRealizado())
                 .unidade(meta.getUnidade())
                 .statusMeta(meta.getStatusMeta())
-                .descricao(meta.getDescricao());
+                .descricao(meta.getDescricao())
+                .renovarAutomaticamente(meta.isRenovarAutomaticamente());
+
 
         if (meta.getCaminhao() != null) {
             builder

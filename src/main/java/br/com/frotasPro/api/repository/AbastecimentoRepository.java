@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -82,5 +83,13 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, UU
     );
 
     Optional<Abastecimento> findFirstByCaminhaoIdOrderByDtAbastecimentoDesc(UUID caminhaoId);
+
+    @Query("""
+       select avg(a.mediaKmLitro)
+       from Abastecimento a
+       where a.caminhao.id = :caminhaoId
+         and a.dtAbastecimento between :inicio and :fim
+       """)
+    BigDecimal mediaKmLitroPorCaminhaoEPeriodo(UUID caminhaoId, LocalDateTime inicio, LocalDateTime fim);
 
 }

@@ -26,4 +26,6 @@ public class MetaRequest {
     private String caminhao;
     private String categoria;
     private String motorista;
+
+    private Boolean renovarAutomaticamente;
 }

@@ -6,6 +6,7 @@ import br.com.frotasPro.api.domain.Caminhao;
 import br.com.frotasPro.api.domain.CategoriaCaminhao;
 import br.com.frotasPro.api.domain.Meta;
 import br.com.frotasPro.api.domain.Motorista;
+import br.com.frotasPro.api.domain.enums.StatusMeta;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.mapper.MetaMapper;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
@@ -32,6 +33,10 @@ public class AtualizarMetaService {
 
         Meta meta = metaRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFound("Meta não encontrada para o id: " + id));
+
+        if (meta.getStatusMeta() == StatusMeta.CONCLUIDA) {
+            throw new IllegalStateException("Meta encerrada não pode mais ser alterada.");
+        }
 
         boolean temCaminhao = temTexto(request.getCaminhao());
         boolean temCategoria = temTexto(request.getCategoria());
