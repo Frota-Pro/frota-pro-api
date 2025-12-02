@@ -58,4 +58,7 @@ public class Meta extends AuditoriaBase{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "motorista_id")
     private Motorista motorista;
+
+    @Column(nullable = false)
+    private boolean renovarAutomaticamente = false;
 }

@@ -2,21 +2,23 @@ package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.MetaRequest;
 import br.com.frotasPro.api.controller.response.MetaResponse;
-import br.com.frotasPro.api.service.meta.AtualizarMetaService;
-import br.com.frotasPro.api.service.meta.BuscarMetaPorIdService;
-import br.com.frotasPro.api.service.meta.BuscarTodasMetasService;
-import br.com.frotasPro.api.service.meta.CriarMetaService;
-import br.com.frotasPro.api.service.meta.DeletarMetaService;
+import br.com.frotasPro.api.domain.Meta;
+import br.com.frotasPro.api.mapper.MetaMapper;
+import br.com.frotasPro.api.repository.MetaRepository;
+import br.com.frotasPro.api.service.meta.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -29,6 +31,8 @@ public class MetaController {
     private final BuscarMetaPorIdService buscarMetaPorIdService;
     private final BuscarTodasMetasService buscarTodasMetasService;
     private final DeletarMetaService deletarMetaService;
+    private final BuscarMetaAtivaComProgressoService buscarMetaAtivaComProgressoService;
+    private final MetaRepository metaRepository;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @PostMapping
@@ -75,4 +79,38 @@ public class MetaController {
         deletarMetaService.deletar(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @GetMapping("/ativas/caminhao/{codigo}")
+    public ResponseEntity<MetaResponse> metaAtivaCaminhao(
+            @PathVariable String codigo,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataReferencia) {
+
+        MetaResponse response = buscarMetaAtivaComProgressoService
+                .buscarMetaAtivaCaminhao(codigo, dataReferencia);
+
+        if (response == null) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @GetMapping("/historico")
+    public ResponseEntity<List<MetaResponse>> historico(
+            @RequestParam(required = false) String caminhao,
+            @RequestParam(required = false) String categoria,
+            @RequestParam(required = false) String motorista,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim) {
+
+        List<Meta> metas = metaRepository.historicoMetas(caminhao, categoria, motorista, inicio, fim);
+        List<MetaResponse> resposta = metas.stream()
+                .map(MetaMapper::toResponse)
+                .toList();
+
+        return ResponseEntity.ok(resposta);
+    }
+
 }

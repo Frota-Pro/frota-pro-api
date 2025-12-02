@@ -1,0 +1,6 @@
+BEGIN;
+
+ALTER TABLE tb_meta
+    ADD COLUMN IF NOT EXISTS renovar_automaticamente BOOLEAN NOT NULL DEFAULT FALSE;
+
+COMMIT;

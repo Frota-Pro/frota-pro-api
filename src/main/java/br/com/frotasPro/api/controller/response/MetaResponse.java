@@ -31,4 +31,6 @@ public class MetaResponse {
 
     private String motoristaCodigo;
     private String motoristaDescricao;
+
+    private boolean renovarAutomaticamente;
 }
