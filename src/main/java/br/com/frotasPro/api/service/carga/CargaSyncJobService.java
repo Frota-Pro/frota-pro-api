@@ -2,6 +2,8 @@ package br.com.frotasPro.api.service.carga;
 
 import br.com.frotasPro.api.domain.integracao.CargaSyncJob;
 import br.com.frotasPro.api.domain.enums.StatusSincronizacao;
+import br.com.frotasPro.api.integracao.dto.CargaSyncRequestEvent;
+import br.com.frotasPro.api.integracao.kafka.CargaSyncRequestProducer;
 import br.com.frotasPro.api.repository.integracao.CargaSyncJobRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import java.util.UUID;
 public class CargaSyncJobService {
 
     private final CargaSyncJobRepository repository;
+    private final CargaSyncRequestProducer requestProducer;
 
     public CargaSyncJob criarJob(UUID empresaId, LocalDate dataReferencia) {
         CargaSyncJob job = new CargaSyncJob();
@@ -24,6 +27,27 @@ public class CargaSyncJobService {
         job.setCriadoEm(OffsetDateTime.now());
         job.setAtualizadoEm(OffsetDateTime.now());
         return repository.save(job);
+    }
+
+    public UUID solicitarSincronizacao(UUID empresaId, LocalDate dataReferencia) {
+        CargaSyncJob job = criarJob(empresaId, dataReferencia);
+
+        CargaSyncRequestEvent event = CargaSyncRequestEvent.builder()
+                .jobId(job.getId())
+                .empresaId(empresaId)
+                .dataInicial(dataReferencia)
+                .dataFinal(dataReferencia)
+                .tipoCarga("TODAS")
+                .origem("API_SCHEDULER")
+                .solicitadoPor("SCHEDULER")
+                .timestampSolicitacao(OffsetDateTime.now())
+                .build();
+
+        requestProducer.enviar(event);
+
+        marcarProcessando(job.getId());
+
+        return job.getId();
     }
 
     public void marcarProcessando(UUID jobId) {

@@ -30,6 +30,7 @@ public class CargaController {
     private final DeletarCargaService deletarCargaService;
     private final IniciarCargaService iniciarCargaService;
     private final FinalizarCargaService finalizarCargaService;
+    private final BuscarCargaAtualMotoristaService buscarCargaAtualMotoristaService;
 
     // ========= BUSCA ÚNICA =========
 
@@ -115,6 +116,13 @@ public class CargaController {
     ) {
         Page<CargaResponse> cargas = buscarCargaService.porCaminhao(codigoCaminhao, pageable);
         return ResponseEntity.ok(cargas);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_MOTORISTA')")
+    @GetMapping("/minha-carga-atual")
+    public ResponseEntity<CargaResponse> minhaCargaAtual() {
+        CargaResponse response = buscarCargaAtualMotoristaService.buscar();
+        return ResponseEntity.ok(response);
     }
     //========== INICIAR CARGA ========
 

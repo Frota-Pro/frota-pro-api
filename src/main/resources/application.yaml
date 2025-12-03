@@ -37,6 +37,7 @@ management:
       show-details: always
 
 frotapro:
+  empresa-sync-id: 11111111-2222-3333-4444-555555555555
   kafka:
     topics:
       carga-sync-request: frotapro.carga.sync.request

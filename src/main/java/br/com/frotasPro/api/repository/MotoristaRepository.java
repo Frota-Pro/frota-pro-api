@@ -25,4 +25,6 @@ public interface MotoristaRepository extends JpaRepository<Motorista, UUID> {
           or m.codigoExterno = :codigo
        """)
     Optional<Motorista> findByMotoristaPorCodigoOuPorCodigoExterno(String codigo);
+
+    Optional<Motorista> findByUsuarioId(UUID usuarioIdLogado);
 }
