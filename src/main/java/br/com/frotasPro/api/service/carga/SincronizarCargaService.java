@@ -92,6 +92,12 @@ public class SincronizarCargaService {
                 ? BigDecimal.valueOf(dto.getPesoTotalKg())
                 : null);
 
+        carga.setValorTotal(
+                dto.getValorTotal() != null && dto.getValorTotal().compareTo(BigDecimal.ZERO) > 0
+                        ? dto.getValorTotal()
+                        : null
+        );
+
         carga.setStatusCarga(Status.SINCRONIZADA);
 
         for (ClienteCargaWinThorDto cli : dto.getClientes()) {

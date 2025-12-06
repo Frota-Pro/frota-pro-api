@@ -10,8 +10,7 @@ import lombok.ToString;
 public enum TipoMeta {
     QUILOMETRAGEM("Meta de quilometragem"),
     CONSUMO_COMBUSTIVEL("Meta de consumo de combustivel"),
-    ENTREGA_PRAZO("Meta de entrega no prazo"),
-    MANUTENCAO_PREVENTIVA("Meta manutençao preventiva"),
+    TONELADA("Meta de tonelada da carga"),
     CARGA_TRANSPORTADA("Meta de carga trasportada");
 
     private final String descricao;

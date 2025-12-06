@@ -20,6 +20,7 @@ public class CargaRequest {
     private LocalDate dtChegada;
 
     private BigDecimal pesoCarga;
+    private BigDecimal valorTotal;
 
     private Integer kmInicial;
     private Integer kmFinal;

@@ -22,8 +22,24 @@ public class AtualizarMetaQuilometragemService {
     public void registrarQuilometragem(String caminhaoCodigo, String motoristaCodigo,
                                        Integer kmInicial, Integer kmFinal, LocalDate dataReferencia) {
 
+        System.out.println(">>> registrarQuilometragem <<<");
+        System.out.println("caminhaoCodigo = " + caminhaoCodigo);
+        System.out.println("motoristaCodigo = " + motoristaCodigo);
+        System.out.println("kmInicial = " + kmInicial + ", kmFinal = " + kmFinal);
+        System.out.println("dataReferencia = " + dataReferencia);
+
+        if (kmInicial == null || kmFinal == null) {
+            System.out.println("kmInicial ou kmFinal nulos, saindo...");
+            return;
+        }
+
         int kmRodado = kmFinal - kmInicial;
-        if (kmRodado <= 0) return;
+        System.out.println("kmRodado = " + kmRodado);
+
+        if (kmRodado <= 0) {
+            System.out.println("kmRodado <= 0, saindo...");
+            return;
+        }
 
         List<Meta> metas = metaRepository.buscarMetasAtivasPorAlvoEData(
                 TipoMeta.QUILOMETRAGEM,
@@ -33,10 +49,23 @@ public class AtualizarMetaQuilometragemService {
                 motoristaCodigo
         );
 
+        System.out.println("metas encontradas = " + metas.size());
+        for (Meta meta : metas) {
+            System.out.println("Meta ID = " + meta.getId()
+                    + ", tipo = " + meta.getTipoMeta()
+                    + ", status = " + meta.getStatusMeta()
+                    + ", caminhao = " + (meta.getCaminhao() != null ? meta.getCaminhao().getCodigo() : "null")
+                    + ", motorista = " + (meta.getMotorista() != null ? meta.getMotorista().getCodigo() : "null")
+                    + ", valorRealizado atual = " + meta.getValorRealizado());
+        }
+
         for (Meta meta : metas) {
             BigDecimal atual = meta.getValorRealizado() != null ? meta.getValorRealizado() : BigDecimal.ZERO;
             meta.setValorRealizado(atual.add(BigDecimal.valueOf(kmRodado)));
+            System.out.println("Meta ID = " + meta.getId()
+                    + " novo valorRealizado = " + meta.getValorRealizado());
         }
     }
 }
+
 

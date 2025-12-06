@@ -19,6 +19,7 @@ public class CargaMapper {
         carga.setDtPrevista(request.getDtPrevista());
         carga.setDtChegada(request.getDtChegada());
         carga.setPesoCarga(request.getPesoCarga());
+        carga.setValorTotal(request.getValorTotal());
         carga.setKmInicial(request.getKmInicial());
         carga.setKmFinal(request.getKmFinal());
         carga.setStatusCarga(request.getStatusCarga());
@@ -41,6 +42,7 @@ public class CargaMapper {
         carga.setDtPrevista(request.getDtPrevista());
         carga.setDtChegada(request.getDtChegada());
         carga.setPesoCarga(request.getPesoCarga());
+        carga.setKmFinal(request.getKmFinal());
         carga.setKmInicial(request.getKmInicial());
         carga.setKmFinal(request.getKmFinal());
         carga.setStatusCarga(request.getStatusCarga());
@@ -64,6 +66,7 @@ public class CargaMapper {
                 .dtPrevista(carga.getDtPrevista())
                 .dtChegada(carga.getDtChegada())
                 .pesoCarga(carga.getPesoCarga())
+                .valorTotal(carga.getValorTotal())
                 .kmInicial(carga.getKmInicial())
                 .kmFinal(carga.getKmFinal())
                 .kmTotal(kmTotal)

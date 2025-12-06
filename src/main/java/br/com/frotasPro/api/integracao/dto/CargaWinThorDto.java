@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -24,6 +25,8 @@ public class CargaWinThorDto {
     private String destino;
 
     private Double pesoTotalKg;
+    private BigDecimal valorTotal;
+
     private String situacaoMdfe;
 
     private Integer totalClientes;

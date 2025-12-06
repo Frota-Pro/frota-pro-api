@@ -1,6 +1,8 @@
 package br.com.frotasPro.api.controller.response;
 
+import br.com.frotasPro.api.config.json.BigDecimalSemZerosSerializer;
 import br.com.frotasPro.api.domain.enums.Status;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,7 +25,10 @@ public class CargaResponse {
     private LocalDate dtPrevista;
     private LocalDate dtChegada;
 
+    @JsonSerialize(using = BigDecimalSemZerosSerializer.class)
     private BigDecimal pesoCarga;
+    @JsonSerialize(using = BigDecimalSemZerosSerializer.class)
+    private BigDecimal valorTotal;
 
     private Integer kmInicial;
     private Integer kmFinal;

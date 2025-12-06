@@ -41,14 +41,18 @@ public interface MetaRepository extends JpaRepository <Meta, UUID>{
     );
 
     @Query("""
-           select m
-           from Meta m
-           where m.tipoMeta = :tipoMeta
-             and m.statusMeta = :status
-             and m.dataIncio <= :data and m.dataFim >= :data
-             and (:caminhaoCodigo is null or m.caminhao.codigo = :caminhaoCodigo)
-             and (:motoristaCodigo is null or m.motorista.codigo = :motoristaCodigo)
-           """)
+       select m
+       from Meta m
+       left join m.caminhao c
+       left join m.motorista mot
+       where m.tipoMeta = :tipoMeta
+         and m.statusMeta = :status
+         and m.dataIncio <= :data and m.dataFim >= :data
+         and (
+              (:caminhaoCodigo is not null and c.codigo = :caminhaoCodigo)
+              or (:motoristaCodigo is not null and mot.codigo = :motoristaCodigo)
+         )
+       """)
     List<Meta> buscarMetasAtivasPorAlvoEData(
             @Param("tipoMeta") TipoMeta tipoMeta,
             @Param("status") StatusMeta status,
@@ -56,6 +60,7 @@ public interface MetaRepository extends JpaRepository <Meta, UUID>{
             @Param("caminhaoCodigo") String caminhaoCodigo,
             @Param("motoristaCodigo") String motoristaCodigo
     );
+
 
     @Query("""
            select m

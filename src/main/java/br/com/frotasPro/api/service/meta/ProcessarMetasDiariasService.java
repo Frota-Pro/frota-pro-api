@@ -2,7 +2,6 @@ package br.com.frotasPro.api.service.meta;
 
 import br.com.frotasPro.api.domain.Meta;
 import br.com.frotasPro.api.domain.enums.StatusMeta;
-import br.com.frotasPro.api.domain.enums.TipoMeta;
 import br.com.frotasPro.api.repository.MetaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

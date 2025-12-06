@@ -1,7 +1,9 @@
 package br.com.frotasPro.api.controller.response;
 
+import br.com.frotasPro.api.config.json.BigDecimalSemZerosSerializer;
 import br.com.frotasPro.api.domain.enums.StatusMeta;
 import br.com.frotasPro.api.domain.enums.TipoMeta;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -17,7 +19,9 @@ public class MetaResponse {
     private LocalDate dataIncio;
     private LocalDate dataFim;
     private TipoMeta tipoMeta;
+    @JsonSerialize(using = BigDecimalSemZerosSerializer.class)
     private BigDecimal valorMeta;
+    @JsonSerialize(using = BigDecimalSemZerosSerializer.class)
     private BigDecimal valorRealizado;
     private String unidade;
     private StatusMeta statusMeta;

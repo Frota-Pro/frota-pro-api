@@ -7,7 +7,9 @@ import br.com.frotasPro.api.domain.enums.Status;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
+import br.com.frotasPro.api.util.AtualizarMetaCargaTransportadaService;
 import br.com.frotasPro.api.util.AtualizarMetaQuilometragemService;
+import br.com.frotasPro.api.util.AtualizarMetaToneladaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,8 @@ public class FinalizarCargaService {
 
     private final CargaRepository cargaRepository;
     private final AtualizarMetaQuilometragemService atualizarMetaQuilometragemService;
+    private final AtualizarMetaToneladaService atualizarMetaToneladaService;
+    private final AtualizarMetaCargaTransportadaService atualizarMetaCargaTransportadaService;
 
 
     @Transactional
@@ -66,6 +70,20 @@ public class FinalizarCargaService {
                 kmFinal,
                 carga.getDtChegada()
         );
+
+        atualizarMetaToneladaService.registrarTonelada(
+                carga.getCaminhao().getCodigo(),
+                carga.getMotorista() != null ? carga.getMotorista().getCodigo() : null,
+                carga.getPesoCarga(),
+                carga.getDtChegada()
+        );
+
+        atualizarMetaCargaTransportadaService.registrarCarga(
+                carga.getCaminhao().getCodigo(),
+                carga.getMotorista() != null ? carga.getMotorista().getCodigo() : null,
+                carga.getDtChegada()
+        );
+
 
 
         cargaRepository.save(carga);

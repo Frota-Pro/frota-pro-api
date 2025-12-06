@@ -53,6 +53,9 @@ public class Carga extends AuditoriaBase{
     @Column(name = "peso_carga", precision = 15, scale = 3)
     private BigDecimal pesoCarga;
 
+    @Column(name = "valor_total", precision = 15, scale = 3)
+    private BigDecimal valorTotal;
+
     @Column(name = "km_inicial")
     private Integer kmInicial;
 
