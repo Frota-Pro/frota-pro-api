@@ -79,4 +79,22 @@ public interface MetaRepository extends JpaRepository <Meta, UUID>{
             @Param("inicio") LocalDate inicio,
             @Param("fim") LocalDate fim
     );
+
+    Optional<Meta> findFirstByTipoMetaAndMotoristaAndStatusMetaOrderByDataIncioDesc(
+            TipoMeta tipoMeta,
+            Motorista motorista,
+            StatusMeta statusMeta
+    );
+
+    Optional<Meta> findFirstByTipoMetaAndCaminhaoAndStatusMetaOrderByDataIncioDesc(
+            TipoMeta tipoMeta,
+            Caminhao caminhao,
+            StatusMeta statusMeta
+    );
+
+    Optional<Meta> findFirstByTipoMetaAndCategoriaAndStatusMetaOrderByDataIncioDesc(
+            TipoMeta tipoMeta,
+            CategoriaCaminhao categoria,
+            StatusMeta statusMeta
+    );
 }

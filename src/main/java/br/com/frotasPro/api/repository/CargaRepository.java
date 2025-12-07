@@ -56,4 +56,19 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
     Optional<Carga> buscarCargaAtualDoMotorista(
             @Param("codmotorista") String codmotorista,
             @Param("status") List<Status> status);
+
+    @Query("""
+            select c
+            from Carga c
+               join fetch c.motorista m
+               join fetch c.caminhao cam
+            where m.codigo = :codigoMotorista
+              and c.dtSaida between :inicio and :fim
+            order by c.dtSaida asc, c.id asc
+            """)
+    List<Carga> findByMotoristaCodigoAndPeriodo(
+            @Param("codigoMotorista") String codigoMotorista,
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim
+    );
 }

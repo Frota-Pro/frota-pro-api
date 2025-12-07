@@ -92,4 +92,18 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, UU
        """)
     BigDecimal mediaKmLitroPorCaminhaoEPeriodo(UUID caminhaoId, LocalDateTime inicio, LocalDateTime fim);
 
+    @Query("""
+    select a
+    from Abastecimento a
+    where a.caminhao.id = :caminhaoId
+      and a.kmOdometro between :kmIni and :kmFim
+    order by a.dtAbastecimento
+""")
+    List<Abastecimento> findByCaminhaoAndKmRodado(
+            @Param("caminhaoId") UUID caminhaoId,
+            @Param("kmIni") Integer kmInicial,
+            @Param("kmFim") Integer kmFinal
+    );
+
+
 }
