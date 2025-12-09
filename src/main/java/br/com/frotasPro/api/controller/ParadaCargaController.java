@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -32,6 +33,7 @@ public class ParadaCargaController {
     private final AtualizarParadaCargaService atualizarService;
     private final DeletarParadaCargaService deletarService;
     private final RegistrarAnexoParadaService registrarAnexoParadaService;
+    private final ListarAnexosParadaService listarAnexosParadaService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
     @PostMapping
@@ -146,5 +148,11 @@ public class ParadaCargaController {
         return ResponseEntity.created(location).body(response);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
+    @GetMapping("/{paradaId}/anexos")
+    public ResponseEntity<List<AnexoParadaResponse>> listarAnexos(@PathVariable UUID paradaId) {
 
+        List<AnexoParadaResponse> anexos = listarAnexosParadaService.listarPorParada(paradaId);
+        return ResponseEntity.ok(anexos);
+    }
 }

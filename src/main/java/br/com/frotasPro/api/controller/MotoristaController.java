@@ -1,8 +1,10 @@
 package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.MotoristaRequest;
+import br.com.frotasPro.api.controller.response.DocumentoMotoristaResponse;
 import br.com.frotasPro.api.controller.response.MotoristaResponse;
 import br.com.frotasPro.api.controller.response.RelatorioMetaMensalMotoristaResponse;
+import br.com.frotasPro.api.domain.enums.TipoDocumentoMotorista;
 import br.com.frotasPro.api.service.motorista.*;
 import br.com.frotasPro.api.service.relatorios.RelatorioMetaMensalMotoristaService;
 import jakarta.validation.Valid;
@@ -10,13 +12,17 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/motorista")
@@ -29,7 +35,8 @@ public class MotoristaController {
     private final AtualizarMotoristaService atualizarMotoristaService;
     private final DeletarMotoristaService deletarMotoristaService;
     private final RelatorioMetaMensalMotoristaService relatorioMetaMensalMotoristaService;
-
+    private final ListarDocumentoMotoristaService listarDocumentoMotoristaService;
+    private final RegistrarDocumentoMotoristaService registrarDocumentoMotoristaService;
 
     @PreAuthorize("hasAnyAuthority(\'ROLE_CONSULTA\')")
     @GetMapping("/{codigo}")
@@ -89,4 +96,39 @@ public class MotoristaController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
+    @PostMapping(
+            value = "/{motoristaId}/documentos",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<DocumentoMotoristaResponse> uploadDocumentoMotorista(
+            @PathVariable UUID motoristaId,
+            @RequestParam("tipoDocumento") TipoDocumentoMotorista tipoDocumento,
+            @RequestParam(value = "observacao", required = false) String observacao,
+            @RequestPart("arquivo") MultipartFile arquivo
+    ) {
+        DocumentoMotoristaResponse response =
+                registrarDocumentoMotoristaService.registrar(motoristaId, tipoDocumento, observacao, arquivo);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(response.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(response);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
+    @GetMapping("/{motoristaId}/documentos")
+    public ResponseEntity<List<DocumentoMotoristaResponse>> listarDocumentosMotorista(
+            @PathVariable UUID motoristaId
+    ) {
+        List<DocumentoMotoristaResponse> documentos =
+                listarDocumentoMotoristaService.listarPorMotorista(motoristaId);
+
+        return ResponseEntity.ok(documentos);
+    }
+
 }
