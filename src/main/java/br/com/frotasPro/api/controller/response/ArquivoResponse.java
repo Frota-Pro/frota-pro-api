@@ -11,6 +11,7 @@ public class ArquivoResponse {
 
     private UUID id;
     private String nomeOriginal;
+    private String urlPreview;
     private String urlDownload;
     private String contentType;
     private Long tamanhoBytes;

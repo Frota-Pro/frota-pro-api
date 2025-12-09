@@ -50,7 +50,6 @@ public class RegistrarAnexoParadaService {
 
         String pastaTipoAnexo = tipoAnexo.name();
 
-
         Arquivo arquivo = salvarArquivoService.salvar(arquivoMultipart, pastaCarga, pastaTipoAnexo);
 
         AnexoParada anexo = new AnexoParada();
@@ -67,12 +66,7 @@ public class RegistrarAnexoParadaService {
     private AnexoParadaResponse toResponse(AnexoParada anexo) {
         Arquivo arquivo = anexo.getArquivo();
 
-        ArquivoResponse arquivoResponse = new ArquivoResponse();
-        arquivoResponse.setId(arquivo.getId());
-        arquivoResponse.setNomeOriginal(arquivo.getNomeOriginal());
-        arquivoResponse.setContentType(arquivo.getContentType());
-        arquivoResponse.setTamanhoBytes(arquivo.getTamanhoBytes());
-        arquivoResponse.setUrlDownload("/arquivos/" + arquivo.getId());
+        ArquivoResponse arquivoResponse = toArquivoResponse(arquivo);
 
         AnexoParadaResponse response = new AnexoParadaResponse();
         response.setId(anexo.getId());
@@ -81,5 +75,18 @@ public class RegistrarAnexoParadaService {
         response.setArquivo(arquivoResponse);
 
         return response;
+    }
+
+    private ArquivoResponse toArquivoResponse(Arquivo arquivo) {
+        ArquivoResponse arquivoResponse = new ArquivoResponse();
+        arquivoResponse.setId(arquivo.getId());
+        arquivoResponse.setNomeOriginal(arquivo.getNomeOriginal());
+        arquivoResponse.setContentType(arquivo.getContentType());
+        arquivoResponse.setTamanhoBytes(arquivo.getTamanhoBytes());
+
+        arquivoResponse.setUrlPreview("/arquivos/" + arquivo.getId() + "/preview");
+        arquivoResponse.setUrlDownload("/arquivos/" + arquivo.getId() + "/download");
+
+        return arquivoResponse;
     }
 }
