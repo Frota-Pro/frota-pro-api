@@ -27,7 +27,10 @@ public class SalvarArquivoService {
 
     private final ArquivoRepository arquivoRepository;
 
-    public Arquivo salvar(MultipartFile multipartFile) {
+    public Arquivo salvar(MultipartFile multipartFile,
+                          String pastaCarga,
+                          String pastaTipoAnexo) {
+
         if (multipartFile == null || multipartFile.isEmpty()) {
             throw new BusinessException("Arquivo não informado ou vazio.");
         }
@@ -41,8 +44,15 @@ public class SalvarArquivoService {
                 return arquivoExistente.get();
             }
 
+            String pastaCargaSanitizada = sanitizeFolderName(pastaCarga);
+            String pastaTipoSanitizada = sanitizeFolderName(pastaTipoAnexo);
+
             Path root = Paths.get(uploadDir).toAbsolutePath().normalize();
-            Files.createDirectories(root);
+            Path pastaDestino = root
+                    .resolve(pastaCargaSanitizada)
+                    .resolve(pastaTipoSanitizada);
+
+            Files.createDirectories(pastaDestino);
 
             String nomeOriginal = multipartFile.getOriginalFilename();
             String extensao = "";
@@ -51,7 +61,7 @@ public class SalvarArquivoService {
             }
 
             String nomeArmazenado = UUID.randomUUID() + extensao;
-            Path destino = root.resolve(nomeArmazenado);
+            Path destino = pastaDestino.resolve(nomeArmazenado);
 
             try (InputStream inputStream = multipartFile.getInputStream()) {
                 Files.copy(inputStream, destino, StandardCopyOption.REPLACE_EXISTING);
@@ -65,7 +75,7 @@ public class SalvarArquivoService {
             arquivo.setHash(hash);
 
             Arquivo salvo = arquivoRepository.save(arquivo);
-            log.info("Arquivo salvo com sucesso. id={} caminho={}", salvo.getId(), salvo.getCaminho());
+            log.info("Arquivo salvo. id={} caminho={}", salvo.getId(), salvo.getCaminho());
 
             return salvo;
         } catch (IOException e) {
@@ -86,5 +96,12 @@ public class SalvarArquivoService {
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException("Algoritmo de hash não suportado.", e);
         }
+    }
+
+    private String sanitizeFolderName(String value) {
+        if (value == null || value.isBlank()) {
+            return "DESCONHECIDO";
+        }
+        return value.replaceAll("[^a-zA-Z0-9-_]", "_");
     }
 }

@@ -4,6 +4,7 @@ import br.com.frotasPro.api.controller.response.AnexoParadaResponse;
 import br.com.frotasPro.api.controller.response.ArquivoResponse;
 import br.com.frotasPro.api.domain.AnexoParada;
 import br.com.frotasPro.api.domain.Arquivo;
+import br.com.frotasPro.api.domain.Carga;
 import br.com.frotasPro.api.domain.ParadaCarga;
 import br.com.frotasPro.api.domain.enums.TipoAnexoParada;
 import br.com.frotasPro.api.excption.ObjectNotFound;
@@ -34,7 +35,23 @@ public class RegistrarAnexoParadaService {
         ParadaCarga parada = paradaCargaRepository.findById(paradaId)
                 .orElseThrow(() -> new ObjectNotFound("Parada não encontrada para o id: " + paradaId));
 
-        Arquivo arquivo = salvarArquivoService.salvar(arquivoMultipart);
+        Carga carga = parada.getCarga();
+
+        if (carga == null) {
+            throw new ObjectNotFound("Parada não está vinculada a nenhuma carga.");
+        }
+
+        String pastaCarga;
+        if (carga.getNumeroCarga() != null && !carga.getNumeroCarga().isBlank()) {
+            pastaCarga = "CARGA_" + carga.getNumeroCarga();
+        } else {
+            pastaCarga = "CARGA_" + carga.getId();
+        }
+
+        String pastaTipoAnexo = tipoAnexo.name();
+
+
+        Arquivo arquivo = salvarArquivoService.salvar(arquivoMultipart, pastaCarga, pastaTipoAnexo);
 
         AnexoParada anexo = new AnexoParada();
         anexo.setParada(parada);
