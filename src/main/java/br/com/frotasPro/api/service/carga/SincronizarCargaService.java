@@ -8,16 +8,18 @@ import br.com.frotasPro.api.domain.enums.Status;
 import br.com.frotasPro.api.integracao.dto.CargaSyncResponseEvent;
 import br.com.frotasPro.api.integracao.dto.CargaWinThorDto;
 import br.com.frotasPro.api.integracao.dto.ClienteCargaWinThorDto;
-import br.com.frotasPro.api.repository.*;
+import br.com.frotasPro.api.repository.CaminhaoRepository;
+import br.com.frotasPro.api.repository.CargaClienteRepository;
+import br.com.frotasPro.api.repository.CargaNotaRepository;
+import br.com.frotasPro.api.repository.CargaRepository;
+import br.com.frotasPro.api.repository.MotoristaRepository;
+import br.com.frotasPro.api.repository.RotaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -78,7 +80,7 @@ public class SincronizarCargaService {
         carga.setCaminhao(caminhaoOpt.get());
 
         String destino = dto.getDestino();
-        var rota = rotaRepository.findByCidadeInicio(destino)
+        Rota rota = rotaRepository.findByCidadeInicio(destino)
                 .orElseGet(() -> {
                     Rota novaRota = new Rota();
                     novaRota.setCidadeInicio(destino);
@@ -86,7 +88,9 @@ public class SincronizarCargaService {
                 });
         carga.setRota(rota);
 
-        carga.setDtFaturamento(dto.getDtSaida().toLocalDate());
+        if (dto.getDtSaida() != null) {
+            carga.setDtFaturamento(dto.getDtSaida().toLocalDate());
+        }
 
         carga.setPesoCarga(dto.getPesoTotalKg() != null
                 ? BigDecimal.valueOf(dto.getPesoTotalKg())
@@ -101,22 +105,23 @@ public class SincronizarCargaService {
         carga.setStatusCarga(Status.SINCRONIZADA);
 
         for (ClienteCargaWinThorDto cli : dto.getClientes()) {
+
+            String clienteStr = cli.getCodCli() + " - " + cli.getNomeCli();
+
             CargaCliente cc = new CargaCliente();
             cc.setCarga(carga);
-            cc.setCliente(cli.getCodCli() + " - " + cli.getNomeCli());
+            cc.setCliente(clienteStr);
             carga.getClientes().add(cc);
-        }
 
-        Set<String> notas = dto.getClientes().stream()
-                .flatMap(c -> c.getNotas().stream())
-                .map(String::valueOf)
-                .collect(Collectors.toCollection(HashSet::new));
-
-        for (String nota : notas) {
-            CargaNota cn = new CargaNota();
-            cn.setCarga(carga);
-            cn.setNota(nota);
-            carga.getNotas().add(cn);
+            if (cli.getNotas() != null) {
+                for (Long nota : cli.getNotas()) {
+                    CargaNota cn = new CargaNota();
+                    cn.setCarga(carga);
+                    cn.setCliente(clienteStr);
+                    cn.setNota(String.valueOf(nota));
+                    carga.getNotas().add(cn);
+                }
+            }
         }
 
         cargaRepository.save(carga);

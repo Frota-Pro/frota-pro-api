@@ -2,6 +2,7 @@ package br.com.frotasPro.api.mapper;
 
 import br.com.frotasPro.api.controller.request.CargaRequest;
 import br.com.frotasPro.api.controller.response.CargaResponse;
+import br.com.frotasPro.api.controller.response.ClienteCargaResponse;
 import br.com.frotasPro.api.domain.*;
 
 import java.util.List;
@@ -54,10 +55,6 @@ public class CargaMapper {
     }
 
     public static CargaResponse toResponse(Carga carga) {
-
-        Integer kmTotal = carga.calcularKmTotal();
-        long atraso = carga.calcularAtraso();
-
         return CargaResponse.builder()
                 .id(carga.getId())
                 .numeroCarga(carga.getNumeroCarga())
@@ -69,16 +66,23 @@ public class CargaMapper {
                 .valorTotal(carga.getValorTotal())
                 .kmInicial(carga.getKmInicial())
                 .kmFinal(carga.getKmFinal())
-                .kmTotal(kmTotal)
-                .diasAtraso(atraso)
+                .kmTotal(carga.calcularKmTotal())
+                .diasAtraso(carga.calcularAtraso())
                 .clientes(
-                        carga.getClientes().stream()
-                                .map(CargaCliente::getCliente)
-                                .toList()
-                )
-                .notas(
-                        carga.getNotas().stream()
-                                .map(CargaNota::getNota)
+                        carga.getClientes()
+                                .stream()
+                                .map(cc ->
+                                        ClienteCargaResponse.builder()
+                                                .cliente(cc.getCliente())
+                                                .notas(
+                                                        carga.getNotas()
+                                                                .stream()
+                                                                .filter(n -> n.getCliente().equals(cc.getCliente()))
+                                                                .map(CargaNota::getNota)
+                                                                .toList()
+                                                )
+                                                .build()
+                                )
                                 .toList()
                 )
                 .statusCarga(carga.getStatusCarga())
@@ -95,4 +99,5 @@ public class CargaMapper {
                 )
                 .build();
     }
+
 }

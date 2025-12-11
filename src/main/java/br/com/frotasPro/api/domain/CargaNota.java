@@ -20,6 +20,10 @@ public class CargaNota {
     private Carga carga;
 
     @Id
+    @Column(name = "cliente", nullable = false, length = 150)
+    private String cliente;
+
+    @Id
     @Column(name = "nota", nullable = false, length = 30)
     private String nota;
 
@@ -27,6 +31,7 @@ public class CargaNota {
     @Setter
     public static class CargaNotaId implements Serializable {
         private UUID carga;
+        private String cliente;
         private String nota;
     }
 }
