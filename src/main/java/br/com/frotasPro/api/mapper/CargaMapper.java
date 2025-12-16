@@ -7,6 +7,8 @@ import br.com.frotasPro.api.domain.*;
 
 import java.util.List;
 
+import static java.util.stream.Collectors.*;
+
 public class CargaMapper {
 
     public static Carga toEntity(CargaRequest request,
@@ -69,19 +71,19 @@ public class CargaMapper {
                 .kmTotal(carga.calcularKmTotal())
                 .diasAtraso(carga.calcularAtraso())
                 .clientes(
-                        carga.getClientes()
+                        carga.getNotas().stream()
+                                .collect(
+                                        groupingBy(
+                                                CargaNota::getCliente,
+                                                mapping(CargaNota::getNota, toList())
+                                        )
+                                )
+                                .entrySet()
                                 .stream()
-                                .map(cc ->
-                                        ClienteCargaResponse.builder()
-                                                .cliente(cc.getCliente())
-                                                .notas(
-                                                        carga.getNotas()
-                                                                .stream()
-                                                                .filter(n -> n.getCliente().equals(cc.getCliente()))
-                                                                .map(CargaNota::getNota)
-                                                                .toList()
-                                                )
-                                                .build()
+                                .map(entry -> ClienteCargaResponse.builder()
+                                        .cliente(entry.getKey())
+                                        .notas(entry.getValue())
+                                        .build()
                                 )
                                 .toList()
                 )

@@ -63,9 +63,6 @@ public class Carga extends AuditoriaBase{
     private Integer kmFinal;
 
     @OneToMany(mappedBy = "carga", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CargaCliente> clientes = new ArrayList<>();
-
-    @OneToMany(mappedBy = "carga", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CargaNota> notas = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)

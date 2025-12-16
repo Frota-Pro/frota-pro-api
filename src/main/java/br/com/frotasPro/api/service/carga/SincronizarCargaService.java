@@ -1,7 +1,6 @@
 package br.com.frotasPro.api.service.carga;
 
 import br.com.frotasPro.api.domain.Carga;
-import br.com.frotasPro.api.domain.CargaCliente;
 import br.com.frotasPro.api.domain.CargaNota;
 import br.com.frotasPro.api.domain.Rota;
 import br.com.frotasPro.api.domain.enums.Status;
@@ -9,7 +8,6 @@ import br.com.frotasPro.api.integracao.dto.CargaSyncResponseEvent;
 import br.com.frotasPro.api.integracao.dto.CargaWinThorDto;
 import br.com.frotasPro.api.integracao.dto.ClienteCargaWinThorDto;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
-import br.com.frotasPro.api.repository.CargaClienteRepository;
 import br.com.frotasPro.api.repository.CargaNotaRepository;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
@@ -30,7 +28,6 @@ public class SincronizarCargaService {
     private final MotoristaRepository motoristaRepository;
     private final CaminhaoRepository caminhaoRepository;
     private final RotaRepository rotaRepository;
-    private final CargaClienteRepository cargaClienteRepository;
     private final CargaNotaRepository cargaNotaRepository;
 
     @Transactional
@@ -52,11 +49,10 @@ public class SincronizarCargaService {
         if (nova) {
             carga.setNumeroCargaExterno(dto.getNumCar().toString());
         } else {
-            cargaClienteRepository.deleteByCargaId(carga.getId());
             cargaNotaRepository.deleteByCargaId(carga.getId());
-
-            carga.getClientes().clear();
-            carga.getNotas().clear();
+            if (carga.getNotas() != null) {
+                carga.getNotas().clear();
+            }
         }
 
         var motoristaOpt = motoristaRepository
@@ -104,14 +100,13 @@ public class SincronizarCargaService {
 
         carga.setStatusCarga(Status.SINCRONIZADA);
 
+        int totalClientes = 0;
+        int totalNotas = 0;
+
         for (ClienteCargaWinThorDto cli : dto.getClientes()) {
 
             String clienteStr = cli.getCodCli() + " - " + cli.getNomeCli();
-
-            CargaCliente cc = new CargaCliente();
-            cc.setCarga(carga);
-            cc.setCliente(clienteStr);
-            carga.getClientes().add(cc);
+            totalClientes++;
 
             if (cli.getNotas() != null) {
                 for (Long nota : cli.getNotas()) {
@@ -120,6 +115,7 @@ public class SincronizarCargaService {
                     cn.setCliente(clienteStr);
                     cn.setNota(String.valueOf(nota));
                     carga.getNotas().add(cn);
+                    totalNotas++;
                 }
             }
         }
@@ -128,8 +124,8 @@ public class SincronizarCargaService {
 
         log.info("Carga {} sincronizada. {} clientes, {} notas",
                 dto.getNumMdfe(),
-                carga.getClientes().size(),
-                carga.getNotas().size());
+                totalClientes,
+                totalNotas);
     }
 
 }
