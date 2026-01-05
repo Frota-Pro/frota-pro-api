@@ -1,0 +1,39 @@
+### Listar todas as cargas
+GET {{baseUrl}}/carga
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Buscar carga por número
+GET {{baseUrl}}/carga/CAR-000001
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Buscar carga por número externo
+GET {{baseUrl}}/carga/externo/392914
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Buscar cargas por data de saída
+GET {{baseUrl}}/carga/data-saida?data=2026-01-05
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Buscar cargas por periodo de saída
+GET {{baseUrl}}/carga/periodo-saida?inicio=2026-01-05&fim=2026-01-05
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Buscar por período de criação (data/hora)
+GET {{baseUrl}}/carga/periodo-criacao?inicio=2026-01-05T00:00:00&fim=2026-01-05T23:59:59
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Buscar cargas por motorista
+GET {{baseUrl}}/carga/motorista?codigo=MOT-00001
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Buscar cargas por caminhão
+GET {{baseUrl}}/carga/caminhao?codigo=CAM-00001
+Authorization: Bearer {{token}}
+Accept: application/json
