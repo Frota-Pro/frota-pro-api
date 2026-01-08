@@ -1,6 +1,7 @@
 package br.com.frotasPro.api.mapper;
 
 import br.com.frotasPro.api.controller.request.CargaRequest;
+import br.com.frotasPro.api.controller.response.CargaMinResponse;
 import br.com.frotasPro.api.controller.response.CargaResponse;
 import br.com.frotasPro.api.controller.response.ClienteCargaResponse;
 import br.com.frotasPro.api.domain.*;
@@ -100,6 +101,20 @@ public class CargaMapper {
                                 .toList()
                 )
                 .build();
+    }
+
+    public static CargaMinResponse toMinResponse(Carga carga) {
+        return CargaMinResponse.builder()
+                .numeroCarga(carga.getNumeroCarga())
+                .numeroCargaExterno(carga.getNumeroCargaExterno())
+                .dtSaida(carga.getDtSaida())
+                .pesoCarga(carga.getPesoCarga())
+                .valorTotal(carga.getValorTotal())
+                .statusCarga(carga.getStatusCarga())
+                .nomeMotorista(carga.getMotorista().getNome())
+                .placaCaminhao(carga.getCaminhao().getPlaca())
+                .build();
+
     }
 
 }

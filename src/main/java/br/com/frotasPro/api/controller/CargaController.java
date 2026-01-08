@@ -1,6 +1,7 @@
 package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.CargaRequest;
+import br.com.frotasPro.api.controller.response.CargaMinResponse;
 import br.com.frotasPro.api.controller.response.CargaResponse;
 import br.com.frotasPro.api.service.carga.*;
 import jakarta.validation.Valid;
@@ -52,8 +53,8 @@ public class CargaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping
-    public ResponseEntity<Page<CargaResponse>> listar(Pageable pageable) {
-        Page<CargaResponse> cargas = listarCargaService.listar(pageable);
+    public ResponseEntity<Page<CargaMinResponse>> listar(Pageable pageable) {
+        Page<CargaMinResponse> cargas = listarCargaService.listar(pageable);
         return ResponseEntity.ok(cargas);
     }
 

@@ -1,5 +1,6 @@
 package br.com.frotasPro.api.service.carga;
 
+import br.com.frotasPro.api.controller.response.CargaMinResponse;
 import br.com.frotasPro.api.controller.response.CargaResponse;
 import br.com.frotasPro.api.domain.Carga;
 import br.com.frotasPro.api.mapper.CargaMapper;
@@ -17,8 +18,8 @@ public class ListarCargaService {
     private final CargaRepository cargaRepository;
 
     @Transactional(readOnly = true)
-    public Page<CargaResponse> listar(Pageable pageable) {
+    public Page<CargaMinResponse> listar(Pageable pageable) {
         Page<Carga> cargas = cargaRepository.findAll(pageable);
-        return cargas.map(CargaMapper::toResponse);
+        return cargas.map(CargaMapper::toMinResponse);
     }
 }
