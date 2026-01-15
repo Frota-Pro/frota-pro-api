@@ -71,4 +71,11 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
             @Param("inicio") LocalDate inicio,
             @Param("fim") LocalDate fim
     );
+
+    long countByStatusCarga(Status statusCarga);
+
+    long countByStatusCargaAndDtChegada(Status statusCarga, LocalDate dtChegada);
+
+    List<Carga> findTop5ByOrderByCriadoEmDesc();
+
 }

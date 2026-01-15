@@ -1,6 +1,7 @@
 package br.com.frotasPro.api.repository;
 
 import br.com.frotasPro.api.domain.Manutencao;
+import br.com.frotasPro.api.domain.enums.StatusManutencao;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -40,4 +41,7 @@ public interface ManutencaoRepository extends JpaRepository<Manutencao, UUID> {
             LocalDate inicio,
             LocalDate fim
     );
+
+    long countByStatusManutencaoIn(List<StatusManutencao> status);
+
 }

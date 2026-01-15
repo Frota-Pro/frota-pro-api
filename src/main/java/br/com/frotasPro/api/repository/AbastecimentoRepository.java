@@ -105,5 +105,13 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, UU
             @Param("kmFim") Integer kmFinal
     );
 
+    @Query("""
+        select coalesce(sum(a.qtLitros), 0)
+        from Abastecimento a
+        where a.dtAbastecimento >= :inicio
+    """)
+    BigDecimal sumLitrosFrom(@Param("inicio") LocalDateTime inicio);
+
+
 
 }
