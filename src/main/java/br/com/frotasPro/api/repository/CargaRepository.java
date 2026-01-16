@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -78,4 +79,31 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
 
     List<Carga> findTop5ByOrderByCriadoEmDesc();
 
+    @Query("""
+       select count(c)
+       from Carga c
+       where c.caminhao.codigo = :codigo
+          or c.caminhao.codigoExterno = :codigo
+       """)
+    long countByCaminhaoCodigoOuCodigoExterno(@Param("codigo") String codigo);
+
+    @Query("""
+       select count(c)
+       from Carga c
+       where (c.caminhao.codigo = :codigo
+          or c.caminhao.codigoExterno = :codigo)
+         and c.statusCarga = :status
+       """)
+    long countByCaminhaoCodigoOuCodigoExternoAndStatus(
+            @Param("codigo") String codigo,
+            @Param("status") Status status
+    );
+
+    @Query("""
+       select coalesce(sum(c.pesoCarga), 0)
+       from Carga c
+       where c.caminhao.codigo = :codigo
+          or c.caminhao.codigoExterno = :codigo
+       """)
+    BigDecimal sumPesoPorCaminhaoCodigoOuCodigoExterno(@Param("codigo") String codigo);
 }

@@ -4,11 +4,13 @@ import br.com.frotasPro.api.controller.response.MetaResponse;
 import br.com.frotasPro.api.domain.Meta;
 import br.com.frotasPro.api.domain.enums.StatusMeta;
 import br.com.frotasPro.api.domain.enums.TipoMeta;
+import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.mapper.MetaMapper;
 import br.com.frotasPro.api.repository.MetaRepository;
 import br.com.frotasPro.api.util.ProgressoMetaKmLitroService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -21,44 +23,16 @@ public class BuscarMetaAtivaComProgressoService {
     private final MetaRepository metaRepository;
     private final ProgressoMetaKmLitroService progressoMetaKmLitroService;
 
-    public MetaResponse buscarMetaAtivaCaminhao(String caminhaoCodigo, LocalDate dataReferencia) {
+    @Transactional(readOnly = true)
+    public MetaResponse buscar(String codigoCaminhao, LocalDate dataReferencia) {
 
-        List<Meta> metas = metaRepository.buscarMetasAtivasPorAlvoEData(
-                null,
-                StatusMeta.EM_ANDAMENTO,
-                dataReferencia,
-                caminhaoCodigo,
-                null
-        );
+        var meta = metaRepository.buscarMetaAtivaCaminhaoNaData(codigoCaminhao, dataReferencia)
+                .orElseThrow(() -> new ObjectNotFound(
+                        "Nenhuma meta ativa para o caminhão " + codigoCaminhao + " na data " + dataReferencia
+                ));
 
-        if (metas.isEmpty()) return null;
-
-        Meta meta = metas.get(0);
-        MetaResponse base = MetaMapper.toResponse(meta);
-
-        if (meta.getTipoMeta() == TipoMeta.CONSUMO_COMBUSTIVEL) {
-            BigDecimal realizado = progressoMetaKmLitroService.calcularProgressoKmLitroParaMeta(meta);
-            base = MetaResponse.builder()
-                    .id(base.getId())
-                    .dataIncio(base.getDataIncio())
-                    .dataFim(base.getDataFim())
-                    .tipoMeta(base.getTipoMeta())
-                    .valorMeta(base.getValorMeta())
-                    .valorRealizado(realizado)
-                    .unidade(base.getUnidade())
-                    .statusMeta(base.getStatusMeta())
-                    .descricao(base.getDescricao())
-                    .caminhaoCodigo(base.getCaminhaoCodigo())
-                    .caminhaoDescricao(base.getCaminhaoDescricao())
-                    .categoriaCodigo(base.getCategoriaCodigo())
-                    .categoriaDescricao(base.getCategoriaDescricao())
-                    .motoristaCodigo(base.getMotoristaCodigo())
-                    .motoristaDescricao(base.getMotoristaDescricao())
-                    .renovarAutomaticamente(base.isRenovarAutomaticamente())
-                    .build();
-        }
-
-        return base;
+        return MetaMapper.toResponse(meta);
     }
+
 }
 

@@ -107,4 +107,23 @@ public interface MetaRepository extends JpaRepository <Meta, UUID>{
     """)
     long countMetasAtivas(@Param("status") StatusMeta status, @Param("data") LocalDate data);
 
+    @Query("""
+      select m
+      from Meta m
+      where m.statusMeta = :status
+        and m.caminhao.codigo = :codigo
+        and m.dataIncio <= :dataReferencia
+        and m.dataFim >= :dataReferencia
+    """)
+    Optional<Meta> buscarMetaAtivaCaminhaoNaData(
+            @Param("codigo") String codigo,
+            @Param("dataReferencia") LocalDate dataReferencia,
+            @Param("status") StatusMeta status
+    );
+
+    default Optional<Meta> buscarMetaAtivaCaminhaoNaData(String codigo, LocalDate dataReferencia) {
+        return buscarMetaAtivaCaminhaoNaData(codigo, dataReferencia, StatusMeta.EM_ANDAMENTO);
+    }
+
+
 }

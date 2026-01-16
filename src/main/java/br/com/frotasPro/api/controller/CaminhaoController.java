@@ -1,6 +1,8 @@
 package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.CaminhaoRequest;
+import br.com.frotasPro.api.controller.request.VincularCategoriaCaminhaoEmLoteRequest;
+import br.com.frotasPro.api.controller.response.CaminhaoDetalheResponse;
 import br.com.frotasPro.api.controller.response.CaminhaoResponse;
 import br.com.frotasPro.api.controller.response.DocumentoCaminhaoResponse;
 import br.com.frotasPro.api.domain.enums.TipoDocumentoCaminhao;
@@ -30,17 +32,22 @@ public class CaminhaoController {
     private final CriarCaminhaoService criarCaminhaoService;
     private final AtualizarCaminhaoService atualizarCaminhaoService;
     private final DeletarCaminhaoService deletarCaminhaoService;
+    private final AtivarCaminhaoService ativarCaminhaoService;
     private final ListarDocumentoCaminhaoService listarDocumentoCaminhaoService;
     private final RegistrarDocumentoCaminhaoService registrarDocumentoCaminhaoService;
+    private final BuscarCaminhaoDetalheService buscarCaminhaoDetalheService;
+    private final VincularCategoriaCaminhaoEmLoteService vincularCategoriaCaminhaoEmLoteService;
 
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping
-    public ResponseEntity<Page<CaminhaoResponse>> listar(Pageable pageable) {
-        Page<CaminhaoResponse> caminhoes = listarCaminhaoService.listar(pageable);
-        return ResponseEntity.ok(caminhoes);
+    public ResponseEntity<Page<CaminhaoResponse>> listar(
+            @RequestParam(required = false) Boolean ativo,
+            @RequestParam(required = false) String q,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(listarCaminhaoService.listar(ativo, q, pageable));
     }
-
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/{codigo}")
@@ -101,6 +108,13 @@ public class CaminhaoController {
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PatchMapping("/{codigo}/ativar")
+    public ResponseEntity<Void> ativar(@PathVariable String codigo) {
+        ativarCaminhaoService.ativar(codigo);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @PostMapping(
             value = "/{caminhaoId}/documentos",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
@@ -132,6 +146,22 @@ public class CaminhaoController {
                 listarDocumentoCaminhaoService.listarPorCaminhao(caminhaoId);
 
         return ResponseEntity.ok(documentos);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @GetMapping("/{codigo}/detalhes")
+    public ResponseEntity<CaminhaoDetalheResponse> detalhes(@PathVariable String codigo) {
+        CaminhaoDetalheResponse response = buscarCaminhaoDetalheService.detalhes(codigo);
+        return ResponseEntity.ok(response);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PutMapping("/categoria")
+    public ResponseEntity<Void> vincularCategoriaEmLote(
+            @RequestBody VincularCategoriaCaminhaoEmLoteRequest request
+    ) {
+        vincularCategoriaCaminhaoEmLoteService.vincular(request);
+        return ResponseEntity.noContent().build();
     }
 
 }

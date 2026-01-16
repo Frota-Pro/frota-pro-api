@@ -7,6 +7,7 @@ import br.com.frotasPro.api.mapper.MetaMapper;
 import br.com.frotasPro.api.repository.MetaRepository;
 import br.com.frotasPro.api.service.meta.*;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -80,21 +81,17 @@ public class MetaController {
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
-    @GetMapping("/ativas/caminhao/{codigo}")
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
+    @GetMapping("/ativas/caminhao/{codigoCaminhao}")
     public ResponseEntity<MetaResponse> metaAtivaCaminhao(
-            @PathVariable String codigo,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataReferencia) {
-
-        MetaResponse response = buscarMetaAtivaComProgressoService
-                .buscarMetaAtivaCaminhao(codigo, dataReferencia);
-
-        if (response == null) {
-            return ResponseEntity.noContent().build();
-        }
-
-        return ResponseEntity.ok(response);
+            @PathVariable @NotBlank String codigoCaminhao,
+            @RequestParam("dataReferencia")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataReferencia
+    ) {
+        MetaResponse meta = buscarMetaAtivaComProgressoService.buscar(codigoCaminhao, dataReferencia);
+        return ResponseEntity.ok(meta);
     }
+
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/historico")

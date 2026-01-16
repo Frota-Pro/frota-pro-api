@@ -5,13 +5,30 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface CaminhaoRepository extends JpaRepository<Caminhao, UUID> {
 
-    Page<Caminhao> findByAtivoTrue(Pageable pageable);
+    @Query("""
+   select c
+   from Caminhao c
+   where (:ativo is null or c.ativo = :ativo)
+     and (
+       :q is null or :q = '' or
+       lower(c.codigo) like lower(concat('%', :q, '%')) or
+       lower(coalesce(c.codigoExterno, '')) like lower(concat('%', :q, '%')) or
+       lower(coalesce(c.placa, '')) like lower(concat('%', :q, '%')) or
+       lower(coalesce(c.descricao, '')) like lower(concat('%', :q, '%')) or
+       lower(coalesce(c.marca, '')) like lower(concat('%', :q, '%')) or
+       lower(coalesce(c.modelo, '')) like lower(concat('%', :q, '%'))
+     )
+""")
+    Page<Caminhao> search(@Param("ativo") Boolean ativo, @Param("q") String q, Pageable pageable);
+
 
     Optional<Caminhao> findByCodigoAndAtivoTrue(String codigo);
 
@@ -30,5 +47,6 @@ public interface CaminhaoRepository extends JpaRepository<Caminhao, UUID> {
           or c.codigoExterno = :codigo
        """)
     Optional<Caminhao> findByCaminhaoPorCodigoOuPorCodigoExterno(String codigo);
-}
 
+    List<Caminhao> findByCodigoIn(List<String> codigos);
+}

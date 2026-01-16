@@ -112,6 +112,34 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, UU
     """)
     BigDecimal sumLitrosFrom(@Param("inicio") LocalDateTime inicio);
 
+    @Query("""
+       select coalesce(sum(a.qtLitros), 0)
+       from Abastecimento a
+       where a.caminhao.codigo = :codigo
+          or a.caminhao.codigoExterno = :codigo
+       """)
+    BigDecimal sumLitrosPorCaminhaoCodigoOuCodigoExterno(@Param("codigo") String codigo);
+
+    @Query("""
+       select coalesce(sum(a.valorTotal), 0)
+       from Abastecimento a
+       where a.caminhao.codigo = :codigo
+          or a.caminhao.codigoExterno = :codigo
+       """)
+    BigDecimal sumValorPorCaminhaoCodigoOuCodigoExterno(@Param("codigo") String codigo);
+
+    @Query("""
+   select a
+   from Abastecimento a
+   where a.caminhao.codigo = :codigo
+      or a.caminhao.codigoExterno = :codigo
+   order by a.dtAbastecimento desc
+""")
+    Page<Abastecimento> buscarPorCodigoCaminhao(
+            @Param("codigo") String codigo,
+            Pageable pageable
+    );
+
 
 
 }

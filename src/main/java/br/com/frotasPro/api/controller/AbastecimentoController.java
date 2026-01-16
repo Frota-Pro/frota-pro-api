@@ -38,6 +38,7 @@ public class AbastecimentoController {
     private final DeletarAbastecimentoService deletarService;
     private final RelatorioAbastecimentoService relatorioService;
     private final ResumoAbastecimentoPorCaminhaoService resumoPorCaminhaoService;
+    private final BuscarAbastecimentosPorCaminhaoService buscarAbastecimentosPorCaminhaoService;
 
     @PreAuthorize("hasAnyAuthority(\'ROLE_CONSULTA\',)")
     @GetMapping("/{codigo}")
@@ -148,6 +149,17 @@ public class AbastecimentoController {
     ) {
         return ResponseEntity.ok(
                 resumoPorCaminhaoService.gerar(inicio, fim)
+        );
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
+    @GetMapping("/caminhao")
+    public ResponseEntity<Page<AbastecimentoResponse>> buscarPorCaminhao(
+            @RequestParam("codigo") String codigoCaminhao,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                buscarAbastecimentosPorCaminhaoService.buscar(codigoCaminhao, pageable)
         );
     }
 }

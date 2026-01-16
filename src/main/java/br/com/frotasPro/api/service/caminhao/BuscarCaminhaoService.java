@@ -49,15 +49,4 @@ public class BuscarCaminhaoService {
         );
         return CaminhaoMapper.toResponse(c);
     }
-
-    @Transactional(readOnly = true)
-    public Page<CaminhaoResponse> todosAtivos(Pageable pageable) {
-        Page<Caminhao> page = caminhaoRepository.findByAtivoTrue(pageable);
-
-        if (page.isEmpty()) {
-            throw new ObjectNotFound("Nenhum caminhão ativo encontrado.");
-        }
-
-        return page.map(CaminhaoMapper::toResponse);
-    }
 }
