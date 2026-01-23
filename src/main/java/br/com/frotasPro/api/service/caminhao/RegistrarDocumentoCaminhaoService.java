@@ -15,8 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class RegistrarDocumentoCaminhaoService {
@@ -26,13 +24,13 @@ public class RegistrarDocumentoCaminhaoService {
     private final SalvarArquivoService salvarArquivoService;
 
     @Transactional
-    public DocumentoCaminhaoResponse registrar(UUID caminhaoId,
+    public DocumentoCaminhaoResponse registrar(String codigo,
                                                TipoDocumentoCaminhao tipoDocumento,
                                                String observacao,
                                                MultipartFile arquivoMultipart) {
 
-        Caminhao caminhao = caminhaoRepository.findById(caminhaoId)
-                .orElseThrow(() -> new ObjectNotFound("Caminhão não encontrado para o id: " + caminhaoId));
+        Caminhao caminhao = caminhaoRepository.findByCodigo(codigo)
+                .orElseThrow(() -> new ObjectNotFound("Caminhão não encontrado para o codigo: " + codigo));
 
         String pastaCaminhao;
         if (caminhao.getCodigo() != null && !caminhao.getCodigo().isBlank()) {

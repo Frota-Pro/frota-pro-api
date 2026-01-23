@@ -1,4 +1,3 @@
-version: "3.8"
 services:
   fortapro-postgres:
     image: postgres:15.3-alpine
@@ -8,9 +7,10 @@ services:
       POSTGRES_PASSWORD: 123456
       POSTGRES_USER: postgres
     ports:
-      - 5432:5432
+      - "5432:5432"
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
+
   fortapro-pgadmin:
     image: dpage/pgadmin4:latest
     container_name: fortapro-pgadmin
@@ -21,9 +21,10 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
-      - 8089:80
+      - "8089:80"
     volumes:
-      - ./data/pgadmin:/var/lib/pgadmin
+      - fortapro_pgadmin_data:/var/lib/pgadmin
+
   fortapro-zookeeper:
     image: confluentinc/cp-zookeeper:7.6.0
     container_name: zookeeper
@@ -45,6 +46,9 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+volumes:
+  fortapro_pgadmin_data:
 
 networks:
   default:
