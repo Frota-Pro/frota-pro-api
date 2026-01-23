@@ -19,8 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/caminhao")
@@ -116,17 +114,17 @@ public class CaminhaoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @PostMapping(
-            value = "/{caminhaoId}/documentos",
+            value = "/{codigo}/documentos",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public ResponseEntity<DocumentoCaminhaoResponse> uploadDocumentoCaminhao(
-            @PathVariable UUID caminhaoId,
+            @PathVariable String codigo,
             @RequestParam("tipoDocumento") TipoDocumentoCaminhao tipoDocumento,
             @RequestParam(value = "observacao", required = false) String observacao,
             @RequestPart("arquivo") MultipartFile arquivo
     ) {
         DocumentoCaminhaoResponse response =
-                registrarDocumentoCaminhaoService.registrar(caminhaoId, tipoDocumento, observacao, arquivo);
+                registrarDocumentoCaminhaoService.registrar(codigo, tipoDocumento, observacao, arquivo);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -138,12 +136,13 @@ public class CaminhaoController {
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
-    @GetMapping("/{caminhaoId}/documentos")
-    public ResponseEntity<List<DocumentoCaminhaoResponse>> listarDocumentosCaminhao(
-            @PathVariable UUID caminhaoId
+    @GetMapping("/{codigo}/documentos")
+    public ResponseEntity<Page<DocumentoCaminhaoResponse>> listarDocumentosCaminhao(
+            @PathVariable String codigo,
+            Pageable pageable
     ) {
-        List<DocumentoCaminhaoResponse> documentos =
-                listarDocumentoCaminhaoService.listarPorCaminhao(caminhaoId);
+        Page<DocumentoCaminhaoResponse> documentos =
+                listarDocumentoCaminhaoService.listarPorCaminhao(codigo, pageable);
 
         return ResponseEntity.ok(documentos);
     }
