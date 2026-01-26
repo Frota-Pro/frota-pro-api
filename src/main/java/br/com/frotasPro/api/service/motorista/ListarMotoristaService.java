@@ -1,7 +1,6 @@
 package br.com.frotasPro.api.service.motorista;
 
 import br.com.frotasPro.api.controller.response.MotoristaResponse;
-import br.com.frotasPro.api.domain.Motorista;
 import br.com.frotasPro.api.mapper.MotoristaMapper;
 import br.com.frotasPro.api.repository.MotoristaRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +16,7 @@ public class ListarMotoristaService {
     private final MotoristaRepository motoristaRepository;
 
     @Transactional(readOnly = true)
-    public Page<MotoristaResponse> listar(Pageable pageable) {
-        Page<Motorista> motoristas = motoristaRepository.findByAtivoTrue(pageable);
-        return motoristas.map(MotoristaMapper::toResponse);
+    public Page<MotoristaResponse> listar(Boolean ativo, String q, Pageable pageable) {
+        return motoristaRepository.search(ativo, q, pageable).map(MotoristaMapper::toResponse);
     }
 }

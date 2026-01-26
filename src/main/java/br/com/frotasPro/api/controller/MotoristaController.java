@@ -45,10 +45,14 @@ public class MotoristaController {
         return ResponseEntity.ok(motorista);
     }
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_CONSULTA\',)")
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping
-    public ResponseEntity<Page<MotoristaResponse>> listar(Pageable pageable) {
-        Page<MotoristaResponse> motoristas = listarMotoristaService.listar(pageable);
+    public ResponseEntity<Page<MotoristaResponse>> listar(
+            @RequestParam(required = false) Boolean ativo,
+            @RequestParam(required = false) String q,
+            Pageable pageable
+    ) {
+        Page<MotoristaResponse> motoristas = listarMotoristaService.listar(ativo, q, pageable);
         return ResponseEntity.ok(motoristas);
     }
 

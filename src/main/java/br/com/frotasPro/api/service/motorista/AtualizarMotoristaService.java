@@ -28,6 +28,12 @@ public class AtualizarMotoristaService {
         motorista.setCnh(request.getCnh());
         motorista.setValidadeCnh(request.getValidadeCnh());
 
+        if (request.getCodigoExterno() != null && !request.getCodigoExterno().trim().isEmpty()) {
+            motorista.setCodigoExterno(request.getCodigoExterno().trim());
+        } else {
+            motorista.setCodigoExterno(null);
+        }
+
         motoristaRepository.save(motorista);
 
         return MotoristaMapper.toResponse(motorista);

@@ -6,7 +6,9 @@ import br.com.frotasPro.api.domain.Motorista;
 public class MotoristaMapper {
     public static MotoristaResponse toResponse(Motorista motorista){
         return MotoristaResponse.builder()
+                .id(motorista.getId())
                 .codigo(motorista.getCodigo())
+                .codigoExterno(motorista.getCodigoExterno())
                 .nome(motorista.getNome())
                 .email(motorista.getEmail())
                 .dataNascimento(motorista.getDataNascimento())

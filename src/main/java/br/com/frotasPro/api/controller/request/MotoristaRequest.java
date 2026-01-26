@@ -14,6 +14,9 @@ import java.time.LocalDate;
 @Setter
 public class MotoristaRequest {
 
+    // opcional
+    private String codigoExterno;
+
     @NotBlank(message = "Nome é obrigatório")
     @Size(min = 3, max = 150, message = "Nome deve ter entre 3 e 150 caracteres")
     private String nome;
@@ -33,5 +36,4 @@ public class MotoristaRequest {
     @NotNull(message = "Validade da CNH é obrigatória")
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate validadeCnh;
-
 }

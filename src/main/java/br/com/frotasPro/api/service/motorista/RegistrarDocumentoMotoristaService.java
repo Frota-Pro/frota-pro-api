@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.text.Normalizer;
 import java.util.UUID;
 
 @Service
@@ -35,7 +36,9 @@ public class RegistrarDocumentoMotoristaService {
                 .orElseThrow(() -> new ObjectNotFound("Motorista não encontrado para o id: " + motoristaId));
 
         String pastaMotorista;
-        if (motorista.getCodigo() != null && !motorista.getCodigo().isBlank()) {
+        if (motorista.getNome() != null && !motorista.getNome().isBlank()) {
+            pastaMotorista = "MOTORISTA_" + slug(motorista.getNome());
+        } else if (motorista.getCodigo() != null && !motorista.getCodigo().isBlank()) {
             pastaMotorista = "MOTORISTA_" + motorista.getCodigo();
         } else {
             pastaMotorista = "MOTORISTA_" + motorista.getId();
@@ -74,5 +77,14 @@ public class RegistrarDocumentoMotoristaService {
         response.setArquivo(arquivoResponse);
 
         return response;
+    }
+
+    private String slug(String input) {
+        String noAccent = Normalizer.normalize(input, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "");
+        return noAccent
+                .trim()
+                .replaceAll("\\s+", "_")
+                .replaceAll("[^A-Za-z0-9_\\-\\.]", "_");
     }
 }
