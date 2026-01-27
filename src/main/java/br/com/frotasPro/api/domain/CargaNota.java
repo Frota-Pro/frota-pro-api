@@ -4,14 +4,11 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serializable;
-import java.util.UUID;
-
 @Getter
 @Setter
 @Entity
 @Table(name = "tb_carga_nota")
-@IdClass(CargaNota.CargaNotaId.class)
+@IdClass(CargaNotaId.class)
 public class CargaNota {
 
     @Id
@@ -26,12 +23,4 @@ public class CargaNota {
     @Id
     @Column(name = "nota", nullable = false, length = 30)
     private String nota;
-
-    @Getter
-    @Setter
-    public static class CargaNotaId implements Serializable {
-        private UUID carga;
-        private String cliente;
-        private String nota;
-    }
 }

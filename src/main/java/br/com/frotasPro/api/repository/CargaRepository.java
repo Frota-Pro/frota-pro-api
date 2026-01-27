@@ -80,6 +80,23 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
     List<Carga> findTop5ByOrderByCriadoEmDesc();
 
     @Query("""
+   select c
+   from Carga c
+   where (:q is null
+          or lower(c.numeroCarga) like concat('%', lower(cast(:q as string)), '%')
+          or lower(c.numeroCargaExterno) like concat('%', lower(cast(:q as string)), '%')
+   )
+   and (:inicio is null or c.dtSaida >= :inicio)
+   and (:fim is null or c.dtSaida <= :fim)
+   """)
+    Page<Carga> listarFiltrado(
+            @Param("q") String q,
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim,
+            Pageable pageable
+    );
+
+    @Query("""
        select count(c)
        from Carga c
        where c.caminhao.codigo = :codigo

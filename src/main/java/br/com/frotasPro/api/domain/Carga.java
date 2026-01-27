@@ -25,7 +25,7 @@ import java.util.UUID;
                 @UniqueConstraint(name = "uk_carga_numero", columnNames = "numero_carga")
         }
 )
-public class Carga extends AuditoriaBase{
+public class Carga extends AuditoriaBase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -62,6 +62,9 @@ public class Carga extends AuditoriaBase{
     @Column(name = "km_final")
     private Integer kmFinal;
 
+    @Column(name = "observacao_motorista", columnDefinition = "text")
+    private String observacaoMotorista;
+
     @OneToMany(mappedBy = "carga", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CargaNota> notas = new ArrayList<>();
 
@@ -88,6 +91,15 @@ public class Carga extends AuditoriaBase{
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "rota_id", nullable = false)
     private Rota rota;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+            name = "tb_carga_ordem_entrega",
+            joinColumns = @JoinColumn(name = "carga_id")
+    )
+    @OrderColumn(name = "ordem")
+    @Column(name = "cliente", length = 200, nullable = false)
+    private List<String> ordemEntregaClientes = new ArrayList<>();
 
     @OneToMany(mappedBy = "carga", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ParadaCarga> paradas = new ArrayList<>();

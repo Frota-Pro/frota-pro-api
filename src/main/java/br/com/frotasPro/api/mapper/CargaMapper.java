@@ -100,8 +100,11 @@ public class CargaMapper {
                                 .map(Ajudante::getCodigo)
                                 .toList()
                 )
+                .ordemEntregaClientes(carga.getOrdemEntregaClientes())
+                .observacaoMotorista(carga.getObservacaoMotorista())
                 .build();
     }
+
 
     public static CargaMinResponse toMinResponse(Carga carga) {
         return CargaMinResponse.builder()
@@ -114,7 +117,6 @@ public class CargaMapper {
                 .nomeMotorista(carga.getMotorista().getNome())
                 .placaCaminhao(carga.getCaminhao().getPlaca())
                 .build();
-
     }
 
 }

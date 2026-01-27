@@ -34,6 +34,7 @@ public class ParadaCargaController {
     private final DeletarParadaCargaService deletarService;
     private final RegistrarAnexoParadaService registrarAnexoParadaService;
     private final ListarAnexosParadaService listarAnexosParadaService;
+    private final BuscarParadaCargaService buscarParadaCargaService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
     @PostMapping
@@ -154,5 +155,11 @@ public class ParadaCargaController {
 
         List<AnexoParadaResponse> anexos = listarAnexosParadaService.listarPorParada(paradaId);
         return ResponseEntity.ok(anexos);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA','ROLE_MOTORISTA')")
+    @GetMapping("/{id}")
+    public ResponseEntity<ParadaCargaResponse> buscar(@PathVariable UUID id) {
+        return ResponseEntity.ok(buscarParadaCargaService.buscar(id));
     }
 }

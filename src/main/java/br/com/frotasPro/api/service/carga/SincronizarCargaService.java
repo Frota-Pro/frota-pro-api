@@ -14,10 +14,12 @@ import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.repository.RotaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 
 @Slf4j
 @Service
@@ -35,7 +37,35 @@ public class SincronizarCargaService {
         log.info("Sincronizando {} cargas da data {} (jobId={})",
                 event.getTotalCargas(), event.getDataReferencia(), event.getJobId());
 
-        event.getCargas().forEach(this::upsertCargaFromWinThor);
+        event.getCargas().forEach(this::upsertCargaFromWinThorWithRetry);
+    }
+
+    private void upsertCargaFromWinThorWithRetry(CargaWinThorDto dto) {
+        int maxTentativas = 3;
+
+        for (int tentativa = 1; tentativa <= maxTentativas; tentativa++) {
+            try {
+                upsertCargaFromWinThor(dto);
+                return;
+            } catch (ObjectOptimisticLockingFailureException e) {
+                if (tentativa >= maxTentativas) {
+                    log.error("Falha por concorrência ao salvar carga/nota após {} tentativas. numCar={} numMdfe={}",
+                            tentativa, dto.getNumCar(), dto.getNumMdfe(), e);
+                    throw e;
+                }
+
+                long backoffMs = 100L * tentativa;
+                log.warn("Concorrência detectada ao salvar carga/nota. Tentando novamente ({}/{}). numCar={} backoff={}ms",
+                        tentativa, maxTentativas, dto.getNumCar(), backoffMs);
+
+                try {
+                    Thread.sleep(backoffMs);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw e;
+                }
+            }
+        }
     }
 
     private void upsertCargaFromWinThor(CargaWinThorDto dto) {
@@ -48,12 +78,16 @@ public class SincronizarCargaService {
 
         if (nova) {
             carga.setNumeroCargaExterno(dto.getNumCar().toString());
-        } else {
-            cargaNotaRepository.deleteByCargaId(carga.getId());
-            if (carga.getNotas() != null) {
-                carga.getNotas().clear();
-            }
         }
+
+        // Garanta que a coleção existe e esteja consistente
+        if (carga.getNotas() == null) {
+            carga.setNotas(new ArrayList<>());
+        }
+
+        // Evite "delete manual" + mexer na coleção ao mesmo tempo.
+        // Deixe o JPA fazer orphanRemoval/cascade (ajuste no mapeamento se necessário).
+        carga.getNotas().clear();
 
         var motoristaOpt = motoristaRepository
                 .findByCodigoExterno(String.valueOf(dto.getCodMotorista()));
@@ -120,7 +154,8 @@ public class SincronizarCargaService {
             }
         }
 
-        cargaRepository.save(carga);
+        // Flush ajuda a detectar conflitos cedo e reduz surpresa no commit do listener.
+        cargaRepository.saveAndFlush(carga);
 
         log.info("Carga {} sincronizada. {} clientes, {} notas",
                 dto.getNumMdfe(),

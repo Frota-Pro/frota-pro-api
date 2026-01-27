@@ -27,8 +27,15 @@ public class CargaSyncResponseConsumer {
         log.info("📥 [API] Resposta de sync recebida. jobId={} totalCargas={}",
                 event.getJobId(), event.getTotalCargas());
 
-        cargaService.sincronizarCargasWinThor(event);
-        jobService.concluirJob(event.getJobId(), event.getTotalCargas());
+        try {
+            cargaService.sincronizarCargasWinThor(event);
+
+            jobService.concluirJob(event.getJobId(), event.getTotalCargas());
+            log.info("✅ [API] Job de sync concluído com sucesso. jobId={}", event.getJobId());
+        } catch (Exception e) {
+            log.error("❌ [API] Falha ao processar sync de cargas. jobId={} totalCargas={}",
+                    event.getJobId(), event.getTotalCargas(), e);
+            throw e;
+        }
     }
 }
-

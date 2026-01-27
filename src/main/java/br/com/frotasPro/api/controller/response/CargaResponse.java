@@ -28,6 +28,7 @@ public class CargaResponse {
 
     @JsonSerialize(using = BigDecimalSemZerosSerializer.class)
     private BigDecimal pesoCarga;
+
     @JsonSerialize(using = BigDecimalBrasilSerializer.class)
     private BigDecimal valorTotal;
 
@@ -50,4 +51,11 @@ public class CargaResponse {
     private String codigoRota;
 
     private List<String> codigosAjudantes;
+
+    // ===== NOVOS CAMPOS =====
+    /** Ordem definida para entrega (lista ordenada de clientes) */
+    private List<String> ordemEntregaClientes;
+
+    /** Observação informada pelo motorista durante/ao final da carga */
+    private String observacaoMotorista;
 }

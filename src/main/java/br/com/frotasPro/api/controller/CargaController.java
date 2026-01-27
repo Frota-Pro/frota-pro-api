@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.controller;
 
+import br.com.frotasPro.api.controller.request.AtualizarObservacaoMotoristaRequest;
+import br.com.frotasPro.api.controller.request.AtualizarOrdemEntregaRequest;
 import br.com.frotasPro.api.controller.request.CargaRequest;
 import br.com.frotasPro.api.controller.response.CargaMinResponse;
 import br.com.frotasPro.api.controller.response.CargaResponse;
@@ -32,6 +34,8 @@ public class CargaController {
     private final IniciarCargaService iniciarCargaService;
     private final FinalizarCargaService finalizarCargaService;
     private final BuscarCargaAtualMotoristaService buscarCargaAtualMotoristaService;
+    private final AtualizarOrdemEntregaService atualizarOrdemEntregaService;
+    private final AtualizarObservacaoMotoristaService atualizarObservacaoMotoristaService;
 
     // ========= BUSCA ÚNICA =========
 
@@ -49,12 +53,25 @@ public class CargaController {
         return ResponseEntity.ok(carga);
     }
 
-    // ========= LISTAGEM GERAL =========
+    // ========= LISTAGEM GERAL (FILTROS) =========
 
+    /**
+     * GET /carga
+     * filtros opcionais:
+     * - q: pesquisa por número da carga (interno) ou número externo
+     * - inicio/fim: período (dtSaida)
+     */
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping
-    public ResponseEntity<Page<CargaMinResponse>> listar(Pageable pageable) {
-        Page<CargaMinResponse> cargas = listarCargaService.listar(pageable);
+    public ResponseEntity<Page<CargaMinResponse>> listar(
+            @RequestParam(value = "q", required = false) String q,
+            @RequestParam(value = "inicio", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam(value = "fim", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim,
+            Pageable pageable
+    ) {
+        Page<CargaMinResponse> cargas = listarCargaService.listar(q, inicio, fim, pageable);
         return ResponseEntity.ok(cargas);
     }
 
@@ -125,6 +142,7 @@ public class CargaController {
         CargaResponse response = buscarCargaAtualMotoristaService.buscar();
         return ResponseEntity.ok(response);
     }
+
     //========== INICIAR CARGA ========
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
@@ -150,6 +168,27 @@ public class CargaController {
         return ResponseEntity.ok(resposta);
     }
 
+    // ========= ORDEM DE ENTREGA / OBSERVAÇÃO MOTORISTA =========
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PatchMapping("/{numeroCarga}/ordem-entrega")
+    public ResponseEntity<Void> atualizarOrdemEntrega(
+            @PathVariable String numeroCarga,
+            @Valid @RequestBody AtualizarOrdemEntregaRequest request
+    ) {
+        atualizarOrdemEntregaService.atualizar(numeroCarga, request.getClientes());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
+    @PatchMapping("/{numeroCarga}/observacao")
+    public ResponseEntity<Void> atualizarObservacaoMotorista(
+            @PathVariable String numeroCarga,
+            @Valid @RequestBody AtualizarObservacaoMotoristaRequest request
+    ) {
+        atualizarObservacaoMotoristaService.atualizar(numeroCarga, request.getObservacao());
+        return ResponseEntity.noContent().build();
+    }
 
     // ========= CRUD =========
 
@@ -159,21 +198,23 @@ public class CargaController {
 
         CargaResponse carga = criarCargaService.criar(request);
 
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+        URI uri = ServletUriComponentsBuilder
+                .fromCurrentRequest()
                 .path("/{numeroCarga}")
                 .buildAndExpand(carga.getNumeroCarga())
                 .toUri();
 
-        return ResponseEntity.created(location).body(carga);
+        return ResponseEntity.created(uri).body(carga);
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @PutMapping("/{numeroCarga}")
-    public ResponseEntity<CargaResponse> atualizar(@PathVariable String numeroCarga,
-                                                   @Valid @RequestBody CargaRequest request) {
-
-        CargaResponse cargaAtualizada = atualizarCargaService.atualizar(numeroCarga, request);
-        return ResponseEntity.ok(cargaAtualizada);
+    public ResponseEntity<CargaResponse> atualizar(
+            @PathVariable String numeroCarga,
+            @Valid @RequestBody CargaRequest request
+    ) {
+        CargaResponse carga = atualizarCargaService.atualizar(numeroCarga, request);
+        return ResponseEntity.ok(carga);
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
