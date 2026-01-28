@@ -140,6 +140,93 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, UU
             Pageable pageable
     );
 
+    @Query(
+            value = """
+select a.*
+from tb_abastecimento a
+join tb_caminhao c on c.id = a.caminhao_id
+left join tb_motorista m on m.id = a.motorista_id
+where (
+cast(:q as text) is null
+or a.codigo ilike ('%' || cast(:q as text) || '%')
+or c.codigo ilike ('%' || cast(:q as text) || '%')
+or coalesce(c.codigo_externo, '') ilike ('%' || cast(:q as text) || '%')
+or coalesce(c.placa, '') ilike ('%' || cast(:q as text) || '%')
+or coalesce(m.codigo, '') ilike ('%' || cast(:q as text) || '%')
+or coalesce(m.codigo_externo, '') ilike ('%' || cast(:q as text) || '%')
+or coalesce(m.nome, '') ilike ('%' || cast(:q as text) || '%')
+or coalesce(a.posto, '') ilike ('%' || cast(:q as text) || '%')
+or coalesce(a.cidade, '') ilike ('%' || cast(:q as text) || '%')
+or coalesce(a.uf, '') ilike ('%' || cast(:q as text) || '%')
+or coalesce(a.numero_nota_cupom, '') ilike ('%' || cast(:q as text) || '%')
+)
+and (
+cast(:caminhao as text) is null
+or c.codigo = cast(:caminhao as text)
+or c.codigo_externo = cast(:caminhao as text)
+or c.placa = cast(:caminhao as text)
+)
+and (
+cast(:motorista as text) is null
+or m.codigo = cast(:motorista as text)
+or m.codigo_externo = cast(:motorista as text)
+)
+and (cast(:tipo as text) is null or a.tipo_combustivel = cast(:tipo as text))
+and (cast(:forma as text) is null or a.forma_pagamento = cast(:forma as text))
 
 
+-- >>> AQUI é o que resolve o 42P18 (tipa o parâmetro mesmo quando vem null)
+and (cast(:inicio as timestamp) is null or a.dt_abastecimento >= cast(:inicio as timestamp))
+and (cast(:fim as timestamp) is null or a.dt_abastecimento <= cast(:fim as timestamp))
+
+
+order by a.dt_abastecimento desc
+""",
+            countQuery = """
+select count(1)
+from tb_abastecimento a
+join tb_caminhao c on c.id = a.caminhao_id
+left join tb_motorista m on m.id = a.motorista_id
+where (
+cast(:q as text) is null
+or a.codigo ilike ('%' || cast(:q as text) || '%')
+or c.codigo ilike ('%' || cast(:q as text) || '%')
+or coalesce(c.codigo_externo, '') ilike ('%' || cast(:q as text) || '%')
+or coalesce(c.placa, '') ilike ('%' || cast(:q as text) || '%')
+or coalesce(m.codigo, '') ilike ('%' || cast(:q as text) || '%')
+or coalesce(m.codigo_externo, '') ilike ('%' || cast(:q as text) || '%')
+or coalesce(m.nome, '') ilike ('%' || cast(:q as text) || '%')
+or coalesce(a.posto, '') ilike ('%' || cast(:q as text) || '%')
+or coalesce(a.cidade, '') ilike ('%' || cast(:q as text) || '%')
+or coalesce(a.uf, '') ilike ('%' || cast(:q as text) || '%')
+or coalesce(a.numero_nota_cupom, '') ilike ('%' || cast(:q as text) || '%')
+)
+and (
+cast(:caminhao as text) is null
+or c.codigo = cast(:caminhao as text)
+or c.codigo_externo = cast(:caminhao as text)
+or c.placa = cast(:caminhao as text)
+)
+and (
+cast(:motorista as text) is null
+or m.codigo = cast(:motorista as text)
+or m.codigo_externo = cast(:motorista as text)
+)
+and (cast(:tipo as text) is null or a.tipo_combustivel = cast(:tipo as text))
+and (cast(:forma as text) is null or a.forma_pagamento = cast(:forma as text))
+and (cast(:inicio as timestamp) is null or a.dt_abastecimento >= cast(:inicio as timestamp))
+and (cast(:fim as timestamp) is null or a.dt_abastecimento <= cast(:fim as timestamp))
+""",
+            nativeQuery = true
+    )
+    Page<Abastecimento> filtrarNative(
+            @Param("q") String q,
+            @Param("caminhao") String caminhao,
+            @Param("motorista") String motorista,
+            @Param("tipo") String tipo,
+            @Param("forma") String forma,
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fim") LocalDateTime fim,
+            Pageable pageable
+    );
 }

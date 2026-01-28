@@ -2,11 +2,13 @@ package br.com.frotasPro.api.service.abastecimento;
 
 import br.com.frotasPro.api.controller.request.AbastecimentoRequest;
 import br.com.frotasPro.api.controller.response.AbastecimentoResponse;
-import br.com.frotasPro.api.domain.*;
-import br.com.frotasPro.api.domain.enums.FormaPagamento;
-import br.com.frotasPro.api.domain.enums.TipoCombustivel;
+import br.com.frotasPro.api.domain.Abastecimento;
+import br.com.frotasPro.api.domain.Caminhao;
+import br.com.frotasPro.api.domain.Motorista;
 import br.com.frotasPro.api.mapper.AbastecimentoMapper;
-import br.com.frotasPro.api.repository.*;
+import br.com.frotasPro.api.repository.AbastecimentoRepository;
+import br.com.frotasPro.api.repository.CaminhaoRepository;
+import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.util.CalcularMediaKmLitroService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,8 +29,11 @@ public class CriarAbastecimentoService {
         Caminhao caminhao = caminhaoRepository.findByCaminhaoPorCodigoOuPorCodigoExterno(request.getCaminhao())
                 .orElseThrow(() -> new RuntimeException("Caminhão não encontrado"));
 
-        Motorista motorista = motoristaRepository.findByMotoristaPorCodigoOuPorCodigoExterno(request.getMotorista())
+        Motorista motorista = null;
+        if (request.getMotorista() != null && !request.getMotorista().isBlank()) {
+            motorista = motoristaRepository.findByMotoristaPorCodigoOuPorCodigoExterno(request.getMotorista())
                     .orElseThrow(() -> new RuntimeException("Motorista não encontrado"));
+        }
 
 
         Abastecimento a = new Abastecimento();
@@ -38,7 +43,13 @@ public class CriarAbastecimentoService {
         a.setKmOdometro(request.getKmOdometro());
         a.setQtLitros(request.getQtLitros());
         a.setValorLitro(request.getValorLitro());
-        a.setValorTotal(request.getValorTotal());
+
+        if (request.getValorTotal() != null) {
+            a.setValorTotal(request.getValorTotal());
+        } else if (request.getQtLitros() != null && request.getValorLitro() != null) {
+            a.setValorTotal(request.getQtLitros().multiply(request.getValorLitro()));
+        }
+
         a.setTipoCombustivel(request.getTipoCombustivel());
         a.setFormaPagamento(request.getFormaPagamento());
         a.setPosto(request.getPosto());

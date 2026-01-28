@@ -21,7 +21,6 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,37 +38,58 @@ public class AbastecimentoController {
     private final RelatorioAbastecimentoService relatorioService;
     private final ResumoAbastecimentoPorCaminhaoService resumoPorCaminhaoService;
     private final BuscarAbastecimentosPorCaminhaoService buscarAbastecimentosPorCaminhaoService;
+    private final BuscarAbastecimentosFiltradoService buscarAbastecimentosFiltradoService;
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_CONSULTA\',)")
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/{codigo}")
     public ResponseEntity<AbastecimentoResponse> buscarPorCodigo(@PathVariable String codigo) {
         AbastecimentoResponse abastecimento = buscarAbastecimentoPorCodigoService.buscar(codigo);
         return ResponseEntity.ok(abastecimento);
     }
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_CONSULTA\',)")
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
     @GetMapping
     public ResponseEntity<Page<AbastecimentoResponse>> listar(Pageable pageable) {
-        Page<AbastecimentoResponse> ajudantes = listarService.listar(pageable);
-        return ResponseEntity.ok(ajudantes);
+        return ResponseEntity.ok(listarService.listar(pageable));
     }
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_CONSULTA\',)")
-    @GetMapping("/periodo")
-    public ResponseEntity<Page<AbastecimentoResponse>> buscarPorPeriodo(
-            @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            LocalDateTime inicio,
-
-            @RequestParam("fim") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            LocalDateTime fim,
-
+    /**
+     * Listagem com filtros opcionais (para a tela do front).
+     *
+     * Exemplos:
+     * - /abastecimento/filtrar?q=AB-2026&inicio=2026-01-01T00:00:00&fim=2026-01-31T23:59:59
+     * - /abastecimento/filtrar?caminhao=CAM-0001&tipo=DIESEL
+     */
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
+    @GetMapping("/filtrar")
+    public ResponseEntity<Page<AbastecimentoResponse>> filtrar(
+            @RequestParam(value = "q", required = false) String q,
+            @RequestParam(value = "caminhao", required = false) String caminhao,
+            @RequestParam(value = "motorista", required = false) String motorista,
+            @RequestParam(value = "tipo", required = false) TipoCombustivel tipo,
+            @RequestParam(value = "forma", required = false) FormaPagamento forma,
+            @RequestParam(value = "inicio", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
+            @RequestParam(value = "fim", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim,
             Pageable pageable
     ) {
         return ResponseEntity.ok(
-                buscarPorPeriodoService.buscar(inicio, fim, pageable)
+                buscarAbastecimentosFiltradoService.buscar(q, caminhao, motorista, tipo, forma, inicio, fim, pageable)
         );
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
+    @GetMapping("/periodo")
+    public ResponseEntity<Page<AbastecimentoResponse>> buscarPorPeriodo(
+            @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
+            @RequestParam("fim") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(buscarPorPeriodoService.buscar(inicio, fim, pageable));
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/periodo/combustivel")
     public ResponseEntity<Page<AbastecimentoResponse>> buscarPorTipoCombustivel(
             @RequestParam TipoCombustivel tipo,
@@ -77,11 +97,10 @@ public class AbastecimentoController {
             @RequestParam("fim") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim,
             Pageable pageable
     ) {
-        return ResponseEntity.ok(
-                buscarPorCombustivelPeriodoService.buscar(tipo, inicio, fim, pageable)
-        );
+        return ResponseEntity.ok(buscarPorCombustivelPeriodoService.buscar(tipo, inicio, fim, pageable));
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/periodo/formapagamento")
     public ResponseEntity<Page<AbastecimentoResponse>> buscarPorFormaPagamento(
             @RequestParam FormaPagamento forma,
@@ -89,15 +108,12 @@ public class AbastecimentoController {
             @RequestParam("fim") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim,
             Pageable pageable
     ) {
-        return ResponseEntity.ok(
-                buscarPorFormaPagamentoPeriodoService.buscar(forma, inicio, fim, pageable)
-        );
+        return ResponseEntity.ok(buscarPorFormaPagamentoPeriodoService.buscar(forma, inicio, fim, pageable));
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @PostMapping
     public ResponseEntity<AbastecimentoResponse> criar(@Valid @RequestBody AbastecimentoRequest request) {
-
         AbastecimentoResponse response = criarService.criar(request);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -112,10 +128,9 @@ public class AbastecimentoController {
     @PutMapping("/{codigo}")
     public ResponseEntity<AbastecimentoResponse> atualizar(
             @PathVariable String codigo,
-            @Valid @RequestBody AbastecimentoRequest request) {
-
-        AbastecimentoResponse response = atualizarService.atualizar(codigo, request);
-        return ResponseEntity.ok(response);
+            @Valid @RequestBody AbastecimentoRequest request
+    ) {
+        return ResponseEntity.ok(atualizarService.atualizar(codigo, request));
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
@@ -125,31 +140,22 @@ public class AbastecimentoController {
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/relatorios/gasto-por-combustivel")
     public ResponseEntity<List<AbastecimentoGastoPorCombustivelResponse>> gastoPorCombustivel(
-            @RequestParam("inicio")
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
-            @RequestParam("fim")
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim) {
-
-        List<AbastecimentoGastoPorCombustivelResponse> relatorio =
-                relatorioService.gastoPorCombustivel(inicio, fim);
-
-        return ResponseEntity.ok(relatorio);
+            @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam("fim") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim
+    ) {
+        return ResponseEntity.ok(relatorioService.gastoPorCombustivel(inicio, fim));
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/relatorio/resumo-caminhao")
     public ResponseEntity<List<AbastecimentoResumoCaminhaoResponse>> resumoPorCaminhao(
-            @RequestParam("inicio")
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
-
-            @RequestParam("fim")
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim
+            @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam("fim") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim
     ) {
-        return ResponseEntity.ok(
-                resumoPorCaminhaoService.gerar(inicio, fim)
-        );
+        return ResponseEntity.ok(resumoPorCaminhaoService.gerar(inicio, fim));
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
@@ -158,8 +164,6 @@ public class AbastecimentoController {
             @RequestParam("codigo") String codigoCaminhao,
             Pageable pageable
     ) {
-        return ResponseEntity.ok(
-                buscarAbastecimentosPorCaminhaoService.buscar(codigoCaminhao, pageable)
-        );
+        return ResponseEntity.ok(buscarAbastecimentosPorCaminhaoService.buscar(codigoCaminhao, pageable));
     }
 }
