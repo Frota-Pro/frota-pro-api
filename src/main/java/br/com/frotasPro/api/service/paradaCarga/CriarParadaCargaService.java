@@ -4,8 +4,8 @@ import br.com.frotasPro.api.controller.request.ParadaCargaRequest;
 import br.com.frotasPro.api.controller.response.ParadaCargaResponse;
 import br.com.frotasPro.api.domain.*;
 import br.com.frotasPro.api.domain.enums.TipoDespesa;
-import br.com.frotasPro.api.domain.enums.TipoParada;
 import br.com.frotasPro.api.domain.enums.TipoManutencao;
+import br.com.frotasPro.api.domain.enums.TipoParada;
 import br.com.frotasPro.api.excption.BusinessException;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.CargaRepository;
@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.UUID;
 
 import static br.com.frotasPro.api.mapper.ParadaCargaMapper.toEntity;
 import static br.com.frotasPro.api.mapper.ParadaCargaMapper.toResponse;
@@ -106,6 +105,7 @@ public class CriarParadaCargaService {
 
             BigDecimal media = calcularMediaKmLitroService.calcular(
                     carga.getCaminhao(),
+                    abastecimento.getDtAbastecimento(),
                     request.getKmOdometro(),
                     abReq.getQtLitros()
             );

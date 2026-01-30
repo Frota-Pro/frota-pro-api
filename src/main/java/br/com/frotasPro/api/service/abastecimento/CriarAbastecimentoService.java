@@ -59,6 +59,7 @@ public class CriarAbastecimentoService {
 
         BigDecimal media = calcularMediaKmLitroService.calcular(
                 caminhao,
+                request.getDtAbastecimento(),
                 request.getKmOdometro(),
                 request.getQtLitros()
         );

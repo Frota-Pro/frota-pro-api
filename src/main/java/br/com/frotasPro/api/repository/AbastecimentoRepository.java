@@ -84,6 +84,18 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, UU
 
     Optional<Abastecimento> findFirstByCaminhaoIdOrderByDtAbastecimentoDesc(UUID caminhaoId);
 
+    // para calcular média por odômetro de forma consistente (mesmo quando lança abastecimento fora de ordem)
+    Optional<Abastecimento> findFirstByCaminhaoIdAndDtAbastecimentoLessThanOrderByDtAbastecimentoDesc(
+            UUID caminhaoId,
+            LocalDateTime dtAbastecimento
+    );
+
+    Optional<Abastecimento> findFirstByCaminhaoIdAndDtAbastecimentoLessThanAndIdNotOrderByDtAbastecimentoDesc(
+            UUID caminhaoId,
+            LocalDateTime dtAbastecimento,
+            UUID id
+    );
+
     @Query("""
        select avg(a.mediaKmLitro)
        from Abastecimento a
