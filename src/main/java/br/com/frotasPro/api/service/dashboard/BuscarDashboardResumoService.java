@@ -37,9 +37,9 @@ public class BuscarDashboardResumoService {
         long cargasAtivas = cargaRepository.countByStatusCarga(Status.EM_ROTA);
         long finalizadasHoje = cargaRepository.countByStatusCargaAndDtChegada(Status.FINALIZADA, hoje);
 
-        LocalDateTime inicio30d = LocalDateTime.now().minusDays(30);
-        BigDecimal litros30d = abastecimentoRepository.sumLitrosFrom(inicio30d);
-        if (litros30d == null) litros30d = BigDecimal.ZERO;
+        LocalDateTime inicioMes = LocalDate.now().withDayOfMonth(1).atStartOfDay();
+        BigDecimal litrosMes = abastecimentoRepository.sumLitrosFrom(inicioMes);
+        if (litrosMes == null) litrosMes = BigDecimal.ZERO;
 
         long metasAtivas = metaRepository.countMetasAtivas(StatusMeta.EM_ANDAMENTO, hoje);
 
@@ -56,7 +56,7 @@ public class BuscarDashboardResumoService {
         return DashboardResumoResponse.builder()
                 .cargasAtivas(cargasAtivas)
                 .finalizadasHoje(finalizadasHoje)
-                .litros30d(litros30d)
+                .litros30d(litrosMes)
                 .metasAtivas(metasAtivas)
                 .osAbertas(osAbertas)
                 .cargasRecentes(cargasRecentes)
