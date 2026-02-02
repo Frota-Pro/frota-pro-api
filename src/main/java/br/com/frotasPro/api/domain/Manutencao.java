@@ -75,4 +75,8 @@ public class Manutencao extends AuditoriaBase{
 
     @OneToMany(mappedBy = "manutencao", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TrocaPneuManutencao> trocasPneu = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "manutencao", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ManutencaoItem> itens = new ArrayList<>();
 }

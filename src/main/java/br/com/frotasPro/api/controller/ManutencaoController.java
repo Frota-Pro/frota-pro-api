@@ -1,8 +1,10 @@
 package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.ManutencaoRequest;
+import br.com.frotasPro.api.controller.response.DocumentoManutencaoResponse;
 import br.com.frotasPro.api.controller.response.ManutencaoResponse;
 import br.com.frotasPro.api.controller.response.RelatorioManutencaoCaminhaoResponse;
+import br.com.frotasPro.api.domain.enums.TipoDocumentoManutencao;
 import br.com.frotasPro.api.service.manutencao.*;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -10,9 +12,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
 import java.time.LocalDate;
@@ -31,6 +35,9 @@ public class ManutencaoController {
     private final BuscarManutencoesPorPeriodoService buscarManutencoesPorPeriodoService;
     private final BuscarManutencoesPorOficinaEPeriodoService buscarManutencoesPorOficinaEPeriodoService;
     private final RelatorioManutencaoCaminhaoService relatorioManutencaoCaminhaoService;
+
+    private final RegistrarDocumentoManutencaoService registrarDocumentoManutencaoService;
+    private final ListarDocumentoManutencaoService listarDocumentoManutencaoService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @PostMapping
@@ -132,5 +139,41 @@ public class ManutencaoController {
         return ResponseEntity.ok(
                 relatorioManutencaoCaminhaoService.gerar(codigoCaminhao, inicio, fim)
         );
+    }
+
+    // =========================
+    // DOCUMENTOS / ANEXOS
+    // =========================
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PostMapping(
+            value = "/{codigo}/documentos",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<DocumentoManutencaoResponse> uploadDocumentoManutencao(
+            @PathVariable String codigo,
+            @RequestParam("tipoDocumento") TipoDocumentoManutencao tipoDocumento,
+            @RequestParam(value = "observacao", required = false) String observacao,
+            @RequestPart("arquivo") MultipartFile arquivo
+    ) {
+        DocumentoManutencaoResponse response =
+                registrarDocumentoManutencaoService.registrar(codigo, tipoDocumento, observacao, arquivo);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(response.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(response);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @GetMapping("/{codigo}/documentos")
+    public ResponseEntity<Page<DocumentoManutencaoResponse>> listarDocumentosManutencao(
+            @PathVariable String codigo,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(listarDocumentoManutencaoService.listarPorManutencao(codigo, pageable));
     }
 }

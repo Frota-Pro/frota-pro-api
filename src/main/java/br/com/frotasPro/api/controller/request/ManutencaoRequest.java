@@ -10,6 +10,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Getter @Setter
 public class ManutencaoRequest {
@@ -25,11 +26,23 @@ public class ManutencaoRequest {
     @NotNull
     private TipoManutencao tipoManutencao;
 
+    // Mantido por compatibilidade (antigo)
     private List<String> itensTrocados;
 
     private String observacoes;
 
     private BigDecimal valor;
+
+    /**
+     * Vínculo opcional com uma parada de carga.
+     */
+    private UUID paradaId;
+
+    /**
+     * Itens detalhados (peças/serviços). Se informado, o total da manutenção
+     * poderá ser calculado a partir desses itens.
+     */
+    private List<ManutencaoItemRequest> itens;
 
     @NotNull
     private StatusManutencao statusManutencao;
@@ -40,6 +53,4 @@ public class ManutencaoRequest {
     private String oficina;
 
     private List<TrocaPneuManutencaoRequest> trocasPneu;
-
-
 }

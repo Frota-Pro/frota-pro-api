@@ -22,13 +22,20 @@ public class ManutencaoResponse {
     private LocalDate dataInicioManutencao;
     private LocalDate dataFimManutencao;
     private TipoManutencao tipoManutencao;
+
     private List<String> itensTrocados;
+    private List<ManutencaoItemResponse> itens;
+
     private String observacoes;
     private BigDecimal valor;
     private StatusManutencao statusManutencao;
+
     private String codigoCaminhao;
     private String caminhao;
+
     private String codigoOficina;
     private String oficina;
+
+    private ParadaResumoResponse parada;
     private List<TrocaPneuManutencaoResponse> trocasPneu;
 }

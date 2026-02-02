@@ -4,13 +4,20 @@ import br.com.frotasPro.api.controller.request.ManutencaoRequest;
 import br.com.frotasPro.api.controller.response.ManutencaoResponse;
 import br.com.frotasPro.api.domain.Caminhao;
 import br.com.frotasPro.api.domain.Manutencao;
+import br.com.frotasPro.api.domain.ManutencaoItem;
 import br.com.frotasPro.api.domain.Oficina;
+import br.com.frotasPro.api.domain.ParadaCarga;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
 import br.com.frotasPro.api.repository.OficinaRepository;
+import br.com.frotasPro.api.repository.ParadaCargaRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import static br.com.frotasPro.api.mapper.ManutencaoMapper.toResponse;
 
@@ -21,6 +28,7 @@ public class AtualizarManutencaoService {
     private final ManutencaoRepository manutencaoRepository;
     private final CaminhaoRepository caminhaoRepository;
     private final OficinaRepository oficinaRepository;
+    private final ParadaCargaRepository paradaCargaRepository;
 
     public ManutencaoResponse atualizar(String codigo, ManutencaoRequest request) {
 
@@ -36,6 +44,12 @@ public class AtualizarManutencaoService {
                     .orElseThrow(() -> new ObjectNotFound("Oficina não encontrada"));
         }
 
+        ParadaCarga parada = null;
+        if (request.getParadaId() != null) {
+            parada = paradaCargaRepository.findById(request.getParadaId())
+                    .orElseThrow(() -> new ObjectNotFound("Parada não encontrada"));
+        }
+
         manutencao.setDescricao(request.getDescricao());
         manutencao.setDataInicioManutencao(request.getDataInicioManutencao());
         manutencao.setDataFimManutencao(request.getDataFimManutencao());
@@ -46,9 +60,40 @@ public class AtualizarManutencaoService {
         manutencao.setStatusManutencao(request.getStatusManutencao());
         manutencao.setCaminhao(caminhao);
         manutencao.setOficina(oficina);
+        manutencao.setParadaCarga(parada);
+
+        // Itens detalhados: substitui a lista (orphanRemoval = true)
+        if (request.getItens() != null) {
+            List<ManutencaoItem> novosItens = new ArrayList<>();
+            BigDecimal total = BigDecimal.ZERO;
+
+            for (var itemReq : request.getItens()) {
+                BigDecimal qtd = itemReq.getQuantidade();
+                BigDecimal unit = itemReq.getValorUnitario();
+                BigDecimal itemTotal = qtd.multiply(unit);
+
+                ManutencaoItem item = ManutencaoItem.builder()
+                        .manutencao(manutencao)
+                        .tipo(itemReq.getTipo())
+                        .descricao(itemReq.getDescricao())
+                        .quantidade(qtd)
+                        .valorUnitario(unit)
+                        .valorTotal(itemTotal)
+                        .build();
+
+                novosItens.add(item);
+                total = total.add(itemTotal);
+            }
+
+            manutencao.getItens().clear();
+            manutencao.getItens().addAll(novosItens);
+
+            if (total.compareTo(BigDecimal.ZERO) > 0) {
+                manutencao.setValor(total);
+            }
+        }
 
         manutencaoRepository.save(manutencao);
-
         return toResponse(manutencao);
     }
 }
