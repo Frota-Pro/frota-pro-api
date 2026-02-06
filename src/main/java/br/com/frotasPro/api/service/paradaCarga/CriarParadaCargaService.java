@@ -1,10 +1,12 @@
 package br.com.frotasPro.api.service.paradaCarga;
 
 import br.com.frotasPro.api.controller.request.ParadaCargaRequest;
+import br.com.frotasPro.api.controller.request.PneuMovimentacaoRequest;
 import br.com.frotasPro.api.controller.response.ParadaCargaResponse;
 import br.com.frotasPro.api.domain.*;
 import br.com.frotasPro.api.domain.enums.TipoDespesa;
 import br.com.frotasPro.api.domain.enums.TipoManutencao;
+import br.com.frotasPro.api.domain.enums.TipoMovimentacaoPneu;
 import br.com.frotasPro.api.domain.enums.TipoParada;
 import br.com.frotasPro.api.excption.BusinessException;
 import br.com.frotasPro.api.excption.ObjectNotFound;
@@ -12,6 +14,7 @@ import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.EixoRepository;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;
 import br.com.frotasPro.api.repository.PneuRepository;
+import br.com.frotasPro.api.service.pneu.PneuService;
 import br.com.frotasPro.api.util.CalcularMediaKmLitroService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,6 +37,8 @@ public class CriarParadaCargaService {
     private final EixoRepository eixoRepository;
     private final PneuRepository pneuRepository;
 
+    // ✅ novo (para registrar eventos do pneu)
+    private final PneuService pneuService;
 
     @Transactional
     public ParadaCargaResponse criar(ParadaCargaRequest request) {
@@ -45,12 +50,15 @@ public class CriarParadaCargaService {
             throw new BusinessException("A carga não está iniciada. Inicie a carga para adicionar parada.");
         }
 
-        if(carga.getDtChegada() != null){
+        if (carga.getDtChegada() != null) {
             throw new BusinessException("A carga não está finalizada. Não é possivel adicionar parada em uma carga ja finalizada.");
         }
 
         ParadaCarga parada = toEntity(request, carga);
 
+        // =========================
+        // DESPESA / ABASTECIMENTO
+        // =========================
         if (!TipoParada.ABASTECIMENTO.equals(request.getTipoParada())) {
 
             if (request.getValorDespesa() != null) {
@@ -70,6 +78,7 @@ public class CriarParadaCargaService {
             }
 
         } else {
+
             if (request.getAbastecimento() == null) {
                 throw new BusinessException("Dados de abastecimento são obrigatórios para parada de ABASTECIMENTO.");
             }
@@ -127,7 +136,11 @@ public class CriarParadaCargaService {
             parada.getDespesaParadas().add(despesa);
         }
 
+        // =========================
+        // MANUTENÇÃO + TROCA DE PNEU
+        // =========================
         if (request.getManutencao() != null) {
+
             var mReq = request.getManutencao();
 
             if (mReq.getValor() == null) {
@@ -167,7 +180,7 @@ public class CriarParadaCargaService {
                                     "Pneu não encontrado para código: " + tpReq.getPneu())
                             );
 
-                    Integer kmTroca = tpReq.getKmOdometro() != null
+                    Integer kmTrocaInt = tpReq.getKmOdometro() != null
                             ? tpReq.getKmOdometro()
                             : request.getKmOdometro();
 
@@ -177,18 +190,11 @@ public class CriarParadaCargaService {
                             .eixo(eixo)
                             .lado(tpReq.getLado())
                             .posicao(tpReq.getPosicao())
-                            .kmOdometro(kmTroca)
+                            .kmOdometro(kmTrocaInt)
                             .tipoTroca(tpReq.getTipoTroca())
                             .build();
 
-                    if (tpReq.getTipoTroca().name().equals("INSTALACAO")) {
-                        pneu.setEixo(eixo);
-                        pneu.setLadoAtual(tpReq.getLado());
-                        pneu.setPosicaoAtual(tpReq.getPosicao());
-                        pneu.setUltimaTroca(java.time.LocalDate.now());
-                        pneu.setKmUltimaTroca(kmTroca);
-                    }
-
+                    // ✅ NÃO mexe mais no pneu aqui (vida útil é por movimentação)
                     trocas.add(troca);
                 });
 
@@ -212,10 +218,64 @@ public class CriarParadaCargaService {
             parada.getDespesaParadas().add(despesaManutencao);
         }
 
-
+        // ✅ salva tudo primeiro (garante IDs)
         repository.save(parada);
 
+        // ✅ Agora registra eventos dos pneus (movimentações) vinculando na parada/manutenção
+        if (request.getManutencao() != null && request.getManutencao().getTrocasPneu() != null
+                && !request.getManutencao().getTrocasPneu().isEmpty()
+                && parada.getManutencoes() != null && !parada.getManutencoes().isEmpty()) {
+
+            // como você está adicionando 1 manutenção por request, pegamos a primeira
+            Manutencao manutencaoPersistida = parada.getManutencoes().get(0);
+
+            request.getManutencao().getTrocasPneu().forEach(tpReq -> {
+
+                Integer kmTrocaInt = tpReq.getKmOdometro() != null
+                        ? tpReq.getKmOdometro()
+                        : request.getKmOdometro();
+
+                BigDecimal kmTroca = toBigDecimal(kmTrocaInt);
+
+                // Mapeia seu tpReq.getTipoTroca() para TipoMovimentacaoPneu
+                TipoMovimentacaoPneu tipoMov = mapearTipoMov(tpReq.getTipoTroca().name());
+
+                // Monta request de movimentação para o módulo de pneus
+                PneuMovimentacaoRequest movReq = PneuMovimentacaoRequest.builder()
+                        .tipo(tipoMov.name())
+                        .kmEvento(kmTroca)
+                        .observacao("Troca na parada/carga (manutenção). TipoTroca=" + tpReq.getTipoTroca().name())
+                        .caminhaoId(carga.getCaminhao().getId())
+                        .manutencaoId(manutencaoPersistida.getId())
+                        .paradaId(parada.getId())
+                        .eixoNumero(tpReq.getEixoNumero())
+                        .lado(tpReq.getLado() != null ? tpReq.getLado().name() : null)
+                        .posicao(tpReq.getPosicao() != null ? tpReq.getPosicao().name() : null)
+                        .kmInstalacao(tipoMov == TipoMovimentacaoPneu.INSTALACAO ? kmTroca : null)
+                        .build();
+
+
+                pneuService.registrarMovimentacao(tpReq.getPneu(), movReq);
+            });
+        }
+
         return toResponse(parada);
+    }
+
+    private BigDecimal toBigDecimal(Integer v) {
+        if (v == null) return null;
+        return BigDecimal.valueOf(v.longValue());
+    }
+
+    private TipoMovimentacaoPneu mapearTipoMov(String tipoTrocaName) {
+        // Ajuste conforme seus enums reais de troca
+        // Ex.: INSTALACAO / REMOCAO / RODIZIO etc.
+        return switch (tipoTrocaName) {
+            case "INSTALACAO" -> TipoMovimentacaoPneu.INSTALACAO;
+            case "REMOCAO", "REMOVER" -> TipoMovimentacaoPneu.REMOVER;
+            case "RODIZIO" -> TipoMovimentacaoPneu.RODIZIO;
+            default -> TipoMovimentacaoPneu.TROCA_MANUTENCAO;
+        };
     }
 
     private TipoDespesa mapearTipoDespesa(TipoParada tipoParada) {

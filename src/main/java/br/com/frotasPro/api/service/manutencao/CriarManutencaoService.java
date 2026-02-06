@@ -1,20 +1,18 @@
 package br.com.frotasPro.api.service.manutencao;
 
 import br.com.frotasPro.api.controller.request.ManutencaoRequest;
+import br.com.frotasPro.api.controller.request.PneuMovimentacaoRequest;
 import br.com.frotasPro.api.controller.response.ManutencaoResponse;
-import br.com.frotasPro.api.domain.Caminhao;
-import br.com.frotasPro.api.domain.ManutencaoItem;
-import br.com.frotasPro.api.domain.Manutencao;
-import br.com.frotasPro.api.domain.Oficina;
-import br.com.frotasPro.api.domain.ParadaCarga;
-import br.com.frotasPro.api.domain.TrocaPneuManutencao;
+import br.com.frotasPro.api.domain.*;
+import br.com.frotasPro.api.domain.enums.TipoMovimentacaoPneu;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.*;
+import br.com.frotasPro.api.service.pneu.PneuService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +29,10 @@ public class CriarManutencaoService {
     private final PneuRepository pneuRepository;
     private final ParadaCargaRepository paradaCargaRepository;
 
+    // ✅ novo
+    private final PneuService pneuService;
+
+    @Transactional
     public ManutencaoResponse criar(ManutencaoRequest request) {
 
         Caminhao caminhao = caminhaoRepository.findByCaminhaoPorCodigoOuPorCodigoExterno(request.getCaminhao())
@@ -62,7 +64,9 @@ public class CriarManutencaoService {
                 .paradaCarga(parada)
                 .build();
 
+        // =========================
         // Itens detalhados (peças/serviços)
+        // =========================
         if (request.getItens() != null && !request.getItens().isEmpty()) {
             List<ManutencaoItem> itens = new ArrayList<>();
             BigDecimal total = BigDecimal.ZERO;
@@ -91,6 +95,9 @@ public class CriarManutencaoService {
             }
         }
 
+        // =========================
+        // Trocas de pneu (histórico da manutenção)
+        // =========================
         if (request.getTrocasPneu() != null && !request.getTrocasPneu().isEmpty()) {
             List<TrocaPneuManutencao> trocas = new ArrayList<>();
 
@@ -113,21 +120,61 @@ public class CriarManutencaoService {
                         .tipoTroca(tpReq.getTipoTroca())
                         .build();
 
-                if (tpReq.getTipoTroca().name().equals("INSTALACAO")) {
-                    pneu.setEixo(eixo);
-                    pneu.setLadoAtual(tpReq.getLado());
-                    pneu.setPosicaoAtual(tpReq.getPosicao());
-                    pneu.setUltimaTroca(LocalDate.now());
-                    pneu.setKmUltimaTroca(tpReq.getKmOdometro());
-                }
-
+                // ✅ NÃO altera mais o pneu aqui (vida útil é via movimentação)
                 trocas.add(troca);
             });
 
             manutencao.setTrocasPneu(trocas);
         }
 
+        // ✅ salva primeiro pra garantir manutencao.id
         manutencaoRepository.save(manutencao);
+
+        // =========================
+        // Registra movimentações do pneu (vida útil)
+        // =========================
+        // ✅ deixa a parada efetivamente final para usar no lambda
+        final ParadaCarga paradaFinal = parada;
+
+        if (request.getTrocasPneu() != null && !request.getTrocasPneu().isEmpty()) {
+
+            request.getTrocasPneu().forEach(tpReq -> {
+
+                BigDecimal kmTroca = tpReq.getKmOdometro() != null
+                        ? BigDecimal.valueOf(tpReq.getKmOdometro().longValue())
+                        : null;
+
+                TipoMovimentacaoPneu tipoMov = mapearTipoMov(tpReq.getTipoTroca().name());
+
+                PneuMovimentacaoRequest movReq = PneuMovimentacaoRequest.builder()
+                        .tipo(tipoMov.name())
+                        .kmEvento(kmTroca)
+                        .observacao("Troca registrada na manutenção " + manutencao.getId()
+                                + ". TipoTroca=" + tpReq.getTipoTroca().name())
+                        .caminhaoId(caminhao.getId())
+                        .manutencaoId(manutencao.getId())
+                        .paradaId(paradaFinal != null ? paradaFinal.getId() : null)
+                        .eixoNumero(tpReq.getEixoNumero())
+                        .lado(tpReq.getLado() != null ? tpReq.getLado().name() : null)
+                        .posicao(tpReq.getPosicao() != null ? tpReq.getPosicao().name() : null)
+                        .kmInstalacao(tipoMov == TipoMovimentacaoPneu.INSTALACAO ? kmTroca : null)
+                        .build();
+
+                pneuService.registrarMovimentacao(tpReq.getPneu(), movReq);
+            });
+        }
+
+
         return toResponse(manutencao);
+    }
+
+    private TipoMovimentacaoPneu mapearTipoMov(String tipoTrocaName) {
+        // Ajuste conforme seus enums reais de troca
+        return switch (tipoTrocaName) {
+            case "INSTALACAO" -> TipoMovimentacaoPneu.INSTALACAO;
+            case "REMOCAO", "REMOVER" -> TipoMovimentacaoPneu.REMOVER;
+            case "RODIZIO" -> TipoMovimentacaoPneu.RODIZIO;
+            default -> TipoMovimentacaoPneu.TROCA_MANUTENCAO;
+        };
     }
 }

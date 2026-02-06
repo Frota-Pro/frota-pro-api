@@ -1,28 +1,25 @@
 package br.com.frotasPro.api.controller.response;
 
+import lombok.*;
 
-import br.com.frotasPro.api.domain.enums.LadoPneu;
-import br.com.frotasPro.api.domain.enums.PosicaoPneu;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.UUID;
 
-@Getter
-@Setter
-@Builder
+@Getter @Setter
+@AllArgsConstructor @NoArgsConstructor @Builder
 public class PneuResponse {
+    public String codigo;
+    public String numeroSerie;
+    public String marca;
+    public String modelo;
+    public String medida;
 
-    private UUID id;
-    private String codigo;
-    private String posicao;
-    private LocalDate ultimaTroca;
-    private Integer kmUltimaTroca;
-    private UUID eixoId;
+    public Integer nivelRecapagem;
+    public String status;
 
-    private LadoPneu ladoAtual;
-    private PosicaoPneu posicaoAtual;
+    public BigDecimal kmMetaAtual;
+    public BigDecimal kmTotalAcumulado;
+
+    public LocalDate dtCompra;
+    public LocalDate dtDescarte;
 }
-

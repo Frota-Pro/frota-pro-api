@@ -1,23 +1,21 @@
 package br.com.frotasPro.api.controller.request;
 
-import br.com.frotasPro.api.domain.enums.LadoPneu;
-import br.com.frotasPro.api.domain.enums.PosicaoPneu;
-import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
-@Getter
-@Setter
+@Getter @Setter
+@AllArgsConstructor @NoArgsConstructor @Builder
 public class PneuRequest {
+    public String numeroSerie;
+    public String marca;
+    public String modelo;
+    public String medida;
 
-    private String posicao;
+    public Integer nivelRecapagem;
+    public String status;              // StatusPneu
 
-    @NotNull(message = "Eixo é obrigatório")
-    private UUID eixoId;
-
-    private LadoPneu ladoAtual;
-    private PosicaoPneu posicaoAtual;
+    public BigDecimal kmMetaAtual;     // meta configurável por pneu
+    public LocalDate dtCompra;
 }
-

@@ -1,48 +1,67 @@
 package br.com.frotasPro.api.domain;
 
-import br.com.frotasPro.api.domain.enums.LadoPneu;
-import br.com.frotasPro.api.domain.enums.PosicaoPneu;
+import br.com.frotasPro.api.domain.enums.StatusPneu;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Entity
 @Table(name = "tb_pneu")
-public class Pneu extends AuditoriaBase {
+public class Pneu {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "uuid")
     private UUID id;
 
     @Column(nullable = false, unique = true, length = 20)
     private String codigo;
 
-    @Column(length = 20)
-    private String posicao;
+    private String numeroSerie;
+    private String marca;
+    private String modelo;
+    private String medida;
 
-    @Column(name = "data_ultima_troca")
-    private LocalDate ultimaTroca;
-
-    @Column(name = "km_ultima_troca")
-    private Integer kmUltimaTroca;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "eixo_id", nullable = false)
-    private Eixo eixo;
+    @Column(nullable = false)
+    private Integer nivelRecapagem;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "lado_atual", length = 20)
-    private LadoPneu ladoAtual;
+    @Column(nullable = false, length = 30)
+    private StatusPneu status;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "posicao_atual", length = 20)
-    private PosicaoPneu posicaoAtual;
+    @Column(nullable = false, precision = 12, scale = 2)
+    private BigDecimal kmMetaAtual;
+
+    @Column(nullable = false, precision = 14, scale = 2)
+    private BigDecimal kmTotalAcumulado;
+
+    private LocalDate dtCompra;
+    private LocalDate dtDescarte;
+
+    @Column(nullable = false)
+    private LocalDateTime criadoEm;
+
+    private LocalDateTime atualizadoEm;
+
+    @PrePersist
+    public void prePersist() {
+        if (id == null) id = UUID.randomUUID();
+        if (nivelRecapagem == null) nivelRecapagem = 0;
+        if (status == null) status = StatusPneu.ESTOQUE;
+        if (kmMetaAtual == null) kmMetaAtual = BigDecimal.ZERO;
+        if (kmTotalAcumulado == null) kmTotalAcumulado = BigDecimal.ZERO;
+        if (criadoEm == null) criadoEm = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        atualizadoEm = LocalDateTime.now();
+    }
 }

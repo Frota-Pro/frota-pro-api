@@ -3,8 +3,6 @@ package br.com.frotasPro.api.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -31,9 +29,6 @@ public class Eixo extends AuditoriaBase {
 
     @Column(nullable = false)
     private int numero;
-
-    @OneToMany(mappedBy = "eixo", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Pneu> pneus = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "caminhao_id", nullable = false)
