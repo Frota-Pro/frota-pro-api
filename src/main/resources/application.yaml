@@ -43,6 +43,11 @@ management:
 
 frotapro:
   empresa-sync-id: 11111111-2222-3333-4444-555555555555
+
+  integracao:
+    integradora-base-url: http://localhost:8081
+    timeout-ms: 2000
+
   kafka:
     topics:
       carga-sync-request: frotapro.carga.sync.request
@@ -54,6 +59,7 @@ frotapro:
 
   storage:
     upload-dir: ./data/uploads
+
 
 jwt:
   public:
