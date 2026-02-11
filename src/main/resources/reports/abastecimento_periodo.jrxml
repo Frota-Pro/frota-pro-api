@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport name="Relatório - Abastecimento por Período" language="java"
+              pageWidth="842" pageHeight="595" orientation="Landscape"
+              columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+
+    <parameter name="logoPath" class="java.lang.Object"/>
+
+    <parameter name="periodoInicio" class="java.time.LocalDate"/>
+    <parameter name="periodoFim" class="java.time.LocalDate"/>
+    <parameter name="filtroCaminhao" class="java.lang.String"/>
+    <parameter name="filtroMotorista" class="java.lang.String"/>
+
+    <parameter name="totalLitros" class="java.math.BigDecimal"/>
+    <parameter name="totalValor" class="java.math.BigDecimal"/>
+
+    <field name="data" class="java.time.LocalDate"/>
+    <field name="caminhao" class="java.lang.String"/>
+    <field name="motorista" class="java.lang.String"/>
+    <field name="posto" class="java.lang.String"/>
+    <field name="cidade" class="java.lang.String"/>
+    <field name="litros" class="java.math.BigDecimal"/>
+    <field name="valorTotal" class="java.math.BigDecimal"/>
+    <field name="kmOdometro" class="java.math.BigDecimal"/>
+    <field name="mediaKmLitro" class="java.math.BigDecimal"/>
+    <field name="tipoCombustivel" class="java.lang.String"/>
+
+    <title height="80">
+        <element kind="image" x="10" y="5" width="120" height="50">
+            <expression><![CDATA[$P{logoPath}]]></expression>
+        </element>
+
+        <element kind="staticText" x="140" y="5" width="520" height="20" fontSize="14" bold="true">
+            <text><![CDATA[RELATÓRIO - ABASTECIMENTO POR PERÍODO]]></text>
+        </element>
+
+        <element kind="textField" x="140" y="28" width="520" height="16">
+            <expression><![CDATA["Caminhão: " + $P{filtroCaminhao} + " | Motorista: " + $P{filtroMotorista}]]></expression>
+        </element>
+
+        <element kind="textField" x="640" y="10" width="180" height="16" hTextAlign="Right">
+            <expression><![CDATA["Período: " + $P{periodoInicio} + " até " + $P{periodoFim}]]></expression>
+        </element>
+    </title>
+
+    <columnHeader height="28">
+        <element kind="staticText" mode="Opaque" x="0" y="3" width="70" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[DATA]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="70" y="3" width="110" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[CAMINHÃO]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="180" y="3" width="160" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[MOTORISTA]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="340" y="3" width="120" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[POSTO]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="460" y="3" width="110" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[CIDADE]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="570" y="3" width="70" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[LITROS]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="640" y="3" width="90" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[VALOR]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="730" y="3" width="72" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[km/L]]></text>
+        </element>
+    </columnHeader>
+
+    <detail>
+        <band height="18">
+            <element kind="textField" x="0" y="0" width="70" height="16">
+                <expression><![CDATA[$F{data}]]></expression>
+            </element>
+            <element kind="textField" x="70" y="0" width="110" height="16">
+                <expression><![CDATA[$F{caminhao}]]></expression>
+            </element>
+            <element kind="textField" x="180" y="0" width="160" height="16">
+                <expression><![CDATA[$F{motorista}]]></expression>
+            </element>
+            <element kind="textField" x="340" y="0" width="120" height="16">
+                <expression><![CDATA[$F{posto}]]></expression>
+            </element>
+            <element kind="textField" x="460" y="0" width="110" height="16">
+                <expression><![CDATA[$F{cidade}]]></expression>
+            </element>
+            <element kind="textField" x="570" y="0" width="70" height="16" pattern="#,##0.00" hTextAlign="Right">
+                <expression><![CDATA[$F{litros}]]></expression>
+            </element>
+            <element kind="textField" x="640" y="0" width="90" height="16" pattern="'R$ ' #,##0.00" hTextAlign="Right">
+                <expression><![CDATA[$F{valorTotal}]]></expression>
+            </element>
+            <element kind="textField" x="730" y="0" width="72" height="16" pattern="#,##0.00" hTextAlign="Right">
+                <expression><![CDATA[$F{mediaKmLitro}]]></expression>
+            </element>
+        </band>
+    </detail>
+
+    <summary height="55">
+        <element kind="staticText" x="0" y="5" width="120" height="16" bold="true">
+            <text><![CDATA[TOTAIS]]></text>
+        </element>
+        <element kind="textField" x="0" y="25" width="300" height="16">
+            <expression><![CDATA["Total litros: " + $P{totalLitros}]]></expression>
+        </element>
+        <element kind="textField" x="320" y="25" width="300" height="16">
+            <expression><![CDATA["Total valor: R$ " + $P{totalValor}]]></expression>
+        </element>
+    </summary>
+
+</jasperReport>

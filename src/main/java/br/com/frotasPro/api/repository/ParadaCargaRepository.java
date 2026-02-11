@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface ParadaCargaRepository extends JpaRepository<ParadaCarga, UUID> {
@@ -30,4 +31,13 @@ public interface ParadaCargaRepository extends JpaRepository<ParadaCarga, UUID> 
             @Param("numeroCarga") String numeroCarga,
             Pageable pageable
     );
+
+    @Query("""
+    select p
+    from ParadaCarga p
+    where p.carga.numeroCarga = :numeroCarga
+    order by p.dtFim
+""")
+    List<ParadaCarga> findAllByNumeroCargaOrderByDtFim(@Param("numeroCarga") String numeroCarga);
+
 }

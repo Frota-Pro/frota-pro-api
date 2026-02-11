@@ -241,4 +241,35 @@ and (cast(:fim as timestamp) is null or a.dt_abastecimento <= cast(:fim as times
             @Param("fim") LocalDateTime fim,
             Pageable pageable
     );
+
+    @Query("""
+    select a
+    from Abastecimento a
+    join fetch a.caminhao c
+    left join fetch a.motorista m
+    where a.dtAbastecimento between :inicio and :fim
+      and (:caminhaoId is null or c.id = :caminhaoId)
+      and (:motoristaId is null or m.id = :motoristaId)
+    order by a.dtAbastecimento
+""")
+    List<Abastecimento> findByPeriodoComFiltro(
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fim") LocalDateTime fim,
+            @Param("caminhaoId") UUID caminhaoId,
+            @Param("motoristaId") UUID motoristaId
+    );
+
+
+    @Query("""
+    select a
+    from Abastecimento a
+    where a.caminhao.id = :caminhaoId
+      and a.dtAbastecimento between :inicio and :fim
+    order by a.dtAbastecimento
+""")
+    List<Abastecimento> findByCaminhaoAndPeriodo(
+            @Param("caminhaoId") UUID caminhaoId,
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fim") LocalDateTime fim
+    );
 }

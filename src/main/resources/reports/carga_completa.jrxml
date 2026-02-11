@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport name="Relatório - Carga Completa" language="java"
+              pageWidth="842" pageHeight="595" orientation="Landscape"
+              columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+
+    <parameter name="logoPath" class="java.lang.Object"/>
+
+    <parameter name="numeroCarga" class="java.lang.String"/>
+    <parameter name="codigoCarga" class="java.lang.String"/>
+    <parameter name="statusCarga" class="java.lang.String"/>
+    <parameter name="motorista" class="java.lang.String"/>
+    <parameter name="caminhao" class="java.lang.String"/>
+    <parameter name="rota" class="java.lang.String"/>
+    <parameter name="dataSaida" class="java.time.LocalDate"/>
+    <parameter name="dataChegada" class="java.time.LocalDate"/>
+    <parameter name="valorTotal" class="java.math.BigDecimal"/>
+    <parameter name="pesoCarga" class="java.math.BigDecimal"/>
+    <parameter name="observacaoMotorista" class="java.lang.String"/>
+
+
+    <field name="tipo" class="java.lang.String"/>
+    <field name="data" class="java.time.LocalDate"/>
+    <field name="descricao" class="java.lang.String"/>
+    <field name="cidade" class="java.lang.String"/>
+    <field name="valor" class="java.math.BigDecimal"/>
+    <field name="km" class="java.math.BigDecimal"/>
+
+    <title height="105">
+        <element kind="image" x="10" y="5" width="120" height="50">
+            <expression><![CDATA[$P{logoPath}]]></expression>
+        </element>
+
+        <element kind="staticText" x="140" y="5" width="520" height="20" fontSize="14" bold="true">
+            <text><![CDATA[RELATÓRIO - CARGA COMPLETA]]></text>
+        </element>
+
+        <element kind="textField" x="140" y="28" width="520" height="16">
+            <expression><![CDATA[
+"Carga: " + $P{numeroCarga} + " (" + $P{codigoCarga} + ") | Status: " + $P{statusCarga}
+            ]]></expression>
+        </element>
+
+        <element kind="textField" x="140" y="46" width="520" height="16">
+            <expression><![CDATA[
+"Motorista: " + $P{motorista} + " | Caminhão: " + $P{caminhao}
+            ]]></expression>
+        </element>
+
+        <element kind="textField" x="140" y="64" width="520" height="16">
+            <expression><![CDATA[
+"Rota: " + $P{rota}
+            ]]></expression>
+        </element>
+
+        <element kind="textField" x="640" y="10" width="180" height="16" hTextAlign="Right">
+            <expression><![CDATA[
+"Saída: " + $P{dataSaida} + " | Chegada: " + $P{dataChegada}
+            ]]></expression>
+        </element>
+
+        <element kind="textField" x="640" y="28" width="180" height="16" hTextAlign="Right">
+            <expression><![CDATA[
+"Valor total: R$ " + $P{valorTotal}
+            ]]></expression>
+        </element>
+
+        <element kind="textField" x="640" y="46" width="180" height="16" hTextAlign="Right">
+            <expression><![CDATA[
+"Peso: " + $P{pesoCarga}
+            ]]></expression>
+        </element>
+    </title>
+
+    <pageHeader height="22">
+        <element kind="textField" x="0" y="2" width="802" height="18">
+            <expression><![CDATA[
+($P{observacaoMotorista} == null || $P{observacaoMotorista}.isBlank()) 
+? "" 
+: ("Obs. motorista: " + $P{observacaoMotorista})
+            ]]></expression>
+        </element>
+    </pageHeader>
+
+    <columnHeader height="28">
+        <element kind="staticText" mode="Opaque" x="0" y="3" width="70" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[TIPO]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="70" y="3" width="80" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[DATA]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="150" y="3" width="360" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[DESCRIÇÃO]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="510" y="3" width="140" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[CIDADE]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="650" y="3" width="80" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[VALOR]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="730" y="3" width="72" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[KM]]></text>
+        </element>
+    </columnHeader>
+
+    <detail>
+        <band height="18">
+            <element kind="textField" x="0" y="0" width="70" height="16" hTextAlign="Center">
+                <expression><![CDATA[$F{tipo}]]></expression>
+            </element>
+            <element kind="textField" x="70" y="0" width="80" height="16" hTextAlign="Center">
+                <expression><![CDATA[$F{data}]]></expression>
+            </element>
+            <element kind="textField" x="150" y="0" width="360" height="16">
+                <expression><![CDATA[$F{descricao}]]></expression>
+            </element>
+            <element kind="textField" x="510" y="0" width="140" height="16">
+                <expression><![CDATA[$F{cidade}]]></expression>
+            </element>
+            <element kind="textField" x="650" y="0" width="80" height="16" pattern="'R$ ' #,##0.00" hTextAlign="Right">
+                <expression><![CDATA[$F{valor}]]></expression>
+            </element>
+            <element kind="textField" x="730" y="0" width="72" height="16" pattern="#,##0.00" hTextAlign="Right">
+                <expression><![CDATA[$F{km}]]></expression>
+            </element>
+        </band>
+    </detail>
+
+</jasperReport>

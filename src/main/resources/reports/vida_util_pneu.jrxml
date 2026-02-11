@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport name="Relatório - Vida Útil do Pneu" language="java"
+              pageWidth="842" pageHeight="595" orientation="Landscape"
+              columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+
+    <parameter name="logoPath" class="java.lang.Object"/>
+
+    <parameter name="filtroCaminhao" class="java.lang.String"/>
+    <parameter name="totalPneus" class="java.lang.Long"/>
+
+
+    <field name="codigoPneu" class="java.lang.String"/>
+    <field name="numeroSerie" class="java.lang.String"/>
+    <field name="marca" class="java.lang.String"/>
+    <field name="modelo" class="java.lang.String"/>
+    <field name="medida" class="java.lang.String"/>
+    <field name="status" class="java.lang.String"/>
+    <field name="caminhao" class="java.lang.String"/>
+    <field name="kmTotal" class="java.math.BigDecimal"/>
+    <field name="kmMeta" class="java.math.BigDecimal"/>
+    <field name="percentualVida" class="java.math.BigDecimal"/>
+
+    <title height="80">
+        <element kind="image" x="10" y="5" width="120" height="50">
+            <expression><![CDATA[$P{logoPath}]]></expression>
+        </element>
+
+        <element kind="staticText" x="140" y="5" width="520" height="20" fontSize="14" bold="true">
+            <text><![CDATA[RELATÓRIO - VIDA ÚTIL DO PNEU]]></text>
+        </element>
+
+        <element kind="textField" x="140" y="28" width="520" height="16">
+            <expression><![CDATA["Filtro caminhão: " + $P{filtroCaminhao}]]></expression>
+        </element>
+
+        <element kind="textField" x="640" y="10" width="180" height="16" hTextAlign="Right">
+            <expression><![CDATA["Total pneus: " + $P{totalPneus}]]></expression>
+        </element>
+    </title>
+
+    <columnHeader height="28">
+        <element kind="staticText" mode="Opaque" x="0" y="3" width="90" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[CÓDIGO]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="90" y="3" width="120" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[SÉRIE]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="210" y="3" width="110" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[MARCA]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="320" y="3" width="140" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[MODELO]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="460" y="3" width="120" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[MEDIDA]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="580" y="3" width="130" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[CAMINHÃO]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="710" y="3" width="92" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[% VIDA]]></text>
+        </element>
+    </columnHeader>
+
+    <detail>
+        <band height="18">
+            <element kind="textField" x="0" y="0" width="90" height="16">
+                <expression><![CDATA[$F{codigoPneu}]]></expression>
+            </element>
+            <element kind="textField" x="90" y="0" width="120" height="16">
+                <expression><![CDATA[$F{numeroSerie}]]></expression>
+            </element>
+            <element kind="textField" x="210" y="0" width="110" height="16">
+                <expression><![CDATA[$F{marca}]]></expression>
+            </element>
+            <element kind="textField" x="320" y="0" width="140" height="16">
+                <expression><![CDATA[$F{modelo}]]></expression>
+            </element>
+            <element kind="textField" x="460" y="0" width="120" height="16">
+                <expression><![CDATA[$F{medida}]]></expression>
+            </element>
+            <element kind="textField" x="580" y="0" width="130" height="16">
+                <expression><![CDATA[$F{caminhao}]]></expression>
+            </element>
+            <element kind="textField" x="710" y="0" width="92" height="16" pattern="#,##0.00" hTextAlign="Right">
+                <expression><![CDATA[$F{percentualVida}]]></expression>
+            </element>
+        </band>
+    </detail>
+
+</jasperReport>

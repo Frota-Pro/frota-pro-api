@@ -123,4 +123,45 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
           or c.caminhao.codigoExterno = :codigo
        """)
     BigDecimal sumPesoPorCaminhaoCodigoOuCodigoExterno(@Param("codigo") String codigo);
+
+    @Query("""
+    select c
+    from Carga c
+    left join fetch c.notas n
+    left join fetch c.motorista m
+    left join fetch c.caminhao cam
+    left join fetch c.rota r
+    where c.numeroCarga = :numeroCarga
+""")
+    Optional<Carga> findByNumeroCargaWithNotas(@Param("numeroCarga") String numeroCarga);
+
+
+    interface RankingMotoristaRow {
+        String getCodigoMotorista();
+        String getNomeMotorista();
+        Long getTotalCargas();
+        java.math.BigDecimal getTotalTonelada();
+        Long getTotalKmRodado();
+        java.math.BigDecimal getTotalValorCargas();
+    }
+
+    @Query("""
+        select
+          m.codigo as codigoMotorista,
+          m.nome as nomeMotorista,
+          count(c.id) as totalCargas,
+          coalesce(sum(c.pesoCarga), 0) as totalTonelada,
+          coalesce(sum(c.kmFinal - c.kmInicial), 0) as totalKmRodado,
+          coalesce(sum(c.valorTotal), 0) as totalValorCargas
+        from Carga c
+        join c.motorista m
+        where c.dtChegada between :inicio and :fim
+        group by m.codigo, m.nome
+        order by totalTonelada desc, totalValorCargas desc
+    """)
+    List<RankingMotoristaRow> rankingMotoristas(
+            @Param("inicio") java.time.LocalDate inicio,
+            @Param("fim") java.time.LocalDate fim
+    );
+
 }

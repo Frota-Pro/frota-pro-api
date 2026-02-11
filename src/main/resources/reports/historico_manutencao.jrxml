@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport name="Relatório - Histórico de Manutenção" language="java"
+              whenNoDataType="AllSectionsNoDetail"
+              pageWidth="842" pageHeight="595" orientation="Landscape"
+              columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+
+    <parameter name="logoPath" class="java.lang.Object"/>
+
+    <parameter name="codigoCaminhao" class="java.lang.String"/>
+    <parameter name="placaCaminhao" class="java.lang.String"/>
+    <parameter name="periodoInicio" class="java.time.LocalDate"/>
+    <parameter name="periodoFim" class="java.time.LocalDate"/>
+    <parameter name="totalManutencao" class="java.math.BigDecimal"/>
+
+
+    <field name="data" class="java.time.LocalDate"/>
+    <field name="descricao" class="java.lang.String"/>
+    <field name="tipo" class="java.lang.String"/>
+    <field name="valor" class="java.math.BigDecimal"/>
+    <field name="status" class="java.lang.String"/>
+
+    <title height="80">
+        <element kind="image" x="10" y="5" width="120" height="50">
+            <expression><![CDATA[$P{logoPath}]]></expression>
+        </element>
+
+        <element kind="staticText" x="140" y="5" width="520" height="20" fontSize="14" bold="true">
+            <text><![CDATA[RELATÓRIO - HISTÓRICO DE MANUTENÇÃO]]></text>
+        </element>
+
+        <element kind="textField" x="140" y="28" width="520" height="16">
+            <expression><![CDATA["Caminhão: " + $P{placaCaminhao} + " (" + $P{codigoCaminhao} + ")"]]></expression>
+        </element>
+
+        <element kind="textField" x="640" y="10" width="180" height="16" hTextAlign="Right">
+            <expression><![CDATA["Período: " + $P{periodoInicio} + " até " + $P{periodoFim}]]></expression>
+        </element>
+    </title>
+
+    <columnHeader height="28">
+        <element kind="staticText" mode="Opaque" x="0" y="3" width="90" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[DATA]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="90" y="3" width="420" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[DESCRIÇÃO]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="510" y="3" width="120" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[TIPO]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="630" y="3" width="90" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[VALOR]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="720" y="3" width="82" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+            <text><![CDATA[STATUS]]></text>
+        </element>
+    </columnHeader>
+
+    <detail>
+        <band height="18">
+            <element kind="textField" x="0" y="0" width="90" height="16" hTextAlign="Center">
+                <expression><![CDATA[$F{data}]]></expression>
+            </element>
+            <element kind="textField" x="90" y="0" width="420" height="16">
+                <expression><![CDATA[$F{descricao}]]></expression>
+            </element>
+            <element kind="textField" x="510" y="0" width="120" height="16" hTextAlign="Center">
+                <expression><![CDATA[$F{tipo}]]></expression>
+            </element>
+            <element kind="textField" x="630" y="0" width="90" height="16" pattern="'R$ ' #,##0.00" hTextAlign="Right">
+                <expression><![CDATA[$F{valor}]]></expression>
+            </element>
+            <element kind="textField" x="720" y="0" width="82" height="16" hTextAlign="Center">
+                <expression><![CDATA[$F{status}]]></expression>
+            </element>
+        </band>
+    </detail>
+
+    <summary height="50">
+        <element kind="staticText" x="0" y="5" width="120" height="16" bold="true">
+            <text><![CDATA[TOTAL]]></text>
+        </element>
+        <element kind="textField" x="0" y="25" width="300" height="16">
+            <expression><![CDATA["Total manutenção: R$ " + $P{totalManutencao}]]></expression>
+        </element>
+    </summary>
+
+</jasperReport>

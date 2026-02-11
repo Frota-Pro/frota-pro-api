@@ -162,4 +162,19 @@ public interface ManutencaoRepository extends JpaRepository<Manutencao, UUID> {
             @Param("fim") LocalDate fim
     );
 
+    @Query("""
+    select m
+    from Manutencao m
+    where m.caminhao.id = :caminhaoId
+      and coalesce(m.dataFimManutencao, m.dataInicioManutencao) between :inicio and :fim
+    order by coalesce(m.dataFimManutencao, m.dataInicioManutencao)
+""")
+    List<Manutencao> findByCaminhaoAndPeriodo(
+            @Param("caminhaoId") UUID caminhaoId,
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim
+    );
+
+
+
 }
