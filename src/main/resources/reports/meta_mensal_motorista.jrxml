@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- JRXML ajustado para uso com JRBeanCollectionDataSource (API) -->
+<jasperReport name="Relatório – Meta mensal do motorista"
+              language="java"
+              pageWidth="842"
+              pageHeight="595"
+              orientation="Landscape"
+              columnWidth="802"
+              leftMargin="20"
+              rightMargin="20"
+              topMargin="20"
+              bottomMargin="20"
+              uuid="11111111-2222-3333-4444-555555555555">
+
+    <!-- IMPORTANTE:
+         - JasperReports 7.x usa <query ...>, NÃO <queryString>.
+         - Como o datasource é JRBeanCollectionDataSource, query fica vazia.
+    -->
+    <query language="SQL"><![CDATA[]]></query>
+
+    <!-- ============ PARAMETERS (header + totais) ============ -->
+    <parameter name="nomeMotorista" class="java.lang.String"/>
+    <parameter name="codigoMotorista" class="java.lang.String"/>
+    <parameter name="placaCaminhao" class="java.lang.String"/>
+    <parameter name="codigoCaminhao" class="java.lang.String"/>
+
+    <parameter name="periodoInicio" class="java.time.LocalDate"/>
+    <parameter name="periodoFim" class="java.time.LocalDate"/>
+
+    <parameter name="objetivoMesTonelada" class="java.math.BigDecimal"/>
+    <parameter name="metaConsumoKmPorLitro" class="java.math.BigDecimal"/>
+
+    <parameter name="totalTonelada" class="java.math.BigDecimal"/>
+    <parameter name="totalKmRodado" class="java.lang.Long"/>
+    <parameter name="totalLitros" class="java.math.BigDecimal"/>
+    <parameter name="totalValorAbastecimento" class="java.math.BigDecimal"/>
+    <parameter name="mediaGeralKmPorLitro" class="java.math.BigDecimal"/>
+    <parameter name="realizadoToneladaPercentual" class="java.math.BigDecimal"/>
+
+    <!-- logoPath é opcional (pode ser caminho do classpath ou file path).
+         Se não usar, deixe null no params e marque "blankWhenNull" no image. -->
+    <parameter name="logoPath" class="java.net.URL"/>
+
+    <!-- ============ FIELDS (detail / linhas) ============ -->
+    <!-- Tipos alinhados ao JSON/DTO informado -->
+    <field name="data" class="java.time.LocalDate"/>
+    <field name="lote" class="java.lang.String"/>
+    <field name="cidade" class="java.lang.String"/>
+    <field name="valorCarga" class="java.math.BigDecimal"/>
+    <field name="tonelagem" class="java.math.BigDecimal"/>
+    <field name="kmInicial" class="java.lang.Integer"/>
+    <field name="kmFinal" class="java.lang.Integer"/>
+    <field name="kmRodado" class="java.lang.Long"/>
+    <field name="litros" class="java.math.BigDecimal"/>
+    <field name="valorAbastecimento" class="java.math.BigDecimal"/>
+    <field name="mediaKmLitro" class="java.math.BigDecimal"/>
+
+    <background splitType="Stretch"/>
+
+    <!-- ===================== TITLE ===================== -->
+    <title height="90" splitType="Stretch">
+
+        <!-- Logo (opcional) -->
+        <element kind="image"
+                 uuid="00000000-0000-0000-0000-000000000201"
+                 x="10" y="5" width="120" height="60"
+                 scaleImage="RetainShape"
+                 onErrorType="Blank">
+            <expression><![CDATA[$P{logoPath}]]></expression>
+        </element>
+
+        <element kind="staticText"
+                 uuid="00000000-0000-0000-0000-000000000202"
+                 x="140" y="5" width="480" height="25"
+                 fontSize="14.0" bold="true"
+                 hTextAlign="Left" vTextAlign="Middle">
+            <text><![CDATA[RELATÓRIO – META MENSAL DO MOTORISTA]]></text>
+        </element>
+
+        <element kind="textField"
+                 uuid="00000000-0000-0000-0000-000000000203"
+                 x="140" y="32" width="480" height="16"
+                 blankWhenNull="true"
+                 vTextAlign="Middle">
+            <expression><![CDATA[
+"Motorista: " + ($P{nomeMotorista} == null ? "-" : $P{nomeMotorista})
++ " (" + ($P{codigoMotorista} == null ? "-" : $P{codigoMotorista}) + ")"
+            ]]></expression>
+        </element>
+
+        <element kind="textField"
+                 uuid="00000000-0000-0000-0000-000000000204"
+                 x="140" y="50" width="480" height="16"
+                 blankWhenNull="true"
+                 vTextAlign="Middle">
+            <expression><![CDATA[
+"Caminhão: " + ($P{placaCaminhao} == null ? "-" : $P{placaCaminhao})
++ " (" + ($P{codigoCaminhao} == null ? "-" : $P{codigoCaminhao}) + ")"
+            ]]></expression>
+        </element>
+
+        <element kind="textField"
+                 uuid="00000000-0000-0000-0000-000000000205"
+                 x="640" y="15" width="180" height="16"
+                 blankWhenNull="true"
+                 hTextAlign="Right" vTextAlign="Middle">
+            <expression><![CDATA[
+"Período: " + ($P{periodoInicio} == null ? "-" : $P{periodoInicio})
++ " até " + ($P{periodoFim} == null ? "-" : $P{periodoFim})
+            ]]></expression>
+        </element>
+
+        <element kind="textField"
+                 uuid="00000000-0000-0000-0000-000000000206"
+                 x="640" y="33" width="180" height="16"
+                 blankWhenNull="true"
+                 hTextAlign="Right" vTextAlign="Middle">
+            <expression><![CDATA[
+"Meta tonelada: " + ($P{objetivoMesTonelada} == null ? "-" : $P{objetivoMesTonelada})
+            ]]></expression>
+        </element>
+
+        <element kind="textField"
+                 uuid="00000000-0000-0000-0000-000000000207"
+                 x="640" y="51" width="180" height="16"
+                 blankWhenNull="true"
+                 hTextAlign="Right" vTextAlign="Middle">
+            <expression><![CDATA[
+"Meta km/L: " + ($P{metaConsumoKmPorLitro} == null ? "-" : $P{metaConsumoKmPorLitro})
+            ]]></expression>
+        </element>
+
+    </title>
+
+    <pageHeader height="5" splitType="Stretch"/>
+
+    <!-- ===================== COLUMN HEADER ===================== -->
+    <columnHeader height="35" splitType="Stretch">
+
+        <element kind="staticText"
+                 uuid="00000000-0000-0000-0000-000000000208"
+                 mode="Opaque"
+                 x="0" y="5" width="60" height="25"
+                 forecolor="#FFFFFF" backcolor="#0D47A1"
+                 fontSize="10.0" bold="true"
+                 hTextAlign="Center" vTextAlign="Middle">
+            <text><![CDATA[DATA]]></text>
+        </element>
+
+        <element kind="staticText"
+                 uuid="00000000-0000-0000-0000-000000000209"
+                 mode="Opaque"
+                 x="60" y="5" width="80" height="25"
+                 forecolor="#FFFFFF" backcolor="#0D47A1"
+                 fontSize="10.0" bold="true"
+                 hTextAlign="Center" vTextAlign="Middle">
+            <text><![CDATA[LOTE]]></text>
+        </element>
+
+        <element kind="staticText"
+                 uuid="00000000-0000-0000-0000-00000000020a"
+                 mode="Opaque"
+                 x="140" y="5" width="120" height="25"
+                 forecolor="#FFFFFF" backcolor="#0D47A1"
+                 fontSize="10.0" bold="true"
+                 hTextAlign="Center" vTextAlign="Middle">
+            <text><![CDATA[CIDADE]]></text>
+        </element>
+
+        <element kind="staticText"
+                 uuid="00000000-0000-0000-0000-00000000020b"
+                 mode="Opaque"
+                 x="260" y="5" width="90" height="25"
+                 forecolor="#FFFFFF" backcolor="#0D47A1"
+                 fontSize="10.0" bold="true"
+                 hTextAlign="Center" vTextAlign="Middle">
+            <text><![CDATA[VALOR CARGA]]></text>
+        </element>
+
+        <element kind="staticText"
+                 uuid="00000000-0000-0000-0000-00000000020c"
+                 mode="Opaque"
+                 x="350" y="5" width="70" height="25"
+                 forecolor="#FFFFFF" backcolor="#0D47A1"
+                 fontSize="10.0" bold="true"
+                 hTextAlign="Center" vTextAlign="Middle">
+            <text><![CDATA[TONELADA]]></text>
+        </element>
+
+        <element kind="staticText"
+                 uuid="00000000-0000-0000-0000-00000000020d"
+                 mode="Opaque"
+                 x="420" y="5" width="60" height="25"
+                 forecolor="#FFFFFF" backcolor="#0D47A1"
+                 fontSize="10.0" bold="true"
+                 hTextAlign="Center" vTextAlign="Middle">
+            <text><![CDATA[KM INI]]></text>
+        </element>
+
+        <element kind="staticText"
+                 uuid="00000000-0000-0000-0000-00000000020e"
+                 mode="Opaque"
+                 x="480" y="5" width="60" height="25"
+                 forecolor="#FFFFFF" backcolor="#0D47A1"
+                 fontSize="10.0" bold="true"
+                 hTextAlign="Center" vTextAlign="Middle">
+            <text><![CDATA[KM FIM]]></text>
+        </element>
+
+        <element kind="staticText"
+                 uuid="00000000-0000-0000-0000-00000000020f"
+                 mode="Opaque"
+                 x="540" y="5" width="60" height="25"
+                 forecolor="#FFFFFF" backcolor="#0D47A1"
+                 fontSize="10.0" bold="true"
+                 hTextAlign="Center" vTextAlign="Middle">
+            <text><![CDATA[KM ROD.]]></text>
+        </element>
+
+        <element kind="staticText"
+                 uuid="00000000-0000-0000-0000-000000000210"
+                 mode="Opaque"
+                 x="600" y="5" width="70" height="25"
+                 forecolor="#FFFFFF" backcolor="#0D47A1"
+                 fontSize="10.0" bold="true"
+                 hTextAlign="Center" vTextAlign="Middle">
+            <text><![CDATA[LITROS]]></text>
+        </element>
+
+        <element kind="staticText"
+                 uuid="00000000-0000-0000-0000-000000000211"
+                 mode="Opaque"
+                 x="670" y="5" width="90" height="25"
+                 forecolor="#FFFFFF" backcolor="#0D47A1"
+                 fontSize="10.0" bold="true"
+                 hTextAlign="Center" vTextAlign="Middle">
+            <text><![CDATA[VALOR ABAST.]]></text>
+        </element>
+
+        <element kind="staticText"
+                 uuid="00000000-0000-0000-0000-000000000212"
+                 mode="Opaque"
+                 x="760" y="5" width="42" height="25"
+                 forecolor="#FFFFFF" backcolor="#0D47A1"
+                 fontSize="10.0" bold="true"
+                 hTextAlign="Center" vTextAlign="Middle">
+            <text><![CDATA[km/L]]></text>
+        </element>
+
+    </columnHeader>
+
+    <!-- ===================== DETAIL (linhas) ===================== -->
+    <detail>
+        <band height="18" splitType="Stretch">
+
+            <element kind="textField"
+                     uuid="00000000-0000-0000-0000-000000000213"
+                     x="0" y="0" width="60" height="16"
+                     blankWhenNull="true"
+                     vTextAlign="Middle">
+                <expression><![CDATA[$F{data}]]></expression>
+            </element>
+
+            <element kind="textField"
+                     uuid="00000000-0000-0000-0000-000000000214"
+                     x="60" y="0" width="80" height="16"
+                     blankWhenNull="true"
+                     vTextAlign="Middle">
+                <expression><![CDATA[$F{lote}]]></expression>
+            </element>
+
+            <element kind="textField"
+                     uuid="00000000-0000-0000-0000-000000000215"
+                     x="140" y="0" width="120" height="16"
+                     blankWhenNull="true"
+                     vTextAlign="Middle">
+                <expression><![CDATA[$F{cidade}]]></expression>
+            </element>
+
+            <element kind="textField"
+                     uuid="00000000-0000-0000-0000-000000000216"
+                     x="260" y="0" width="90" height="16"
+                     blankWhenNull="true"
+                     pattern="'R$ ' #,##0.00"
+                     hTextAlign="Right" vTextAlign="Middle">
+                <expression><![CDATA[$F{valorCarga}]]></expression>
+            </element>
+
+            <element kind="textField"
+                     uuid="00000000-0000-0000-0000-000000000217"
+                     x="350" y="0" width="70" height="16"
+                     blankWhenNull="true"
+                     pattern="#,##0.000"
+                     hTextAlign="Right" vTextAlign="Middle">
+                <expression><![CDATA[$F{tonelagem}]]></expression>
+            </element>
+
+            <element kind="textField"
+                     uuid="00000000-0000-0000-0000-000000000218"
+                     x="420" y="0" width="60" height="16"
+                     blankWhenNull="true"
+                     hTextAlign="Right" vTextAlign="Middle">
+                <expression><![CDATA[$F{kmInicial}]]></expression>
+            </element>
+
+            <element kind="textField"
+                     uuid="00000000-0000-0000-0000-000000000219"
+                     x="480" y="0" width="60" height="16"
+                     blankWhenNull="true"
+                     hTextAlign="Right" vTextAlign="Middle">
+                <expression><![CDATA[$F{kmFinal}]]></expression>
+            </element>
+
+            <element kind="textField"
+                     uuid="00000000-0000-0000-0000-00000000021a"
+                     x="540" y="0" width="60" height="16"
+                     blankWhenNull="true"
+                     hTextAlign="Right" vTextAlign="Middle">
+                <expression><![CDATA[$F{kmRodado}]]></expression>
+            </element>
+
+            <element kind="textField"
+                     uuid="00000000-0000-0000-0000-00000000021b"
+                     x="600" y="0" width="70" height="16"
+                     blankWhenNull="true"
+                     pattern="#,##0.00"
+                     hTextAlign="Right" vTextAlign="Middle">
+                <expression><![CDATA[$F{litros}]]></expression>
+            </element>
+
+            <element kind="textField"
+                     uuid="00000000-0000-0000-0000-00000000021c"
+                     x="670" y="0" width="90" height="16"
+                     blankWhenNull="true"
+                     pattern="'R$ ' #,##0.00"
+                     hTextAlign="Right" vTextAlign="Middle">
+                <expression><![CDATA[$F{valorAbastecimento}]]></expression>
+            </element>
+
+            <element kind="textField"
+                     uuid="00000000-0000-0000-0000-00000000021d"
+                     x="760" y="0" width="42" height="16"
+                     blankWhenNull="true"
+                     pattern="#,##0.00"
+                     hTextAlign="Right" vTextAlign="Middle">
+                <expression><![CDATA[$F{mediaKmLitro}]]></expression>
+            </element>
+
+        </band>
+    </detail>
+
+    <columnFooter height="5" splitType="Stretch"/>
+
+    <!-- ===================== PAGE FOOTER ===================== -->
+    <pageFooter height="35" splitType="Stretch">
+
+        <element kind="textField"
+                 uuid="00000000-0000-0000-0000-00000000021e"
+                 x="0" y="10" width="150" height="20">
+            <expression><![CDATA[
+new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date())
+            ]]></expression>
+        </element>
+
+        <element kind="textField"
+                 uuid="00000000-0000-0000-0000-00000000021f"
+                 x="700" y="10" width="120" height="20"
+                 hTextAlign="Right">
+            <expression><![CDATA["Página " + $V{PAGE_NUMBER}]]></expression>
+        </element>
+
+    </pageFooter>
+
+    <!-- ===================== SUMMARY (totais) ===================== -->
+    <summary height="70" splitType="Stretch">
+
+        <element kind="staticText"
+                 uuid="00000000-0000-0000-0000-000000000220"
+                 x="0" y="5" width="120" height="18"
+                 fontSize="11.0" bold="true">
+            <text><![CDATA[TOTAIS DO PERÍODO]]></text>
+        </element>
+
+        <element kind="textField"
+                 uuid="00000000-0000-0000-0000-000000000221"
+                 x="0" y="25" width="220" height="16"
+                 blankWhenNull="true">
+            <expression><![CDATA[
+"Total tonelada: " + ($P{totalTonelada} == null ? "-" : $P{totalTonelada})
+            ]]></expression>
+        </element>
+
+        <element kind="textField"
+                 uuid="00000000-0000-0000-0000-000000000222"
+                 x="220" y="25" width="200" height="16"
+                 blankWhenNull="true">
+            <expression><![CDATA[
+"Total km rodado: " + ($P{totalKmRodado} == null ? "-" : $P{totalKmRodado})
+            ]]></expression>
+        </element>
+
+        <element kind="textField"
+                 uuid="00000000-0000-0000-0000-000000000223"
+                 x="420" y="25" width="200" height="16"
+                 blankWhenNull="true">
+            <expression><![CDATA[
+"Total litros: " + ($P{totalLitros} == null ? "-" : $P{totalLitros})
+            ]]></expression>
+        </element>
+
+        <element kind="textField"
+                 uuid="00000000-0000-0000-0000-000000000224"
+                 x="0" y="43" width="220" height="16"
+                 blankWhenNull="true">
+            <expression><![CDATA[
+"Total abastecimento: R$ " + ($P{totalValorAbastecimento} == null ? "-" : $P{totalValorAbastecimento})
+            ]]></expression>
+        </element>
+
+        <element kind="textField"
+                 uuid="00000000-0000-0000-0000-000000000225"
+                 x="220" y="43" width="200" height="16"
+                 blankWhenNull="true">
+            <expression><![CDATA[
+"Média geral km/L: " + ($P{mediaGeralKmPorLitro} == null ? "-" : $P{mediaGeralKmPorLitro})
+            ]]></expression>
+        </element>
+
+        <element kind="textField"
+                 uuid="00000000-0000-0000-0000-000000000226"
+                 x="420" y="43" width="280" height="16"
+                 blankWhenNull="true">
+            <expression><![CDATA[
+"Realizado x Meta tonelada: " + ($P{realizadoToneladaPercentual} == null ? "-" : $P{realizadoToneladaPercentual}) + " %"
+            ]]></expression>
+        </element>
+
+    </summary>
+
+</jasperReport>
