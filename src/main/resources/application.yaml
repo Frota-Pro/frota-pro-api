@@ -41,12 +41,24 @@ management:
     health:
       show-details: always
 
+
+logging:
+  file:
+    name: logs/frotapro.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n"
+
 frotapro:
   empresa-sync-id: 11111111-2222-3333-4444-555555555555
 
   integracao:
     integradora-base-url: http://localhost:8081
     timeout-ms: 2000
+
+  logs:
+    api-file: logs/frotapro.log
+    integradora-logfile-path: /actuator/logfile
 
   kafka:
     topics:
