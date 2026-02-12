@@ -1,6 +1,9 @@
 package br.com.frotasPro.api.service.usuario;
 
 import br.com.frotasPro.api.controller.request.UsuarioRequest;
+import br.com.frotasPro.api.controller.request.UsuarioSenhaSelfRequest;
+import br.com.frotasPro.api.controller.request.UsuarioSenhaUpdateRequest;
+import br.com.frotasPro.api.controller.request.UsuarioUpdateRequest;
 import br.com.frotasPro.api.controller.response.UsuarioResponse;
 import br.com.frotasPro.api.domain.Acesso;
 import br.com.frotasPro.api.domain.Motorista;
@@ -10,10 +13,7 @@ import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.repository.UsuarioRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -21,6 +21,7 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static br.com.frotasPro.api.mapper.UsuarioMapper.toResponse;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
@@ -34,9 +35,15 @@ public class UsuarioService {
     private final PasswordEncoder passwordEncoder;
     private final MotoristaRepository motoristaRepository;
 
+    private final UsuarioAutenticadoService usuarioAutenticadoService;
+
     public UsuarioResponse registar(UsuarioRequest request) {
         if (usuarioRepository.findByLogin(request.getLogin()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuário já existe");
+        }
+
+        if (usuarioRepository.existsByNome(request.getNome())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Já existe um usuário com esse nome");
         }
 
         Usuario usuario = new Usuario();
@@ -44,17 +51,83 @@ public class UsuarioService {
         usuario.setNome(request.getNome());
         usuario.setSenha(passwordEncoder.encode(request.getSenha()));
 
-        Acesso acessoPadrao = acessoRepository.findByNome("ROLE_ADMIN")
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.INTERNAL_SERVER_ERROR,
-                        "Acesso padrão ROLE_ADMIN não encontrado."
-                ));
+        // ativo
+        usuario.setAtivo(request.getAtivo() == null ? true : request.getAtivo());
 
-        usuario.adicionarAcesso(acessoPadrao);
+        // acessos
+        aplicarAcessos(usuario, request.getAcessos());
 
         usuarioRepository.save(usuario);
 
         return toResponse(usuario);
+    }
+
+    public org.springframework.data.domain.Page<UsuarioResponse> listar(String q, Boolean ativo, org.springframework.data.domain.Pageable pageable) {
+        return usuarioRepository.search(q, ativo, pageable).map(br.com.frotasPro.api.mapper.UsuarioMapper::toResponse);
+    }
+
+    public UsuarioResponse buscarPorId(UUID id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
+        return toResponse(usuario);
+    }
+
+    public UsuarioResponse atualizar(UUID id, UsuarioUpdateRequest request) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
+
+        String novoLogin = request.getLogin().trim();
+        String novoNome = request.getNome().trim();
+
+        // unicidade
+        usuarioRepository.findByLogin(novoLogin)
+                .filter(u -> !u.getId().equals(id))
+                .ifPresent(u -> { throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Já existe um usuário com esse login"); });
+
+        usuarioRepository.findByNome(novoNome)
+                .filter(u -> !u.getId().equals(id))
+                .ifPresent(u -> { throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Já existe um usuário com esse nome"); });
+
+        usuario.setLogin(novoLogin);
+        usuario.setNome(novoNome);
+
+        if (request.getAtivo() != null) {
+            usuario.setAtivo(request.getAtivo());
+        }
+        if (request.getAcessos() != null) {
+            usuario.getAcesso().clear();
+            aplicarAcessos(usuario, request.getAcessos());
+        }
+
+        usuarioRepository.save(usuario);
+        return toResponse(usuario);
+    }
+
+    public UsuarioResponse atualizarAtivo(UUID id, boolean ativo) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
+
+        usuario.setAtivo(ativo);
+        usuarioRepository.save(usuario);
+        return toResponse(usuario);
+    }
+
+    public void atualizarSenha(UUID id, UsuarioSenhaUpdateRequest request) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
+        usuario.setSenha(passwordEncoder.encode(request.getNovaSenha()));
+        usuarioRepository.save(usuario);
+    }
+
+    public void atualizarMinhaSenha(UsuarioSenhaSelfRequest request) {
+        Usuario usuario = usuarioAutenticadoService.getUsuario();
+
+        if (!passwordEncoder.matches(request.getSenhaAtual(), usuario.getSenha())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Senha atual inválida");
+        }
+
+        usuario.setSenha(passwordEncoder.encode(request.getNovaSenha()));
+        usuarioRepository.save(usuario);
     }
 
     public List<String> criarUsuariosPelosMotoristas(List<String> codigos) {
@@ -84,6 +157,7 @@ public class UsuarioService {
                 usuario.setNome(motorista.getNome());
                 usuario.setLogin(gerarLoginUnico(motorista.getNome()));
                 usuario.setSenha(passwordEncoder.encode("padrao123"));
+                usuario.setAtivo(true);
 
                 usuario.adicionarAcesso(acessoPadrao);
 
@@ -119,6 +193,19 @@ public class UsuarioService {
         }
 
         return login;
+    }
+
+    private void aplicarAcessos(Usuario usuario, List<String> acessos) {
+        // padrão
+        List<String> nomes = (acessos == null || acessos.isEmpty())
+                ? List.of("ROLE_OPERADOR_LOGISTICA")
+                : acessos;
+
+        for (String nomeAcesso : nomes) {
+            Acesso acesso = acessoRepository.findByNome(nomeAcesso)
+                    .orElseThrow(() -> new ResponseStatusException(INTERNAL_SERVER_ERROR, "Acesso não encontrado: " + nomeAcesso));
+            usuario.adicionarAcesso(acesso);
+        }
     }
 
 

@@ -174,7 +174,4 @@ public interface ManutencaoRepository extends JpaRepository<Manutencao, UUID> {
             @Param("inicio") LocalDate inicio,
             @Param("fim") LocalDate fim
     );
-
-
-
 }

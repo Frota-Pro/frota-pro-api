@@ -29,7 +29,7 @@ public class RelatorioHistoricoManutencaoService {
 
         List<RelatorioHistoricoManutencaoResponse.Linha> linhas = itens.stream()
                 .map(m -> RelatorioHistoricoManutencaoResponse.Linha.builder()
-                        .data(m.getDataFimManutencao())
+                        .data(m.getDataFimManutencao() != null ? m.getDataFimManutencao() : m.getDataInicioManutencao())
                         .descricao(m.getDescricao())
                         .tipo(m.getTipoManutencao() == null ? null : m.getTipoManutencao().name())
                         .valor(nvl(m.getValor()))

@@ -8,7 +8,11 @@ public class UsuarioMapper {
         return UsuarioResponse.builder()
                 .id(usuario.getId())
                 .login(usuario.getLogin())
+                .nome(usuario.getNome())
+                .ativo(usuario.isAtivo())
                 .acessos(usuario.getAcesso().stream().map(a -> a.getNome()).toList())
+                .criadoEm(usuario.getCriadoEm())
+                .atualizadoEm(usuario.getAtualizadoEm())
                 .build();
     }
 }

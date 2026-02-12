@@ -14,7 +14,14 @@ public class BuscarUsuarioService {
     private final UsuarioRepository usuarioRepository;
 
     public Usuario buscarUsuarioPorlogin(String login) {
-        return usuarioRepository.findByLogin(login).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario não encontrado"));
+        Usuario usuario = usuarioRepository.findByLogin(login)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario não encontrado"));
+
+        if (!usuario.isAtivo()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário inativo");
+        }
+
+        return usuario;
     }
 
 }

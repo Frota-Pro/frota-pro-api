@@ -36,10 +36,13 @@ public class Usuario extends AuditoriaBase{
     @Column(nullable = false, length = 150)
     private String senha;
 
+    @Column(nullable = false)
+    private boolean ativo = true;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "tb_usuario_acesso",
-        joinColumns = @JoinColumn(name = "usuario_id"),
-        inverseJoinColumns = @JoinColumn(name = "acesso_id"))
+            joinColumns = @JoinColumn(name = "usuario_id"),
+            inverseJoinColumns = @JoinColumn(name = "acesso_id"))
     private List<Acesso> acesso= new ArrayList<>();
 
     public void adicionarAcesso(Acesso acesso){
