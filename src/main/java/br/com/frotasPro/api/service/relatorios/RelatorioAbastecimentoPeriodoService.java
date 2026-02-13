@@ -7,6 +7,7 @@ import br.com.frotasPro.api.domain.Motorista;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
+import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,8 @@ public class RelatorioAbastecimentoPeriodoService {
     private final MotoristaRepository motoristaRepository;
 
     public RelatorioAbastecimentoPeriodoResponse gerar(LocalDate inicio, LocalDate fim, String codigoCaminhao, String codigoMotorista) {
+
+        PeriodoValidator.obrigatorio(inicio, fim, "dtAbastecimento");
 
         Caminhao caminhao = null;
         Motorista motorista = null;
@@ -47,7 +50,6 @@ public class RelatorioAbastecimentoPeriodoService {
                 caminhao == null ? null : caminhao.getId(),
                 motorista == null ? null : motorista.getId()
         );
-
 
         List<RelatorioAbastecimentoPeriodoResponse.Linha> linhas = itens.stream()
                 .map(a -> RelatorioAbastecimentoPeriodoResponse.Linha.builder()

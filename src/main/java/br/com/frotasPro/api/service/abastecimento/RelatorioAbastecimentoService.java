@@ -3,6 +3,7 @@ package br.com.frotasPro.api.service.abastecimento;
 import br.com.frotasPro.api.controller.response.AbastecimentoGastoPorCombustivelResponse;
 import br.com.frotasPro.api.projections.AbastecimentoGastoPorCombustivel;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
+import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,8 @@ public class RelatorioAbastecimentoService {
             LocalDate inicio,
             LocalDate fim
     ) {
+
+        PeriodoValidator.obrigatorio(inicio, fim, "dtAbastecimento");
 
         LocalDateTime inicioDt = inicio.atStartOfDay();
         LocalDateTime fimDt = fim.atTime(23, 59, 59);

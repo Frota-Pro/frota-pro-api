@@ -5,6 +5,8 @@ import br.com.frotasPro.api.domain.enums.PosicaoPneu;
 import br.com.frotasPro.api.domain.enums.TipoTrocaPneu;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,21 +14,23 @@ import lombok.Setter;
 @Setter
 public class TrocaPneuManutencaoRequest {
 
-    @NotBlank
+    @NotBlank(message = "Pneu é obrigatório")
+    @Size(max = 80, message = "Pneu inválido")
     private String pneu;
 
-    @NotNull
+    @NotNull(message = "Número do eixo é obrigatório")
     private Integer eixoNumero;
 
-    @NotNull
+    @NotNull(message = "Lado é obrigatório")
     private LadoPneu lado;
 
-    @NotNull
+    @NotNull(message = "Posição é obrigatória")
     private PosicaoPneu posicao;
 
-    @NotNull
+    @NotNull(message = "KM do odômetro é obrigatório")
+    @PositiveOrZero(message = "KM do odômetro deve ser >= 0")
     private Integer kmOdometro;
 
-    @NotNull
+    @NotNull(message = "Tipo de troca é obrigatório")
     private TipoTrocaPneu tipoTroca;
 }

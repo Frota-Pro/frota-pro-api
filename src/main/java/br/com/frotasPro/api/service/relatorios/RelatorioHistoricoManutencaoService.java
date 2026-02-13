@@ -5,6 +5,7 @@ import br.com.frotasPro.api.domain.Caminhao;
 import br.com.frotasPro.api.domain.Manutencao;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
+import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,8 @@ public class RelatorioHistoricoManutencaoService {
     private final ManutencaoRepository manutencaoRepository;
 
     public RelatorioHistoricoManutencaoResponse gerar(String codigoCaminhao, LocalDate inicio, LocalDate fim) {
+
+        PeriodoValidator.obrigatorio(inicio, fim, "periodo");
 
         Caminhao caminhao = caminhaoRepository.findByCodigo(codigoCaminhao)
                 .orElseThrow(() -> new IllegalArgumentException("Caminhão não encontrado: " + codigoCaminhao));

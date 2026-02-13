@@ -5,6 +5,7 @@ import br.com.frotasPro.api.controller.request.PneuRequest;
 import br.com.frotasPro.api.controller.response.PneuResponse;
 import br.com.frotasPro.api.controller.response.PneuVidaUtilResponse;
 import br.com.frotasPro.api.service.pneu.PneuService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,12 +34,12 @@ public class PneuController {
     }
 
     @PostMapping
-    public ResponseEntity<PneuResponse> criar(@RequestBody PneuRequest req) {
+    public ResponseEntity<PneuResponse> criar(@Valid @RequestBody PneuRequest req) {
         return ResponseEntity.ok(service.criar(req));
     }
 
     @PutMapping("/{codigo}")
-    public ResponseEntity<PneuResponse> atualizar(@PathVariable String codigo, @RequestBody PneuRequest req) {
+    public ResponseEntity<PneuResponse> atualizar(@PathVariable String codigo, @Valid @RequestBody PneuRequest req) {
         return ResponseEntity.ok(service.atualizar(codigo, req));
     }
 
@@ -56,7 +57,7 @@ public class PneuController {
 
     // EVENTOS
     @PostMapping("/{codigo}/movimentacoes")
-    public ResponseEntity<Void> movimentacao(@PathVariable String codigo, @RequestBody PneuMovimentacaoRequest req) {
+    public ResponseEntity<Void> movimentacao(@PathVariable String codigo,@Valid @RequestBody PneuMovimentacaoRequest req) {
         service.registrarMovimentacao(codigo, req);
         return ResponseEntity.ok().build();
     }

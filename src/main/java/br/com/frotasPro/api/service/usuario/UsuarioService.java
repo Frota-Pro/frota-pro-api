@@ -34,27 +34,37 @@ public class UsuarioService {
     private final AcessoRepository acessoRepository;
     private final PasswordEncoder passwordEncoder;
     private final MotoristaRepository motoristaRepository;
-
     private final UsuarioAutenticadoService usuarioAutenticadoService;
 
     public UsuarioResponse registar(UsuarioRequest request) {
-        if (usuarioRepository.findByLogin(request.getLogin()).isPresent()) {
+
+        String login = request.getLogin() == null ? null : request.getLogin().trim();
+        String nome = request.getNome() == null ? null : request.getNome().trim();
+
+        if (login == null || login.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Login é obrigatório");
+        }
+        if (nome == null || nome.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nome é obrigatório");
+        }
+
+        if (usuarioRepository.findByLogin(login).isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuário já existe");
         }
 
-        if (usuarioRepository.existsByNome(request.getNome())) {
+        if (usuarioRepository.existsByNome(nome)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Já existe um usuário com esse nome");
         }
 
         Usuario usuario = new Usuario();
-        usuario.setLogin(request.getLogin());
-        usuario.setNome(request.getNome());
+        usuario.setLogin(login);
+        usuario.setNome(nome);
         usuario.setSenha(passwordEncoder.encode(request.getSenha()));
 
-        // ativo
-        usuario.setAtivo(request.getAtivo() == null ? true : request.getAtivo());
+        // ✅ sempre true no cadastro, como você pediu
+        usuario.setAtivo(true);
 
-        // acessos
+        // ✅ acessos: se não vier, aplica padrão e garante que terá role para logar
         aplicarAcessos(usuario, request.getAcessos());
 
         usuarioRepository.save(usuario);
@@ -94,6 +104,7 @@ public class UsuarioService {
         if (request.getAtivo() != null) {
             usuario.setAtivo(request.getAtivo());
         }
+
         if (request.getAcessos() != null) {
             usuario.getAcesso().clear();
             aplicarAcessos(usuario, request.getAcessos());
@@ -196,10 +207,21 @@ public class UsuarioService {
     }
 
     private void aplicarAcessos(Usuario usuario, List<String> acessos) {
-        // padrão
-        List<String> nomes = (acessos == null || acessos.isEmpty())
+
+        // Normaliza lista recebida
+        List<String> recebidos = new ArrayList<>();
+        if (acessos != null) {
+            for (String a : acessos) {
+                if (a == null) continue;
+                String t = a.trim();
+                if (!t.isBlank()) recebidos.add(t);
+            }
+        }
+
+        // padrão se não vier nada
+        List<String> nomes = (recebidos.isEmpty())
                 ? List.of("ROLE_OPERADOR_LOGISTICA")
-                : acessos;
+                : recebidos;
 
         for (String nomeAcesso : nomes) {
             Acesso acesso = acessoRepository.findByNome(nomeAcesso)
@@ -207,7 +229,4 @@ public class UsuarioService {
             usuario.adicionarAcesso(acesso);
         }
     }
-
-
-
 }

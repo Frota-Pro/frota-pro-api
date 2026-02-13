@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class AjudanteRequest {
 
-    @NotBlank
-    @Size(max = 150)
+    @NotBlank(message = "Nome é obrigatório")
+    @Size(min = 3, max = 150, message = "Nome deve ter entre 3 e 150 caracteres")
     private String nome;
 }

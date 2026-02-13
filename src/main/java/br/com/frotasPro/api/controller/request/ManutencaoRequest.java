@@ -2,8 +2,11 @@ package br.com.frotasPro.api.controller.request;
 
 import br.com.frotasPro.api.domain.enums.StatusManutencao;
 import br.com.frotasPro.api.domain.enums.TipoManutencao;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,25 +15,29 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-@Getter @Setter
+@Getter
+@Setter
 public class ManutencaoRequest {
 
-    @NotBlank
+    @NotBlank(message = "Descrição é obrigatória")
+    @Size(min = 3, max = 200, message = "Descrição deve ter entre 3 e 200 caracteres")
     private String descricao;
 
-    @NotNull
+    @NotNull(message = "Data de início é obrigatória")
     private LocalDate dataInicioManutencao;
 
     private LocalDate dataFimManutencao;
 
-    @NotNull
+    @NotNull(message = "Tipo de manutenção é obrigatório")
     private TipoManutencao tipoManutencao;
 
     // Mantido por compatibilidade (antigo)
-    private List<String> itensTrocados;
+    private List<@Size(max = 120, message = "Item trocado inválido") String> itensTrocados;
 
+    @Size(max = 500, message = "Observações deve ter no máximo 500 caracteres")
     private String observacoes;
 
+    @DecimalMin(value = "0.00", message = "Valor deve ser >= 0")
     private BigDecimal valor;
 
     /**
@@ -39,18 +46,19 @@ public class ManutencaoRequest {
     private UUID paradaId;
 
     /**
-     * Itens detalhados (peças/serviços). Se informado, o total da manutenção
-     * poderá ser calculado a partir desses itens.
+     * Itens detalhados (peças/serviços).
      */
-    private List<ManutencaoItemRequest> itens;
+    private List<@Valid ManutencaoItemRequest> itens;
 
-    @NotNull
+    @NotNull(message = "Status da manutenção é obrigatório")
     private StatusManutencao statusManutencao;
 
-    @NotNull
+    @NotBlank(message = "Caminhão é obrigatório")
+    @Size(max = 80, message = "Caminhão inválido")
     private String caminhao;
 
+    @Size(max = 120, message = "Oficina inválida")
     private String oficina;
 
-    private List<TrocaPneuManutencaoRequest> trocasPneu;
+    private List<@Valid TrocaPneuManutencaoRequest> trocasPneu;
 }

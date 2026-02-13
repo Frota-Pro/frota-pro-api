@@ -10,6 +10,7 @@ import br.com.frotasPro.api.repository.AbastecimentoRepository;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.util.CalcularMediaKmLitroService;
+import br.com.frotasPro.api.excption.ObjectNotFound;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,14 +28,13 @@ public class CriarAbastecimentoService {
     public AbastecimentoResponse criar(AbastecimentoRequest request) {
 
         Caminhao caminhao = caminhaoRepository.findByCaminhaoPorCodigoOuPorCodigoExterno(request.getCaminhao())
-                .orElseThrow(() -> new RuntimeException("Caminhão não encontrado"));
+                .orElseThrow(() -> new ObjectNotFound("Caminhão não encontrado"));
 
         Motorista motorista = null;
         if (request.getMotorista() != null && !request.getMotorista().isBlank()) {
             motorista = motoristaRepository.findByMotoristaPorCodigoOuPorCodigoExterno(request.getMotorista())
-                    .orElseThrow(() -> new RuntimeException("Motorista não encontrado"));
+                    .orElseThrow(() -> new ObjectNotFound("Motorista não encontrado"));
         }
-
 
         Abastecimento a = new Abastecimento();
         a.setCaminhao(caminhao);
@@ -65,7 +65,6 @@ public class CriarAbastecimentoService {
         );
 
         a.setMediaKmLitro(media);
-
 
         repository.save(a);
 

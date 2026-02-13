@@ -5,6 +5,7 @@ import br.com.frotasPro.api.domain.enums.FormaPagamento;
 import br.com.frotasPro.api.domain.enums.TipoCombustivel;
 import br.com.frotasPro.api.mapper.AbastecimentoMapper;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
+import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,12 +30,14 @@ public class BuscarAbastecimentosFiltradoService {
             LocalDateTime fim,
             Pageable pageable
     ) {
+
+        PeriodoValidator.opcional(inicio, fim, "dtAbastecimento");
+
         String qN = norm(q);
         String caminhaoN = norm(caminhao);
         String motoristaN = norm(motorista);
 
-        // A query nativa já tem ORDER BY fixo.
-        // Removemos sort do pageable para evitar Spring tentando ordenar por nomes errados.
+
         Pageable pageableNoSort = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
 
         return repository.filtrarNative(

@@ -53,13 +53,6 @@ public class AbastecimentoController {
         return ResponseEntity.ok(listarService.listar(pageable));
     }
 
-    /**
-     * Listagem com filtros opcionais (para a tela do front).
-     *
-     * Exemplos:
-     * - /abastecimento/filtrar?q=AB-2026&inicio=2026-01-01T00:00:00&fim=2026-01-31T23:59:59
-     * - /abastecimento/filtrar?caminhao=CAM-0001&tipo=DIESEL
-     */
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/filtrar")
     public ResponseEntity<Page<AbastecimentoResponse>> filtrar(

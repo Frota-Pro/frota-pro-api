@@ -1,6 +1,7 @@
 package br.com.frotasPro.api.controller.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,6 +9,7 @@ import lombok.Setter;
 @Setter
 public class AtualizarObservacaoMotoristaRequest {
 
-    @NotBlank
+    @NotBlank(message = "Observação é obrigatória")
+    @Size(max = 500, message = "Observação deve ter no máximo 500 caracteres")
     private String observacao;
 }

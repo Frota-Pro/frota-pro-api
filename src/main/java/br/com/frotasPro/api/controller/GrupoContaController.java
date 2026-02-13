@@ -3,6 +3,7 @@ package br.com.frotasPro.api.controller;
 import br.com.frotasPro.api.controller.request.GrupoContaRequest;
 import br.com.frotasPro.api.controller.response.GrupoContaResponse;
 import br.com.frotasPro.api.service.grupoConta.*;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ public class GrupoContaController {
     private final DeletarGrupoContaService deletarService;
 
     @PostMapping
-    public GrupoContaResponse criar(@RequestBody GrupoContaRequest request) {
+    public GrupoContaResponse criar(@Valid @RequestBody GrupoContaRequest request) {
         return criarService.criar(request);
     }
 
@@ -46,7 +47,7 @@ public class GrupoContaController {
     }
 
     @PutMapping("/{id}")
-    public GrupoContaResponse atualizar(@PathVariable UUID id, @RequestBody GrupoContaRequest request) {
+    public GrupoContaResponse atualizar(@PathVariable UUID id, @Valid @RequestBody GrupoContaRequest request) {
         return atualizarService.atualizar(id, request);
     }
 

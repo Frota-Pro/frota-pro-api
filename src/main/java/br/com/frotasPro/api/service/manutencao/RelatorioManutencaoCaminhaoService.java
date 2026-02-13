@@ -5,6 +5,7 @@ import br.com.frotasPro.api.domain.Manutencao;
 import br.com.frotasPro.api.domain.enums.TipoManutencao;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
+import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,9 @@ public class RelatorioManutencaoCaminhaoService {
             LocalDate inicio,
             LocalDate fim
     ) {
+
+        PeriodoValidator.obrigatorio(inicio, fim, "dataInicioManutencao");
+
         List<Manutencao> manutencoes =
                 manutencaoRepository.findAllByCaminhaoCodigoAndDataInicioManutencaoBetween(
                         codigoCaminhao, inicio, fim

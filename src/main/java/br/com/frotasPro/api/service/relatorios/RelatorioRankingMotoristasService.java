@@ -2,6 +2,7 @@ package br.com.frotasPro.api.service.relatorios;
 
 import br.com.frotasPro.api.controller.response.RelatorioRankingMotoristasResponse;
 import br.com.frotasPro.api.repository.CargaRepository;
+import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,8 @@ public class RelatorioRankingMotoristasService {
     private final CargaRepository cargaRepository;
 
     public RelatorioRankingMotoristasResponse gerar(LocalDate inicio, LocalDate fim) {
+
+        PeriodoValidator.obrigatorio(inicio, fim, "dtChegada");
 
         List<CargaRepository.RankingMotoristaRow> rows = cargaRepository.rankingMotoristas(inicio, fim);
 

@@ -15,6 +15,7 @@ import java.time.LocalDate;
 public class MotoristaRequest {
 
     // opcional
+    @Size(max = 50, message = "Código externo deve ter no máximo 50 caracteres")
     private String codigoExterno;
 
     @NotBlank(message = "Nome é obrigatório")

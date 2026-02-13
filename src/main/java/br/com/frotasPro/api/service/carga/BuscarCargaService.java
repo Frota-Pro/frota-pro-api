@@ -5,6 +5,7 @@ import br.com.frotasPro.api.domain.Carga;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.CargaRepository;
+import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -51,13 +52,7 @@ public class BuscarCargaService {
                                                LocalDate fim,
                                                Pageable pageable) {
 
-        if (inicio == null || fim == null) {
-            throw new IllegalArgumentException("As datas de início e fim devem ser informadas.");
-        }
-
-        if (inicio.isAfter(fim)) {
-            throw new IllegalArgumentException("A data de início não pode ser maior que a data fim.");
-        }
+        PeriodoValidator.obrigatorio(inicio, fim, "dtSaida");
 
         return cargaRepository.findByDtSaidaBetween(inicio, fim, pageable)
                 .map(CargaMapper::toResponse);
@@ -68,13 +63,7 @@ public class BuscarCargaService {
                                                  LocalDateTime fim,
                                                  Pageable pageable) {
 
-        if (inicio == null || fim == null) {
-            throw new IllegalArgumentException("As datas de início e fim devem ser informadas.");
-        }
-
-        if (inicio.isAfter(fim)) {
-            throw new IllegalArgumentException("A data de início não pode ser maior que a data fim.");
-        }
+        PeriodoValidator.obrigatorio(inicio, fim, "criadoEm");
 
         return cargaRepository.findByCriadoEmBetween(inicio, fim, pageable)
                 .map(CargaMapper::toResponse);

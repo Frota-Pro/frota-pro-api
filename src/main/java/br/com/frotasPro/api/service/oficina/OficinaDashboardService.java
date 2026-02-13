@@ -5,6 +5,7 @@ import br.com.frotasPro.api.domain.enums.StatusManutencao;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
 import br.com.frotasPro.api.repository.OficinaRepository;
+import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,8 @@ public class OficinaDashboardService {
 
     @Transactional(readOnly = true)
     public OficinaDashboardResponse gerar(String codigoOficina, LocalDate inicio, LocalDate fim) {
+
+        PeriodoValidator.obrigatorio(inicio, fim, "dataInicioManutencao");
 
         var oficina = oficinaRepository.findByCodigo(codigoOficina)
                 .orElseThrow(() -> new ObjectNotFound("Oficina não encontrada: " + codigoOficina));

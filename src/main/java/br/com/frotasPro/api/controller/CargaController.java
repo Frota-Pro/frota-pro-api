@@ -55,12 +55,6 @@ public class CargaController {
 
     // ========= LISTAGEM GERAL (FILTROS) =========
 
-    /**
-     * GET /carga
-     * filtros opcionais:
-     * - q: pesquisa por número da carga (interno) ou número externo
-     * - inicio/fim: período (dtSaida)
-     */
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping
     public ResponseEntity<Page<CargaMinResponse>> listar(

@@ -4,6 +4,7 @@ import br.com.frotasPro.api.controller.response.CargaMinResponse;
 import br.com.frotasPro.api.domain.Carga;
 import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.CargaRepository;
+import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +21,9 @@ public class ListarCargaService {
 
     @Transactional(readOnly = true)
     public Page<CargaMinResponse> listar(String q, LocalDate inicio, LocalDate fim, Pageable pageable) {
+
+        PeriodoValidator.opcional(inicio, fim, "dtSaida");
+
         String query = (q == null || q.trim().isEmpty()) ? null : q.trim();
 
         Page<Carga> page = cargaRepository.listarFiltrado(query, inicio, fim, pageable);

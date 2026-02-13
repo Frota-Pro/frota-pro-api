@@ -8,6 +8,7 @@ import br.com.frotasPro.api.domain.enums.TipoMeta;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.MetaRepository;
+import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,8 @@ public class RelatorioMetaMensalMotoristaService {
             LocalDate inicio,
             LocalDate fim) {
 
+        PeriodoValidator.obrigatorio(inicio, fim, "dtSaida");
+
         List<Carga> cargas = cargaRepository
                 .findByMotoristaCodigoAndPeriodo(codigoMotorista, inicio, fim);
 
@@ -53,8 +56,7 @@ public class RelatorioMetaMensalMotoristaService {
 
         Motorista motorista = cargas.get(0).getMotorista();
         Caminhao caminhao = cargas.get(0).getCaminhao();
-        CategoriaCaminhao categoriaCaminhao =
-                caminhao != null ? caminhao.getCategoria() : null;
+        CategoriaCaminhao categoriaCaminhao = caminhao != null ? caminhao.getCategoria() : null;
 
         BigDecimal objetivoMesTonelada = buscarMetaTonelada(motorista, caminhao, categoriaCaminhao);
         BigDecimal metaConsumo = buscarMetaConsumoCombustivel(motorista, caminhao, categoriaCaminhao);
@@ -93,11 +95,11 @@ public class RelatorioMetaMensalMotoristaService {
 
             LinhaRelatorioMetaMensalMotoristaResponse linha =
                     LinhaRelatorioMetaMensalMotoristaResponse.builder()
-                            .data(carga.getDtSaida())               // ajustar se for dtSaida
-                            .lote(carga.getNumeroCarga())              // ou outro campo
-                            .cidade(carga.getRota().getCidadeInicio())         // ajustar nome
-                            .valorCarga(carga.getValorTotal())        // R$ carga
-                            .tonelagem(carga.getPesoCarga())           // peso/tonelada
+                            .data(carga.getDtSaida())
+                            .lote(carga.getNumeroCarga())
+                            .cidade(carga.getRota().getCidadeInicio())
+                            .valorCarga(carga.getValorTotal())
+                            .tonelagem(carga.getPesoCarga())
                             .kmInicial(kmIni)
                             .kmFinal(kmFin)
                             .kmRodado(kmRodado)
@@ -108,7 +110,6 @@ public class RelatorioMetaMensalMotoristaService {
 
             linhas.add(linha);
 
-
             if (carga.getPesoCarga() != null) {
                 totalTonelada = totalTonelada.add(carga.getPesoCarga());
             }
@@ -118,14 +119,12 @@ public class RelatorioMetaMensalMotoristaService {
         }
 
         BigDecimal mediaGeralKmPorLitro = totalLitros.compareTo(BigDecimal.ZERO) > 0
-                ? BigDecimal.valueOf(totalKmRodado)
-                .divide(totalLitros, 2, RoundingMode.HALF_UP)
+                ? BigDecimal.valueOf(totalKmRodado).divide(totalLitros, 2, RoundingMode.HALF_UP)
                 : BigDecimal.ZERO;
 
         BigDecimal realizadoPercentual =
                 (objetivoMesTonelada != null && objetivoMesTonelada.compareTo(BigDecimal.ZERO) > 0)
-                        ? totalTonelada.multiply(BigDecimal.valueOf(100))
-                        .divide(objetivoMesTonelada, 2, RoundingMode.HALF_UP)
+                        ? totalTonelada.multiply(BigDecimal.valueOf(100)).divide(objetivoMesTonelada, 2, RoundingMode.HALF_UP)
                         : BigDecimal.ZERO;
 
         return RelatorioMetaMensalMotoristaResponse.builder()
@@ -147,70 +146,52 @@ public class RelatorioMetaMensalMotoristaService {
                 .build();
     }
 
-    private BigDecimal calcularMediaKmLitro(long kmRodado,
-                                            BigDecimal litros,
-                                            BigDecimal metaConsumo) {
-
+    private BigDecimal calcularMediaKmLitro(long kmRodado, BigDecimal litros, BigDecimal metaConsumo) {
         if (litros != null && litros.compareTo(BigDecimal.ZERO) > 0) {
-            return BigDecimal.valueOf(kmRodado)
-                    .divide(litros, 2, RoundingMode.HALF_UP);
+            return BigDecimal.valueOf(kmRodado).divide(litros, 2, RoundingMode.HALF_UP);
         }
-
-        // Sem abastecimento na rota:
-        // usa a meta como referência (pra ter M/LT em todas as linhas)
         return metaConsumo;
     }
 
-    private BigDecimal buscarMetaTonelada(Motorista motorista,
-                                          Caminhao caminhao,
-                                          CategoriaCaminhao categoriaCaminhao) {
+    private BigDecimal buscarMetaTonelada(Motorista motorista, Caminhao caminhao, CategoriaCaminhao categoriaCaminhao) {
 
-        // prioridade: motorista > caminhão > categoria
         Optional<Meta> metaOpt = Optional.empty();
 
         if (motorista != null) {
-            metaOpt = metaRepository
-                    .findFirstByTipoMetaAndMotoristaAndStatusMetaOrderByDataIncioDesc(
-                            TipoMeta.TONELADA, motorista, StatusMeta.EM_ANDAMENTO);
+            metaOpt = metaRepository.findFirstByTipoMetaAndMotoristaAndStatusMetaOrderByDataIncioDesc(
+                    TipoMeta.TONELADA, motorista, StatusMeta.EM_ANDAMENTO);
         }
 
         if (metaOpt.isEmpty() && caminhao != null) {
-            metaOpt = metaRepository
-                    .findFirstByTipoMetaAndCaminhaoAndStatusMetaOrderByDataIncioDesc(
-                            TipoMeta.TONELADA, caminhao, StatusMeta.EM_ANDAMENTO);
+            metaOpt = metaRepository.findFirstByTipoMetaAndCaminhaoAndStatusMetaOrderByDataIncioDesc(
+                    TipoMeta.TONELADA, caminhao, StatusMeta.EM_ANDAMENTO);
         }
 
         if (metaOpt.isEmpty() && categoriaCaminhao != null) {
-            metaOpt = metaRepository
-                    .findFirstByTipoMetaAndCategoriaAndStatusMetaOrderByDataIncioDesc(
-                            TipoMeta.TONELADA, categoriaCaminhao, StatusMeta.EM_ANDAMENTO);
+            metaOpt = metaRepository.findFirstByTipoMetaAndCategoriaAndStatusMetaOrderByDataIncioDesc(
+                    TipoMeta.TONELADA, categoriaCaminhao, StatusMeta.EM_ANDAMENTO);
         }
 
         return metaOpt.map(Meta::getValorMeta).orElse(null);
     }
 
-    private BigDecimal buscarMetaConsumoCombustivel(Motorista motorista,
-                                                    Caminhao caminhao,
-                                                    CategoriaCaminhao categoriaCaminhao) {
+    private BigDecimal buscarMetaConsumoCombustivel(Motorista motorista, Caminhao caminhao, CategoriaCaminhao categoriaCaminhao) {
 
         Optional<Meta> metaOpt = Optional.empty();
 
         if (caminhao != null) {
-            metaOpt = metaRepository
-                    .findFirstByTipoMetaAndCaminhaoAndStatusMetaOrderByDataIncioDesc(
-                            TipoMeta.CONSUMO_COMBUSTIVEL, caminhao, StatusMeta.EM_ANDAMENTO);
+            metaOpt = metaRepository.findFirstByTipoMetaAndCaminhaoAndStatusMetaOrderByDataIncioDesc(
+                    TipoMeta.CONSUMO_COMBUSTIVEL, caminhao, StatusMeta.EM_ANDAMENTO);
         }
 
         if (metaOpt.isEmpty() && categoriaCaminhao != null) {
-            metaOpt = metaRepository
-                    .findFirstByTipoMetaAndCategoriaAndStatusMetaOrderByDataIncioDesc(
-                            TipoMeta.CONSUMO_COMBUSTIVEL, categoriaCaminhao, StatusMeta.EM_ANDAMENTO);
+            metaOpt = metaRepository.findFirstByTipoMetaAndCategoriaAndStatusMetaOrderByDataIncioDesc(
+                    TipoMeta.CONSUMO_COMBUSTIVEL, categoriaCaminhao, StatusMeta.EM_ANDAMENTO);
         }
 
         if (metaOpt.isEmpty() && motorista != null) {
-            metaOpt = metaRepository
-                    .findFirstByTipoMetaAndMotoristaAndStatusMetaOrderByDataIncioDesc(
-                            TipoMeta.CONSUMO_COMBUSTIVEL, motorista, StatusMeta.EM_ANDAMENTO);
+            metaOpt = metaRepository.findFirstByTipoMetaAndMotoristaAndStatusMetaOrderByDataIncioDesc(
+                    TipoMeta.CONSUMO_COMBUSTIVEL, motorista, StatusMeta.EM_ANDAMENTO);
         }
 
         return metaOpt.map(Meta::getValorMeta).orElse(null);

@@ -157,7 +157,7 @@ public class CaminhaoController {
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @PutMapping("/categoria")
     public ResponseEntity<Void> vincularCategoriaEmLote(
-            @RequestBody VincularCategoriaCaminhaoEmLoteRequest request
+            @Valid @RequestBody VincularCategoriaCaminhaoEmLoteRequest request
     ) {
         vincularCategoriaCaminhaoEmLoteService.vincular(request);
         return ResponseEntity.noContent().build();
