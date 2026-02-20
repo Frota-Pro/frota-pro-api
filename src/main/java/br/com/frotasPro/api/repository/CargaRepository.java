@@ -73,6 +73,94 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
             @Param("fim") LocalDate fim
     );
 
+    @Query("""
+       select coalesce(sum(c.kmFinal - c.kmInicial), 0)
+       from Carga c
+       where c.caminhao.codigo = :codigo
+         and c.statusCarga = :status
+         and c.dtChegada between :inicio and :fim
+         and c.kmFinal is not null
+         and c.kmInicial is not null
+       """)
+    Long sumKmRodadoPorCaminhaoNoPeriodo(
+            @Param("codigo") String codigo,
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim,
+            @Param("status") Status status
+    );
+
+    @Query("""
+       select coalesce(sum(c.kmFinal - c.kmInicial), 0)
+       from Carga c
+       where c.motorista.codigo = :codigo
+         and c.statusCarga = :status
+         and c.dtChegada between :inicio and :fim
+         and c.kmFinal is not null
+         and c.kmInicial is not null
+       """)
+    Long sumKmRodadoPorMotoristaNoPeriodo(
+            @Param("codigo") String codigo,
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim,
+            @Param("status") Status status
+    );
+
+    @Query("""
+       select coalesce(sum(c.pesoCarga), 0)
+       from Carga c
+       where c.caminhao.codigo = :codigo
+         and c.statusCarga = :status
+         and c.dtChegada between :inicio and :fim
+       """)
+    BigDecimal sumPesoPorCaminhaoNoPeriodo(
+            @Param("codigo") String codigo,
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim,
+            @Param("status") Status status
+    );
+
+    @Query("""
+       select coalesce(sum(c.pesoCarga), 0)
+       from Carga c
+       where c.motorista.codigo = :codigo
+         and c.statusCarga = :status
+         and c.dtChegada between :inicio and :fim
+       """)
+    BigDecimal sumPesoPorMotoristaNoPeriodo(
+            @Param("codigo") String codigo,
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim,
+            @Param("status") Status status
+    );
+
+    @Query("""
+       select count(c)
+       from Carga c
+       where c.caminhao.codigo = :codigo
+         and c.statusCarga = :status
+         and c.dtChegada between :inicio and :fim
+       """)
+    Long countCargasPorCaminhaoNoPeriodo(
+            @Param("codigo") String codigo,
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim,
+            @Param("status") Status status
+    );
+
+    @Query("""
+       select count(c)
+       from Carga c
+       where c.motorista.codigo = :codigo
+         and c.statusCarga = :status
+         and c.dtChegada between :inicio and :fim
+       """)
+    Long countCargasPorMotoristaNoPeriodo(
+            @Param("codigo") String codigo,
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim,
+            @Param("status") Status status
+    );
+
     long countByStatusCarga(Status statusCarga);
 
     long countByStatusCargaAndDtChegada(Status statusCarga, LocalDate dtChegada);

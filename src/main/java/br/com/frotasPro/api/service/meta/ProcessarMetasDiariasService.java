@@ -40,13 +40,15 @@ public class ProcessarMetasDiariasService {
             LocalDate novoInicio = meta.getDataFim().plusDays(1);
             LocalDate novoFim = novoInicio.plus(periodo);
 
-            boolean jaExiste = metaRepository.existsByTipoMetaAndStatusMetaAndDataIncioAndCaminhaoAndCategoriaAndMotorista(
+            boolean jaExiste = metaRepository.existsMetaAtivaConflitante(
                     meta.getTipoMeta(),
-                    StatusMeta.EM_ANDAMENTO,
+                    List.of(StatusMeta.EM_ANDAMENTO, StatusMeta.NAO_INICIADA),
                     novoInicio,
+                    novoFim,
                     meta.getCaminhao(),
                     meta.getCategoria(),
-                    meta.getMotorista()
+                    meta.getMotorista(),
+                    null
             );
 
             if (jaExiste) {

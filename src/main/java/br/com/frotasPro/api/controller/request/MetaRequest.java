@@ -56,4 +56,6 @@ public class MetaRequest {
     private String motorista;
 
     private Boolean renovarAutomaticamente;
+
+    private Boolean recalcularProgresso;
 }

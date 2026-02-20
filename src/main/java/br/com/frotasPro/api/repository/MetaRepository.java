@@ -29,6 +29,20 @@ public interface MetaRepository extends JpaRepository <Meta, UUID>{
             LocalDate dataFim
     );
 
+    List<Meta> findByCaminhaoCodigoAndStatusMetaAndDataIncioLessThanEqualAndDataFimGreaterThanEqual(
+            String caminhaoCodigo,
+            StatusMeta statusMeta,
+            LocalDate dataInicio,
+            LocalDate dataFim
+    );
+
+    List<Meta> findByCategoriaCodigoAndStatusMetaAndDataIncioLessThanEqualAndDataFimGreaterThanEqual(
+            String categoriaCodigo,
+            StatusMeta statusMeta,
+            LocalDate dataInicio,
+            LocalDate dataFim
+    );
+
     List<Meta> findByDataFimBeforeAndStatusMeta(LocalDate data, StatusMeta statusMeta);
 
     boolean existsByTipoMetaAndStatusMetaAndDataIncioAndCaminhaoAndCategoriaAndMotorista(
@@ -38,6 +52,31 @@ public interface MetaRepository extends JpaRepository <Meta, UUID>{
             Caminhao caminhao,
             CategoriaCaminhao categoria,
             Motorista motorista
+    );
+
+    @Query("""
+       select (count(m) > 0)
+       from Meta m
+       where m.tipoMeta = :tipoMeta
+         and m.statusMeta in :status
+         and m.dataIncio <= :dataFim
+         and m.dataFim >= :dataInicio
+         and (
+              (:caminhao is not null and m.caminhao = :caminhao)
+              or (:categoria is not null and m.categoria = :categoria)
+              or (:motorista is not null and m.motorista = :motorista)
+         )
+         and (:id is null or m.id <> :id)
+       """)
+    boolean existsMetaAtivaConflitante(
+            @Param("tipoMeta") TipoMeta tipoMeta,
+            @Param("status") List<StatusMeta> status,
+            @Param("dataInicio") LocalDate dataInicio,
+            @Param("dataFim") LocalDate dataFim,
+            @Param("caminhao") Caminhao caminhao,
+            @Param("categoria") CategoriaCaminhao categoria,
+            @Param("motorista") Motorista motorista,
+            @Param("id") UUID id
     );
 
     @Query("""

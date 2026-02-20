@@ -83,13 +83,13 @@ public class MetaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/ativas/caminhao/{codigoCaminhao}")
-    public ResponseEntity<MetaResponse> metaAtivaCaminhao(
+    public ResponseEntity<List<MetaResponse>> metaAtivaCaminhao(
             @PathVariable @NotBlank String codigoCaminhao,
             @RequestParam("dataReferencia")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataReferencia
     ) {
-        MetaResponse meta = buscarMetaAtivaComProgressoService.buscar(codigoCaminhao, dataReferencia);
-        return ResponseEntity.ok(meta);
+        List<MetaResponse> metas = buscarMetaAtivaComProgressoService.buscar(codigoCaminhao, dataReferencia);
+        return ResponseEntity.ok(metas);
     }
 
 
