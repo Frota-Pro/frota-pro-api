@@ -4,6 +4,7 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -40,6 +41,10 @@ public class PneuRequest {
 
     @NotBlank(message = "Status é obrigatório")
     @Size(max = 30, message = "Status inválido")
+    @Pattern(
+            regexp = "ESTOQUE|EM_USO|EM_RECAPAGEM|DESCARTADO",
+            message = "Status inválido"
+    )
     public String status;              // StatusPneu
 
     @DecimalMin(value = "0.00", message = "KM meta atual deve ser >= 0")

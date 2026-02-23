@@ -5,16 +5,21 @@ import br.com.frotasPro.api.controller.response.OficinaDashboardResponse;
 import br.com.frotasPro.api.controller.response.OficinaResponse;
 import br.com.frotasPro.api.service.oficina.*;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 
+@Validated
 @RestController
 @RequestMapping("/oficinas")
 @RequiredArgsConstructor
@@ -37,7 +42,12 @@ public class OficinaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN')")
     @GetMapping("/codigo/{codigo}")
-    public ResponseEntity<OficinaResponse> buscarPorCodigo(@PathVariable String codigo) {
+    public ResponseEntity<OficinaResponse> buscarPorCodigo(
+            @PathVariable
+            @NotBlank(message = "Código é obrigatório")
+            @Size(max = 50, message = "Código inválido")
+            String codigo
+    ) {
         OficinaResponse response = buscarOficinaPorCodigoService.porCodigo(codigo);
         return ResponseEntity.ok(response);
     }
@@ -58,7 +68,10 @@ public class OficinaController {
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PutMapping("/{codigo}")
     public ResponseEntity<OficinaResponse> atualizar(
-            @PathVariable String codigo,
+            @PathVariable
+            @NotBlank(message = "Código é obrigatório")
+            @Size(max = 50, message = "Código inválido")
+            String codigo,
             @Valid @RequestBody OficinaRequest request) {
 
         OficinaResponse response = atualizarOficinaService.atualizar(codigo, request);
@@ -67,16 +80,28 @@ public class OficinaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{codigo}")
-    public ResponseEntity<Void> deletar(@PathVariable String codigo) {
+    public ResponseEntity<Void> deletar(
+            @PathVariable
+            @NotBlank(message = "Código é obrigatório")
+            @Size(max = 50, message = "Código inválido")
+            String codigo
+    ) {
         deletarOficinaService.deletar(codigo);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{codigo}/dashboard")
     public ResponseEntity<OficinaDashboardResponse> dashboard(
-            @PathVariable String codigo,
-            @RequestParam("inicio") @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate inicio,
-            @RequestParam("fim") @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate fim
+            @PathVariable
+            @NotBlank(message = "Código é obrigatório")
+            @Size(max = 50, message = "Código inválido")
+            String codigo,
+            @RequestParam("inicio")
+            @NotNull(message = "Data de início é obrigatória")
+            @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate inicio,
+            @RequestParam("fim")
+            @NotNull(message = "Data de fim é obrigatória")
+            @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate fim
     ) {
         return ResponseEntity.ok(oficinaDashboardService.gerar(codigo, inicio, fim));
     }

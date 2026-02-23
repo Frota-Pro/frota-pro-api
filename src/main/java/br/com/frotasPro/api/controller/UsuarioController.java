@@ -7,11 +7,15 @@ import br.com.frotasPro.api.controller.request.UsuarioUpdateRequest;
 import br.com.frotasPro.api.controller.response.UsuarioResponse;
 import br.com.frotasPro.api.service.usuario.UsuarioService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.annotation.Validated;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.UUID;
 
+@Validated
 @RestController
 @RequestMapping("/usuario")
 @AllArgsConstructor
@@ -35,7 +40,9 @@ public class UsuarioController {
     @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
     @GetMapping
     public Page<UsuarioResponse> listar(
-            @RequestParam(value = "q", required = false) String q,
+            @RequestParam(value = "q", required = false)
+            @Size(max = 150, message = "Filtro inválido")
+            String q,
             @RequestParam(value = "ativo", required = false) Boolean ativo,
             Pageable pageable
     ) {
@@ -76,7 +83,15 @@ public class UsuarioController {
 
     @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
     @PostMapping("/motoristas")
-    public ResponseEntity<List<String>> criarUsuariosPelosMotoristas(@RequestParam("matriculas") List<String> codigo) {
+    public ResponseEntity<List<String>> criarUsuariosPelosMotoristas(
+            @RequestParam("matriculas")
+            @NotEmpty(message = "Matrículas são obrigatórias")
+            List<
+                    @NotBlank(message = "Matrícula inválida")
+                    @Size(max = 50, message = "Matrícula inválida")
+                            String
+                    > codigo
+    ) {
         List<String> resultado = usuarioService.criarUsuariosPelosMotoristas(codigo);
         return ResponseEntity.status(HttpStatus.CREATED).body(resultado);
     }

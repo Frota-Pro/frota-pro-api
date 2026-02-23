@@ -36,9 +36,9 @@ public class BuscarMetaAtivaComProgressoService {
                 .orElseThrow(() -> new ObjectNotFound("Caminhão não encontrado para o código: " + codigoCaminhao));
 
         List<Meta> metasCaminhao = metaRepository
-                .findByCaminhaoCodigoAndStatusMetaAndDataIncioLessThanEqualAndDataFimGreaterThanEqual(
-                        caminhao.getCodigo(),
-                        StatusMeta.EM_ANDAMENTO,
+                .findByCaminhaoIdAndStatusMetaInAndDataIncioLessThanEqualAndDataFimGreaterThanEqual(
+                        caminhao.getId(),
+                        List.of(StatusMeta.EM_ANDAMENTO, StatusMeta.NAO_INICIADA),
                         dataReferencia,
                         dataReferencia
                 );
@@ -46,9 +46,9 @@ public class BuscarMetaAtivaComProgressoService {
         List<Meta> metasCategoria = new ArrayList<>();
         if (caminhao.getCategoria() != null) {
             metasCategoria = metaRepository
-                    .findByCategoriaCodigoAndStatusMetaAndDataIncioLessThanEqualAndDataFimGreaterThanEqual(
-                            caminhao.getCategoria().getCodigo(),
-                            StatusMeta.EM_ANDAMENTO,
+                    .findByCategoriaIdAndStatusMetaInAndDataIncioLessThanEqualAndDataFimGreaterThanEqual(
+                            caminhao.getCategoria().getId(),
+                            List.of(StatusMeta.EM_ANDAMENTO, StatusMeta.NAO_INICIADA),
                             dataReferencia,
                             dataReferencia
                     );
@@ -63,7 +63,7 @@ public class BuscarMetaAtivaComProgressoService {
         }
 
         if (escolhidas.isEmpty()) {
-            throw new ObjectNotFound("Nenhuma meta ativa para o caminhão " + codigoCaminhao + " na data " + dataReferencia);
+            return List.of();
         }
 
         return escolhidas.values().stream()

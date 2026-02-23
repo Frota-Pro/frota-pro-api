@@ -3,6 +3,7 @@ package br.com.frotasPro.api.controller.request;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -18,6 +19,10 @@ public class PneuMovimentacaoRequest {
 
     @NotBlank(message = "Tipo de movimentação é obrigatório")
     @Size(max = 30, message = "Tipo de movimentação inválido")
+    @Pattern(
+            regexp = "INSTALACAO|REMOVER|RODIZIO|TROCA_MANUTENCAO|ENVIO_RECAPAGEM|RETORNO_RECAPAGEM|DESCARTE",
+            message = "Tipo de movimentação inválido"
+    )
     public String tipo;            // TipoMovimentacaoPneu
 
     @DecimalMin(value = "0.00", message = "KM do evento deve ser >= 0")
@@ -34,9 +39,11 @@ public class PneuMovimentacaoRequest {
     public Integer eixoNumero;
 
     @Size(max = 20, message = "Lado inválido")
+    @Pattern(regexp = "ESQUERDO|DIREITO", message = "Lado inválido")
     public String lado;
 
     @Size(max = 20, message = "Posição inválida")
+    @Pattern(regexp = "INTERNO|EXTERNO", message = "Posição inválida")
     public String posicao;
 
     // usado para INSTALACAO (obrigatório por regra de negócio)

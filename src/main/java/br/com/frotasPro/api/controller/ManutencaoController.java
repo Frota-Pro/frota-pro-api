@@ -7,6 +7,9 @@ import br.com.frotasPro.api.controller.response.RelatorioManutencaoCaminhaoRespo
 import br.com.frotasPro.api.domain.enums.TipoDocumentoManutencao;
 import br.com.frotasPro.api.service.manutencao.*;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,12 +18,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
 import java.time.LocalDate;
 
+@Validated
 @RestController
 @RequestMapping("/manutencao")
 @AllArgsConstructor
@@ -54,7 +59,12 @@ public class ManutencaoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @GetMapping("/{codigo}")
-    public ResponseEntity<ManutencaoResponse> buscarPorCodigo(@PathVariable String codigo) {
+    public ResponseEntity<ManutencaoResponse> buscarPorCodigo(
+            @PathVariable
+            @NotBlank(message = "Código é obrigatório")
+            @Size(max = 50, message = "Código inválido")
+            String codigo
+    ) {
         return ResponseEntity.ok(buscarManutencaoPorCodigoService.buscar(codigo));
     }
 
@@ -83,7 +93,10 @@ public class ManutencaoController {
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @GetMapping("/caminhao/{codigoCaminhao}")
     public ResponseEntity<Page<ManutencaoResponse>> buscarPorCaminhao(
-            @PathVariable String codigoCaminhao,
+            @PathVariable
+            @NotBlank(message = "Código do caminhão é obrigatório")
+            @Size(max = 50, message = "Código do caminhão inválido")
+            String codigoCaminhao,
             Pageable pageable
     ) {
         return ResponseEntity.ok(
@@ -94,9 +107,16 @@ public class ManutencaoController {
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @GetMapping("/caminhao/{codigoCaminhao}/periodo")
     public ResponseEntity<Page<ManutencaoResponse>> buscarPorCaminhaoEPeriodo(
-            @PathVariable String codigoCaminhao,
-            @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
-            @RequestParam("fim") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim,
+            @PathVariable
+            @NotBlank(message = "Código do caminhão é obrigatório")
+            @Size(max = 50, message = "Código do caminhão inválido")
+            String codigoCaminhao,
+            @RequestParam("inicio")
+            @NotNull(message = "Data de início é obrigatória")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam("fim")
+            @NotNull(message = "Data de fim é obrigatória")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim,
             Pageable pageable
     ) {
         return ResponseEntity.ok(
@@ -107,8 +127,12 @@ public class ManutencaoController {
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @GetMapping("/periodo")
     public ResponseEntity<Page<ManutencaoResponse>> buscarPorPeriodo(
-            @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
-            @RequestParam("fim") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim,
+            @RequestParam("inicio")
+            @NotNull(message = "Data de início é obrigatória")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam("fim")
+            @NotNull(message = "Data de fim é obrigatória")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim,
             Pageable pageable
     ) {
         return ResponseEntity.ok(
@@ -119,9 +143,16 @@ public class ManutencaoController {
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @GetMapping("/oficina/{codigoOficina}/periodo")
     public ResponseEntity<Page<ManutencaoResponse>> buscarPorOficinaEPeriodo(
-            @PathVariable String codigoOficina,
-            @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
-            @RequestParam("fim") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim,
+            @PathVariable
+            @NotBlank(message = "Código da oficina é obrigatório")
+            @Size(max = 50, message = "Código da oficina inválido")
+            String codigoOficina,
+            @RequestParam("inicio")
+            @NotNull(message = "Data de início é obrigatória")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam("fim")
+            @NotNull(message = "Data de fim é obrigatória")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim,
             Pageable pageable
     ) {
         return ResponseEntity.ok(
@@ -132,9 +163,16 @@ public class ManutencaoController {
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @GetMapping("/relatorios/caminhao")
     public ResponseEntity<RelatorioManutencaoCaminhaoResponse> relatorioPorCaminhaoEPeriodo(
-            @RequestParam("caminhao") String codigoCaminhao,
-            @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
-            @RequestParam("fim") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim
+            @RequestParam("caminhao")
+            @NotBlank(message = "Código do caminhão é obrigatório")
+            @Size(max = 50, message = "Código do caminhão inválido")
+            String codigoCaminhao,
+            @RequestParam("inicio")
+            @NotNull(message = "Data de início é obrigatória")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam("fim")
+            @NotNull(message = "Data de fim é obrigatória")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim
     ) {
         return ResponseEntity.ok(
                 relatorioManutencaoCaminhaoService.gerar(codigoCaminhao, inicio, fim)
@@ -151,8 +189,13 @@ public class ManutencaoController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public ResponseEntity<DocumentoManutencaoResponse> uploadDocumentoManutencao(
-            @PathVariable String codigo,
-            @RequestParam("tipoDocumento") TipoDocumentoManutencao tipoDocumento,
+            @PathVariable
+            @NotBlank(message = "Código é obrigatório")
+            @Size(max = 50, message = "Código inválido")
+            String codigo,
+            @RequestParam("tipoDocumento")
+            @NotNull(message = "Tipo de documento é obrigatório")
+            TipoDocumentoManutencao tipoDocumento,
             @RequestParam(value = "observacao", required = false) String observacao,
             @RequestPart("arquivo") MultipartFile arquivo
     ) {
@@ -171,7 +214,10 @@ public class ManutencaoController {
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/{codigo}/documentos")
     public ResponseEntity<Page<DocumentoManutencaoResponse>> listarDocumentosManutencao(
-            @PathVariable String codigo,
+            @PathVariable
+            @NotBlank(message = "Código é obrigatório")
+            @Size(max = 50, message = "Código inválido")
+            String codigo,
             Pageable pageable
     ) {
         return ResponseEntity.ok(listarDocumentoManutencaoService.listarPorManutencao(codigo, pageable));

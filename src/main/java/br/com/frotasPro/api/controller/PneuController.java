@@ -6,12 +6,17 @@ import br.com.frotasPro.api.controller.response.PneuResponse;
 import br.com.frotasPro.api.controller.response.PneuVidaUtilResponse;
 import br.com.frotasPro.api.service.pneu.PneuService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.annotation.Validated;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/pneus")
@@ -21,15 +26,27 @@ public class PneuController {
 
     @GetMapping
     public ResponseEntity<Page<PneuResponse>> listar(
-            @RequestParam(value = "q", required = false) String q,
-            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "q", required = false)
+            @Size(max = 120, message = "Filtro inválido")
+            String q,
+            @RequestParam(value = "status", required = false)
+            @Pattern(
+                    regexp = "ESTOQUE|EM_USO|EM_RECAPAGEM|DESCARTADO",
+                    message = "Status inválido"
+            )
+            String status,
             Pageable pageable
     ) {
         return ResponseEntity.ok(service.listar(q, status, pageable));
     }
 
     @GetMapping("/{codigo}")
-    public ResponseEntity<PneuResponse> buscar(@PathVariable String codigo) {
+    public ResponseEntity<PneuResponse> buscar(
+            @PathVariable
+            @NotBlank(message = "Código é obrigatório")
+            @Size(max = 20, message = "Código inválido")
+            String codigo
+    ) {
         return ResponseEntity.ok(service.buscarPorCodigo(codigo));
     }
 
@@ -39,25 +56,47 @@ public class PneuController {
     }
 
     @PutMapping("/{codigo}")
-    public ResponseEntity<PneuResponse> atualizar(@PathVariable String codigo, @Valid @RequestBody PneuRequest req) {
+    public ResponseEntity<PneuResponse> atualizar(
+            @PathVariable
+            @NotBlank(message = "Código é obrigatório")
+            @Size(max = 20, message = "Código inválido")
+            String codigo,
+            @Valid @RequestBody PneuRequest req
+    ) {
         return ResponseEntity.ok(service.atualizar(codigo, req));
     }
 
     @DeleteMapping("/{codigo}")
-    public ResponseEntity<Void> deletar(@PathVariable String codigo) {
+    public ResponseEntity<Void> deletar(
+            @PathVariable
+            @NotBlank(message = "Código é obrigatório")
+            @Size(max = 20, message = "Código inválido")
+            String codigo
+    ) {
         service.deletar(codigo);
         return ResponseEntity.noContent().build();
     }
 
     // VIDA ÚTIL
     @GetMapping("/{codigo}/vida-util")
-    public ResponseEntity<PneuVidaUtilResponse> vidaUtil(@PathVariable String codigo) {
+    public ResponseEntity<PneuVidaUtilResponse> vidaUtil(
+            @PathVariable
+            @NotBlank(message = "Código é obrigatório")
+            @Size(max = 20, message = "Código inválido")
+            String codigo
+    ) {
         return ResponseEntity.ok(service.vidaUtil(codigo));
     }
 
     // EVENTOS
     @PostMapping("/{codigo}/movimentacoes")
-    public ResponseEntity<Void> movimentacao(@PathVariable String codigo,@Valid @RequestBody PneuMovimentacaoRequest req) {
+    public ResponseEntity<Void> movimentacao(
+            @PathVariable
+            @NotBlank(message = "Código é obrigatório")
+            @Size(max = 20, message = "Código inválido")
+            String codigo,
+            @Valid @RequestBody PneuMovimentacaoRequest req
+    ) {
         service.registrarMovimentacao(codigo, req);
         return ResponseEntity.ok().build();
     }

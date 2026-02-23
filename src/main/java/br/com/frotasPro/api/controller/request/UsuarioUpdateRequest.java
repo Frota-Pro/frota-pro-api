@@ -20,6 +20,10 @@ public class UsuarioUpdateRequest {
     private String nome;
 
 
-    private List<String> acessos;
+    private List<
+            @NotBlank(message = "Acesso inválido")
+            @Size(max = 50, message = "Acesso inválido")
+                    String
+            > acessos;
     private Boolean ativo;
 }

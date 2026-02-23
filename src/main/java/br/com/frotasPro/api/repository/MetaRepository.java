@@ -36,9 +36,37 @@ public interface MetaRepository extends JpaRepository <Meta, UUID>{
             LocalDate dataFim
     );
 
+    List<Meta> findByCaminhaoCodigoAndStatusMetaInAndDataIncioLessThanEqualAndDataFimGreaterThanEqual(
+            String caminhaoCodigo,
+            List<StatusMeta> statusMeta,
+            LocalDate dataInicio,
+            LocalDate dataFim
+    );
+
+    List<Meta> findByCaminhaoIdAndStatusMetaInAndDataIncioLessThanEqualAndDataFimGreaterThanEqual(
+            UUID caminhaoId,
+            List<StatusMeta> statusMeta,
+            LocalDate dataInicio,
+            LocalDate dataFim
+    );
+
     List<Meta> findByCategoriaCodigoAndStatusMetaAndDataIncioLessThanEqualAndDataFimGreaterThanEqual(
             String categoriaCodigo,
             StatusMeta statusMeta,
+            LocalDate dataInicio,
+            LocalDate dataFim
+    );
+
+    List<Meta> findByCategoriaCodigoAndStatusMetaInAndDataIncioLessThanEqualAndDataFimGreaterThanEqual(
+            String categoriaCodigo,
+            List<StatusMeta> statusMeta,
+            LocalDate dataInicio,
+            LocalDate dataFim
+    );
+
+    List<Meta> findByCategoriaIdAndStatusMetaInAndDataIncioLessThanEqualAndDataFimGreaterThanEqual(
+            UUID categoriaId,
+            List<StatusMeta> statusMeta,
             LocalDate dataInicio,
             LocalDate dataFim
     );
