@@ -28,6 +28,7 @@ public class RelatorioPdfController {
     private final RelatorioRankingMotoristasService rankingMotoristasService;
     private final RelatorioHistoricoManutencaoService historicoManutencaoService;
     private final RelatorioVidaUtilPneuService vidaUtilPneuService;
+    private final RelatorioDespesaCategoriaPeriodoService despesaCategoriaPeriodoService;
 
     private static final String LOGO_CLASSPATH = "reports/logo.png";
 
@@ -229,6 +230,41 @@ public class RelatorioPdfController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "inline; filename=\"manutencoes-" + codigoCaminhao + "-" + inicio + "-a-" + fim + ".pdf\"")
+                .body(pdf);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @GetMapping("/despesas/categorias")
+    public ResponseEntity<byte[]> despesaCategoriaPeriodoPdf(
+            @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam("fim")    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim
+    ) {
+        RelatorioDespesaCategoriaPeriodoResponse rel = despesaCategoriaPeriodoService.gerar(inicio, fim);
+
+        Map<String, Object> p = new HashMap<>();
+        p.put("periodoInicio", rel.getPeriodoInicio());
+        p.put("periodoFim", rel.getPeriodoFim());
+        p.put("totalFrota", rel.getTotalFrota());
+        p.put("totalPessoal", rel.getTotalPessoal());
+        p.put("totalGeral", rel.getTotalGeral());
+        p.put("totalAbastecimento", rel.getTotalAbastecimento());
+        p.put("totalManutencoes", rel.getTotalManutencoes());
+        p.put("totalPneu", rel.getTotalPneu());
+        p.put("totalAlimentacao", rel.getTotalAlimentacao());
+        p.put("totalPernoite", rel.getTotalPernoite());
+        p.put("quantidadeLancamentos", rel.getQuantidadeLancamentos());
+        aplicarLogo(p);
+
+        byte[] pdf = jasperPdfService.gerarPdfFromJrxml(
+                "reports/despesa_categoria_periodo.jrxml",
+                p,
+                rel.getLinhas()
+        );
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=\"despesas-categoria-" + inicio + "-a-" + fim + ".pdf\"")
                 .body(pdf);
     }
 

@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport name="Relatório - Despesas por Categoria (Período)" language="java"
+              whenNoDataType="AllSectionsNoDetail"
+              pageWidth="842" pageHeight="595" orientation="Landscape"
+              columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+
+    <parameter name="logoPath" class="java.lang.Object"/>
+
+    <parameter name="periodoInicio" class="java.time.LocalDate"/>
+    <parameter name="periodoFim" class="java.time.LocalDate"/>
+
+    <parameter name="totalFrota" class="java.math.BigDecimal"/>
+    <parameter name="totalPessoal" class="java.math.BigDecimal"/>
+    <parameter name="totalGeral" class="java.math.BigDecimal"/>
+    <parameter name="totalAbastecimento" class="java.math.BigDecimal"/>
+    <parameter name="totalManutencoes" class="java.math.BigDecimal"/>
+    <parameter name="totalPneu" class="java.math.BigDecimal"/>
+    <parameter name="totalAlimentacao" class="java.math.BigDecimal"/>
+    <parameter name="totalPernoite" class="java.math.BigDecimal"/>
+    <parameter name="quantidadeLancamentos" class="java.lang.Integer"/>
+
+    <field name="data" class="java.time.LocalDate"/>
+    <field name="categoriaPrincipal" class="java.lang.String"/>
+    <field name="subcategoria" class="java.lang.String"/>
+    <field name="referencia" class="java.lang.String"/>
+    <field name="descricao" class="java.lang.String"/>
+    <field name="cidade" class="java.lang.String"/>
+    <field name="valor" class="java.math.BigDecimal"/>
+
+    <group name="grupoCategoriaPrincipal">
+        <expression><![CDATA[$F{categoriaPrincipal}]]></expression>
+        <groupHeader>
+            <band height="24">
+                <element kind="staticText" mode="Opaque" x="0" y="2" width="802" height="20" forecolor="#FFFFFF" backcolor="#1E3A8A" bold="true">
+                    <text><![CDATA[CATEGORIA]]></text>
+                </element>
+                <element kind="textField" x="90" y="4" width="600" height="16" forecolor="#FFFFFF" bold="true">
+                    <expression><![CDATA[$F{categoriaPrincipal}]]></expression>
+                </element>
+            </band>
+        </groupHeader>
+        <groupFooter>
+            <band height="20">
+                <element kind="line" x="0" y="1" width="802" height="1"/>
+                <element kind="staticText" x="500" y="3" width="180" height="15" bold="true" hTextAlign="Right">
+                    <text><![CDATA[Subtotal da categoria:]]></text>
+                </element>
+                <element kind="textField" x="680" y="3" width="122" height="15" pattern="'R$ ' #,##0.00" bold="true" hTextAlign="Right">
+                    <expression><![CDATA[$V{vSubtotalCategoria}]]></expression>
+                </element>
+            </band>
+        </groupFooter>
+    </group>
+
+    <group name="grupoSubcategoria">
+        <expression><![CDATA[$F{subcategoria}]]></expression>
+        <groupHeader>
+            <band height="18">
+                <element kind="staticText" mode="Opaque" x="0" y="1" width="95" height="15" forecolor="#0F172A" backcolor="#DBEAFE" bold="true">
+                    <text><![CDATA[SUBCATEGORIA]]></text>
+                </element>
+                <element kind="textField" x="100" y="1" width="702" height="15" forecolor="#0F172A" backcolor="#DBEAFE" mode="Opaque" bold="true">
+                    <expression><![CDATA[$F{subcategoria}]]></expression>
+                </element>
+            </band>
+        </groupHeader>
+        <groupFooter>
+            <band height="18">
+                <element kind="staticText" x="500" y="2" width="180" height="14" hTextAlign="Right">
+                    <text><![CDATA[Subtotal subcategoria:]]></text>
+                </element>
+                <element kind="textField" x="680" y="2" width="122" height="14" pattern="'R$ ' #,##0.00" hTextAlign="Right">
+                    <expression><![CDATA[$V{vSubtotalSubcategoria}]]></expression>
+                </element>
+            </band>
+        </groupFooter>
+    </group>
+
+    <variable name="vSubtotalCategoria" class="java.math.BigDecimal" resetType="Group" resetGroup="grupoCategoriaPrincipal" calculation="Sum">
+        <expression><![CDATA[$F{valor}]]></expression>
+        <initialValueExpression><![CDATA[java.math.BigDecimal.ZERO]]></initialValueExpression>
+    </variable>
+
+    <variable name="vSubtotalSubcategoria" class="java.math.BigDecimal" resetType="Group" resetGroup="grupoSubcategoria" calculation="Sum">
+        <expression><![CDATA[$F{valor}]]></expression>
+        <initialValueExpression><![CDATA[java.math.BigDecimal.ZERO]]></initialValueExpression>
+    </variable>
+
+    <title height="132">
+        <element kind="image" x="10" y="5" width="120" height="50">
+            <expression><![CDATA[$P{logoPath}]]></expression>
+        </element>
+
+        <element kind="staticText" x="140" y="6" width="470" height="22" fontSize="14" bold="true">
+            <text><![CDATA[RELATÓRIO DE DESPESAS POR CATEGORIA]]></text>
+        </element>
+
+        <element kind="textField" x="140" y="30" width="470" height="16">
+            <expression><![CDATA["Período: " + $P{periodoInicio} + " até " + $P{periodoFim}]]></expression>
+        </element>
+
+        <element kind="textField" x="640" y="10" width="180" height="16" hTextAlign="Right">
+            <expression><![CDATA["Lançamentos: " + $P{quantidadeLancamentos}]]></expression>
+        </element>
+
+        <element kind="staticText" mode="Opaque" x="0" y="58" width="258" height="30" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center" vTextAlign="Middle">
+            <text><![CDATA[TOTAL FROTA]]></text>
+        </element>
+        <element kind="textField" mode="Opaque" x="0" y="88" width="258" height="22" forecolor="#0D47A1" backcolor="#E3F2FD" bold="true" pattern="'R$ ' #,##0.00" hTextAlign="Center" vTextAlign="Middle">
+            <expression><![CDATA[$P{totalFrota}]]></expression>
+        </element>
+
+        <element kind="staticText" mode="Opaque" x="272" y="58" width="258" height="30" forecolor="#FFFFFF" backcolor="#2E7D32" bold="true" hTextAlign="Center" vTextAlign="Middle">
+            <text><![CDATA[TOTAL PESSOAL]]></text>
+        </element>
+        <element kind="textField" mode="Opaque" x="272" y="88" width="258" height="22" forecolor="#1B5E20" backcolor="#E8F5E9" bold="true" pattern="'R$ ' #,##0.00" hTextAlign="Center" vTextAlign="Middle">
+            <expression><![CDATA[$P{totalPessoal}]]></expression>
+        </element>
+
+        <element kind="staticText" mode="Opaque" x="544" y="58" width="258" height="30" forecolor="#FFFFFF" backcolor="#B45309" bold="true" hTextAlign="Center" vTextAlign="Middle">
+            <text><![CDATA[TOTAL GERAL]]></text>
+        </element>
+        <element kind="textField" mode="Opaque" x="544" y="88" width="258" height="22" forecolor="#7C2D12" backcolor="#FFF3E0" bold="true" pattern="'R$ ' #,##0.00" hTextAlign="Center" vTextAlign="Middle">
+            <expression><![CDATA[$P{totalGeral}]]></expression>
+        </element>
+    </title>
+
+    <columnHeader height="24">
+        <element kind="staticText" mode="Opaque" x="0" y="2" width="80" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" hTextAlign="Center">
+            <text><![CDATA[DATA]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="80" y="2" width="150" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" hTextAlign="Center">
+            <text><![CDATA[REFERÊNCIA]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="230" y="2" width="330" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" hTextAlign="Center">
+            <text><![CDATA[DESCRIÇÃO]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="560" y="2" width="120" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" hTextAlign="Center">
+            <text><![CDATA[CIDADE]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="680" y="2" width="122" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" hTextAlign="Center">
+            <text><![CDATA[VALOR]]></text>
+        </element>
+    </columnHeader>
+
+    <detail>
+        <band height="18">
+            <element kind="textField" x="0" y="1" width="80" height="15" hTextAlign="Center">
+                <expression><![CDATA[$F{data}]]></expression>
+            </element>
+            <element kind="textField" x="80" y="1" width="150" height="15">
+                <expression><![CDATA[$F{referencia}]]></expression>
+            </element>
+            <element kind="textField" x="230" y="1" width="330" height="15">
+                <expression><![CDATA[$F{descricao}]]></expression>
+            </element>
+            <element kind="textField" x="560" y="1" width="120" height="15">
+                <expression><![CDATA[$F{cidade}]]></expression>
+            </element>
+            <element kind="textField" x="680" y="1" width="122" height="15" pattern="'R$ ' #,##0.00" hTextAlign="Right">
+                <expression><![CDATA[$F{valor}]]></expression>
+            </element>
+        </band>
+    </detail>
+
+    <summary height="95">
+        <element kind="staticText" x="0" y="0" width="802" height="16" bold="true">
+            <text><![CDATA[Consolidação por Subcategoria]]></text>
+        </element>
+
+        <element kind="textField" x="0" y="20" width="250" height="16">
+            <expression><![CDATA["Abastecimento: R$ " + $P{totalAbastecimento}]]></expression>
+        </element>
+        <element kind="textField" x="270" y="20" width="250" height="16">
+            <expression><![CDATA["Manutenções: R$ " + $P{totalManutencoes}]]></expression>
+        </element>
+        <element kind="textField" x="540" y="20" width="250" height="16">
+            <expression><![CDATA["Pneu: R$ " + $P{totalPneu}]]></expression>
+        </element>
+
+        <element kind="textField" x="0" y="42" width="250" height="16">
+            <expression><![CDATA["Alimentação: R$ " + $P{totalAlimentacao}]]></expression>
+        </element>
+        <element kind="textField" x="270" y="42" width="250" height="16">
+            <expression><![CDATA["Pernoite: R$ " + $P{totalPernoite}]]></expression>
+        </element>
+
+        <element kind="line" x="0" y="66" width="802" height="1"/>
+        <element kind="staticText" x="560" y="72" width="120" height="16" bold="true" hTextAlign="Right">
+            <text><![CDATA[TOTAL GERAL]]></text>
+        </element>
+        <element kind="textField" x="680" y="72" width="122" height="16" pattern="'R$ ' #,##0.00" bold="true" hTextAlign="Right">
+            <expression><![CDATA[$P{totalGeral}]]></expression>
+        </element>
+    </summary>
+</jasperReport>

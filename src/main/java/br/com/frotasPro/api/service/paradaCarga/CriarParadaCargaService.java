@@ -50,10 +50,6 @@ public class CriarParadaCargaService {
             throw new BusinessException("A carga não está iniciada. Inicie a carga para adicionar parada.");
         }
 
-        if (carga.getDtChegada() != null) {
-            throw new BusinessException("A carga não está finalizada. Não é possivel adicionar parada em uma carga ja finalizada.");
-        }
-
         ParadaCarga parada = toEntity(request, carga);
 
         // =========================
