@@ -20,6 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -85,10 +89,6 @@ public class SincronizarCargaService {
             carga.setNotas(new ArrayList<>());
         }
 
-        // Evite "delete manual" + mexer na coleção ao mesmo tempo.
-        // Deixe o JPA fazer orphanRemoval/cascade (ajuste no mapeamento se necessário).
-        carga.getNotas().clear();
-
         var motoristaOpt = motoristaRepository
                 .findByCodigoExterno(String.valueOf(dto.getCodMotorista()));
 
@@ -137,6 +137,12 @@ public class SincronizarCargaService {
         int totalClientes = 0;
         int totalNotas = 0;
 
+        Map<String, CargaNota> notasExistentes = new HashMap<>();
+        for (CargaNota n : carga.getNotas()) {
+            notasExistentes.put(notaKey(n.getCliente(), n.getNota()), n);
+        }
+        Set<String> notasDesejadas = new HashSet<>();
+
         for (ClienteCargaWinThorDto cli : dto.getClientes()) {
 
             String clienteStr = cli.getCodCli() + " - " + cli.getNomeCli();
@@ -144,15 +150,24 @@ public class SincronizarCargaService {
 
             if (cli.getNotas() != null) {
                 for (Long nota : cli.getNotas()) {
-                    CargaNota cn = new CargaNota();
-                    cn.setCarga(carga);
-                    cn.setCliente(clienteStr);
-                    cn.setNota(String.valueOf(nota));
-                    carga.getNotas().add(cn);
+                    String notaStr = String.valueOf(nota);
+                    String key = notaKey(clienteStr, notaStr);
+                    notasDesejadas.add(key);
+
+                    if (!notasExistentes.containsKey(key)) {
+                        CargaNota cn = new CargaNota();
+                        cn.setCarga(carga);
+                        cn.setCliente(clienteStr);
+                        cn.setNota(notaStr);
+                        carga.getNotas().add(cn);
+                    }
                     totalNotas++;
                 }
             }
         }
+
+        // Remove apenas o que não existe mais, evita "delete + reinsert" no mesmo contexto.
+        carga.getNotas().removeIf(n -> !notasDesejadas.contains(notaKey(n.getCliente(), n.getNota())));
 
         // Flush ajuda a detectar conflitos cedo e reduz surpresa no commit do listener.
         cargaRepository.saveAndFlush(carga);
@@ -161,6 +176,10 @@ public class SincronizarCargaService {
                 dto.getNumMdfe(),
                 totalClientes,
                 totalNotas);
+    }
+
+    private static String notaKey(String cliente, String nota) {
+        return cliente + "||" + nota;
     }
 
 }
