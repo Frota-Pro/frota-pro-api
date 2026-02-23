@@ -58,7 +58,7 @@
     <background splitType="Stretch"/>
 
     <!-- ===================== TITLE ===================== -->
-    <title height="90" splitType="Stretch">
+    <title height="132" splitType="Stretch">
 
         <!-- Logo (opcional) -->
         <element kind="image"
@@ -101,7 +101,7 @@
 
         <element kind="textField"
                  uuid="00000000-0000-0000-0000-000000000205"
-                 x="640" y="15" width="180" height="16"
+                 x="640" y="12" width="180" height="16"
                  blankWhenNull="true"
                  hTextAlign="Right" vTextAlign="Middle">
             <expression><![CDATA[
@@ -112,7 +112,7 @@
 
         <element kind="textField"
                  uuid="00000000-0000-0000-0000-000000000206"
-                 x="640" y="33" width="180" height="16"
+                 x="640" y="30" width="180" height="16"
                  blankWhenNull="true"
                  hTextAlign="Right" vTextAlign="Middle">
             <expression><![CDATA[
@@ -122,7 +122,7 @@
 
         <element kind="textField"
                  uuid="00000000-0000-0000-0000-000000000207"
-                 x="640" y="51" width="180" height="16"
+                 x="640" y="48" width="180" height="16"
                  blankWhenNull="true"
                  hTextAlign="Right" vTextAlign="Middle">
             <expression><![CDATA[
@@ -130,18 +130,63 @@
             ]]></expression>
         </element>
 
+        <element kind="staticText"
+                 mode="Opaque"
+                 x="0" y="78" width="258" height="22"
+                 forecolor="#FFFFFF" backcolor="#1D4ED8"
+                 bold="true" hTextAlign="Center" vTextAlign="Middle">
+            <text><![CDATA[META TONELADA]]></text>
+        </element>
+        <element kind="textField"
+                 mode="Opaque"
+                 x="0" y="100" width="258" height="22"
+                 forecolor="#1E3A8A" backcolor="#DBEAFE"
+                 bold="true" hTextAlign="Center" vTextAlign="Middle">
+            <expression><![CDATA[$P{objetivoMesTonelada}]]></expression>
+        </element>
+
+        <element kind="staticText"
+                 mode="Opaque"
+                 x="272" y="78" width="258" height="22"
+                 forecolor="#FFFFFF" backcolor="#0F766E"
+                 bold="true" hTextAlign="Center" vTextAlign="Middle">
+            <text><![CDATA[MÉDIA GERAL KM/L]]></text>
+        </element>
+        <element kind="textField"
+                 mode="Opaque"
+                 x="272" y="100" width="258" height="22"
+                 forecolor="#134E4A" backcolor="#CCFBF1"
+                 bold="true" pattern="#,##0.00" hTextAlign="Center" vTextAlign="Middle">
+            <expression><![CDATA[$P{mediaGeralKmPorLitro}]]></expression>
+        </element>
+
+        <element kind="staticText"
+                 mode="Opaque"
+                 x="544" y="78" width="258" height="22"
+                 forecolor="#FFFFFF" backcolor="#B45309"
+                 bold="true" hTextAlign="Center" vTextAlign="Middle">
+            <text><![CDATA[REALIZADO X META (%)]]></text>
+        </element>
+        <element kind="textField"
+                 mode="Opaque"
+                 x="544" y="100" width="258" height="22"
+                 forecolor="#7C2D12" backcolor="#FFEDD5"
+                 bold="true" pattern="#,##0.00" hTextAlign="Center" vTextAlign="Middle">
+            <expression><![CDATA[$P{realizadoToneladaPercentual}]]></expression>
+        </element>
+
     </title>
 
     <pageHeader height="5" splitType="Stretch"/>
 
     <!-- ===================== COLUMN HEADER ===================== -->
-    <columnHeader height="35" splitType="Stretch">
+    <columnHeader height="24" splitType="Stretch">
 
         <element kind="staticText"
                  uuid="00000000-0000-0000-0000-000000000208"
                  mode="Opaque"
-                 x="0" y="5" width="60" height="25"
-                 forecolor="#FFFFFF" backcolor="#0D47A1"
+                 x="0" y="3" width="60" height="18"
+                 forecolor="#FFFFFF" backcolor="#334155"
                  fontSize="10.0" bold="true"
                  hTextAlign="Center" vTextAlign="Middle">
             <text><![CDATA[DATA]]></text>
@@ -150,8 +195,8 @@
         <element kind="staticText"
                  uuid="00000000-0000-0000-0000-000000000209"
                  mode="Opaque"
-                 x="60" y="5" width="80" height="25"
-                 forecolor="#FFFFFF" backcolor="#0D47A1"
+                 x="60" y="3" width="80" height="18"
+                 forecolor="#FFFFFF" backcolor="#334155"
                  fontSize="10.0" bold="true"
                  hTextAlign="Center" vTextAlign="Middle">
             <text><![CDATA[LOTE]]></text>
@@ -160,8 +205,8 @@
         <element kind="staticText"
                  uuid="00000000-0000-0000-0000-00000000020a"
                  mode="Opaque"
-                 x="140" y="5" width="120" height="25"
-                 forecolor="#FFFFFF" backcolor="#0D47A1"
+                 x="140" y="3" width="120" height="18"
+                 forecolor="#FFFFFF" backcolor="#334155"
                  fontSize="10.0" bold="true"
                  hTextAlign="Center" vTextAlign="Middle">
             <text><![CDATA[CIDADE]]></text>
@@ -170,8 +215,8 @@
         <element kind="staticText"
                  uuid="00000000-0000-0000-0000-00000000020b"
                  mode="Opaque"
-                 x="260" y="5" width="90" height="25"
-                 forecolor="#FFFFFF" backcolor="#0D47A1"
+                 x="260" y="3" width="90" height="18"
+                 forecolor="#FFFFFF" backcolor="#334155"
                  fontSize="10.0" bold="true"
                  hTextAlign="Center" vTextAlign="Middle">
             <text><![CDATA[VALOR CARGA]]></text>
@@ -180,8 +225,8 @@
         <element kind="staticText"
                  uuid="00000000-0000-0000-0000-00000000020c"
                  mode="Opaque"
-                 x="350" y="5" width="70" height="25"
-                 forecolor="#FFFFFF" backcolor="#0D47A1"
+                 x="350" y="3" width="70" height="18"
+                 forecolor="#FFFFFF" backcolor="#334155"
                  fontSize="10.0" bold="true"
                  hTextAlign="Center" vTextAlign="Middle">
             <text><![CDATA[TONELADA]]></text>
@@ -190,8 +235,8 @@
         <element kind="staticText"
                  uuid="00000000-0000-0000-0000-00000000020d"
                  mode="Opaque"
-                 x="420" y="5" width="60" height="25"
-                 forecolor="#FFFFFF" backcolor="#0D47A1"
+                 x="420" y="3" width="60" height="18"
+                 forecolor="#FFFFFF" backcolor="#334155"
                  fontSize="10.0" bold="true"
                  hTextAlign="Center" vTextAlign="Middle">
             <text><![CDATA[KM INI]]></text>
@@ -200,8 +245,8 @@
         <element kind="staticText"
                  uuid="00000000-0000-0000-0000-00000000020e"
                  mode="Opaque"
-                 x="480" y="5" width="60" height="25"
-                 forecolor="#FFFFFF" backcolor="#0D47A1"
+                 x="480" y="3" width="60" height="18"
+                 forecolor="#FFFFFF" backcolor="#334155"
                  fontSize="10.0" bold="true"
                  hTextAlign="Center" vTextAlign="Middle">
             <text><![CDATA[KM FIM]]></text>
@@ -210,8 +255,8 @@
         <element kind="staticText"
                  uuid="00000000-0000-0000-0000-00000000020f"
                  mode="Opaque"
-                 x="540" y="5" width="60" height="25"
-                 forecolor="#FFFFFF" backcolor="#0D47A1"
+                 x="540" y="3" width="60" height="18"
+                 forecolor="#FFFFFF" backcolor="#334155"
                  fontSize="10.0" bold="true"
                  hTextAlign="Center" vTextAlign="Middle">
             <text><![CDATA[KM ROD.]]></text>
@@ -220,8 +265,8 @@
         <element kind="staticText"
                  uuid="00000000-0000-0000-0000-000000000210"
                  mode="Opaque"
-                 x="600" y="5" width="70" height="25"
-                 forecolor="#FFFFFF" backcolor="#0D47A1"
+                 x="600" y="3" width="70" height="18"
+                 forecolor="#FFFFFF" backcolor="#334155"
                  fontSize="10.0" bold="true"
                  hTextAlign="Center" vTextAlign="Middle">
             <text><![CDATA[LITROS]]></text>
@@ -230,8 +275,8 @@
         <element kind="staticText"
                  uuid="00000000-0000-0000-0000-000000000211"
                  mode="Opaque"
-                 x="670" y="5" width="90" height="25"
-                 forecolor="#FFFFFF" backcolor="#0D47A1"
+                 x="670" y="3" width="90" height="18"
+                 forecolor="#FFFFFF" backcolor="#334155"
                  fontSize="10.0" bold="true"
                  hTextAlign="Center" vTextAlign="Middle">
             <text><![CDATA[VALOR ABAST.]]></text>
@@ -240,8 +285,8 @@
         <element kind="staticText"
                  uuid="00000000-0000-0000-0000-000000000212"
                  mode="Opaque"
-                 x="760" y="5" width="42" height="25"
-                 forecolor="#FFFFFF" backcolor="#0D47A1"
+                 x="760" y="3" width="42" height="18"
+                 forecolor="#FFFFFF" backcolor="#334155"
                  fontSize="10.0" bold="true"
                  hTextAlign="Center" vTextAlign="Middle">
             <text><![CDATA[km/L]]></text>
@@ -255,7 +300,7 @@
 
             <element kind="textField"
                      uuid="00000000-0000-0000-0000-000000000213"
-                     x="0" y="0" width="60" height="16"
+                     x="0" y="1" width="60" height="15"
                      blankWhenNull="true"
                      vTextAlign="Middle">
                 <expression><![CDATA[$F{data}]]></expression>
@@ -263,7 +308,7 @@
 
             <element kind="textField"
                      uuid="00000000-0000-0000-0000-000000000214"
-                     x="60" y="0" width="80" height="16"
+                     x="60" y="1" width="80" height="15"
                      blankWhenNull="true"
                      vTextAlign="Middle">
                 <expression><![CDATA[$F{lote}]]></expression>
@@ -271,7 +316,7 @@
 
             <element kind="textField"
                      uuid="00000000-0000-0000-0000-000000000215"
-                     x="140" y="0" width="120" height="16"
+                     x="140" y="1" width="120" height="15"
                      blankWhenNull="true"
                      vTextAlign="Middle">
                 <expression><![CDATA[$F{cidade}]]></expression>
@@ -279,7 +324,7 @@
 
             <element kind="textField"
                      uuid="00000000-0000-0000-0000-000000000216"
-                     x="260" y="0" width="90" height="16"
+                     x="260" y="1" width="90" height="15"
                      blankWhenNull="true"
                      pattern="'R$ ' #,##0.00"
                      hTextAlign="Right" vTextAlign="Middle">
@@ -288,7 +333,7 @@
 
             <element kind="textField"
                      uuid="00000000-0000-0000-0000-000000000217"
-                     x="350" y="0" width="70" height="16"
+                     x="350" y="1" width="70" height="15"
                      blankWhenNull="true"
                      pattern="#,##0.000"
                      hTextAlign="Right" vTextAlign="Middle">
@@ -297,7 +342,7 @@
 
             <element kind="textField"
                      uuid="00000000-0000-0000-0000-000000000218"
-                     x="420" y="0" width="60" height="16"
+                     x="420" y="1" width="60" height="15"
                      blankWhenNull="true"
                      hTextAlign="Right" vTextAlign="Middle">
                 <expression><![CDATA[$F{kmInicial}]]></expression>
@@ -305,7 +350,7 @@
 
             <element kind="textField"
                      uuid="00000000-0000-0000-0000-000000000219"
-                     x="480" y="0" width="60" height="16"
+                     x="480" y="1" width="60" height="15"
                      blankWhenNull="true"
                      hTextAlign="Right" vTextAlign="Middle">
                 <expression><![CDATA[$F{kmFinal}]]></expression>
@@ -313,7 +358,7 @@
 
             <element kind="textField"
                      uuid="00000000-0000-0000-0000-00000000021a"
-                     x="540" y="0" width="60" height="16"
+                     x="540" y="1" width="60" height="15"
                      blankWhenNull="true"
                      hTextAlign="Right" vTextAlign="Middle">
                 <expression><![CDATA[$F{kmRodado}]]></expression>
@@ -321,7 +366,7 @@
 
             <element kind="textField"
                      uuid="00000000-0000-0000-0000-00000000021b"
-                     x="600" y="0" width="70" height="16"
+                     x="600" y="1" width="70" height="15"
                      blankWhenNull="true"
                      pattern="#,##0.00"
                      hTextAlign="Right" vTextAlign="Middle">
@@ -330,7 +375,7 @@
 
             <element kind="textField"
                      uuid="00000000-0000-0000-0000-00000000021c"
-                     x="670" y="0" width="90" height="16"
+                     x="670" y="1" width="90" height="15"
                      blankWhenNull="true"
                      pattern="'R$ ' #,##0.00"
                      hTextAlign="Right" vTextAlign="Middle">
@@ -339,7 +384,7 @@
 
             <element kind="textField"
                      uuid="00000000-0000-0000-0000-00000000021d"
-                     x="760" y="0" width="42" height="16"
+                     x="760" y="1" width="42" height="15"
                      blankWhenNull="true"
                      pattern="#,##0.00"
                      hTextAlign="Right" vTextAlign="Middle">
@@ -352,19 +397,19 @@
     <columnFooter height="5" splitType="Stretch"/>
 
     <!-- ===================== PAGE FOOTER ===================== -->
-    <pageFooter height="35" splitType="Stretch">
+    <pageFooter height="24" splitType="Stretch">
 
         <element kind="textField"
                  uuid="00000000-0000-0000-0000-00000000021e"
-                 x="0" y="10" width="150" height="20">
+                 x="0" y="6" width="260" height="15">
             <expression><![CDATA[
-new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date())
+"Emitido em: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())
             ]]></expression>
         </element>
 
         <element kind="textField"
                  uuid="00000000-0000-0000-0000-00000000021f"
-                 x="700" y="10" width="120" height="20"
+                 x="700" y="6" width="120" height="15"
                  hTextAlign="Right">
             <expression><![CDATA["Página " + $V{PAGE_NUMBER}]]></expression>
         </element>
@@ -372,18 +417,20 @@ new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date())
     </pageFooter>
 
     <!-- ===================== SUMMARY (totais) ===================== -->
-    <summary height="70" splitType="Stretch">
+    <summary height="76" splitType="Stretch">
 
         <element kind="staticText"
                  uuid="00000000-0000-0000-0000-000000000220"
-                 x="0" y="5" width="120" height="18"
+                 x="0" y="4" width="220" height="18"
                  fontSize="11.0" bold="true">
-            <text><![CDATA[TOTAIS DO PERÍODO]]></text>
+            <text><![CDATA[CONSOLIDAÇÃO DO PERÍODO]]></text>
         </element>
+
+        <element kind="line" x="0" y="24" width="802" height="1"/>
 
         <element kind="textField"
                  uuid="00000000-0000-0000-0000-000000000221"
-                 x="0" y="25" width="220" height="16"
+                 x="0" y="30" width="220" height="16"
                  blankWhenNull="true">
             <expression><![CDATA[
 "Total tonelada: " + ($P{totalTonelada} == null ? "-" : $P{totalTonelada})
@@ -392,7 +439,7 @@ new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date())
 
         <element kind="textField"
                  uuid="00000000-0000-0000-0000-000000000222"
-                 x="220" y="25" width="200" height="16"
+                 x="220" y="30" width="200" height="16"
                  blankWhenNull="true">
             <expression><![CDATA[
 "Total km rodado: " + ($P{totalKmRodado} == null ? "-" : $P{totalKmRodado})
@@ -401,7 +448,7 @@ new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date())
 
         <element kind="textField"
                  uuid="00000000-0000-0000-0000-000000000223"
-                 x="420" y="25" width="200" height="16"
+                 x="420" y="30" width="200" height="16"
                  blankWhenNull="true">
             <expression><![CDATA[
 "Total litros: " + ($P{totalLitros} == null ? "-" : $P{totalLitros})
@@ -410,7 +457,7 @@ new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date())
 
         <element kind="textField"
                  uuid="00000000-0000-0000-0000-000000000224"
-                 x="0" y="43" width="220" height="16"
+                 x="0" y="50" width="220" height="16"
                  blankWhenNull="true">
             <expression><![CDATA[
 "Total abastecimento: R$ " + ($P{totalValorAbastecimento} == null ? "-" : $P{totalValorAbastecimento})
@@ -419,7 +466,7 @@ new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date())
 
         <element kind="textField"
                  uuid="00000000-0000-0000-0000-000000000225"
-                 x="220" y="43" width="200" height="16"
+                 x="220" y="50" width="200" height="16"
                  blankWhenNull="true">
             <expression><![CDATA[
 "Média geral km/L: " + ($P{mediaGeralKmPorLitro} == null ? "-" : $P{mediaGeralKmPorLitro})
@@ -428,7 +475,7 @@ new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date())
 
         <element kind="textField"
                  uuid="00000000-0000-0000-0000-000000000226"
-                 x="420" y="43" width="280" height="16"
+                 x="420" y="50" width="280" height="16"
                  blankWhenNull="true">
             <expression><![CDATA[
 "Realizado x Meta tonelada: " + ($P{realizadoToneladaPercentual} == null ? "-" : $P{realizadoToneladaPercentual}) + " %"

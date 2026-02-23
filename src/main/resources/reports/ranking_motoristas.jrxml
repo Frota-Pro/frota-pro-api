@@ -18,72 +18,88 @@
     <field name="totalKmRodado" class="java.lang.Long"/>
     <field name="totalValorCargas" class="java.math.BigDecimal"/>
 
-    <title height="80">
+    <title height="118">
         <element kind="image" x="10" y="5" width="120" height="50">
             <expression><![CDATA[$P{logoPath}]]></expression>
         </element>
 
-        <element kind="staticText" x="140" y="5" width="520" height="20" fontSize="14" bold="true">
-            <text><![CDATA[RELATÓRIO - RANKING DE MOTORISTAS]]></text>
+        <element kind="staticText" x="140" y="6" width="520" height="20" fontSize="14" bold="true">
+            <text><![CDATA[RELATÓRIO DE RANKING DE MOTORISTAS]]></text>
         </element>
 
-        <element kind="textField" x="140" y="28" width="520" height="16">
+        <element kind="textField" x="140" y="30" width="520" height="16">
             <expression><![CDATA["Período: " + $P{periodoInicio} + " até " + $P{periodoFim}]]></expression>
         </element>
 
-        <element kind="textField" x="640" y="10" width="180" height="16" hTextAlign="Right">
+        <element kind="textField" x="640" y="12" width="180" height="16" hTextAlign="Right">
             <expression><![CDATA["Total motoristas: " + $P{totalMotoristas}]]></expression>
+        </element>
+
+        <element kind="staticText" mode="Opaque" x="0" y="64" width="802" height="22" forecolor="#FFFFFF" backcolor="#334155" bold="true" hTextAlign="Center" vTextAlign="Middle">
+            <text><![CDATA[PERFORMANCE CONSOLIDADA POR MOTORISTA]]></text>
+        </element>
+        <element kind="textField" mode="Opaque" x="0" y="86" width="802" height="22" forecolor="#111827" backcolor="#E5E7EB" hTextAlign="Center" vTextAlign="Middle">
+            <expression><![CDATA["Ordenação por posição (maior performance no topo)"]]></expression>
         </element>
     </title>
 
-    <columnHeader height="28">
-        <element kind="staticText" mode="Opaque" x="0" y="3" width="50" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+    <columnHeader height="24">
+        <element kind="staticText" mode="Opaque" x="0" y="3" width="50" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" hTextAlign="Center">
             <text><![CDATA[#]]></text>
         </element>
-        <element kind="staticText" mode="Opaque" x="50" y="3" width="110" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+        <element kind="staticText" mode="Opaque" x="50" y="3" width="110" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" hTextAlign="Center">
             <text><![CDATA[CÓDIGO]]></text>
         </element>
-        <element kind="staticText" mode="Opaque" x="160" y="3" width="260" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+        <element kind="staticText" mode="Opaque" x="160" y="3" width="260" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" hTextAlign="Center">
             <text><![CDATA[MOTORISTA]]></text>
         </element>
-        <element kind="staticText" mode="Opaque" x="420" y="3" width="90" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+        <element kind="staticText" mode="Opaque" x="420" y="3" width="90" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" hTextAlign="Center">
             <text><![CDATA[CARGAS]]></text>
         </element>
-        <element kind="staticText" mode="Opaque" x="510" y="3" width="110" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+        <element kind="staticText" mode="Opaque" x="510" y="3" width="110" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" hTextAlign="Center">
             <text><![CDATA[TONELADAS]]></text>
         </element>
-        <element kind="staticText" mode="Opaque" x="620" y="3" width="90" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+        <element kind="staticText" mode="Opaque" x="620" y="3" width="90" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" hTextAlign="Center">
             <text><![CDATA[KM]]></text>
         </element>
-        <element kind="staticText" mode="Opaque" x="710" y="3" width="92" height="20" forecolor="#FFFFFF" backcolor="#0D47A1" bold="true" hTextAlign="Center">
+        <element kind="staticText" mode="Opaque" x="710" y="3" width="92" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" hTextAlign="Center">
             <text><![CDATA[VALOR]]></text>
         </element>
     </columnHeader>
 
     <detail>
         <band height="18">
-            <element kind="textField" x="0" y="0" width="50" height="16" hTextAlign="Center">
+            <element kind="textField" x="0" y="1" width="50" height="15" hTextAlign="Center">
                 <expression><![CDATA[$F{posicao}]]></expression>
             </element>
-            <element kind="textField" x="50" y="0" width="110" height="16">
+            <element kind="textField" x="50" y="1" width="110" height="15">
                 <expression><![CDATA[$F{codigoMotorista}]]></expression>
             </element>
-            <element kind="textField" x="160" y="0" width="260" height="16">
+            <element kind="textField" x="160" y="1" width="260" height="15">
                 <expression><![CDATA[$F{nomeMotorista}]]></expression>
             </element>
-            <element kind="textField" x="420" y="0" width="90" height="16" hTextAlign="Right">
+            <element kind="textField" x="420" y="1" width="90" height="15" hTextAlign="Right">
                 <expression><![CDATA[$F{totalCargas}]]></expression>
             </element>
-            <element kind="textField" x="510" y="0" width="110" height="16" pattern="#,##0.000" hTextAlign="Right">
+            <element kind="textField" x="510" y="1" width="110" height="15" pattern="#,##0.000" hTextAlign="Right">
                 <expression><![CDATA[$F{totalTonelada}]]></expression>
             </element>
-            <element kind="textField" x="620" y="0" width="90" height="16" hTextAlign="Right">
+            <element kind="textField" x="620" y="1" width="90" height="15" hTextAlign="Right">
                 <expression><![CDATA[$F{totalKmRodado}]]></expression>
             </element>
-            <element kind="textField" x="710" y="0" width="92" height="16" pattern="'R$ ' #,##0.00" hTextAlign="Right">
+            <element kind="textField" x="710" y="1" width="92" height="15" pattern="'R$ ' #,##0.00" hTextAlign="Right">
                 <expression><![CDATA[$F{totalValorCargas}]]></expression>
             </element>
         </band>
     </detail>
+
+    <pageFooter height="24">
+        <element kind="textField" x="0" y="6" width="300" height="15">
+            <expression><![CDATA["Emitido em: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())]]></expression>
+        </element>
+        <element kind="textField" x="700" y="6" width="102" height="15" hTextAlign="Right">
+            <expression><![CDATA["Página " + $V{PAGE_NUMBER}]]></expression>
+        </element>
+    </pageFooter>
 
 </jasperReport>
