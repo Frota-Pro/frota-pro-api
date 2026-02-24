@@ -35,8 +35,33 @@ jobs:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
+          script_stop: true
+          command_timeout: 30m
           script: |
-            cd ~/deploy/frotapro
+            set -e
+
+            echo "== whoami =="; whoami
+            echo "== home =="; echo "$HOME"
+            echo "== pwd =="; pwd
+
+            echo "== list deploy dir =="
+            ls -la /home/frotapro/deploy/frotapro || true
+
+            echo "== cd deploy dir =="
+            cd /home/frotapro/deploy/frotapro
+
+            echo "== docker version =="
+            docker --version
+
+            echo "== docker compose version =="
+            docker compose version
+
+            echo "== docker ps =="
+            docker ps
+
+            echo "== pull/up api =="
             docker compose pull api
             docker compose up -d api
-            docker logs --tail=120 frotapro-api
+
+            echo "== api logs =="
+            docker logs --tail=200 frotapro-api
