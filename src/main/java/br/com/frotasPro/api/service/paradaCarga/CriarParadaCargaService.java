@@ -5,15 +5,18 @@ import br.com.frotasPro.api.controller.request.PneuMovimentacaoRequest;
 import br.com.frotasPro.api.controller.response.ParadaCargaResponse;
 import br.com.frotasPro.api.domain.*;
 import br.com.frotasPro.api.domain.enums.TipoDespesa;
+import br.com.frotasPro.api.domain.enums.EventoNotificacao;
 import br.com.frotasPro.api.domain.enums.TipoManutencao;
 import br.com.frotasPro.api.domain.enums.TipoMovimentacaoPneu;
 import br.com.frotasPro.api.domain.enums.TipoParada;
+import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.excption.BusinessException;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.EixoRepository;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;
 import br.com.frotasPro.api.repository.PneuRepository;
+import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import br.com.frotasPro.api.service.pneu.PneuService;
 import br.com.frotasPro.api.util.CalcularMediaKmLitroService;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +42,7 @@ public class CriarParadaCargaService {
 
     // ✅ novo (para registrar eventos do pneu)
     private final PneuService pneuService;
+    private final NotificacaoService notificacaoService;
 
     @Transactional
     public ParadaCargaResponse criar(ParadaCargaRequest request) {
@@ -254,6 +258,17 @@ public class CriarParadaCargaService {
                 pneuService.registrarMovimentacao(tpReq.getPneu(), movReq);
             });
         }
+
+        notificacaoService.notificar(
+                EventoNotificacao.PARADA_CRIADA,
+                TipoNotificacao.INFO,
+                "Nova parada registrada",
+                "Parada " + parada.getId() + " criada para a carga " + carga.getNumeroCarga()
+                        + " (" + parada.getTipoParada() + ").",
+                "PARADA_CARGA",
+                parada.getId(),
+                carga.getNumeroCarga()
+        );
 
         return toResponse(parada);
     }

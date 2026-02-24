@@ -4,9 +4,12 @@ import br.com.frotasPro.api.controller.request.ManutencaoRequest;
 import br.com.frotasPro.api.controller.request.PneuMovimentacaoRequest;
 import br.com.frotasPro.api.controller.response.ManutencaoResponse;
 import br.com.frotasPro.api.domain.*;
+import br.com.frotasPro.api.domain.enums.EventoNotificacao;
+import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.domain.enums.TipoMovimentacaoPneu;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.*;
+import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import br.com.frotasPro.api.service.pneu.PneuService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,6 +34,7 @@ public class CriarManutencaoService {
 
     // ✅ novo
     private final PneuService pneuService;
+    private final NotificacaoService notificacaoService;
 
     @Transactional
     public ManutencaoResponse criar(ManutencaoRequest request) {
@@ -163,6 +167,17 @@ public class CriarManutencaoService {
                 pneuService.registrarMovimentacao(tpReq.getPneu(), movReq);
             });
         }
+
+        notificacaoService.notificar(
+                EventoNotificacao.MANUTENCAO_CRIADA,
+                TipoNotificacao.INFO,
+                "Nova manutenção criada",
+                "Manutenção " + manutencao.getCodigo() + " criada para o caminhão "
+                        + (caminhao != null ? caminhao.getCodigo() : "N/A") + ".",
+                "MANUTENCAO",
+                manutencao.getId(),
+                manutencao.getCodigo()
+        );
 
 
         return toResponse(manutencao);

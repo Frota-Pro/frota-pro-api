@@ -7,11 +7,14 @@ import br.com.frotasPro.api.domain.Manutencao;
 import br.com.frotasPro.api.domain.ManutencaoItem;
 import br.com.frotasPro.api.domain.Oficina;
 import br.com.frotasPro.api.domain.ParadaCarga;
+import br.com.frotasPro.api.domain.enums.EventoNotificacao;
+import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
 import br.com.frotasPro.api.repository.OficinaRepository;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;
+import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +32,7 @@ public class AtualizarManutencaoService {
     private final CaminhaoRepository caminhaoRepository;
     private final OficinaRepository oficinaRepository;
     private final ParadaCargaRepository paradaCargaRepository;
+    private final NotificacaoService notificacaoService;
 
     public ManutencaoResponse atualizar(String codigo, ManutencaoRequest request) {
 
@@ -94,6 +98,17 @@ public class AtualizarManutencaoService {
         }
 
         manutencaoRepository.save(manutencao);
+
+        notificacaoService.notificar(
+                EventoNotificacao.MANUTENCAO_ATUALIZADA,
+                TipoNotificacao.INFO,
+                "Manutenção atualizada",
+                "Manutenção " + manutencao.getCodigo() + " foi atualizada.",
+                "MANUTENCAO",
+                manutencao.getId(),
+                manutencao.getCodigo()
+        );
+
         return toResponse(manutencao);
     }
 }

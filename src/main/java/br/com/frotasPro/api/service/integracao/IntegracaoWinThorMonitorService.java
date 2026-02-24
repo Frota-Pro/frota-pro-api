@@ -1,7 +1,9 @@
 package br.com.frotasPro.api.service.integracao;
 
 import br.com.frotasPro.api.controller.integracao.dto.IntegracaoWinThorJobResponse;
+import br.com.frotasPro.api.domain.enums.EventoNotificacao;
 import br.com.frotasPro.api.domain.enums.StatusSincronizacao;
+import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.domain.integracao.CaminhaoSyncJob;
 import br.com.frotasPro.api.domain.integracao.CargaSyncJob;
 import br.com.frotasPro.api.domain.integracao.MotoristaSyncJob;
@@ -17,6 +19,7 @@ import br.com.frotasPro.api.repository.integracao.MotoristaSyncJobRepository;
 import br.com.frotasPro.api.service.caminhao.CaminhaoSyncJobService;
 import br.com.frotasPro.api.service.carga.CargaSyncJobService;
 import br.com.frotasPro.api.service.motorista.MotoristaSyncJobService;
+import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -46,6 +49,7 @@ public class IntegracaoWinThorMonitorService {
     private final CargaSyncJobService cargaJobService;
     private final CaminhaoSyncJobService caminhaoJobService;
     private final MotoristaSyncJobService motoristaJobService;
+    private final NotificacaoService notificacaoService;
 
     @Transactional(readOnly = true)
     public List<IntegracaoWinThorJobResponse> listarJobs(
@@ -112,6 +116,15 @@ public class IntegracaoWinThorMonitorService {
 
         cargaProducer.enviar(event);
         cargaJobService.marcarProcessando(job.getId());
+        notificacaoService.notificar(
+                EventoNotificacao.SINCRONIZACAO_PENDENTE,
+                TipoNotificacao.INFO,
+                "Retry de sincronização de cargas",
+                "Job " + job.getId() + " voltou para fila de processamento.",
+                "SYNC_CARGA",
+                job.getId(),
+                "JOB-" + job.getId()
+        );
     }
 
     private void retryCaminhao(UUID empresaId, UUID jobId) {
@@ -133,6 +146,15 @@ public class IntegracaoWinThorMonitorService {
 
         caminhaoProducer.enviar(event);
         caminhaoJobService.marcarProcessando(job.getId());
+        notificacaoService.notificar(
+                EventoNotificacao.SINCRONIZACAO_PENDENTE,
+                TipoNotificacao.INFO,
+                "Retry de sincronização de caminhões",
+                "Job " + job.getId() + " voltou para fila de processamento.",
+                "SYNC_CAMINHAO",
+                job.getId(),
+                "JOB-" + job.getId()
+        );
     }
 
     private void retryMotorista(UUID empresaId, UUID jobId) {
@@ -153,6 +175,15 @@ public class IntegracaoWinThorMonitorService {
 
         motoristaProducer.enviar(event);
         motoristaJobService.marcarProcessando(job.getId());
+        notificacaoService.notificar(
+                EventoNotificacao.SINCRONIZACAO_PENDENTE,
+                TipoNotificacao.INFO,
+                "Retry de sincronização de motoristas",
+                "Job " + job.getId() + " voltou para fila de processamento.",
+                "SYNC_MOTORISTA",
+                job.getId(),
+                "JOB-" + job.getId()
+        );
     }
 
     private IntegracaoWinThorJobResponse mapCarga(CargaSyncJob j) {

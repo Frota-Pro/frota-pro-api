@@ -3,10 +3,13 @@ package br.com.frotasPro.api.service.carga;
 import br.com.frotasPro.api.domain.Caminhao;
 import br.com.frotasPro.api.domain.Carga;
 import br.com.frotasPro.api.domain.Motorista;
+import br.com.frotasPro.api.domain.enums.EventoNotificacao;
 import br.com.frotasPro.api.domain.enums.Status;
+import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
+import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import br.com.frotasPro.api.util.AtualizarMetaCargaTransportadaService;
 import br.com.frotasPro.api.util.AtualizarMetaQuilometragemService;
 import br.com.frotasPro.api.util.AtualizarMetaToneladaService;
@@ -24,6 +27,7 @@ public class FinalizarCargaService {
     private final AtualizarMetaQuilometragemService atualizarMetaQuilometragemService;
     private final AtualizarMetaToneladaService atualizarMetaToneladaService;
     private final AtualizarMetaCargaTransportadaService atualizarMetaCargaTransportadaService;
+    private final NotificacaoService notificacaoService;
 
 
     @Transactional
@@ -87,6 +91,17 @@ public class FinalizarCargaService {
 
 
         cargaRepository.save(carga);
+
+        notificacaoService.notificar(
+                EventoNotificacao.CARGA_FINALIZADA,
+                TipoNotificacao.SUCESSO,
+                "Carga finalizada",
+                "Carga " + carga.getNumeroCarga() + " finalizada com KM final " + kmFinal + ".",
+                "CARGA",
+                carga.getId(),
+                carga.getNumeroCarga()
+        );
+
         return "Carga finalizada com sucesso! 🚚💨";
     }
 }

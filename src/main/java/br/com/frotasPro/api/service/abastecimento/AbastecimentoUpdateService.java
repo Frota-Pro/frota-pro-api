@@ -5,11 +5,14 @@ import br.com.frotasPro.api.controller.response.AbastecimentoResponse;
 import br.com.frotasPro.api.domain.Abastecimento;
 import br.com.frotasPro.api.domain.Caminhao;
 import br.com.frotasPro.api.domain.Motorista;
+import br.com.frotasPro.api.domain.enums.EventoNotificacao;
+import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;
+import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import br.com.frotasPro.api.util.CalcularMediaKmLitroService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,6 +30,7 @@ public class AbastecimentoUpdateService {
     private final MotoristaRepository motoristaRepository;
     private final ParadaCargaRepository paradaRepository;
     private final CalcularMediaKmLitroService calcularMediaKmLitroService;
+    private final NotificacaoService notificacaoService;
 
     public AbastecimentoResponse atualizar(String codigo, AbastecimentoRequest request) {
 
@@ -75,6 +79,17 @@ public class AbastecimentoUpdateService {
         abastecimento.setMediaKmLitro(media);
 
         abastecimento = repository.save(abastecimento);
+
+        String codigoRef = abastecimento.getCodigo() != null ? abastecimento.getCodigo() : "ID-" + abastecimento.getId();
+        notificacaoService.notificar(
+                EventoNotificacao.ABASTECIMENTO_ATUALIZADO,
+                TipoNotificacao.INFO,
+                "Abastecimento atualizado",
+                "Abastecimento " + codigoRef + " foi atualizado.",
+                "ABASTECIMENTO",
+                abastecimento.getId(),
+                codigoRef
+        );
 
         return toResponse(abastecimento);
     }

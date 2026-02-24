@@ -1,8 +1,11 @@
 package br.com.frotasPro.api.service.motorista;
 
+import br.com.frotasPro.api.domain.enums.EventoNotificacao;
 import br.com.frotasPro.api.domain.enums.StatusSincronizacao;
+import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.domain.integracao.MotoristaSyncJob;
 import br.com.frotasPro.api.repository.integracao.MotoristaSyncJobRepository;
+import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +17,7 @@ import java.util.UUID;
 public class MotoristaSyncJobService {
 
     private final MotoristaSyncJobRepository repository;
+    private final NotificacaoService notificacaoService;
 
     public MotoristaSyncJob criarJob(UUID empresaId) {
         MotoristaSyncJob job = new MotoristaSyncJob();
@@ -21,7 +25,19 @@ public class MotoristaSyncJobService {
         job.setStatus(StatusSincronizacao.PENDENTE);
         job.setCriadoEm(OffsetDateTime.now());
         job.setAtualizadoEm(OffsetDateTime.now());
-        return repository.save(job);
+        MotoristaSyncJob salvo = repository.save(job);
+
+        notificacaoService.notificar(
+                EventoNotificacao.SINCRONIZACAO_PENDENTE,
+                TipoNotificacao.INFO,
+                "Sincronização de motoristas pendente",
+                "Job " + salvo.getId() + " criado para sincronização de motoristas.",
+                "SYNC_MOTORISTA",
+                salvo.getId(),
+                "JOB-" + salvo.getId()
+        );
+
+        return salvo;
     }
 
     public void marcarProcessando(UUID jobId) {
@@ -38,6 +54,16 @@ public class MotoristaSyncJobService {
             job.setTotalMotoristas(totalMotoristas);
             job.setAtualizadoEm(OffsetDateTime.now());
             repository.save(job);
+
+            notificacaoService.notificar(
+                    EventoNotificacao.SINCRONIZACAO_CONCLUIDA,
+                    TipoNotificacao.SUCESSO,
+                    "Sincronização de motoristas concluída",
+                    "Job " + job.getId() + " finalizado com " + totalMotoristas + " motoristas.",
+                    "SYNC_MOTORISTA",
+                    job.getId(),
+                    "JOB-" + job.getId()
+            );
         });
     }
 
@@ -47,7 +73,16 @@ public class MotoristaSyncJobService {
             job.setMensagemErro(mensagemErro);
             job.setAtualizadoEm(OffsetDateTime.now());
             repository.save(job);
+
+            notificacaoService.notificar(
+                    EventoNotificacao.SINCRONIZACAO_ERRO,
+                    TipoNotificacao.ERRO,
+                    "Erro na sincronização de motoristas",
+                    "Job " + job.getId() + " falhou: " + mensagemErro,
+                    "SYNC_MOTORISTA",
+                    job.getId(),
+                    "JOB-" + job.getId()
+            );
         });
     }
 }
-

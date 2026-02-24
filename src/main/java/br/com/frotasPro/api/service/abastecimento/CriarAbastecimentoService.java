@@ -5,10 +5,13 @@ import br.com.frotasPro.api.controller.response.AbastecimentoResponse;
 import br.com.frotasPro.api.domain.Abastecimento;
 import br.com.frotasPro.api.domain.Caminhao;
 import br.com.frotasPro.api.domain.Motorista;
+import br.com.frotasPro.api.domain.enums.EventoNotificacao;
+import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.mapper.AbastecimentoMapper;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
+import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import br.com.frotasPro.api.util.CalcularMediaKmLitroService;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +27,7 @@ public class CriarAbastecimentoService {
     private final CaminhaoRepository caminhaoRepository;
     private final MotoristaRepository motoristaRepository;
     private final CalcularMediaKmLitroService calcularMediaKmLitroService;
+    private final NotificacaoService notificacaoService;
 
     public AbastecimentoResponse criar(AbastecimentoRequest request) {
 
@@ -67,6 +71,17 @@ public class CriarAbastecimentoService {
         a.setMediaKmLitro(media);
 
         repository.save(a);
+
+        String codigoRef = a.getCodigo() != null ? a.getCodigo() : "ID-" + a.getId();
+        notificacaoService.notificar(
+                EventoNotificacao.ABASTECIMENTO_CRIADO,
+                TipoNotificacao.INFO,
+                "Novo abastecimento criado",
+                "Abastecimento " + codigoRef + " registrado para o caminhão " + caminhao.getCodigo() + ".",
+                "ABASTECIMENTO",
+                a.getId(),
+                codigoRef
+        );
 
         return AbastecimentoMapper.toResponse(a);
     }

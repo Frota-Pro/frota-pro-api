@@ -4,10 +4,13 @@ import br.com.frotasPro.api.domain.Ajudante;
 import br.com.frotasPro.api.domain.Caminhao;
 import br.com.frotasPro.api.domain.Carga;
 import br.com.frotasPro.api.domain.Motorista;
+import br.com.frotasPro.api.domain.enums.EventoNotificacao;
 import br.com.frotasPro.api.domain.enums.Status;
+import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.AjudanteRepository;
 import br.com.frotasPro.api.repository.CargaRepository;
+import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +25,7 @@ public class IniciarCargaService {
 
     private final CargaRepository cargaRepository;
     private final AjudanteRepository ajudanteRepository;
+    private final NotificacaoService notificacaoService;
 
     @Transactional
     public String iniciarCarga(String numCarga, Integer kmInicial, List<String> ajudanteCodigos) {
@@ -65,6 +69,16 @@ public class IniciarCargaService {
         carga.setStatusCarga(Status.EM_ROTA);
 
         cargaRepository.save(carga);
+
+        notificacaoService.notificar(
+                EventoNotificacao.CARGA_INICIADA,
+                TipoNotificacao.SUCESSO,
+                "Carga iniciada",
+                "Carga " + carga.getNumeroCarga() + " iniciada com KM inicial " + kmInicial + ".",
+                "CARGA",
+                carga.getId(),
+                carga.getNumeroCarga()
+        );
 
         return "Carga iniciada! Boa viagem 🚚";
     }

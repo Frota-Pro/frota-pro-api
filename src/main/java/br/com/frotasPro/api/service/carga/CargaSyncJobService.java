@@ -1,10 +1,13 @@
 package br.com.frotasPro.api.service.carga;
 
 import br.com.frotasPro.api.domain.integracao.CargaSyncJob;
+import br.com.frotasPro.api.domain.enums.EventoNotificacao;
 import br.com.frotasPro.api.domain.enums.StatusSincronizacao;
+import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.integracao.dto.CargaSyncRequestEvent;
 import br.com.frotasPro.api.integracao.kafka.CargaSyncRequestProducer;
 import br.com.frotasPro.api.repository.integracao.CargaSyncJobRepository;
+import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +21,7 @@ public class CargaSyncJobService {
 
     private final CargaSyncJobRepository repository;
     private final CargaSyncRequestProducer requestProducer;
+    private final NotificacaoService notificacaoService;
 
     public CargaSyncJob criarJob(UUID empresaId, LocalDate dataReferencia) {
         CargaSyncJob job = new CargaSyncJob();
@@ -26,7 +30,19 @@ public class CargaSyncJobService {
         job.setStatus(StatusSincronizacao.PENDENTE);
         job.setCriadoEm(OffsetDateTime.now());
         job.setAtualizadoEm(OffsetDateTime.now());
-        return repository.save(job);
+        CargaSyncJob salvo = repository.save(job);
+
+        notificacaoService.notificar(
+                EventoNotificacao.SINCRONIZACAO_PENDENTE,
+                TipoNotificacao.INFO,
+                "Sincronização de cargas pendente",
+                "Job " + salvo.getId() + " criado para a data " + dataReferencia + ".",
+                "SYNC_CARGA",
+                salvo.getId(),
+                "JOB-" + salvo.getId()
+        );
+
+        return salvo;
     }
 
     public UUID solicitarSincronizacao(UUID empresaId, LocalDate dataReferencia) {
@@ -64,6 +80,16 @@ public class CargaSyncJobService {
             job.setTotalCargas(totalCargas);
             job.setAtualizadoEm(OffsetDateTime.now());
             repository.save(job);
+
+            notificacaoService.notificar(
+                    EventoNotificacao.SINCRONIZACAO_CONCLUIDA,
+                    TipoNotificacao.SUCESSO,
+                    "Sincronização de cargas concluída",
+                    "Job " + job.getId() + " finalizado com " + totalCargas + " cargas.",
+                    "SYNC_CARGA",
+                    job.getId(),
+                    "JOB-" + job.getId()
+            );
         });
     }
 
@@ -73,6 +99,16 @@ public class CargaSyncJobService {
             job.setMensagemErro(mensagemErro);
             job.setAtualizadoEm(OffsetDateTime.now());
             repository.save(job);
+
+            notificacaoService.notificar(
+                    EventoNotificacao.SINCRONIZACAO_ERRO,
+                    TipoNotificacao.ERRO,
+                    "Erro na sincronização de cargas",
+                    "Job " + job.getId() + " falhou: " + mensagemErro,
+                    "SYNC_CARGA",
+                    job.getId(),
+                    "JOB-" + job.getId()
+            );
         });
     }
 }

@@ -7,12 +7,15 @@ import br.com.frotasPro.api.domain.Carga;
 import br.com.frotasPro.api.domain.DespesaParada;
 import br.com.frotasPro.api.domain.Manutencao;
 import br.com.frotasPro.api.domain.ParadaCarga;
+import br.com.frotasPro.api.domain.enums.EventoNotificacao;
 import br.com.frotasPro.api.domain.enums.TipoDespesa;
 import br.com.frotasPro.api.domain.enums.TipoManutencao;
+import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.domain.enums.TipoParada;
 import br.com.frotasPro.api.excption.BusinessException;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;
+import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +32,7 @@ import static br.com.frotasPro.api.mapper.ParadaCargaMapper.toResponse;
 public class AtualizarParadaCargaService {
 
     private final ParadaCargaRepository paradaRepository;
+    private final NotificacaoService notificacaoService;
 
     @Transactional
     public ParadaCargaResponse atualizar(UUID id, ParadaCargaRequest request) {
@@ -162,6 +166,18 @@ public class AtualizarParadaCargaService {
 
             parada.getDespesaParadas().add(despesaManutencao);
         }
+
+        notificacaoService.notificar(
+                EventoNotificacao.PARADA_ATUALIZADA,
+                TipoNotificacao.INFO,
+                "Parada atualizada",
+                "Parada " + parada.getId() + " da carga "
+                        + (carga != null ? carga.getNumeroCarga() : "N/A")
+                        + " foi atualizada.",
+                "PARADA_CARGA",
+                parada.getId(),
+                carga != null ? carga.getNumeroCarga() : null
+        );
 
         return toResponse(parada);
     }
