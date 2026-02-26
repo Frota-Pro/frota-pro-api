@@ -130,11 +130,28 @@ public interface MetaRepository extends JpaRepository <Meta, UUID>{
 
 
     @Query("""
-           select m
-           from Meta m
-           where (:caminhaoCodigo is null or m.caminhao.codigo = :caminhaoCodigo)
-             and (:categoriaCodigo is null or m.categoria.codigo = :categoriaCodigo)
-             and (:motoristaCodigo is null or m.motorista.codigo = :motoristaCodigo)
+            select m
+            from Meta m
+            left join m.caminhao cam
+            left join m.categoria cat
+            left join m.motorista mot
+            where (
+                   :caminhaoCodigo is null
+                   or cam.codigo = :caminhaoCodigo
+                   or cam.codigoExterno = :caminhaoCodigo
+                   or (
+                       cam is null
+                       and cat is not null
+                       and exists (
+                           select 1
+                           from Caminhao c2
+                           where (c2.codigo = :caminhaoCodigo or c2.codigoExterno = :caminhaoCodigo)
+                             and c2.categoria = cat
+                       )
+                  )
+             )
+             and (:categoriaCodigo is null or cat.codigo = :categoriaCodigo)
+             and (:motoristaCodigo is null or mot.codigo = :motoristaCodigo or mot.codigoExterno = :motoristaCodigo)
              and m.dataIncio >= :inicio
              and m.dataFim <= :fim
            order by m.dataIncio desc
