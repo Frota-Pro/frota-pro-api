@@ -119,7 +119,7 @@ public class CriarParadaCargaService {
                     abReq.getQtLitros()
             );
 
-            abastecimento.setMediaKmLitro(media);
+            abastecimento.setMediaKmLitro(media != null ? media : abReq.getMediaKmLitro());
 
             parada.getAbastecimentos().add(abastecimento);
 

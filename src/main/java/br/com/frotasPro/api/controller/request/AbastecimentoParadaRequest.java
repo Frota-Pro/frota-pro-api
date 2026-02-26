@@ -26,6 +26,9 @@ public class AbastecimentoParadaRequest {
     @DecimalMin(value = "0.00", message = "Valor total deve ser >= 0")
     private BigDecimal valorTotal;
 
+    @DecimalMin(value = "0.0001", message = "Média km/L deve ser maior que zero")
+    private BigDecimal mediaKmLitro;
+
     @NotNull(message = "Tipo de combustível é obrigatório")
     private TipoCombustivel tipoCombustivel;
 

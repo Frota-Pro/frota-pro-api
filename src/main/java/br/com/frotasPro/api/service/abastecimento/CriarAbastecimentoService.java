@@ -68,7 +68,7 @@ public class CriarAbastecimentoService {
                 request.getQtLitros()
         );
 
-        a.setMediaKmLitro(media);
+        a.setMediaKmLitro(media != null ? media : request.getMediaKmLitro());
 
         repository.save(a);
 

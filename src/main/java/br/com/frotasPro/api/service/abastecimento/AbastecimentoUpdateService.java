@@ -76,7 +76,7 @@ public class AbastecimentoUpdateService {
                 request.getKmOdometro(),
                 request.getQtLitros()
         );
-        abastecimento.setMediaKmLitro(media);
+        abastecimento.setMediaKmLitro(media != null ? media : request.getMediaKmLitro());
 
         abastecimento = repository.save(abastecimento);
 
