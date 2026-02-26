@@ -31,6 +31,9 @@ public class PneuMovimentacaoRequest {
     @Size(max = 500, message = "Observação deve ter no máximo 500 caracteres")
     public String observacao;
 
+    @Size(max = 50, message = "Caminhão inválido")
+    public String caminhao; // aceita placa, codigo interno ou codigo externo
+
     public UUID caminhaoId;
     public UUID manutencaoId;
     public UUID paradaId;

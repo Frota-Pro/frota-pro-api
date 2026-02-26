@@ -19,7 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +30,7 @@ public class PneuService {
     private final PneuRepository pneuRepository;
     private final PneuMovimentacaoRepository movRepository;
     private final PneuInstalacaoAtualRepository instalacaoRepository;
+    private final CaminhaoRepository caminhaoRepository;
 
     @Transactional(readOnly = true)
     public Page<PneuResponse> listar(String q, String status, Pageable pageable) {
@@ -170,6 +173,7 @@ public class PneuService {
     public void registrarMovimentacao(String codigoPneu, PneuMovimentacaoRequest req) {
         var pneu = getPneu(codigoPneu);
         var tipo = TipoMovimentacaoPneu.valueOf(req.tipo);
+        UUID caminhaoId = resolverCaminhaoId(req);
 
         // salva movimentação
         var mov = PneuMovimentacao.builder()
@@ -177,7 +181,7 @@ public class PneuService {
                 .tipo(tipo)
                 .kmEvento(req.kmEvento)
                 .observacao(req.observacao)
-                .caminhaoId(req.caminhaoId)
+                .caminhaoId(caminhaoId)
                 .manutencaoId(req.manutencaoId)
                 .paradaId(req.paradaId)
                 .eixoNumero(req.eixoNumero)
@@ -189,7 +193,9 @@ public class PneuService {
         // regras por tipo
         switch (tipo) {
             case INSTALACAO -> {
-                if (req.caminhaoId == null) throw new IllegalArgumentException("caminhaoId é obrigatório em INSTALACAO");
+                if (caminhaoId == null) {
+                    throw new IllegalArgumentException("caminhaoId/caminhao é obrigatório em INSTALACAO");
+                }
                 if (req.kmInstalacao == null) throw new IllegalArgumentException("kmInstalacao é obrigatório em INSTALACAO");
                 if (req.eixoNumero == null || req.lado == null || req.posicao == null)
                     throw new IllegalArgumentException("eixoNumero/lado/posicao obrigatórios em INSTALACAO");
@@ -198,7 +204,7 @@ public class PneuService {
                 var inst = instalacaoRepository.findByPneu_Codigo(codigoPneu)
                         .orElse(PneuInstalacaoAtual.builder().pneu(pneu).build());
 
-                inst.setCaminhaoId(req.caminhaoId);
+                inst.setCaminhaoId(caminhaoId);
                 inst.setEixoNumero(req.eixoNumero);
                 inst.setLado(req.lado);
                 inst.setPosicao(req.posicao);
@@ -247,6 +253,26 @@ public class PneuService {
         }
 
         pneuRepository.save(pneu);
+    }
+
+    private UUID resolverCaminhaoId(PneuMovimentacaoRequest req) {
+        if (req.caminhaoId != null) return req.caminhaoId;
+        if (req.caminhao == null || req.caminhao.isBlank()) return null;
+
+        String identificador = req.caminhao.trim();
+
+        try {
+            return UUID.fromString(identificador);
+        } catch (IllegalArgumentException ignored) {
+            // não é UUID, continua resolução por placa/código
+        }
+
+        return caminhaoRepository.findByCodigoAndAtivoTrue(identificador)
+                .or(() -> caminhaoRepository.findByCodigoExternoAndAtivoTrue(identificador))
+                .or(() -> caminhaoRepository.findByPlacaAndAtivoTrue(identificador.toUpperCase(Locale.ROOT)))
+                .or(() -> caminhaoRepository.findByPlacaAndAtivoTrue(identificador))
+                .map(Caminhao::getId)
+                .orElseThrow(() -> new ObjectNotFound("Caminhão não encontrado para o identificador: " + identificador));
     }
 
     @Transactional(readOnly = true)
