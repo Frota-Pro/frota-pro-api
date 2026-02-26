@@ -67,8 +67,8 @@ public class RelatorioPdfController {
         // Logo (opcional). Se não for usar, remova do JRXML e daqui também.
         aplicarLogo(p);
 
-        byte[] pdf = jasperPdfService.gerarPdfFromJrxml(
-                "reports/meta_mensal_motorista.jrxml",
+        byte[] pdf = jasperPdfService.gerarPdfFromJasper(
+                "reports/meta_mensal_motorista.jasper",
                 p,
                 rel.getLinhas()
         );
@@ -99,8 +99,8 @@ public class RelatorioPdfController {
         p.put("totalGeral", rel.getTotalGeral());
         aplicarLogo(p);
 
-        byte[] pdf = jasperPdfService.gerarPdfFromJrxml(
-                "reports/custo_por_caminhao.jrxml",
+        byte[] pdf = jasperPdfService.gerarPdfFromJasper(
+                "reports/custo_por_caminhao.jasper",
                 p,
                 rel.getLinhas()
         );
@@ -131,8 +131,8 @@ public class RelatorioPdfController {
         p.put("totalValor", rel.getTotalValor());
         aplicarLogo(p);
 
-        byte[] pdf = jasperPdfService.gerarPdfFromJrxml(
-                "reports/abastecimento_periodo.jrxml",
+        byte[] pdf = jasperPdfService.gerarPdfFromJasper(
+                "reports/abastecimento_periodo.jasper",
                 p,
                 rel.getLinhas()
         );
@@ -163,8 +163,8 @@ public class RelatorioPdfController {
         p.put("observacaoMotorista", rel.getObservacaoMotorista());
         aplicarLogo(p);
 
-        byte[] pdf = jasperPdfService.gerarPdfFromJrxml(
-                "reports/carga_completa.jrxml",
+        byte[] pdf = jasperPdfService.gerarPdfFromJasper(
+                "reports/carga_completa.jasper",
                 p,
                 rel.getLinhas() // linhas “achatadas” (nota/parada) para tabela
         );
@@ -190,8 +190,8 @@ public class RelatorioPdfController {
         p.put("totalMotoristas", rel.getTotalMotoristas());
         aplicarLogo(p);
 
-        byte[] pdf = jasperPdfService.gerarPdfFromJrxml(
-                "reports/ranking_motoristas.jrxml",
+        byte[] pdf = jasperPdfService.gerarPdfFromJasper(
+                "reports/ranking_motoristas.jasper",
                 p,
                 rel.getLinhas()
         );
@@ -220,8 +220,8 @@ public class RelatorioPdfController {
         p.put("totalManutencao", rel.getTotalManutencao());
         aplicarLogo(p);
 
-        byte[] pdf = jasperPdfService.gerarPdfFromJrxml(
-                "reports/historico_manutencao.jrxml",
+        byte[] pdf = jasperPdfService.gerarPdfFromJasper(
+                "reports/historico_manutencao.jasper",
                 p,
                 rel.getLinhas()
         );
@@ -255,8 +255,8 @@ public class RelatorioPdfController {
         p.put("quantidadeLancamentos", rel.getQuantidadeLancamentos());
         aplicarLogo(p);
 
-        byte[] pdf = jasperPdfService.gerarPdfFromJrxml(
-                "reports/despesa_categoria_periodo.jrxml",
+        byte[] pdf = jasperPdfService.gerarPdfFromJasper(
+                "reports/despesa_categoria_periodo.jasper",
                 p,
                 rel.getLinhas()
         );

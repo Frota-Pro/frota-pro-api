@@ -1,8 +1,12 @@
 package br.com.frotasPro.api.service.relatorios;
 
 import lombok.RequiredArgsConstructor;
-import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.util.JRLoader;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
@@ -15,13 +19,13 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class JasperPdfService {
 
-    public byte[] gerarPdfFromJrxml(String jrxmlClasspath,
-                                    Map<String, Object> params,
-                                    List<?> linhas) {
+    public byte[] gerarPdfFromJasper(String jasperClasspath,
+                                     Map<String, Object> params,
+                                     List<?> linhas) {
         try {
-            ClassPathResource resource = new ClassPathResource(jrxmlClasspath);
+            ClassPathResource resource = new ClassPathResource(jasperClasspath);
             try (InputStream in = resource.getInputStream()) {
-                JasperReport report = JasperCompileManager.compileReport(in);
+                JasperReport report = (JasperReport) JRLoader.loadObject(in);
 
                 JRBeanCollectionDataSource ds =
                         new JRBeanCollectionDataSource(linhas == null ? Collections.emptyList() : linhas);
@@ -30,7 +34,7 @@ public class JasperPdfService {
                 return JasperExportManager.exportReportToPdf(print);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao gerar PDF Jasper: " + jrxmlClasspath, e);
+            throw new RuntimeException("Erro ao gerar PDF Jasper: " + jasperClasspath, e);
         }
     }
 }
