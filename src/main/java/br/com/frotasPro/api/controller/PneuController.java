@@ -2,6 +2,7 @@ package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.PneuMovimentacaoRequest;
 import br.com.frotasPro.api.controller.request.PneuRequest;
+import br.com.frotasPro.api.controller.response.PneuMovimentacaoResponse;
 import br.com.frotasPro.api.controller.response.PneuResponse;
 import br.com.frotasPro.api.controller.response.PneuVidaUtilResponse;
 import br.com.frotasPro.api.service.pneu.PneuService;
@@ -99,5 +100,16 @@ public class PneuController {
     ) {
         service.registrarMovimentacao(codigo, req);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{codigo}/movimentacoes")
+    public ResponseEntity<Page<PneuMovimentacaoResponse>> listarMovimentacoes(
+            @PathVariable
+            @NotBlank(message = "Código é obrigatório")
+            @Size(max = 20, message = "Código inválido")
+            String codigo,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(service.listarMovimentacoes(codigo, pageable));
     }
 }

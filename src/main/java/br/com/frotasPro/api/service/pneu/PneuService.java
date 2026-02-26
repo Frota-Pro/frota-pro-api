@@ -2,6 +2,7 @@ package br.com.frotasPro.api.service.pneu;
 
 import br.com.frotasPro.api.controller.request.PneuMovimentacaoRequest;
 import br.com.frotasPro.api.controller.request.PneuRequest;
+import br.com.frotasPro.api.controller.response.PneuMovimentacaoResponse;
 import br.com.frotasPro.api.controller.response.PneuResponse;
 import br.com.frotasPro.api.controller.response.PneuVidaUtilResponse;
 import br.com.frotasPro.api.domain.*;
@@ -248,6 +249,14 @@ public class PneuService {
         pneuRepository.save(pneu);
     }
 
+    @Transactional(readOnly = true)
+    public Page<PneuMovimentacaoResponse> listarMovimentacoes(String codigoPneu, Pageable pageable) {
+        getPneu(codigoPneu); // garante 404 quando pneu não existe
+        return movRepository
+                .findByPneu_CodigoOrderByDataEventoDesc(codigoPneu, pageable)
+                .map(this::toMovimentacaoResponse);
+    }
+
     private Pneu getPneu(String codigo) {
         return pneuRepository.findByCodigo(codigo)
                 .orElseThrow(() -> new ObjectNotFound("Pneu não encontrado: " + codigo));
@@ -266,6 +275,23 @@ public class PneuService {
                 .kmTotalAcumulado(p.getKmTotalAcumulado())
                 .dtCompra(p.getDtCompra())
                 .dtDescarte(p.getDtDescarte())
+                .build();
+    }
+
+    private PneuMovimentacaoResponse toMovimentacaoResponse(PneuMovimentacao mov) {
+        return PneuMovimentacaoResponse.builder()
+                .id(mov.getId())
+                .tipo(mov.getTipo().name())
+                .dataEvento(mov.getDataEvento())
+                .kmEvento(mov.getKmEvento())
+                .observacao(mov.getObservacao())
+                .caminhaoId(mov.getCaminhaoId())
+                .manutencaoId(mov.getManutencaoId())
+                .paradaId(mov.getParadaId())
+                .eixoNumero(mov.getEixoNumero())
+                .lado(mov.getLado())
+                .posicao(mov.getPosicao())
+                .criadoEm(mov.getCriadoEm())
                 .build();
     }
 }
