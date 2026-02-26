@@ -71,6 +71,21 @@ public interface MetaRepository extends JpaRepository <Meta, UUID>{
             LocalDate dataFim
     );
 
+    @Query("""
+        select distinct m
+        from Meta m
+        join m.vinculosCategoriaCaminhao v
+        where v.caminhao.id = :caminhaoId
+          and m.statusMeta in :status
+          and m.dataIncio <= :data
+          and m.dataFim >= :data
+    """)
+    List<Meta> findMetasCategoriaVinculadasAoCaminhaoNaData(
+            @Param("caminhaoId") UUID caminhaoId,
+            @Param("status") List<StatusMeta> status,
+            @Param("data") LocalDate data
+    );
+
     List<Meta> findByDataFimBeforeAndStatusMeta(LocalDate data, StatusMeta statusMeta);
 
     boolean existsByTipoMetaAndStatusMetaAndDataIncioAndCaminhaoAndCategoriaAndMotorista(
@@ -139,6 +154,15 @@ public interface MetaRepository extends JpaRepository <Meta, UUID>{
                    :caminhaoCodigo is null
                    or cam.codigo = :caminhaoCodigo
                    or cam.codigoExterno = :caminhaoCodigo
+                   or exists (
+                       select 1
+                       from MetaCategoriaCaminhaoVinculo v
+                       where v.meta = m
+                         and (
+                            v.caminhao.codigo = :caminhaoCodigo
+                            or v.caminhao.codigoExterno = :caminhaoCodigo
+                         )
+                   )
                    or (
                        cam is null
                        and cat is not null

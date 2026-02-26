@@ -7,6 +7,8 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 @Getter
 @Setter
@@ -61,4 +63,7 @@ public class Meta extends AuditoriaBase{
 
     @Column(nullable = false)
     private boolean renovarAutomaticamente = false;
+
+    @OneToMany(mappedBy = "meta", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MetaCategoriaCaminhaoVinculo> vinculosCategoriaCaminhao = new ArrayList<>();
 }

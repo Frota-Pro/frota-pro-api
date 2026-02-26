@@ -32,6 +32,7 @@ public class AtualizarMetaService {
     private final CategoriaCaminhaoRepository categoriaCaminhaoRepository;
     private final MotoristaRepository motoristaRepository;
     private final MetaProgressoService metaProgressoService;
+    private final MetaCategoriaCaminhaoVinculoService metaCategoriaCaminhaoVinculoService;
 
     @Transactional
     public MetaResponse atualizar(UUID id, MetaRequest request) {
@@ -124,6 +125,7 @@ public class AtualizarMetaService {
         }
 
         Meta salva = metaRepository.save(meta);
+        metaCategoriaCaminhaoVinculoService.sincronizar(salva);
         return MetaMapper.toResponse(salva);
     }
 

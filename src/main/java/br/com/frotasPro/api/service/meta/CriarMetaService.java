@@ -31,6 +31,7 @@ public class CriarMetaService {
     private final CategoriaCaminhaoRepository categoriaCaminhaoRepository;
     private final MotoristaRepository motoristaRepository;
     private final MetaProgressoService metaProgressoService;
+    private final MetaCategoriaCaminhaoVinculoService metaCategoriaCaminhaoVinculoService;
 
     @Transactional
     public MetaResponse criar(MetaRequest request) {
@@ -92,6 +93,7 @@ public class CriarMetaService {
         }
 
         Meta salva = metaRepository.save(meta);
+        metaCategoriaCaminhaoVinculoService.sincronizar(salva);
         return MetaMapper.toResponse(salva);
     }
 

@@ -44,14 +44,20 @@ public class BuscarMetaAtivaComProgressoService {
                 );
 
         List<Meta> metasCategoria = new ArrayList<>();
-        if (caminhao.getCategoria() != null) {
-            metasCategoria = metaRepository
-                    .findByCategoriaIdAndStatusMetaInAndDataIncioLessThanEqualAndDataFimGreaterThanEqual(
-                            caminhao.getCategoria().getId(),
-                            List.of(StatusMeta.EM_ANDAMENTO, StatusMeta.NAO_INICIADA),
-                            dataReferencia,
-                            dataReferencia
-                    );
+        metasCategoria = metaRepository.findMetasCategoriaVinculadasAoCaminhaoNaData(
+                caminhao.getId(),
+                List.of(StatusMeta.EM_ANDAMENTO, StatusMeta.NAO_INICIADA),
+                dataReferencia
+        );
+
+        // compatibilidade para metas antigas que ainda não possuem vínculo materializado
+        if (metasCategoria.isEmpty() && caminhao.getCategoria() != null) {
+            metasCategoria = metaRepository.findByCategoriaIdAndStatusMetaInAndDataIncioLessThanEqualAndDataFimGreaterThanEqual(
+                    caminhao.getCategoria().getId(),
+                    List.of(StatusMeta.EM_ANDAMENTO, StatusMeta.NAO_INICIADA),
+                    dataReferencia,
+                    dataReferencia
+            );
         }
 
         Map<TipoMeta, Meta> escolhidas = new LinkedHashMap<>();

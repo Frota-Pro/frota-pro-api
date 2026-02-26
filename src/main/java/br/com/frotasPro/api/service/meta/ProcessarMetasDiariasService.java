@@ -17,6 +17,7 @@ import java.util.List;
 public class ProcessarMetasDiariasService {
 
     private final MetaRepository metaRepository;
+    private final MetaCategoriaCaminhaoVinculoService metaCategoriaCaminhaoVinculoService;
 
     @Transactional
     public void processar() {
@@ -69,7 +70,8 @@ public class ProcessarMetasDiariasService {
             nova.setMotorista(meta.getMotorista());
             nova.setRenovarAutomaticamente(meta.isRenovarAutomaticamente());
 
-            metaRepository.save(nova);
+            Meta novaSalva = metaRepository.save(nova);
+            metaCategoriaCaminhaoVinculoService.sincronizar(novaSalva);
         }
     }
 }

@@ -108,6 +108,26 @@ public class MetaController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim) {
 
+        return ResponseEntity.ok(buscarHistoricoComProgresso(caminhao, categoria, motorista, inicio, fim));
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_CONSULTA')")
+    @GetMapping("/historico/caminhao/{codigoCaminhao}")
+    public ResponseEntity<List<MetaResponse>> historicoPorCaminhao(
+            @PathVariable @NotBlank String codigoCaminhao,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim
+    ) {
+        return ResponseEntity.ok(buscarHistoricoComProgresso(codigoCaminhao, null, null, inicio, fim));
+    }
+
+    private List<MetaResponse> buscarHistoricoComProgresso(
+            String caminhao,
+            String categoria,
+            String motorista,
+            LocalDate inicio,
+            LocalDate fim
+    ) {
         final Caminhao caminhaoRef = (caminhao != null && !caminhao.isBlank())
                 ? caminhaoRepository.findByCaminhaoPorCodigoOuPorCodigoExterno(caminhao)
                 .orElseThrow(() -> new ObjectNotFound("Caminhão não encontrado para o código: " + caminhao))
@@ -125,8 +145,7 @@ public class MetaController {
                     return MetaMapper.toResponse(meta);
                 })
                 .toList();
-
-        return ResponseEntity.ok(resposta);
+        return resposta;
     }
 
 }
