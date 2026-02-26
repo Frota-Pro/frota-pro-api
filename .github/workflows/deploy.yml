@@ -32,6 +32,6 @@ jobs:
       - name: Deploy locally
         run: |
           cd /home/frotapro/deploy/frotapro
-          docker compose pull api
-          docker compose up -d api
-          docker logs --tail=200 frotapro-api
+          docker compose pull frotapro-api
+          docker compose up -d --no-deps --remove-orphans frotapro-api
+          docker compose logs --tail=200 frotapro-api
