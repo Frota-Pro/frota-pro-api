@@ -45,18 +45,12 @@ public class AtualizarMetaService {
 
         validarPeriodo(request);
 
-        boolean temCaminhao = temTexto(request.getCaminhao());
-        boolean temCategoria = temTexto(request.getCategoria());
-        boolean temMotorista = temTexto(request.getMotorista());
+        boolean temCaminhaoReq = temTexto(request.getCaminhao());
+        boolean temCategoriaReq = temTexto(request.getCategoria());
+        boolean temMotoristaReq = temTexto(request.getMotorista());
 
-        int count = (temCaminhao ? 1 : 0) + (temCategoria ? 1 : 0) + (temMotorista ? 1 : 0);
-
-        if (count == 0) {
-            if (request.getStatusMeta() != StatusMeta.CANCELADA) {
-                throw new BusinessException("Para desvincular a meta, use status CANCELADA e não informe alvo.");
-            }
-        }
-        if (count > 1) {
+        int countReq = (temCaminhaoReq ? 1 : 0) + (temCategoriaReq ? 1 : 0) + (temMotoristaReq ? 1 : 0);
+        if (countReq > 1) {
             throw new BusinessException("Informe apenas um alvo: caminhão OU categoria OU motorista.");
         }
 
@@ -72,33 +66,56 @@ public class AtualizarMetaService {
             meta.setRenovarAutomaticamente(Boolean.TRUE.equals(request.getRenovarAutomaticamente()));
         }
 
-        meta.setCaminhao(null);
-        meta.setCategoria(null);
-        meta.setMotorista(null);
-
         Caminhao caminhao = null;
         CategoriaCaminhao categoria = null;
         Motorista motorista = null;
 
-        if (temCaminhao) {
+        if (countReq == 0) {
+            if (request.getStatusMeta() == StatusMeta.CANCELADA) {
+                meta.setCaminhao(null);
+                meta.setCategoria(null);
+                meta.setMotorista(null);
+            } else {
+                caminhao = meta.getCaminhao();
+                categoria = meta.getCategoria();
+                motorista = meta.getMotorista();
+            }
+        } else if (temCaminhaoReq) {
+            meta.setCaminhao(null);
+            meta.setCategoria(null);
+            meta.setMotorista(null);
             caminhao = caminhaoRepository.findByCodigo(request.getCaminhao())
                     .orElseThrow(() -> new ObjectNotFound("Caminhão não encontrado para o código: " + request.getCaminhao()));
             meta.setCaminhao(caminhao);
-        } else if (temCategoria) {
+        } else if (temCategoriaReq) {
+            meta.setCaminhao(null);
+            meta.setCategoria(null);
+            meta.setMotorista(null);
             categoria = categoriaCaminhaoRepository.findByCodigo(request.getCategoria())
                     .orElseThrow(() -> new ObjectNotFound("Categoria de caminhão não encontrada para o código: " + request.getCategoria()));
             meta.setCategoria(categoria);
-        } else if (temMotorista) {
+        } else if (temMotoristaReq) {
+            meta.setCaminhao(null);
+            meta.setCategoria(null);
+            meta.setMotorista(null);
             motorista = motoristaRepository.findByCodigo(request.getMotorista())
                     .orElseThrow(() -> new ObjectNotFound("Motorista não encontrado para o código: " + request.getMotorista()));
             meta.setMotorista(motorista);
         }
 
-        if (count == 1) {
+        int countFinal = (meta.getCaminhao() != null ? 1 : 0)
+                + (meta.getCategoria() != null ? 1 : 0)
+                + (meta.getMotorista() != null ? 1 : 0);
+
+        if (countFinal > 1) {
+            throw new BusinessException("Meta inválida: mais de um alvo vinculado.");
+        }
+
+        if (countFinal == 1) {
             validarDuplicidade(meta, caminhao, categoria, motorista, meta.getId());
         }
 
-        if (count == 1) {
+        if (countFinal == 1) {
             boolean recalcular = Boolean.TRUE.equals(request.getRecalcularProgresso());
             if (recalcular || request.getValorRealizado() == null) {
                 BigDecimal recalculado = metaProgressoService.calcularValorRealizado(meta, caminhao, motorista);
