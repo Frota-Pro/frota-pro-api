@@ -280,8 +280,8 @@ public class RelatorioPdfController {
 //        p.put("totalPneus", rel.getTotalPneus());
 //        aplicarLogo(p);
 //
-//        byte[] pdf = jasperPdfService.gerarPdfFromJrxml(
-//                "reports/vida_util_pneu.jrxml",
+//        byte[] pdf = jasperPdfService.gerarPdfFromJasper(
+//                "reports/vida_util_pneu.jasper",
 //                p,
 //                rel.getLinhas()
 //        );

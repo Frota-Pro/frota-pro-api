@@ -7,7 +7,6 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
@@ -23,8 +22,10 @@ public class JasperPdfService {
                                      Map<String, Object> params,
                                      List<?> linhas) {
         try {
-            ClassPathResource resource = new ClassPathResource(jasperClasspath);
-            try (InputStream in = resource.getInputStream()) {
+            try (InputStream in = getClass().getClassLoader().getResourceAsStream(jasperClasspath)) {
+                if (in == null) {
+                    throw new RuntimeException("Arquivo .jasper nao encontrado no classpath: " + jasperClasspath);
+                }
                 JasperReport report = (JasperReport) JRLoader.loadObject(in);
 
                 JRBeanCollectionDataSource ds =
