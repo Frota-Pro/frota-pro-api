@@ -16,8 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -74,12 +77,34 @@ public class RelatorioMetaMensalMotoristaService {
             Integer kmFin = carga.getKmFinal();
             long kmRodado = (kmIni != null && kmFin != null) ? kmFin - kmIni : 0L;
 
-            List<Abastecimento> abastecimentos =
-                    abastecimentoRepository.findByCaminhaoAndKmRodado(
-                            carga.getCaminhao().getId(),
-                            carga.getKmInicial(),
-                            carga.getKmFinal()
-                    );
+            Map<java.util.UUID, Abastecimento> abastecimentosDaViagem = new LinkedHashMap<>();
+
+            if (kmIni != null && kmFin != null) {
+                List<Abastecimento> porKm = abastecimentoRepository.findByCaminhaoAndKmRodado(
+                        carga.getCaminhao().getId(),
+                        kmIni,
+                        kmFin
+                );
+                for (Abastecimento a : porKm) {
+                    abastecimentosDaViagem.put(a.getId(), a);
+                }
+            }
+
+            LocalDate inicioViagem = carga.getDtSaida() != null ? carga.getDtSaida() : inicio;
+            LocalDate fimViagem = carga.getDtChegada() != null ? carga.getDtChegada() : inicioViagem;
+            LocalDateTime dtInicioViagem = inicioViagem.atStartOfDay();
+            LocalDateTime dtFimViagem = fimViagem.atTime(23, 59, 59);
+
+            List<Abastecimento> porPeriodo = abastecimentoRepository.findByCaminhaoAndPeriodo(
+                    carga.getCaminhao().getId(),
+                    dtInicioViagem,
+                    dtFimViagem
+            );
+            for (Abastecimento a : porPeriodo) {
+                abastecimentosDaViagem.put(a.getId(), a);
+            }
+
+            List<Abastecimento> abastecimentos = new ArrayList<>(abastecimentosDaViagem.values());
 
             BigDecimal litros = abastecimentos.stream()
                     .map(Abastecimento::getQtLitros)
@@ -91,7 +116,13 @@ public class RelatorioMetaMensalMotoristaService {
                     .filter(v -> v != null)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            BigDecimal mediaKmLitro = calcularMediaKmLitro(kmRodado, litros, metaConsumo);
+            BigDecimal mediaManual = abastecimentos.stream()
+                    .map(Abastecimento::getMediaKmLitro)
+                    .filter(m -> m != null)
+                    .findFirst()
+                    .orElse(null);
+
+            BigDecimal mediaKmLitro = calcularMediaKmLitro(kmRodado, litros, mediaManual, metaConsumo);
 
             LinhaRelatorioMetaMensalMotoristaResponse linha =
                     LinhaRelatorioMetaMensalMotoristaResponse.builder()
@@ -118,9 +149,16 @@ public class RelatorioMetaMensalMotoristaService {
             totalValorAbastecimento = totalValorAbastecimento.add(valorAbastecimento);
         }
 
-        BigDecimal mediaGeralKmPorLitro = totalLitros.compareTo(BigDecimal.ZERO) > 0
-                ? BigDecimal.valueOf(totalKmRodado).divide(totalLitros, 2, RoundingMode.HALF_UP)
-                : BigDecimal.ZERO;
+        BigDecimal mediaGeralKmPorLitro;
+        if (totalLitros.compareTo(BigDecimal.ZERO) > 0) {
+            mediaGeralKmPorLitro = BigDecimal.valueOf(totalKmRodado).divide(totalLitros, 2, RoundingMode.HALF_UP);
+        } else {
+            mediaGeralKmPorLitro = linhas.stream()
+                    .map(LinhaRelatorioMetaMensalMotoristaResponse::getMediaKmLitro)
+                    .filter(m -> m != null)
+                    .findFirst()
+                    .orElse(BigDecimal.ZERO);
+        }
 
         BigDecimal realizadoPercentual =
                 (objetivoMesTonelada != null && objetivoMesTonelada.compareTo(BigDecimal.ZERO) > 0)
@@ -146,9 +184,15 @@ public class RelatorioMetaMensalMotoristaService {
                 .build();
     }
 
-    private BigDecimal calcularMediaKmLitro(long kmRodado, BigDecimal litros, BigDecimal metaConsumo) {
+    private BigDecimal calcularMediaKmLitro(long kmRodado,
+                                            BigDecimal litros,
+                                            BigDecimal mediaManual,
+                                            BigDecimal metaConsumo) {
         if (litros != null && litros.compareTo(BigDecimal.ZERO) > 0) {
             return BigDecimal.valueOf(kmRodado).divide(litros, 2, RoundingMode.HALF_UP);
+        }
+        if (mediaManual != null) {
+            return mediaManual;
         }
         return metaConsumo;
     }
