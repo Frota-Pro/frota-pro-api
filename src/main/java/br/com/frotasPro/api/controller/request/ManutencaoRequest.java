@@ -1,7 +1,9 @@
 package br.com.frotasPro.api.controller.request;
 
+import br.com.frotasPro.api.config.jackson.FlexibleLocalDateDeserializer;
 import br.com.frotasPro.api.domain.enums.StatusManutencao;
 import br.com.frotasPro.api.domain.enums.TipoManutencao;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -24,8 +26,10 @@ public class ManutencaoRequest {
     private String descricao;
 
     @NotNull(message = "Data de início é obrigatória")
+    @JsonDeserialize(using = FlexibleLocalDateDeserializer.class)
     private LocalDate dataInicioManutencao;
 
+    @JsonDeserialize(using = FlexibleLocalDateDeserializer.class)
     private LocalDate dataFimManutencao;
 
     @NotNull(message = "Tipo de manutenção é obrigatório")
