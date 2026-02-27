@@ -4,7 +4,6 @@ import br.com.frotasPro.api.controller.response.ManutencaoResponse;
 import br.com.frotasPro.api.mapper.ManutencaoMapper;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

@@ -5,7 +5,6 @@ import br.com.frotasPro.api.mapper.ManutencaoMapper;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
 import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.AllArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

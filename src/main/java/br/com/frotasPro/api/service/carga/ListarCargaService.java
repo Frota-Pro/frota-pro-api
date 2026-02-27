@@ -1,12 +1,8 @@
 package br.com.frotasPro.api.service.carga;
 
 import br.com.frotasPro.api.controller.response.CargaMinResponse;
-import br.com.frotasPro.api.domain.Carga;
-import br.com.frotasPro.api.mapper.CargaMapper;
-import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,7 +14,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class ListarCargaService {
 
-    private final CargaRepository cargaRepository;
+    private final CargaListCacheService cacheService;
 
     @Transactional(readOnly = true)
     public Page<CargaMinResponse> listar(String q, LocalDate inicio, LocalDate fim, Pageable pageable) {
@@ -27,8 +23,14 @@ public class ListarCargaService {
 
         String query = (q == null || q.trim().isEmpty()) ? null : q.trim();
 
-        Page<Carga> page = cargaRepository.listarFiltrado(query, inicio, fim, pageable);
-
-        return page.map(CargaMapper::toMinResponse);
+        var cached = cacheService.listar(
+                query,
+                inicio,
+                fim,
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                pageable.getSort()
+        );
+        return cached.toPage(pageable);
     }
 }
