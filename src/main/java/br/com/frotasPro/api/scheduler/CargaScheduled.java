@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Slf4j
@@ -19,20 +21,40 @@ public class CargaScheduled {
 
     private final IntegracaoCargaService integracaoCargaService;
     private final IntegracaoWinThorConfigService configService;
+    private volatile LocalDateTime ultimoDisparoAutomatico;
 
     @Value("${frotapro.empresa-sync-id}")
     private UUID empresaIdPadrao;
 
-    @Scheduled(cron = "0 0 8-18/2 * * *")
-    public void sincronizarCargasDiurnas() {
-        log.debug("Scheduler: janela diurna");
-        sincronizarCargas();
-    }
+    @Scheduled(cron = "0 * * * * *")
+    public void sincronizarCargasAutomatico() {
+        IntegracaoWinThorConfig cfg = configService.getOrDefault(empresaIdPadrao);
 
-    @Scheduled(cron = "0 30 21,23 * * *")
-    public void sincronizarCargasNoturnas() {
-        log.debug("Scheduler: janela noturna");
+        // Compatibilidade: sem configuração, mantém comportamento anterior.
+        Integer intervaloMin = cfg != null ? cfg.getIntervaloMin() : null;
+        if (intervaloMin == null) {
+            if (deveRodarNoCronLegado(LocalDateTime.now())) {
+                log.debug("Scheduler: execução no cron legado.");
+                sincronizarCargas();
+            }
+            return;
+        }
+
+        if (intervaloMin < 1) {
+            log.warn("Sincronização automática ignorada: intervaloMin inválido ({})", intervaloMin);
+            return;
+        }
+
+        LocalDateTime agora = LocalDateTime.now();
+        if (ultimoDisparoAutomatico != null) {
+            long minutos = Duration.between(ultimoDisparoAutomatico, agora).toMinutes();
+            if (minutos < intervaloMin) {
+                return;
+            }
+        }
+
         sincronizarCargas();
+        ultimoDisparoAutomatico = agora;
     }
 
     private void sincronizarCargas() {
@@ -60,5 +82,14 @@ public class CargaScheduled {
         );
 
         log.info("Job automático de sincronização de cargas disparado. jobId={} data={}", jobId, hoje);
+    }
+
+    private boolean deveRodarNoCronLegado(LocalDateTime agora) {
+        int hora = agora.getHour();
+        int minuto = agora.getMinute();
+
+        boolean janelaDiurna = minuto == 0 && (hora == 8 || hora == 10 || hora == 12 || hora == 14 || hora == 16 || hora == 18);
+        boolean janelaNoturna = minuto == 30 && (hora == 21 || hora == 23);
+        return janelaDiurna || janelaNoturna;
     }
 }
