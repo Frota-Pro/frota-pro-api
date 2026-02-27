@@ -1,8 +1,11 @@
 package br.com.frotasPro.api.config.json;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.type.WritableTypeId;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -34,5 +37,16 @@ public class BigDecimalBrasilSerializer extends JsonSerializer<BigDecimal> {
         String formatado = FORMATTER.format(ajustado);
 
         gen.writeString(formatado);
+    }
+
+    @Override
+    public void serializeWithType(BigDecimal value, JsonGenerator gen, SerializerProvider serializers, TypeSerializer typeSer) throws IOException {
+        if (value == null) {
+            gen.writeNull();
+            return;
+        }
+        WritableTypeId typeId = typeSer.writeTypePrefix(gen, typeSer.typeId(value, JsonToken.VALUE_STRING));
+        serialize(value, gen, serializers);
+        typeSer.writeTypeSuffix(gen, typeId);
     }
 }
