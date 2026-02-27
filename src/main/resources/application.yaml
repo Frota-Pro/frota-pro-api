@@ -3,6 +3,8 @@ spring:
     name: frotaPro
   profiles:
     active: dev
+  cache:
+    type: simple
 
   jackson:
     mapper:

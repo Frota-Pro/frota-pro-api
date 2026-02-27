@@ -11,6 +11,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,12 +36,17 @@ public class UsuarioController {
 
     @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
     @PostMapping
+    @Caching(evict = {
+            @CacheEvict(value = "usuario_listar", allEntries = true),
+            @CacheEvict(value = "usuario_buscar_id", allEntries = true)
+    })
     public UsuarioResponse registar(@Valid @RequestBody UsuarioRequest request){
         return usuarioService.registar(request);
     }
 
     @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
     @GetMapping
+    @Cacheable("usuario_listar")
     public Page<UsuarioResponse> listar(
             @RequestParam(value = "q", required = false)
             @Size(max = 150, message = "Filtro inválido")
@@ -51,24 +59,37 @@ public class UsuarioController {
 
     @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
     @GetMapping("/{id}")
+    @Cacheable("usuario_buscar_id")
     public UsuarioResponse buscarPorId(@PathVariable UUID id) {
         return usuarioService.buscarPorId(id);
     }
 
     @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\')")
     @PutMapping("/{id}")
+    @Caching(evict = {
+            @CacheEvict(value = "usuario_listar", allEntries = true),
+            @CacheEvict(value = "usuario_buscar_id", allEntries = true)
+    })
     public UsuarioResponse atualizar(@PathVariable UUID id, @Valid @RequestBody UsuarioUpdateRequest request) {
         return usuarioService.atualizar(id, request);
     }
 
     @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\')")
     @PatchMapping("/{id}/ativo")
+    @Caching(evict = {
+            @CacheEvict(value = "usuario_listar", allEntries = true),
+            @CacheEvict(value = "usuario_buscar_id", allEntries = true)
+    })
     public UsuarioResponse atualizarAtivo(@PathVariable UUID id, @RequestParam("ativo") boolean ativo) {
         return usuarioService.atualizarAtivo(id, ativo);
     }
 
     @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\')")
     @PutMapping("/{id}/senha")
+    @Caching(evict = {
+            @CacheEvict(value = "usuario_listar", allEntries = true),
+            @CacheEvict(value = "usuario_buscar_id", allEntries = true)
+    })
     public ResponseEntity<Void> atualizarSenha(@PathVariable UUID id, @Valid @RequestBody UsuarioSenhaUpdateRequest request) {
         usuarioService.atualizarSenha(id, request);
         return ResponseEntity.noContent().build();
@@ -76,6 +97,10 @@ public class UsuarioController {
 
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/me/senha")
+    @Caching(evict = {
+            @CacheEvict(value = "usuario_listar", allEntries = true),
+            @CacheEvict(value = "usuario_buscar_id", allEntries = true)
+    })
     public ResponseEntity<Void> atualizarMinhaSenha(@Valid @RequestBody UsuarioSenhaSelfRequest request) {
         usuarioService.atualizarMinhaSenha(request);
         return ResponseEntity.noContent().build();
@@ -83,6 +108,10 @@ public class UsuarioController {
 
     @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
     @PostMapping("/motoristas")
+    @Caching(evict = {
+            @CacheEvict(value = "usuario_listar", allEntries = true),
+            @CacheEvict(value = "usuario_buscar_id", allEntries = true)
+    })
     public ResponseEntity<List<String>> criarUsuariosPelosMotoristas(
             @RequestParam("matriculas")
             @NotEmpty(message = "Matrículas são obrigatórias")

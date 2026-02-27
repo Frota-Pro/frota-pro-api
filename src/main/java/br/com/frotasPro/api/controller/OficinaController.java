@@ -9,6 +9,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +38,7 @@ public class OficinaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN')")
     @GetMapping
+    @Cacheable("oficina_listar")
     public ResponseEntity<Page<OficinaResponse>> listar(Pageable pageable) {
         Page<OficinaResponse> page = buscarTodasOficinasService.listar(pageable);
         return ResponseEntity.ok(page);
@@ -42,6 +46,7 @@ public class OficinaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN')")
     @GetMapping("/codigo/{codigo}")
+    @Cacheable("oficina_buscar_codigo")
     public ResponseEntity<OficinaResponse> buscarPorCodigo(
             @PathVariable
             @NotBlank(message = "Código é obrigatório")
@@ -54,6 +59,11 @@ public class OficinaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PostMapping
+    @Caching(evict = {
+            @CacheEvict(value = "oficina_listar", allEntries = true),
+            @CacheEvict(value = "oficina_buscar_codigo", allEntries = true),
+            @CacheEvict(value = "oficina_dashboard", allEntries = true)
+    })
     public ResponseEntity<OficinaResponse> criar(@Valid @RequestBody OficinaRequest request) {
         OficinaResponse response = criarOficinaService.criar(request);
 
@@ -67,6 +77,11 @@ public class OficinaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PutMapping("/{codigo}")
+    @Caching(evict = {
+            @CacheEvict(value = "oficina_listar", allEntries = true),
+            @CacheEvict(value = "oficina_buscar_codigo", allEntries = true),
+            @CacheEvict(value = "oficina_dashboard", allEntries = true)
+    })
     public ResponseEntity<OficinaResponse> atualizar(
             @PathVariable
             @NotBlank(message = "Código é obrigatório")
@@ -80,6 +95,11 @@ public class OficinaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{codigo}")
+    @Caching(evict = {
+            @CacheEvict(value = "oficina_listar", allEntries = true),
+            @CacheEvict(value = "oficina_buscar_codigo", allEntries = true),
+            @CacheEvict(value = "oficina_dashboard", allEntries = true)
+    })
     public ResponseEntity<Void> deletar(
             @PathVariable
             @NotBlank(message = "Código é obrigatório")
@@ -91,6 +111,7 @@ public class OficinaController {
     }
 
     @GetMapping("/{codigo}/dashboard")
+    @Cacheable("oficina_dashboard")
     public ResponseEntity<OficinaDashboardResponse> dashboard(
             @PathVariable
             @NotBlank(message = "Código é obrigatório")

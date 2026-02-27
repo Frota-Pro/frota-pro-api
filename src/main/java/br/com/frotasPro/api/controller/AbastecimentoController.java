@@ -9,6 +9,9 @@ import br.com.frotasPro.api.domain.enums.TipoCombustivel;
 import br.com.frotasPro.api.service.abastecimento.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -42,6 +45,7 @@ public class AbastecimentoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/{codigo}")
+    @Cacheable("abastecimento_buscar_codigo")
     public ResponseEntity<AbastecimentoResponse> buscarPorCodigo(@PathVariable String codigo) {
         AbastecimentoResponse abastecimento = buscarAbastecimentoPorCodigoService.buscar(codigo);
         return ResponseEntity.ok(abastecimento);
@@ -49,12 +53,14 @@ public class AbastecimentoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
     @GetMapping
+    @Cacheable("abastecimento_listar")
     public ResponseEntity<Page<AbastecimentoResponse>> listar(Pageable pageable) {
         return ResponseEntity.ok(listarService.listar(pageable));
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/filtrar")
+    @Cacheable("abastecimento_filtrar")
     public ResponseEntity<Page<AbastecimentoResponse>> filtrar(
             @RequestParam(value = "q", required = false) String q,
             @RequestParam(value = "caminhao", required = false) String caminhao,
@@ -74,6 +80,7 @@ public class AbastecimentoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/periodo")
+    @Cacheable("abastecimento_periodo")
     public ResponseEntity<Page<AbastecimentoResponse>> buscarPorPeriodo(
             @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
             @RequestParam("fim") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim,
@@ -84,6 +91,7 @@ public class AbastecimentoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/periodo/combustivel")
+    @Cacheable("abastecimento_periodo_combustivel")
     public ResponseEntity<Page<AbastecimentoResponse>> buscarPorTipoCombustivel(
             @RequestParam TipoCombustivel tipo,
             @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
@@ -95,6 +103,7 @@ public class AbastecimentoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/periodo/formapagamento")
+    @Cacheable("abastecimento_periodo_forma")
     public ResponseEntity<Page<AbastecimentoResponse>> buscarPorFormaPagamento(
             @RequestParam FormaPagamento forma,
             @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
@@ -106,6 +115,17 @@ public class AbastecimentoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @PostMapping
+    @Caching(evict = {
+            @CacheEvict(value = "abastecimento_buscar_codigo", allEntries = true),
+            @CacheEvict(value = "abastecimento_listar", allEntries = true),
+            @CacheEvict(value = "abastecimento_filtrar", allEntries = true),
+            @CacheEvict(value = "abastecimento_periodo", allEntries = true),
+            @CacheEvict(value = "abastecimento_periodo_combustivel", allEntries = true),
+            @CacheEvict(value = "abastecimento_periodo_forma", allEntries = true),
+            @CacheEvict(value = "abastecimento_relatorio_gasto", allEntries = true),
+            @CacheEvict(value = "abastecimento_relatorio_resumo", allEntries = true),
+            @CacheEvict(value = "abastecimento_caminhao", allEntries = true)
+    })
     public ResponseEntity<AbastecimentoResponse> criar(@Valid @RequestBody AbastecimentoRequest request) {
         AbastecimentoResponse response = criarService.criar(request);
 
@@ -119,6 +139,17 @@ public class AbastecimentoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @PutMapping("/{codigo}")
+    @Caching(evict = {
+            @CacheEvict(value = "abastecimento_buscar_codigo", allEntries = true),
+            @CacheEvict(value = "abastecimento_listar", allEntries = true),
+            @CacheEvict(value = "abastecimento_filtrar", allEntries = true),
+            @CacheEvict(value = "abastecimento_periodo", allEntries = true),
+            @CacheEvict(value = "abastecimento_periodo_combustivel", allEntries = true),
+            @CacheEvict(value = "abastecimento_periodo_forma", allEntries = true),
+            @CacheEvict(value = "abastecimento_relatorio_gasto", allEntries = true),
+            @CacheEvict(value = "abastecimento_relatorio_resumo", allEntries = true),
+            @CacheEvict(value = "abastecimento_caminhao", allEntries = true)
+    })
     public ResponseEntity<AbastecimentoResponse> atualizar(
             @PathVariable String codigo,
             @Valid @RequestBody AbastecimentoRequest request
@@ -128,6 +159,17 @@ public class AbastecimentoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @DeleteMapping("/{codigo}")
+    @Caching(evict = {
+            @CacheEvict(value = "abastecimento_buscar_codigo", allEntries = true),
+            @CacheEvict(value = "abastecimento_listar", allEntries = true),
+            @CacheEvict(value = "abastecimento_filtrar", allEntries = true),
+            @CacheEvict(value = "abastecimento_periodo", allEntries = true),
+            @CacheEvict(value = "abastecimento_periodo_combustivel", allEntries = true),
+            @CacheEvict(value = "abastecimento_periodo_forma", allEntries = true),
+            @CacheEvict(value = "abastecimento_relatorio_gasto", allEntries = true),
+            @CacheEvict(value = "abastecimento_relatorio_resumo", allEntries = true),
+            @CacheEvict(value = "abastecimento_caminhao", allEntries = true)
+    })
     public ResponseEntity<Void> deletar(@PathVariable String codigo) {
         deletarService.deletar(codigo);
         return ResponseEntity.noContent().build();
@@ -135,6 +177,7 @@ public class AbastecimentoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/relatorios/gasto-por-combustivel")
+    @Cacheable("abastecimento_relatorio_gasto")
     public ResponseEntity<List<AbastecimentoGastoPorCombustivelResponse>> gastoPorCombustivel(
             @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
             @RequestParam("fim") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim
@@ -144,6 +187,7 @@ public class AbastecimentoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/relatorio/resumo-caminhao")
+    @Cacheable("abastecimento_relatorio_resumo")
     public ResponseEntity<List<AbastecimentoResumoCaminhaoResponse>> resumoPorCaminhao(
             @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
             @RequestParam("fim") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim
@@ -153,6 +197,7 @@ public class AbastecimentoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/caminhao")
+    @Cacheable("abastecimento_caminhao")
     public ResponseEntity<Page<AbastecimentoResponse>> buscarPorCaminhao(
             @RequestParam("codigo") String codigoCaminhao,
             Pageable pageable

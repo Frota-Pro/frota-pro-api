@@ -8,6 +8,9 @@ import br.com.frotasPro.api.controller.response.CargaResponse;
 import br.com.frotasPro.api.service.carga.*;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -41,6 +44,7 @@ public class CargaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/{numeroCarga}")
+    @Cacheable("carga_buscar_numero")
     public ResponseEntity<CargaResponse> buscarPorNumero(@PathVariable String numeroCarga) {
         CargaResponse carga = buscarCargaService.porCodigo(numeroCarga);
         return ResponseEntity.ok(carga);
@@ -48,6 +52,7 @@ public class CargaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/externo/{codigoExterno}")
+    @Cacheable("carga_buscar_codigo_externo")
     public ResponseEntity<CargaResponse> buscarPorCodigoExterno(@PathVariable String codigoExterno) {
         CargaResponse carga = buscarCargaService.porCodigoExterno(codigoExterno);
         return ResponseEntity.ok(carga);
@@ -57,6 +62,7 @@ public class CargaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping
+    @Cacheable("carga_listar")
     public ResponseEntity<Page<CargaMinResponse>> listar(
             @RequestParam(value = "q", required = false) String q,
             @RequestParam(value = "inicio", required = false)
@@ -73,6 +79,7 @@ public class CargaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/data-saida")
+    @Cacheable("carga_data_saida")
     public ResponseEntity<Page<CargaResponse>> buscarPorDataSaida(
             @RequestParam("data")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataSaida,
@@ -84,6 +91,7 @@ public class CargaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/periodo-saida")
+    @Cacheable("carga_periodo_saida")
     public ResponseEntity<Page<CargaResponse>> buscarPorPeriodoSaida(
             @RequestParam("inicio")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
@@ -97,6 +105,7 @@ public class CargaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/periodo-criacao")
+    @Cacheable("carga_periodo_criacao")
     public ResponseEntity<Page<CargaResponse>> buscarPorPeriodoCriacao(
             @RequestParam("inicio")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
@@ -112,6 +121,7 @@ public class CargaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/motorista")
+    @Cacheable("carga_motorista")
     public ResponseEntity<Page<CargaResponse>> buscarPorMotorista(
             @RequestParam("codigo") String codigoMotorista,
             Pageable pageable
@@ -122,6 +132,7 @@ public class CargaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/caminhao")
+    @Cacheable("carga_caminhao")
     public ResponseEntity<Page<CargaResponse>> buscarPorCaminhao(
             @RequestParam("codigo") String codigoCaminhao,
             Pageable pageable
@@ -141,6 +152,17 @@ public class CargaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
     @PatchMapping("/iniciar")
+    @Caching(evict = {
+            @CacheEvict(value = "carga_buscar_numero", allEntries = true),
+            @CacheEvict(value = "carga_buscar_codigo_externo", allEntries = true),
+            @CacheEvict(value = "carga_listar", allEntries = true),
+            @CacheEvict(value = "carga_data_saida", allEntries = true),
+            @CacheEvict(value = "carga_periodo_saida", allEntries = true),
+            @CacheEvict(value = "carga_periodo_criacao", allEntries = true),
+            @CacheEvict(value = "carga_motorista", allEntries = true),
+            @CacheEvict(value = "carga_caminhao", allEntries = true),
+            @CacheEvict(value = "carga_minha_atual", allEntries = true)
+    })
     public ResponseEntity<String> iniciarCarga(
             @RequestParam("carga") String numeroCarga,
             @RequestParam("km") Integer kmInicial,
@@ -154,6 +176,17 @@ public class CargaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
     @PatchMapping("/finalizar")
+    @Caching(evict = {
+            @CacheEvict(value = "carga_buscar_numero", allEntries = true),
+            @CacheEvict(value = "carga_buscar_codigo_externo", allEntries = true),
+            @CacheEvict(value = "carga_listar", allEntries = true),
+            @CacheEvict(value = "carga_data_saida", allEntries = true),
+            @CacheEvict(value = "carga_periodo_saida", allEntries = true),
+            @CacheEvict(value = "carga_periodo_criacao", allEntries = true),
+            @CacheEvict(value = "carga_motorista", allEntries = true),
+            @CacheEvict(value = "carga_caminhao", allEntries = true),
+            @CacheEvict(value = "carga_minha_atual", allEntries = true)
+    })
     public ResponseEntity<String> finalizarCarga(
             @RequestParam("carga") String numeroCarga,
             @RequestParam("km") Integer kmfinal
@@ -166,6 +199,17 @@ public class CargaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @PatchMapping("/{numeroCarga}/ordem-entrega")
+    @Caching(evict = {
+            @CacheEvict(value = "carga_buscar_numero", allEntries = true),
+            @CacheEvict(value = "carga_buscar_codigo_externo", allEntries = true),
+            @CacheEvict(value = "carga_listar", allEntries = true),
+            @CacheEvict(value = "carga_data_saida", allEntries = true),
+            @CacheEvict(value = "carga_periodo_saida", allEntries = true),
+            @CacheEvict(value = "carga_periodo_criacao", allEntries = true),
+            @CacheEvict(value = "carga_motorista", allEntries = true),
+            @CacheEvict(value = "carga_caminhao", allEntries = true),
+            @CacheEvict(value = "carga_minha_atual", allEntries = true)
+    })
     public ResponseEntity<Void> atualizarOrdemEntrega(
             @PathVariable String numeroCarga,
             @Valid @RequestBody AtualizarOrdemEntregaRequest request
@@ -176,6 +220,17 @@ public class CargaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
     @PatchMapping("/{numeroCarga}/observacao")
+    @Caching(evict = {
+            @CacheEvict(value = "carga_buscar_numero", allEntries = true),
+            @CacheEvict(value = "carga_buscar_codigo_externo", allEntries = true),
+            @CacheEvict(value = "carga_listar", allEntries = true),
+            @CacheEvict(value = "carga_data_saida", allEntries = true),
+            @CacheEvict(value = "carga_periodo_saida", allEntries = true),
+            @CacheEvict(value = "carga_periodo_criacao", allEntries = true),
+            @CacheEvict(value = "carga_motorista", allEntries = true),
+            @CacheEvict(value = "carga_caminhao", allEntries = true),
+            @CacheEvict(value = "carga_minha_atual", allEntries = true)
+    })
     public ResponseEntity<Void> atualizarObservacaoMotorista(
             @PathVariable String numeroCarga,
             @Valid @RequestBody AtualizarObservacaoMotoristaRequest request
@@ -188,6 +243,17 @@ public class CargaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @PostMapping
+    @Caching(evict = {
+            @CacheEvict(value = "carga_buscar_numero", allEntries = true),
+            @CacheEvict(value = "carga_buscar_codigo_externo", allEntries = true),
+            @CacheEvict(value = "carga_listar", allEntries = true),
+            @CacheEvict(value = "carga_data_saida", allEntries = true),
+            @CacheEvict(value = "carga_periodo_saida", allEntries = true),
+            @CacheEvict(value = "carga_periodo_criacao", allEntries = true),
+            @CacheEvict(value = "carga_motorista", allEntries = true),
+            @CacheEvict(value = "carga_caminhao", allEntries = true),
+            @CacheEvict(value = "carga_minha_atual", allEntries = true)
+    })
     public ResponseEntity<CargaResponse> registrar(@Valid @RequestBody CargaRequest request) {
 
         CargaResponse carga = criarCargaService.criar(request);
@@ -203,6 +269,17 @@ public class CargaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @PutMapping("/{numeroCarga}")
+    @Caching(evict = {
+            @CacheEvict(value = "carga_buscar_numero", allEntries = true),
+            @CacheEvict(value = "carga_buscar_codigo_externo", allEntries = true),
+            @CacheEvict(value = "carga_listar", allEntries = true),
+            @CacheEvict(value = "carga_data_saida", allEntries = true),
+            @CacheEvict(value = "carga_periodo_saida", allEntries = true),
+            @CacheEvict(value = "carga_periodo_criacao", allEntries = true),
+            @CacheEvict(value = "carga_motorista", allEntries = true),
+            @CacheEvict(value = "carga_caminhao", allEntries = true),
+            @CacheEvict(value = "carga_minha_atual", allEntries = true)
+    })
     public ResponseEntity<CargaResponse> atualizar(
             @PathVariable String numeroCarga,
             @Valid @RequestBody CargaRequest request
@@ -213,6 +290,17 @@ public class CargaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @DeleteMapping("/{numeroCarga}")
+    @Caching(evict = {
+            @CacheEvict(value = "carga_buscar_numero", allEntries = true),
+            @CacheEvict(value = "carga_buscar_codigo_externo", allEntries = true),
+            @CacheEvict(value = "carga_listar", allEntries = true),
+            @CacheEvict(value = "carga_data_saida", allEntries = true),
+            @CacheEvict(value = "carga_periodo_saida", allEntries = true),
+            @CacheEvict(value = "carga_periodo_criacao", allEntries = true),
+            @CacheEvict(value = "carga_motorista", allEntries = true),
+            @CacheEvict(value = "carga_caminhao", allEntries = true),
+            @CacheEvict(value = "carga_minha_atual", allEntries = true)
+    })
     public ResponseEntity<Void> deletar(@PathVariable String numeroCarga) {
         deletarCargaService.deletar(numeroCarga);
         return ResponseEntity.noContent().build();

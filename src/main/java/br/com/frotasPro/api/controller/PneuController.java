@@ -11,6 +11,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +29,7 @@ public class PneuController {
     private final PneuService service;
 
     @GetMapping
+    @Cacheable("pneu_listar")
     public ResponseEntity<Page<PneuResponse>> listar(
             @RequestParam(value = "q", required = false)
             @Size(max = 120, message = "Filtro inválido")
@@ -42,6 +46,7 @@ public class PneuController {
     }
 
     @GetMapping("/{codigo}")
+    @Cacheable("pneu_buscar_codigo")
     public ResponseEntity<PneuResponse> buscar(
             @PathVariable
             @NotBlank(message = "Código é obrigatório")
@@ -52,11 +57,23 @@ public class PneuController {
     }
 
     @PostMapping
+    @Caching(evict = {
+            @CacheEvict(value = "pneu_listar", allEntries = true),
+            @CacheEvict(value = "pneu_buscar_codigo", allEntries = true),
+            @CacheEvict(value = "pneu_vida_util", allEntries = true),
+            @CacheEvict(value = "pneu_movimentacoes", allEntries = true)
+    })
     public ResponseEntity<PneuResponse> criar(@Valid @RequestBody PneuRequest req) {
         return ResponseEntity.ok(service.criar(req));
     }
 
     @PutMapping("/{codigo}")
+    @Caching(evict = {
+            @CacheEvict(value = "pneu_listar", allEntries = true),
+            @CacheEvict(value = "pneu_buscar_codigo", allEntries = true),
+            @CacheEvict(value = "pneu_vida_util", allEntries = true),
+            @CacheEvict(value = "pneu_movimentacoes", allEntries = true)
+    })
     public ResponseEntity<PneuResponse> atualizar(
             @PathVariable
             @NotBlank(message = "Código é obrigatório")
@@ -68,6 +85,12 @@ public class PneuController {
     }
 
     @DeleteMapping("/{codigo}")
+    @Caching(evict = {
+            @CacheEvict(value = "pneu_listar", allEntries = true),
+            @CacheEvict(value = "pneu_buscar_codigo", allEntries = true),
+            @CacheEvict(value = "pneu_vida_util", allEntries = true),
+            @CacheEvict(value = "pneu_movimentacoes", allEntries = true)
+    })
     public ResponseEntity<Void> deletar(
             @PathVariable
             @NotBlank(message = "Código é obrigatório")
@@ -80,6 +103,7 @@ public class PneuController {
 
     // VIDA ÚTIL
     @GetMapping("/{codigo}/vida-util")
+    @Cacheable("pneu_vida_util")
     public ResponseEntity<PneuVidaUtilResponse> vidaUtil(
             @PathVariable
             @NotBlank(message = "Código é obrigatório")
@@ -91,6 +115,12 @@ public class PneuController {
 
     // EVENTOS
     @PostMapping("/{codigo}/movimentacoes")
+    @Caching(evict = {
+            @CacheEvict(value = "pneu_listar", allEntries = true),
+            @CacheEvict(value = "pneu_buscar_codigo", allEntries = true),
+            @CacheEvict(value = "pneu_vida_util", allEntries = true),
+            @CacheEvict(value = "pneu_movimentacoes", allEntries = true)
+    })
     public ResponseEntity<Void> movimentacao(
             @PathVariable
             @NotBlank(message = "Código é obrigatório")
@@ -103,6 +133,7 @@ public class PneuController {
     }
 
     @GetMapping("/{codigo}/movimentacoes")
+    @Cacheable("pneu_movimentacoes")
     public ResponseEntity<Page<PneuMovimentacaoResponse>> listarMovimentacoes(
             @PathVariable
             @NotBlank(message = "Código é obrigatório")

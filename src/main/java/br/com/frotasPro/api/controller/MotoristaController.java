@@ -9,6 +9,9 @@ import br.com.frotasPro.api.service.motorista.*;
 import br.com.frotasPro.api.service.relatorios.RelatorioMetaMensalMotoristaService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -40,6 +43,7 @@ public class MotoristaController {
 
     @PreAuthorize("hasAnyAuthority(\'ROLE_CONSULTA\')")
     @GetMapping("/{codigo}")
+    @Cacheable("motorista_buscar_codigo")
     public ResponseEntity<MotoristaResponse> buscarPorCodigo(@PathVariable String codigo) {
         MotoristaResponse motorista = buscarMotoristaService.buscar(codigo);
         return ResponseEntity.ok(motorista);
@@ -47,6 +51,7 @@ public class MotoristaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping
+    @Cacheable("motorista_listar")
     public ResponseEntity<Page<MotoristaResponse>> listar(
             @RequestParam(required = false) Boolean ativo,
             @RequestParam(required = false) String q,
@@ -58,6 +63,12 @@ public class MotoristaController {
 
     @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
     @PostMapping
+    @Caching(evict = {
+            @CacheEvict(value = "motorista_buscar_codigo", allEntries = true),
+            @CacheEvict(value = "motorista_listar", allEntries = true),
+            @CacheEvict(value = "motorista_meta_mensal", allEntries = true),
+            @CacheEvict(value = "motorista_documentos", allEntries = true)
+    })
     public ResponseEntity<MotoristaResponse> registar(@Valid @RequestBody MotoristaRequest request){
 
         MotoristaResponse motorista = criarMotoristaService.criar(request);
@@ -71,6 +82,12 @@ public class MotoristaController {
 
     @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
     @PutMapping("/{codigo}")
+    @Caching(evict = {
+            @CacheEvict(value = "motorista_buscar_codigo", allEntries = true),
+            @CacheEvict(value = "motorista_listar", allEntries = true),
+            @CacheEvict(value = "motorista_meta_mensal", allEntries = true),
+            @CacheEvict(value = "motorista_documentos", allEntries = true)
+    })
     public ResponseEntity<MotoristaResponse> atualizar(@PathVariable String codigo, @Valid @RequestBody MotoristaRequest request) {
 
         MotoristaResponse motoristaAtualizado =
@@ -81,6 +98,12 @@ public class MotoristaController {
 
     @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
     @DeleteMapping("/{codigo}")
+    @Caching(evict = {
+            @CacheEvict(value = "motorista_buscar_codigo", allEntries = true),
+            @CacheEvict(value = "motorista_listar", allEntries = true),
+            @CacheEvict(value = "motorista_meta_mensal", allEntries = true),
+            @CacheEvict(value = "motorista_documentos", allEntries = true)
+    })
     public ResponseEntity<Void> deletar(@PathVariable String codigo) {
         deletarMotoristaService.deletar(codigo);
         return ResponseEntity.noContent().build();
@@ -88,6 +111,7 @@ public class MotoristaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/{codigoMotorista}/meta-mensal")
+    @Cacheable("motorista_meta_mensal")
     public ResponseEntity<RelatorioMetaMensalMotoristaResponse> gerar(
             @PathVariable String codigoMotorista,
             @RequestParam("inicio")
@@ -106,6 +130,7 @@ public class MotoristaController {
             value = "/{motoristaId}/documentos",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
+    @CacheEvict(value = "motorista_documentos", allEntries = true)
     public ResponseEntity<DocumentoMotoristaResponse> uploadDocumentoMotorista(
             @PathVariable UUID motoristaId,
             @RequestParam("tipoDocumento") TipoDocumentoMotorista tipoDocumento,
@@ -126,6 +151,7 @@ public class MotoristaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
     @GetMapping("/{motoristaId}/documentos")
+    @Cacheable("motorista_documentos")
     public ResponseEntity<List<DocumentoMotoristaResponse>> listarDocumentosMotorista(
             @PathVariable UUID motoristaId
     ) {
