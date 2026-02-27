@@ -5,6 +5,7 @@ import br.com.frotasPro.api.projections.AbastecimentoResumoCaminhao;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
 import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -17,6 +18,7 @@ public class ResumoAbastecimentoPorCaminhaoService {
 
     private final AbastecimentoRepository repository;
 
+    @Cacheable("abastecimento_relatorio_resumo")
     public List<AbastecimentoResumoCaminhaoResponse> gerar(
             LocalDate inicio,
             LocalDate fim

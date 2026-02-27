@@ -12,6 +12,7 @@ import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.*;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ public class PneuService {
     private final CaminhaoRepository caminhaoRepository;
 
     @Transactional(readOnly = true)
+    @Cacheable("pneu_listar")
     public Page<PneuResponse> listar(String q, String status, Pageable pageable) {
 
         if (status != null && !status.isBlank()) {
@@ -52,6 +54,7 @@ public class PneuService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable("pneu_buscar_codigo")
     public PneuResponse buscarPorCodigo(String codigo) {
         return toResponse(getPneu(codigo));
     }
@@ -104,6 +107,7 @@ public class PneuService {
     // ===================== VIDA ÚTIL =====================
 
     @Transactional(readOnly = true)
+    @Cacheable("pneu_vida_util")
     public PneuVidaUtilResponse vidaUtil(String codigo) {
         var p = getPneu(codigo);
 
@@ -276,6 +280,7 @@ public class PneuService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable("pneu_movimentacoes")
     public Page<PneuMovimentacaoResponse> listarMovimentacoes(String codigoPneu, Pageable pageable) {
         getPneu(codigoPneu); // garante 404 quando pneu não existe
         return movRepository

@@ -7,6 +7,7 @@ import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
 import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -19,6 +20,7 @@ public class RelatorioManutencaoCaminhaoService {
 
     private final ManutencaoRepository manutencaoRepository;
 
+    @Cacheable("manutencao_relatorio_caminhao")
     public RelatorioManutencaoCaminhaoResponse gerar(
             String codigoCaminhao,
             LocalDate inicio,

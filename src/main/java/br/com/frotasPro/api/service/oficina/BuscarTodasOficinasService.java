@@ -5,6 +5,7 @@ import br.com.frotasPro.api.domain.Oficina;
 import br.com.frotasPro.api.mapper.OficinaMapper;
 import br.com.frotasPro.api.repository.OficinaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ public class BuscarTodasOficinasService {
     private final OficinaRepository oficinaRepository;
 
     @Transactional(readOnly = true)
+    @Cacheable("oficina_listar")
     public Page<OficinaResponse> listar(Pageable pageable) {
         Page<Oficina> oficinas = oficinaRepository.findAll(pageable);
         return oficinas.map(OficinaMapper::toResponse);

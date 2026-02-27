@@ -5,6 +5,7 @@ import br.com.frotasPro.api.projections.AbastecimentoGastoPorCombustivel;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
 import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ public class RelatorioAbastecimentoService {
     private final AbastecimentoRepository repository;
 
     @Transactional(readOnly = true)
+    @Cacheable("abastecimento_relatorio_gasto")
     public List<AbastecimentoGastoPorCombustivelResponse> gastoPorCombustivel(
             LocalDate inicio,
             LocalDate fim

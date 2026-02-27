@@ -10,7 +10,6 @@ import br.com.frotasPro.api.service.caminhao.*;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,7 +41,6 @@ public class CaminhaoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping
-    @Cacheable("caminhao_listar")
     public ResponseEntity<Page<CaminhaoResponse>> listar(
             @RequestParam(required = false) Boolean ativo,
             @RequestParam(required = false) String q,
@@ -53,7 +51,6 @@ public class CaminhaoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/{codigo}")
-    @Cacheable("caminhao_buscar_codigo")
     public ResponseEntity<CaminhaoResponse> buscarPorCodigo(@PathVariable String codigo) {
         CaminhaoResponse caminhao = buscarCaminhaoService.porCodigo(codigo);
         return ResponseEntity.ok(caminhao);
@@ -62,7 +59,6 @@ public class CaminhaoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/placa/{placa}")
-    @Cacheable("caminhao_buscar_placa")
     public ResponseEntity<CaminhaoResponse> buscarPorPlaca(@PathVariable String placa) {
         CaminhaoResponse caminhao = buscarCaminhaoService.porPlaca(placa);
         return ResponseEntity.ok(caminhao);
@@ -71,7 +67,6 @@ public class CaminhaoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/codigo-externo/{codigoExterno}")
-    @Cacheable("caminhao_buscar_codigo_externo")
     public ResponseEntity<CaminhaoResponse> buscarPorCodigoExterno(@PathVariable String codigoExterno) {
         CaminhaoResponse caminhao = buscarCaminhaoService.porCodigoExterno(codigoExterno);
         return ResponseEntity.ok(caminhao);
@@ -180,7 +175,6 @@ public class CaminhaoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/{codigo}/documentos")
-    @Cacheable("caminhao_documentos")
     public ResponseEntity<Page<DocumentoCaminhaoResponse>> listarDocumentosCaminhao(
             @PathVariable String codigo,
             Pageable pageable
@@ -193,7 +187,6 @@ public class CaminhaoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/{codigo}/detalhes")
-    @Cacheable("caminhao_detalhes")
     public ResponseEntity<CaminhaoDetalheResponse> detalhes(@PathVariable String codigo) {
         CaminhaoDetalheResponse response = buscarCaminhaoDetalheService.detalhes(codigo);
         return ResponseEntity.ok(response);

@@ -4,6 +4,7 @@ import br.com.frotasPro.api.controller.response.AbastecimentoResponse;
 import br.com.frotasPro.api.mapper.AbastecimentoMapper;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ public class BuscarAbastecimentosPorCaminhaoService {
     private final AbastecimentoRepository repository;
 
     @Transactional(readOnly = true)
+    @Cacheable("abastecimento_caminhao")
     public Page<AbastecimentoResponse> buscar(String codigoCaminhao, Pageable pageable) {
         return repository.buscarPorCodigoCaminhao(codigoCaminhao, pageable)
                 .map(AbastecimentoMapper::toResponse);

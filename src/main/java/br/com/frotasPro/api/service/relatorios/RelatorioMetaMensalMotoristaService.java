@@ -10,6 +10,7 @@ import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.MetaRepository;
 import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +33,7 @@ public class RelatorioMetaMensalMotoristaService {
     private final MetaRepository metaRepository;
 
     @Transactional(readOnly = true)
+    @Cacheable("motorista_meta_mensal")
     public RelatorioMetaMensalMotoristaResponse gerar(
             String codigoMotorista,
             LocalDate inicio,

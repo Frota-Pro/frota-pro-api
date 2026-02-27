@@ -8,6 +8,7 @@ import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.DocumentoMotoristaRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ public class ListarDocumentoMotoristaService {
     private final DocumentoMotoristaRepository documentoMotoristaRepository;
 
     @Transactional(readOnly = true)
+    @Cacheable("motorista_documentos")
     public List<DocumentoMotoristaResponse> listarPorMotorista(UUID motoristaId) {
 
         motoristaRepository.findById(motoristaId)

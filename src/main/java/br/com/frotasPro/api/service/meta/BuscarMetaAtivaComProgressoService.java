@@ -11,6 +11,7 @@ import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.MetaRepository;
 import br.com.frotasPro.api.util.MetaProgressoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,7 @@ public class BuscarMetaAtivaComProgressoService {
     private final MetaProgressoService metaProgressoService;
 
     @Transactional(readOnly = true)
+    @Cacheable("meta_ativas_caminhao")
     public List<MetaResponse> buscar(String codigoCaminhao, LocalDate dataReferencia) {
 
         Caminhao caminhao = caminhaoRepository.findByCaminhaoPorCodigoOuPorCodigoExterno(codigoCaminhao)

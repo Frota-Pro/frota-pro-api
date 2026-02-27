@@ -12,7 +12,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -72,7 +71,6 @@ public class ManutencaoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @GetMapping("/{codigo}")
-    @Cacheable("manutencao_buscar_codigo")
     public ResponseEntity<ManutencaoResponse> buscarPorCodigo(
             @PathVariable
             @NotBlank(message = "Código é obrigatório")
@@ -84,7 +82,6 @@ public class ManutencaoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @GetMapping
-    @Cacheable("manutencao_listar")
     public ResponseEntity<Page<ManutencaoResponse>> listar(Pageable pageable) {
         return ResponseEntity.ok(listarManutencoesPaginadoService.listar(pageable));
     }
@@ -127,7 +124,6 @@ public class ManutencaoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @GetMapping("/caminhao/{codigoCaminhao}")
-    @Cacheable("manutencao_caminhao")
     public ResponseEntity<Page<ManutencaoResponse>> buscarPorCaminhao(
             @PathVariable
             @NotBlank(message = "Código do caminhão é obrigatório")
@@ -142,7 +138,6 @@ public class ManutencaoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @GetMapping("/caminhao/{codigoCaminhao}/periodo")
-    @Cacheable("manutencao_caminhao_periodo")
     public ResponseEntity<Page<ManutencaoResponse>> buscarPorCaminhaoEPeriodo(
             @PathVariable
             @NotBlank(message = "Código do caminhão é obrigatório")
@@ -163,7 +158,6 @@ public class ManutencaoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @GetMapping("/periodo")
-    @Cacheable("manutencao_periodo")
     public ResponseEntity<Page<ManutencaoResponse>> buscarPorPeriodo(
             @RequestParam("inicio")
             @NotNull(message = "Data de início é obrigatória")
@@ -180,7 +174,6 @@ public class ManutencaoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @GetMapping("/oficina/{codigoOficina}/periodo")
-    @Cacheable("manutencao_oficina_periodo")
     public ResponseEntity<Page<ManutencaoResponse>> buscarPorOficinaEPeriodo(
             @PathVariable
             @NotBlank(message = "Código da oficina é obrigatório")
@@ -201,7 +194,6 @@ public class ManutencaoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @GetMapping("/relatorios/caminhao")
-    @Cacheable("manutencao_relatorio_caminhao")
     public ResponseEntity<RelatorioManutencaoCaminhaoResponse> relatorioPorCaminhaoEPeriodo(
             @RequestParam("caminhao")
             @NotBlank(message = "Código do caminhão é obrigatório")
@@ -254,7 +246,6 @@ public class ManutencaoController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/{codigo}/documentos")
-    @Cacheable("manutencao_documentos")
     public ResponseEntity<Page<DocumentoManutencaoResponse>> listarDocumentosManutencao(
             @PathVariable
             @NotBlank(message = "Código é obrigatório")

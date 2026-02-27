@@ -5,6 +5,7 @@ import br.com.frotasPro.api.mapper.ManutencaoMapper;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
 import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ public class BuscarManutencoesPorCaminhaoService {
 
     private final ManutencaoRepository manutencaoRepository;
 
+    @Cacheable("manutencao_caminhao")
     public Page<ManutencaoResponse> buscarPorCaminhao(
             String codigoCaminhao,
             Pageable pageable
@@ -25,6 +27,7 @@ public class BuscarManutencoesPorCaminhaoService {
                 .map(ManutencaoMapper::toResponse);
     }
 
+    @Cacheable("manutencao_caminhao_periodo")
     public Page<ManutencaoResponse> buscarPorCaminhaoEPeriodo(
             String codigoCaminhao,
             LocalDate inicio,

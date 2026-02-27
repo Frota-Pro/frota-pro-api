@@ -9,6 +9,7 @@ import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.DocumentoCaminhaoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class ListarDocumentoCaminhaoService {
     private final DocumentoCaminhaoRepository documentoCaminhaoRepository;
 
     @Transactional(readOnly = true)
+    @Cacheable("caminhao_documentos")
     public Page<DocumentoCaminhaoResponse> listarPorCaminhao(String codigo, Pageable pageable) {
 
         Caminhao caminhao = caminhaoRepository.findByCodigo(codigo)

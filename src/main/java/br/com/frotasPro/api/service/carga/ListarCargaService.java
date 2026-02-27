@@ -6,6 +6,7 @@ import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class ListarCargaService {
     private final CargaRepository cargaRepository;
 
     @Transactional(readOnly = true)
+    @Cacheable("carga_listar")
     public Page<CargaMinResponse> listar(String q, LocalDate inicio, LocalDate fim, Pageable pageable) {
 
         PeriodoValidator.opcional(inicio, fim, "dtSaida");

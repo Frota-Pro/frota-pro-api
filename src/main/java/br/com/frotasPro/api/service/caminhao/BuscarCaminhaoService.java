@@ -6,6 +6,7 @@ import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.mapper.CaminhaoMapper;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class BuscarCaminhaoService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable("caminhao_buscar_codigo")
     public CaminhaoResponse porCodigo(String codigo) {
         Caminhao c = getAtivoOrError(
                 caminhaoRepository.findByCodigoAndAtivoTrue(codigo),
@@ -33,6 +35,7 @@ public class BuscarCaminhaoService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable("caminhao_buscar_codigo_externo")
     public CaminhaoResponse porCodigoExterno(String codigoExterno) {
         Caminhao c = getAtivoOrError(
                 caminhaoRepository.findByCodigoExternoAndAtivoTrue(codigoExterno),
@@ -42,6 +45,7 @@ public class BuscarCaminhaoService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable("caminhao_buscar_placa")
     public CaminhaoResponse porPlaca(String placa) {
         Caminhao c = getAtivoOrError(
                 caminhaoRepository.findByPlacaAndAtivoTrue(placa),

@@ -14,7 +14,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -84,7 +83,6 @@ public class MetaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/{id}")
-    @Cacheable("meta_buscar_id")
     public ResponseEntity<MetaResponse> buscarPorId(@PathVariable UUID id) {
         MetaResponse response = buscarMetaPorIdService.buscarPorId(id);
         return ResponseEntity.ok(response);
@@ -92,7 +90,6 @@ public class MetaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @GetMapping
-    @Cacheable("meta_listar")
     public ResponseEntity<Page<MetaResponse>> listar(Pageable pageable) {
         Page<MetaResponse> page = buscarTodasMetasService.listar(pageable);
         return ResponseEntity.ok(page);
@@ -115,7 +112,6 @@ public class MetaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/ativas/caminhao/{codigoCaminhao}")
-    @Cacheable("meta_ativas_caminhao")
     public ResponseEntity<List<MetaResponse>> metaAtivaCaminhao(
             @PathVariable @NotBlank String codigoCaminhao,
             @RequestParam("dataReferencia")
@@ -128,7 +124,6 @@ public class MetaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/historico")
-    @Cacheable("meta_historico")
     public ResponseEntity<List<MetaResponse>> historico(
             @RequestParam(required = false) String caminhao,
             @RequestParam(required = false) String categoria,
@@ -141,7 +136,6 @@ public class MetaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_CONSULTA')")
     @GetMapping("/historico/caminhao/{codigoCaminhao}")
-    @Cacheable("meta_historico_caminhao")
     public ResponseEntity<List<MetaResponse>> historicoPorCaminhao(
             @PathVariable @NotBlank String codigoCaminhao,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,

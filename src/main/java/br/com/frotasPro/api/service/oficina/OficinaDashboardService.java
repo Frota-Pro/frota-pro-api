@@ -7,6 +7,7 @@ import br.com.frotasPro.api.repository.ManutencaoRepository;
 import br.com.frotasPro.api.repository.OficinaRepository;
 import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ public class OficinaDashboardService {
     private final ManutencaoRepository manutencaoRepository;
 
     @Transactional(readOnly = true)
+    @Cacheable("oficina_dashboard")
     public OficinaDashboardResponse gerar(String codigoOficina, LocalDate inicio, LocalDate fim) {
 
         PeriodoValidator.obrigatorio(inicio, fim, "dataInicioManutencao");

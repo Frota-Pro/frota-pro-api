@@ -6,6 +6,7 @@ import br.com.frotasPro.api.mapper.AbastecimentoMapper;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
 import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class BuscarAbastecimentoPorPeriodoService {
 
     private final AbastecimentoRepository repository;
 
+    @Cacheable("abastecimento_periodo")
     public Page<AbastecimentoResponse> buscar(
             LocalDateTime inicio,
             LocalDateTime fim,

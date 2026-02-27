@@ -10,7 +10,6 @@ import br.com.frotasPro.api.service.relatorios.RelatorioMetaMensalMotoristaServi
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,7 +42,6 @@ public class MotoristaController {
 
     @PreAuthorize("hasAnyAuthority(\'ROLE_CONSULTA\')")
     @GetMapping("/{codigo}")
-    @Cacheable("motorista_buscar_codigo")
     public ResponseEntity<MotoristaResponse> buscarPorCodigo(@PathVariable String codigo) {
         MotoristaResponse motorista = buscarMotoristaService.buscar(codigo);
         return ResponseEntity.ok(motorista);
@@ -51,7 +49,6 @@ public class MotoristaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping
-    @Cacheable("motorista_listar")
     public ResponseEntity<Page<MotoristaResponse>> listar(
             @RequestParam(required = false) Boolean ativo,
             @RequestParam(required = false) String q,
@@ -111,7 +108,6 @@ public class MotoristaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/{codigoMotorista}/meta-mensal")
-    @Cacheable("motorista_meta_mensal")
     public ResponseEntity<RelatorioMetaMensalMotoristaResponse> gerar(
             @PathVariable String codigoMotorista,
             @RequestParam("inicio")
@@ -151,7 +147,6 @@ public class MotoristaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
     @GetMapping("/{motoristaId}/documentos")
-    @Cacheable("motorista_documentos")
     public ResponseEntity<List<DocumentoMotoristaResponse>> listarDocumentosMotorista(
             @PathVariable UUID motoristaId
     ) {

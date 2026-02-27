@@ -12,7 +12,6 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +28,6 @@ public class PneuController {
     private final PneuService service;
 
     @GetMapping
-    @Cacheable("pneu_listar")
     public ResponseEntity<Page<PneuResponse>> listar(
             @RequestParam(value = "q", required = false)
             @Size(max = 120, message = "Filtro inválido")
@@ -46,7 +44,6 @@ public class PneuController {
     }
 
     @GetMapping("/{codigo}")
-    @Cacheable("pneu_buscar_codigo")
     public ResponseEntity<PneuResponse> buscar(
             @PathVariable
             @NotBlank(message = "Código é obrigatório")
@@ -103,7 +100,6 @@ public class PneuController {
 
     // VIDA ÚTIL
     @GetMapping("/{codigo}/vida-util")
-    @Cacheable("pneu_vida_util")
     public ResponseEntity<PneuVidaUtilResponse> vidaUtil(
             @PathVariable
             @NotBlank(message = "Código é obrigatório")
@@ -133,7 +129,6 @@ public class PneuController {
     }
 
     @GetMapping("/{codigo}/movimentacoes")
-    @Cacheable("pneu_movimentacoes")
     public ResponseEntity<Page<PneuMovimentacaoResponse>> listarMovimentacoes(
             @PathVariable
             @NotBlank(message = "Código é obrigatório")

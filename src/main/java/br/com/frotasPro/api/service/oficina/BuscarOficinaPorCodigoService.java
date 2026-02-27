@@ -6,6 +6,7 @@ import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.mapper.OficinaMapper;
 import br.com.frotasPro.api.repository.OficinaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class BuscarOficinaPorCodigoService {
     private final OficinaRepository oficinaRepository;
 
     @Transactional(readOnly = true)
+    @Cacheable("oficina_buscar_codigo")
     public OficinaResponse porCodigo(String codigo) {
         Oficina oficina = oficinaRepository.findByCodigo(codigo)
                 .orElseThrow(() -> new ObjectNotFound("Oficina não encontrada para o código: " + codigo));

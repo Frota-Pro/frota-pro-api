@@ -8,6 +8,7 @@ import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.DocumentoManutencaoRepository;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class ListarDocumentoManutencaoService {
     private final DocumentoManutencaoRepository documentoManutencaoRepository;
 
     @Transactional(readOnly = true)
+    @Cacheable("manutencao_documentos")
     public Page<DocumentoManutencaoResponse> listarPorManutencao(String codigo, Pageable pageable) {
 
         manutencaoRepository.findByCodigo(codigo)

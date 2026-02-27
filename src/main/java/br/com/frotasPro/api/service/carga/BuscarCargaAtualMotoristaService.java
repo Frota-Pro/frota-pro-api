@@ -43,4 +43,3 @@ public class BuscarCargaAtualMotoristaService {
         return CargaMapper.toResponse(carga);
     }
 }
-

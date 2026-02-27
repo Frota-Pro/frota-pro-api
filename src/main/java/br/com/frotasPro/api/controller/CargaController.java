@@ -9,7 +9,6 @@ import br.com.frotasPro.api.service.carga.*;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,7 +43,6 @@ public class CargaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/{numeroCarga}")
-    @Cacheable("carga_buscar_numero")
     public ResponseEntity<CargaResponse> buscarPorNumero(@PathVariable String numeroCarga) {
         CargaResponse carga = buscarCargaService.porCodigo(numeroCarga);
         return ResponseEntity.ok(carga);
@@ -52,7 +50,6 @@ public class CargaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/externo/{codigoExterno}")
-    @Cacheable("carga_buscar_codigo_externo")
     public ResponseEntity<CargaResponse> buscarPorCodigoExterno(@PathVariable String codigoExterno) {
         CargaResponse carga = buscarCargaService.porCodigoExterno(codigoExterno);
         return ResponseEntity.ok(carga);
@@ -62,7 +59,6 @@ public class CargaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping
-    @Cacheable("carga_listar")
     public ResponseEntity<Page<CargaMinResponse>> listar(
             @RequestParam(value = "q", required = false) String q,
             @RequestParam(value = "inicio", required = false)
@@ -79,7 +75,6 @@ public class CargaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/data-saida")
-    @Cacheable("carga_data_saida")
     public ResponseEntity<Page<CargaResponse>> buscarPorDataSaida(
             @RequestParam("data")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataSaida,
@@ -91,7 +86,6 @@ public class CargaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/periodo-saida")
-    @Cacheable("carga_periodo_saida")
     public ResponseEntity<Page<CargaResponse>> buscarPorPeriodoSaida(
             @RequestParam("inicio")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
@@ -105,7 +99,6 @@ public class CargaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/periodo-criacao")
-    @Cacheable("carga_periodo_criacao")
     public ResponseEntity<Page<CargaResponse>> buscarPorPeriodoCriacao(
             @RequestParam("inicio")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
@@ -121,7 +114,6 @@ public class CargaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/motorista")
-    @Cacheable("carga_motorista")
     public ResponseEntity<Page<CargaResponse>> buscarPorMotorista(
             @RequestParam("codigo") String codigoMotorista,
             Pageable pageable
@@ -132,7 +124,6 @@ public class CargaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/caminhao")
-    @Cacheable("carga_caminhao")
     public ResponseEntity<Page<CargaResponse>> buscarPorCaminhao(
             @RequestParam("codigo") String codigoCaminhao,
             Pageable pageable

@@ -12,6 +12,7 @@ import br.com.frotasPro.api.repository.AcessoRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.repository.UsuarioRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -72,10 +73,12 @@ public class UsuarioService {
         return toResponse(usuario);
     }
 
+    @Cacheable("usuario_listar")
     public org.springframework.data.domain.Page<UsuarioResponse> listar(String q, Boolean ativo, org.springframework.data.domain.Pageable pageable) {
         return usuarioRepository.search(q, ativo, pageable).map(br.com.frotasPro.api.mapper.UsuarioMapper::toResponse);
     }
 
+    @Cacheable("usuario_buscar_id")
     public UsuarioResponse buscarPorId(UUID id) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));

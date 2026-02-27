@@ -5,6 +5,7 @@ import br.com.frotasPro.api.domain.Manutencao;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ public class BuscarManutencaoPorCodigoService {
     private final ManutencaoRepository manutencaoRepository;
 
     @Transactional(readOnly = true)
+    @Cacheable("manutencao_buscar_codigo")
     public ManutencaoResponse buscar(String codigo) {
         Manutencao manutencao = manutencaoRepository.findByCodigo(codigo)
                 .orElseThrow(() -> new ObjectNotFound("Manutenção não encontrada"));

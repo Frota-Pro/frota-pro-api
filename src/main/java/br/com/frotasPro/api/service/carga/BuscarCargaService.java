@@ -7,6 +7,7 @@ import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class BuscarCargaService {
     private final CargaRepository cargaRepository;
 
     @Transactional(readOnly = true)
+    @Cacheable("carga_buscar_numero")
     public CargaResponse porCodigo(String NumeroCarga) {
         Carga carga = cargaRepository.findByNumeroCarga(NumeroCarga.trim())
                 .orElseThrow(() -> new ObjectNotFound(
@@ -32,6 +34,7 @@ public class BuscarCargaService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable("carga_buscar_codigo_externo")
     public CargaResponse porCodigoExterno(String codigoExterno) {
         Carga carga = cargaRepository.findByNumeroCargaExterno(codigoExterno.trim())
                 .orElseThrow(() -> new ObjectNotFound(
@@ -42,12 +45,14 @@ public class BuscarCargaService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable("carga_data_saida")
     public Page<CargaResponse> porDataSaida(LocalDate dataSaida, Pageable pageable) {
         return cargaRepository.findByDtSaida(dataSaida, pageable)
                 .map(CargaMapper::toResponse);
     }
 
     @Transactional(readOnly = true)
+    @Cacheable("carga_periodo_saida")
     public Page<CargaResponse> porPeriodoSaida(LocalDate inicio,
                                                LocalDate fim,
                                                Pageable pageable) {
@@ -59,6 +64,7 @@ public class BuscarCargaService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable("carga_periodo_criacao")
     public Page<CargaResponse> porPeriodoCriacao(LocalDateTime inicio,
                                                  LocalDateTime fim,
                                                  Pageable pageable) {
@@ -70,6 +76,7 @@ public class BuscarCargaService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable("carga_motorista")
     public Page<CargaResponse> porMotorista(String codigo, Pageable pageable) {
 
         if (codigo == null || codigo.isBlank()) {
@@ -84,6 +91,7 @@ public class BuscarCargaService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable("carga_caminhao")
     public Page<CargaResponse> porCaminhao(String codigo, Pageable pageable) {
 
         if (codigo == null || codigo.isBlank()) {

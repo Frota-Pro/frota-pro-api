@@ -13,6 +13,7 @@ import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
 import br.com.frotasPro.api.service.meta.BuscarMetaAtivaComProgressoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +33,7 @@ public class BuscarCaminhaoDetalheService {
     private final BuscarMetaAtivaComProgressoService buscarMetaAtivaComProgressoService;
 
     @Transactional(readOnly = true)
+    @Cacheable("caminhao_detalhes")
     public CaminhaoDetalheResponse detalhes(String codigo) {
 
         var caminhao = caminhaoRepository.findByCodigoAndAtivoTrue(codigo)

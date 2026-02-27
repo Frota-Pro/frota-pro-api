@@ -10,7 +10,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,7 +37,6 @@ public class OficinaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN')")
     @GetMapping
-    @Cacheable("oficina_listar")
     public ResponseEntity<Page<OficinaResponse>> listar(Pageable pageable) {
         Page<OficinaResponse> page = buscarTodasOficinasService.listar(pageable);
         return ResponseEntity.ok(page);
@@ -46,7 +44,6 @@ public class OficinaController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN')")
     @GetMapping("/codigo/{codigo}")
-    @Cacheable("oficina_buscar_codigo")
     public ResponseEntity<OficinaResponse> buscarPorCodigo(
             @PathVariable
             @NotBlank(message = "Código é obrigatório")
@@ -111,7 +108,6 @@ public class OficinaController {
     }
 
     @GetMapping("/{codigo}/dashboard")
-    @Cacheable("oficina_dashboard")
     public ResponseEntity<OficinaDashboardResponse> dashboard(
             @PathVariable
             @NotBlank(message = "Código é obrigatório")
