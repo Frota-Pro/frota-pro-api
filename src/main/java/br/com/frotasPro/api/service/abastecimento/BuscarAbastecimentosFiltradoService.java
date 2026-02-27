@@ -21,7 +21,6 @@ public class BuscarAbastecimentosFiltradoService {
 
     private final AbastecimentoRepository repository;
 
-    @Cacheable("abastecimento_filtrar")
     public Page<AbastecimentoResponse> buscar(
             String q,
             String caminhao,

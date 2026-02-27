@@ -20,7 +20,6 @@ public class BuscarTodasOficinasService {
     private final OficinaRepository oficinaRepository;
 
     @Transactional(readOnly = true)
-    @Cacheable("oficina_listar")
     public Page<OficinaResponse> listar(Pageable pageable) {
         Page<Oficina> oficinas = oficinaRepository.findAll(pageable);
         return oficinas.map(OficinaMapper::toResponse);

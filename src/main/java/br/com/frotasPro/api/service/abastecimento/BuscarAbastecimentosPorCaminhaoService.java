@@ -17,7 +17,6 @@ public class BuscarAbastecimentosPorCaminhaoService {
     private final AbastecimentoRepository repository;
 
     @Transactional(readOnly = true)
-    @Cacheable("abastecimento_caminhao")
     public Page<AbastecimentoResponse> buscar(String codigoCaminhao, Pageable pageable) {
         return repository.buscarPorCodigoCaminhao(codigoCaminhao, pageable)
                 .map(AbastecimentoMapper::toResponse);

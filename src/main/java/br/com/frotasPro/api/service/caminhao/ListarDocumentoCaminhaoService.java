@@ -23,7 +23,6 @@ public class ListarDocumentoCaminhaoService {
     private final DocumentoCaminhaoRepository documentoCaminhaoRepository;
 
     @Transactional(readOnly = true)
-    @Cacheable("caminhao_documentos")
     public Page<DocumentoCaminhaoResponse> listarPorCaminhao(String codigo, Pageable pageable) {
 
         Caminhao caminhao = caminhaoRepository.findByCodigo(codigo)

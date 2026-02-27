@@ -45,14 +45,12 @@ public class BuscarCargaService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable("carga_data_saida")
     public Page<CargaResponse> porDataSaida(LocalDate dataSaida, Pageable pageable) {
         return cargaRepository.findByDtSaida(dataSaida, pageable)
                 .map(CargaMapper::toResponse);
     }
 
     @Transactional(readOnly = true)
-    @Cacheable("carga_periodo_saida")
     public Page<CargaResponse> porPeriodoSaida(LocalDate inicio,
                                                LocalDate fim,
                                                Pageable pageable) {
@@ -64,7 +62,6 @@ public class BuscarCargaService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable("carga_periodo_criacao")
     public Page<CargaResponse> porPeriodoCriacao(LocalDateTime inicio,
                                                  LocalDateTime fim,
                                                  Pageable pageable) {
@@ -76,7 +73,6 @@ public class BuscarCargaService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable("carga_motorista")
     public Page<CargaResponse> porMotorista(String codigo, Pageable pageable) {
 
         if (codigo == null || codigo.isBlank()) {
@@ -91,7 +87,6 @@ public class BuscarCargaService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable("carga_caminhao")
     public Page<CargaResponse> porCaminhao(String codigo, Pageable pageable) {
 
         if (codigo == null || codigo.isBlank()) {

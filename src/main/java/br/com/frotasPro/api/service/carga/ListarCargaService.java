@@ -21,7 +21,6 @@ public class ListarCargaService {
     private final CargaRepository cargaRepository;
 
     @Transactional(readOnly = true)
-    @Cacheable("carga_listar")
     public Page<CargaMinResponse> listar(String q, LocalDate inicio, LocalDate fim, Pageable pageable) {
 
         PeriodoValidator.opcional(inicio, fim, "dtSaida");

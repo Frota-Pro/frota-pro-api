@@ -19,7 +19,6 @@ public class BuscarAbastecimentoPorPeriodoService {
 
     private final AbastecimentoRepository repository;
 
-    @Cacheable("abastecimento_periodo")
     public Page<AbastecimentoResponse> buscar(
             LocalDateTime inicio,
             LocalDateTime fim,

@@ -17,7 +17,6 @@ public class ListarManutencoesPaginadoService {
     private final ManutencaoRepository manutencaoRepository;
 
     @Transactional(readOnly = true)
-    @Cacheable("manutencao_listar")
     public Page<ManutencaoResponse> listar(Pageable pageable) {
         return manutencaoRepository.findAll(pageable)
                 .map(ManutencaoMapper::toResponse);

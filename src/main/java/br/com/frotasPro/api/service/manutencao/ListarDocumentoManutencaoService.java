@@ -22,7 +22,6 @@ public class ListarDocumentoManutencaoService {
     private final DocumentoManutencaoRepository documentoManutencaoRepository;
 
     @Transactional(readOnly = true)
-    @Cacheable("manutencao_documentos")
     public Page<DocumentoManutencaoResponse> listarPorManutencao(String codigo, Pageable pageable) {
 
         manutencaoRepository.findByCodigo(codigo)

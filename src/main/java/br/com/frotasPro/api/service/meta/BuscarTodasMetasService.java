@@ -16,7 +16,6 @@ public class BuscarTodasMetasService {
 
     private final MetaRepository metaRepository;
 
-    @Cacheable("meta_listar")
     public Page<MetaResponse> listar(Pageable pageable) {
         Page<Meta> page = metaRepository.findAll(pageable);
         return page.map(MetaMapper::toResponse);

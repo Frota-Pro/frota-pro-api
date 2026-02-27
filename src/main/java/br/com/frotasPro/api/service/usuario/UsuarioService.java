@@ -73,7 +73,6 @@ public class UsuarioService {
         return toResponse(usuario);
     }
 
-    @Cacheable("usuario_listar")
     public org.springframework.data.domain.Page<UsuarioResponse> listar(String q, Boolean ativo, org.springframework.data.domain.Pageable pageable) {
         return usuarioRepository.search(q, ativo, pageable).map(br.com.frotasPro.api.mapper.UsuarioMapper::toResponse);
     }

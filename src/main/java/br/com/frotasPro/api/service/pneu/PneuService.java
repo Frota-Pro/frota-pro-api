@@ -34,7 +34,6 @@ public class PneuService {
     private final CaminhaoRepository caminhaoRepository;
 
     @Transactional(readOnly = true)
-    @Cacheable("pneu_listar")
     public Page<PneuResponse> listar(String q, String status, Pageable pageable) {
 
         if (status != null && !status.isBlank()) {
@@ -280,7 +279,6 @@ public class PneuService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable("pneu_movimentacoes")
     public Page<PneuMovimentacaoResponse> listarMovimentacoes(String codigoPneu, Pageable pageable) {
         getPneu(codigoPneu); // garante 404 quando pneu não existe
         return movRepository

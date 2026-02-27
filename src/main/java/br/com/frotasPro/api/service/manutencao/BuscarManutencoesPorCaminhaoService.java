@@ -18,7 +18,6 @@ public class BuscarManutencoesPorCaminhaoService {
 
     private final ManutencaoRepository manutencaoRepository;
 
-    @Cacheable("manutencao_caminhao")
     public Page<ManutencaoResponse> buscarPorCaminhao(
             String codigoCaminhao,
             Pageable pageable
@@ -27,7 +26,6 @@ public class BuscarManutencoesPorCaminhaoService {
                 .map(ManutencaoMapper::toResponse);
     }
 
-    @Cacheable("manutencao_caminhao_periodo")
     public Page<ManutencaoResponse> buscarPorCaminhaoEPeriodo(
             String codigoCaminhao,
             LocalDate inicio,

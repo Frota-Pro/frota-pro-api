@@ -20,7 +20,6 @@ public class BuscarAbastecimentoPorCombustivelPeriodoService {
 
     private final AbastecimentoRepository repository;
 
-    @Cacheable("abastecimento_periodo_combustivel")
     public Page<AbastecimentoResponse> buscar(
             TipoCombustivel tipoCombustivel,
             LocalDateTime inicio,

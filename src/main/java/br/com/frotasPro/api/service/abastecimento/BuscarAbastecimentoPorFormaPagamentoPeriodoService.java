@@ -20,7 +20,6 @@ public class BuscarAbastecimentoPorFormaPagamentoPeriodoService {
 
     private final AbastecimentoRepository repository;
 
-    @Cacheable("abastecimento_periodo_forma")
     public Page<AbastecimentoResponse> buscar(
             FormaPagamento formaPagamento,
             LocalDateTime inicio,

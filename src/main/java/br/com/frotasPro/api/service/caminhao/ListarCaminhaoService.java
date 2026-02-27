@@ -17,7 +17,6 @@ public class ListarCaminhaoService {
     private final CaminhaoRepository caminhaoRepository;
 
     @Transactional(readOnly = true)
-    @Cacheable("caminhao_listar")
     public Page<CaminhaoResponse> listar(Boolean ativo, String q, Pageable pageable) {
         return caminhaoRepository.search(ativo, q, pageable).map(CaminhaoMapper::toResponse);
     }

@@ -18,7 +18,6 @@ public class BuscarManutencoesPorOficinaEPeriodoService {
 
     private final ManutencaoRepository manutencaoRepository;
 
-    @Cacheable("manutencao_oficina_periodo")
     public Page<ManutencaoResponse> buscar(
             String codigoOficina,
             LocalDate inicio,
