@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -24,8 +25,11 @@ public class IntegracaoWinThorController {
 
     @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
     @PostMapping("/motoristas/sincronizar")
-    public ResponseEntity<?> sincronizarMotoristas(@RequestParam UUID empresaId) {
-        UUID jobId = motoristaIntegracaoService.solicitarSincronizacao(empresaId);
+    public ResponseEntity<?> sincronizarMotoristas(
+            @RequestParam UUID empresaId,
+            @RequestParam(value = "codigosMotoristas", required = false) List<Integer> codigosMotoristas
+    ) {
+        UUID jobId = motoristaIntegracaoService.solicitarSincronizacao(empresaId, codigosMotoristas);
         return ResponseEntity.accepted().body(Map.of("jobId", jobId));
     }
 
@@ -33,9 +37,10 @@ public class IntegracaoWinThorController {
     @PostMapping("/caminhoes/sincronizar")
     public ResponseEntity<?> sincronizarCaminhoes(
             @RequestParam UUID empresaId,
-            @RequestParam(required = false) Integer codFilial
+            @RequestParam(required = false) Integer codFilial,
+            @RequestParam(value = "codigosCaminhoes", required = false) List<Integer> codigosCaminhoes
     ) {
-        UUID jobId = caminhaoIntegracaoService.solicitarSincronizacao(empresaId, codFilial);
+        UUID jobId = caminhaoIntegracaoService.solicitarSincronizacao(empresaId, codFilial, codigosCaminhoes);
         return ResponseEntity.accepted().body(Map.of("jobId", jobId));
     }
 
@@ -45,12 +50,32 @@ public class IntegracaoWinThorController {
             @RequestParam("empresaId") UUID empresaId,
             @RequestParam(value = "data", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate data) {
+            LocalDate data,
+            @RequestParam(value = "dataInicial", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate dataInicial,
+            @RequestParam(value = "dataFinal", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate dataFinal,
+            @RequestParam(value = "codigosCaminhoes", required = false) List<Integer> codigosCaminhoes,
+            @RequestParam(value = "codigosMotoristas", required = false) List<Integer> codigosMotoristas,
+            @RequestParam(value = "tipoCarga", defaultValue = "FATURADA") String tipoCarga,
+            @RequestParam(value = "origem", defaultValue = "API_FROTAPRO") String origem,
+            @RequestParam(value = "solicitadoPor", defaultValue = "sistema") String solicitadoPor
+    ) {
 
         LocalDate hoje = LocalDate.now();
 
-        if (data == null) {
-            data = hoje;
+        if (dataInicial == null && dataFinal == null) {
+            dataInicial = data != null ? data : hoje;
+            dataFinal = dataInicial;
+        } else {
+            if (dataInicial == null) {
+                dataInicial = dataFinal;
+            }
+            if (dataFinal == null) {
+                dataFinal = dataInicial;
+            }
         }
 
 //        if (data.isBefore(hoje)) {
@@ -69,7 +94,16 @@ public class IntegracaoWinThorController {
 //                    ));
 //        }
 
-        UUID jobId = integracaoCargaService.solicitarSincronizacao(empresaId, data);
+        UUID jobId = integracaoCargaService.solicitarSincronizacao(
+                empresaId,
+                dataInicial,
+                dataFinal,
+                codigosCaminhoes,
+                codigosMotoristas,
+                tipoCarga,
+                origem,
+                solicitadoPor
+        );
         return ResponseEntity.accepted().body(Map.of("jobId", jobId));
     }
 

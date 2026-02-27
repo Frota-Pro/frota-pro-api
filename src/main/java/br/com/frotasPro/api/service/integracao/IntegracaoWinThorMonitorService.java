@@ -49,6 +49,7 @@ public class IntegracaoWinThorMonitorService {
     private final CargaSyncJobService cargaJobService;
     private final CaminhaoSyncJobService caminhaoJobService;
     private final MotoristaSyncJobService motoristaJobService;
+    private final IntegracaoWinThorConfigService configService;
     private final NotificacaoService notificacaoService;
 
     @Transactional(readOnly = true)
@@ -102,12 +103,17 @@ public class IntegracaoWinThorMonitorService {
         cargaRepo.save(job);
 
         var data = job.getDataReferencia();
+        var config = configService.getOrDefault(empresaId);
+        List<Integer> codigosCaminhoes = normalizarCodigos(config != null ? config.getCodigosCaminhoes() : null);
+        List<Integer> codigosMotoristas = normalizarCodigos(config != null ? config.getCodigosMotoristas() : null);
 
         CargaSyncRequestEvent event = CargaSyncRequestEvent.builder()
                 .jobId(job.getId())
                 .empresaId(empresaId)
                 .dataInicial(data)
                 .dataFinal(data)
+                .codigosCaminhoes(codigosCaminhoes)
+                .codigosMotoristas(codigosMotoristas)
                 .tipoCarga("FATURADA")
                 .origem("API_RETRY")
                 .solicitadoPor("USUARIO")
@@ -136,11 +142,14 @@ public class IntegracaoWinThorMonitorService {
         job.setMensagemErro(null);
         job.setAtualizadoEm(OffsetDateTime.now());
         caminhaoRepo.save(job);
+        var config = configService.getOrDefault(empresaId);
+        List<Integer> codigosCaminhoes = normalizarCodigos(config != null ? config.getCodigosCaminhoes() : null);
 
         CaminhaoSyncRequestEvent event = CaminhaoSyncRequestEvent.builder()
                 .jobId(job.getId())
                 .empresaId(empresaId)
                 .codFilial(null)
+                .codigosCaminhoes(codigosCaminhoes)
                 .timestampSolicitacao(OffsetDateTime.now())
                 .build();
 
@@ -166,10 +175,13 @@ public class IntegracaoWinThorMonitorService {
         job.setMensagemErro(null);
         job.setAtualizadoEm(OffsetDateTime.now());
         motoristaRepo.save(job);
+        var config = configService.getOrDefault(empresaId);
+        List<Integer> codigosMotoristas = normalizarCodigos(config != null ? config.getCodigosMotoristas() : null);
 
         MotoristaSyncRequestEvent event = MotoristaSyncRequestEvent.builder()
                 .jobId(job.getId())
                 .empresaId(empresaId)
+                .codigosMotoristas(codigosMotoristas)
                 .timestampSolicitacao(OffsetDateTime.now())
                 .build();
 
@@ -221,5 +233,12 @@ public class IntegracaoWinThorMonitorService {
                 .criadoEm(j.getCriadoEm())
                 .atualizadoEm(j.getAtualizadoEm())
                 .build();
+    }
+
+    private List<Integer> normalizarCodigos(List<Integer> codigos) {
+        if (codigos == null || codigos.isEmpty()) {
+            return null;
+        }
+        return codigos;
     }
 }

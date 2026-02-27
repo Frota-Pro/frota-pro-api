@@ -1,10 +1,12 @@
 package br.com.frotasPro.api.domain.integracao;
 
+import br.com.frotasPro.api.domain.integracao.converter.IntegerListToStringConverter;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -41,6 +43,14 @@ public class IntegracaoWinThorConfig {
 
     @Column(name = "sync_cargas", nullable = false)
     private boolean syncCargas = true;
+
+    @Convert(converter = IntegerListToStringConverter.class)
+    @Column(name = "codigos_caminhoes")
+    private List<Integer> codigosCaminhoes;
+
+    @Convert(converter = IntegerListToStringConverter.class)
+    @Column(name = "codigos_motoristas")
+    private List<Integer> codigosMotoristas;
 
     @Column(name = "criado_em", nullable = false)
     private OffsetDateTime criadoEm;

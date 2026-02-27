@@ -7,9 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
-import java.time.OffsetDateTime;
-import java.util.UUID;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -22,11 +19,10 @@ public class CaminhaoSyncRequestProducer {
 
     public void enviar(CaminhaoSyncRequestEvent event) {
 
-        log.info("📤 Enviando pedido de sync de caminhões. jobId={} empresaId={} codFilial={}",
-                event.getJobId(), event.getEmpresaId(), event.getCodFilial());
+        log.info("📤 Enviando pedido de sync de caminhões. jobId={} empresaId={} codFilial={} codigosCaminhoes={}",
+                event.getJobId(), event.getEmpresaId(), event.getCodFilial(), event.getCodigosCaminhoes());
 
         kafkaTemplate.send(topic, event.getJobId().toString(), event);
     }
 }
-
 

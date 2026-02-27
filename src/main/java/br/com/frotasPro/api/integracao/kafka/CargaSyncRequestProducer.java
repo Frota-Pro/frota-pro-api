@@ -18,8 +18,9 @@ public class CargaSyncRequestProducer {
     private String topic;
 
     public void enviar(CargaSyncRequestEvent event) {
-        log.info("📤 Enviando pedido de sync de cargas. jobId={} dataInicial={} dataFinal={}",
-                event.getJobId(), event.getDataInicial(), event.getDataFinal());
+        log.info("📤 Enviando pedido de sync de cargas. jobId={} dataInicial={} dataFinal={} codigosCaminhoes={} codigosMotoristas={}",
+                event.getJobId(), event.getDataInicial(), event.getDataFinal(),
+                event.getCodigosCaminhoes(), event.getCodigosMotoristas());
 
         kafkaTemplate.send(topic, event.getJobId().toString(), event);
     }

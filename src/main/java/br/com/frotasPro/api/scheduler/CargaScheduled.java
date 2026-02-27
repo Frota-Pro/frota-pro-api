@@ -1,7 +1,7 @@
 package br.com.frotasPro.api.scheduler;
 
 import br.com.frotasPro.api.domain.integracao.IntegracaoWinThorConfig;
-import br.com.frotasPro.api.service.carga.CargaSyncJobService;
+import br.com.frotasPro.api.service.integracao.IntegracaoCargaService;
 import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CargaScheduled {
 
-    private final CargaSyncJobService cargaSyncJobService;
+    private final IntegracaoCargaService integracaoCargaService;
     private final IntegracaoWinThorConfigService configService;
 
     @Value("${frotapro.empresa-sync-id}")
@@ -48,7 +48,16 @@ public class CargaScheduled {
         }
 
         LocalDate hoje = LocalDate.now();
-        UUID jobId = cargaSyncJobService.solicitarSincronizacao(empresaIdPadrao, hoje);
+        UUID jobId = integracaoCargaService.solicitarSincronizacao(
+                empresaIdPadrao,
+                hoje,
+                hoje,
+                null,
+                null,
+                "FATURADA",
+                "API_SCHEDULER",
+                "SCHEDULER"
+        );
 
         log.info("Job automático de sincronização de cargas disparado. jobId={} data={}", jobId, hoje);
     }
