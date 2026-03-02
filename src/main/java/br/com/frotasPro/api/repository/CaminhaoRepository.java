@@ -45,6 +45,7 @@ public interface CaminhaoRepository extends JpaRepository<Caminhao, UUID> {
        from Caminhao c
        where c.codigo = :codigo
           or c.codigoExterno = :codigo
+          or lower(replace(coalesce(c.placa, ''), '-', '')) = lower(replace(:codigo, '-', ''))
        """)
     Optional<Caminhao> findByCaminhaoPorCodigoOuPorCodigoExterno(String codigo);
 
