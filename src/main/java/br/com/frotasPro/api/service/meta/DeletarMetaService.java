@@ -1,6 +1,7 @@
 package br.com.frotasPro.api.service.meta;
 
 import br.com.frotasPro.api.domain.Meta;
+import br.com.frotasPro.api.domain.enums.StatusMeta;
 import br.com.frotasPro.api.excption.BusinessException;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.MetaRepository;
@@ -21,7 +22,10 @@ public class DeletarMetaService {
         Meta meta = metaRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFound("Meta não encontrada para o id: " + id));
 
-        if (meta.getCaminhao() != null || meta.getCategoria() != null || meta.getMotorista() != null) {
+        boolean vinculada = meta.getCaminhao() != null || meta.getCategoria() != null || meta.getMotorista() != null;
+        boolean encerrada = meta.getStatusMeta() == StatusMeta.CANCELADA || meta.getStatusMeta() == StatusMeta.CONCLUIDA;
+
+        if (vinculada && !encerrada) {
             throw new BusinessException("Não é possível excluir uma meta vinculada. Desvincule/cancele a meta antes de excluir.");
         }
 
