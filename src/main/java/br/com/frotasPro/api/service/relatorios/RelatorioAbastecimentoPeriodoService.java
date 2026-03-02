@@ -12,10 +12,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,19 +54,42 @@ public class RelatorioAbastecimentoPeriodoService {
                 motorista == null ? null : motorista.getId()
         );
 
+        Map<String, Integer> ultimoKmPorCaminhao = new HashMap<>();
+
         List<RelatorioAbastecimentoPeriodoResponse.Linha> linhas = itens.stream()
-                .map(a -> RelatorioAbastecimentoPeriodoResponse.Linha.builder()
-                        .data(LocalDate.from(a.getDtAbastecimento()))
-                        .caminhao(a.getCaminhao() == null ? "-" : (a.getCaminhao().getPlaca() + " (" + a.getCaminhao().getCodigo() + ")"))
-                        .motorista(a.getMotorista() == null ? "-" : (a.getMotorista().getNome() + " (" + a.getMotorista().getCodigo() + ")"))
-                        .posto(a.getPosto())
-                        .cidade(a.getCidade())
-                        .litros(nvl(a.getQtLitros()))
-                        .valorTotal(nvl(a.getValorTotal()))
-                        .kmOdometro(a.getKmOdometro() == null ? BigDecimal.ZERO : new BigDecimal(a.getKmOdometro()))
-                        .mediaKmLitro(nvl(a.getMediaKmLitro()))
-                        .tipoCombustivel(a.getTipoCombustivel() == null ? null : a.getTipoCombustivel().name())
-                        .build())
+                .map(a -> {
+                    String chaveCaminhao = a.getCaminhao() == null ? null : a.getCaminhao().getId().toString();
+                    Integer kmAtual = a.getKmOdometro();
+
+                    BigDecimal media = a.getMediaKmLitro();
+                    if (media == null && chaveCaminhao != null && kmAtual != null && a.getQtLitros() != null
+                            && a.getQtLitros().compareTo(BigDecimal.ZERO) > 0) {
+                        Integer kmAnterior = ultimoKmPorCaminhao.get(chaveCaminhao);
+                        if (kmAnterior != null) {
+                            int kmRodado = kmAtual - kmAnterior;
+                            if (kmRodado > 0) {
+                                media = BigDecimal.valueOf(kmRodado).divide(a.getQtLitros(), 3, RoundingMode.HALF_UP);
+                            }
+                        }
+                    }
+
+                    if (chaveCaminhao != null && kmAtual != null) {
+                        ultimoKmPorCaminhao.put(chaveCaminhao, kmAtual);
+                    }
+
+                    return RelatorioAbastecimentoPeriodoResponse.Linha.builder()
+                            .data(LocalDate.from(a.getDtAbastecimento()))
+                            .caminhao(a.getCaminhao() == null ? "-" : (a.getCaminhao().getPlaca() + " (" + a.getCaminhao().getCodigo() + ")"))
+                            .motorista(a.getMotorista() == null ? "-" : (a.getMotorista().getNome() + " (" + a.getMotorista().getCodigo() + ")"))
+                            .posto(a.getPosto())
+                            .cidade(a.getCidade())
+                            .litros(nvl(a.getQtLitros()))
+                            .valorTotal(nvl(a.getValorTotal()))
+                            .kmOdometro(kmAtual == null ? BigDecimal.ZERO : new BigDecimal(kmAtual))
+                            .mediaKmLitro(nvl(media))
+                            .tipoCombustivel(a.getTipoCombustivel() == null ? null : a.getTipoCombustivel().name())
+                            .build();
+                })
                 .collect(Collectors.toList());
 
         BigDecimal totalLitros = itens.stream().map(Abastecimento::getQtLitros).map(this::nvl).reduce(BigDecimal.ZERO, BigDecimal::add);
