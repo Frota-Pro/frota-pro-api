@@ -28,6 +28,15 @@ public interface MotoristaRepository extends JpaRepository<Motorista, UUID> {
        """)
     Optional<Motorista> findByMotoristaPorCodigoOuPorCodigoExterno(String codigo);
 
+    @Query("""
+       select m
+       from Motorista m
+       where m.codigo = :valor
+          or m.codigoExterno = :valor
+          or lower(coalesce(m.nome, '')) = lower(:valor)
+       """)
+    Optional<Motorista> findByCodigoOuCodigoExternoOuNome(@Param("valor") String valor);
+
     Optional<Motorista> findByUsuarioId(UUID usuarioIdLogado);
 
     @Query("""

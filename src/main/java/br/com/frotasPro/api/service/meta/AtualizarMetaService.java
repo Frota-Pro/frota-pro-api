@@ -85,22 +85,25 @@ public class AtualizarMetaService {
             meta.setCaminhao(null);
             meta.setCategoria(null);
             meta.setMotorista(null);
-            caminhao = caminhaoRepository.findByCodigo(request.getCaminhao())
-                    .orElseThrow(() -> new ObjectNotFound("Caminhão não encontrado para o código: " + request.getCaminhao()));
+            String alvo = request.getCaminhao().trim();
+            caminhao = caminhaoRepository.findByCaminhaoPorCodigoOuPorCodigoExterno(alvo)
+                    .orElseThrow(() -> new ObjectNotFound("Caminhão não encontrado para código/código externo/placa: " + alvo));
             meta.setCaminhao(caminhao);
         } else if (temCategoriaReq) {
             meta.setCaminhao(null);
             meta.setCategoria(null);
             meta.setMotorista(null);
-            categoria = categoriaCaminhaoRepository.findByCodigo(request.getCategoria())
-                    .orElseThrow(() -> new ObjectNotFound("Categoria de caminhão não encontrada para o código: " + request.getCategoria()));
+            String alvo = request.getCategoria().trim();
+            categoria = categoriaCaminhaoRepository.findByCodigoOuDescricao(alvo)
+                    .orElseThrow(() -> new ObjectNotFound("Categoria de caminhão não encontrada para código/nome: " + alvo));
             meta.setCategoria(categoria);
         } else if (temMotoristaReq) {
             meta.setCaminhao(null);
             meta.setCategoria(null);
             meta.setMotorista(null);
-            motorista = motoristaRepository.findByCodigo(request.getMotorista())
-                    .orElseThrow(() -> new ObjectNotFound("Motorista não encontrado para o código: " + request.getMotorista()));
+            String alvo = request.getMotorista().trim();
+            motorista = motoristaRepository.findByCodigoOuCodigoExternoOuNome(alvo)
+                    .orElseThrow(() -> new ObjectNotFound("Motorista não encontrado para código/código externo/nome: " + alvo));
             meta.setMotorista(motorista);
         }
 

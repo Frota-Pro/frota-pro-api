@@ -25,7 +25,7 @@ public class RelatorioHistoricoManutencaoService {
 
         PeriodoValidator.obrigatorio(inicio, fim, "periodo");
 
-        Caminhao caminhao = caminhaoRepository.findByCodigo(codigoCaminhao)
+        Caminhao caminhao = caminhaoRepository.findByCaminhaoPorCodigoOuPorCodigoExterno(codigoCaminhao)
                 .orElseThrow(() -> new IllegalArgumentException("Caminhão não encontrado: " + codigoCaminhao));
 
         List<Manutencao> itens = manutencaoRepository.findByCaminhaoAndPeriodo(caminhao.getId(), inicio, fim);

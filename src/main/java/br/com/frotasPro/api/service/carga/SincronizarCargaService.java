@@ -14,6 +14,8 @@ import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.repository.RotaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +38,17 @@ public class SincronizarCargaService {
     private final RotaRepository rotaRepository;
     private final CargaNotaRepository cargaNotaRepository;
 
+    @Caching(evict = {
+            @CacheEvict(value = "carga_listar", allEntries = true),
+            @CacheEvict(value = "carga_buscar_numero", allEntries = true),
+            @CacheEvict(value = "carga_buscar_codigo_externo", allEntries = true),
+            @CacheEvict(value = "carga_data_saida", allEntries = true),
+            @CacheEvict(value = "carga_periodo_saida", allEntries = true),
+            @CacheEvict(value = "carga_periodo_criacao", allEntries = true),
+            @CacheEvict(value = "carga_motorista", allEntries = true),
+            @CacheEvict(value = "carga_caminhao", allEntries = true),
+            @CacheEvict(value = "carga_minha_atual", allEntries = true)
+    })
     @Transactional
     public void sincronizarCargasWinThor(CargaSyncResponseEvent event) {
         log.info("Sincronizando {} cargas da data {} (jobId={})",

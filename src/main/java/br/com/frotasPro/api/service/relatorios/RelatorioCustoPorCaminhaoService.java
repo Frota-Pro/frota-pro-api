@@ -31,7 +31,7 @@ public class RelatorioCustoPorCaminhaoService {
 
         PeriodoValidator.obrigatorio(inicio, fim, "periodo");
 
-        Caminhao caminhao = caminhaoRepository.findByCodigo(codigoCaminhao)
+        Caminhao caminhao = caminhaoRepository.findByCaminhaoPorCodigoOuPorCodigoExterno(codigoCaminhao)
                 .orElseThrow(() -> new IllegalArgumentException("Caminhão não encontrado: " + codigoCaminhao));
 
         List<RelatorioCustoPorCaminhaoResponse.Linha> linhas = new ArrayList<>();

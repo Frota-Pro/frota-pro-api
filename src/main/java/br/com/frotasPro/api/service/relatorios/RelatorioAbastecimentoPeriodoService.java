@@ -37,7 +37,7 @@ public class RelatorioAbastecimentoPeriodoService {
         Motorista motorista = null;
 
         if (codigoCaminhao != null && !codigoCaminhao.isBlank()) {
-            caminhao = caminhaoRepository.findByCodigo(codigoCaminhao)
+            caminhao = caminhaoRepository.findByCaminhaoPorCodigoOuPorCodigoExterno(codigoCaminhao)
                     .orElseThrow(() -> new IllegalArgumentException("Caminhão não encontrado: " + codigoCaminhao));
         }
         if (codigoMotorista != null && !codigoMotorista.isBlank()) {
