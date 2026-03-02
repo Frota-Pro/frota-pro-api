@@ -37,9 +37,9 @@ public class CalcularMediaKmLitroService {
         if (dtAbastecimento != null) {
             // pega o último abastecimento ANTERIOR ao atual (ordem cronológica)
             ultimo = (ignorarAbastecimentoId != null)
-                    ? repository.findFirstByCaminhaoIdAndDtAbastecimentoLessThanAndIdNotOrderByDtAbastecimentoDesc(
+                    ? repository.findFirstByCaminhaoIdAndDtAbastecimentoLessThanAndIdNotAndKmOdometroIsNotNullOrderByDtAbastecimentoDesc(
                     caminhao.getId(), dtAbastecimento, ignorarAbastecimentoId)
-                    : repository.findFirstByCaminhaoIdAndDtAbastecimentoLessThanOrderByDtAbastecimentoDesc(
+                    : repository.findFirstByCaminhaoIdAndDtAbastecimentoLessThanAndKmOdometroIsNotNullOrderByDtAbastecimentoDesc(
                     caminhao.getId(), dtAbastecimento);
         } else {
             // fallback (mantém comportamento antigo)

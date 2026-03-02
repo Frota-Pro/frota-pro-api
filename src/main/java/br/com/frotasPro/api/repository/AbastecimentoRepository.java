@@ -94,7 +94,18 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, UU
             LocalDateTime dtAbastecimento
     );
 
+    Optional<Abastecimento> findFirstByCaminhaoIdAndDtAbastecimentoLessThanAndKmOdometroIsNotNullOrderByDtAbastecimentoDesc(
+            UUID caminhaoId,
+            LocalDateTime dtAbastecimento
+    );
+
     Optional<Abastecimento> findFirstByCaminhaoIdAndDtAbastecimentoLessThanAndIdNotOrderByDtAbastecimentoDesc(
+            UUID caminhaoId,
+            LocalDateTime dtAbastecimento,
+            UUID id
+    );
+
+    Optional<Abastecimento> findFirstByCaminhaoIdAndDtAbastecimentoLessThanAndIdNotAndKmOdometroIsNotNullOrderByDtAbastecimentoDesc(
             UUID caminhaoId,
             LocalDateTime dtAbastecimento,
             UUID id
