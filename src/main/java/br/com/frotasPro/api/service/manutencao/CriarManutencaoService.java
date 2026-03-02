@@ -43,8 +43,9 @@ public class CriarManutencaoService {
                 .orElseThrow(() -> new ObjectNotFound("Caminhão não encontrado"));
 
         Oficina oficina = null;
-        if (request.getOficina() != null) {
-            oficina = oficinaRepository.findByCodigo(request.getOficina())
+        String codigoOficina = request.getOficina() == null ? null : request.getOficina().trim();
+        if (codigoOficina != null && !codigoOficina.isEmpty()) {
+            oficina = oficinaRepository.findByCodigo(codigoOficina)
                     .orElseThrow(() -> new ObjectNotFound("Oficina não encontrada"));
         }
 
