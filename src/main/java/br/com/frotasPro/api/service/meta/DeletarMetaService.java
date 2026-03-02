@@ -23,9 +23,13 @@ public class DeletarMetaService {
                 .orElseThrow(() -> new ObjectNotFound("Meta não encontrada para o id: " + id));
 
         boolean vinculada = meta.getCaminhao() != null || meta.getCategoria() != null || meta.getMotorista() != null;
-        boolean encerrada = meta.getStatusMeta() == StatusMeta.CANCELADA || meta.getStatusMeta() == StatusMeta.CONCLUIDA;
+        boolean cancelada = meta.getStatusMeta() == StatusMeta.CANCELADA;
 
-        if (vinculada && !encerrada) {
+        if (!cancelada) {
+            throw new BusinessException("Só é possível excluir meta com status CANCELADA.");
+        }
+
+        if (vinculada) {
             throw new BusinessException("Não é possível excluir uma meta vinculada. Desvincule/cancele a meta antes de excluir.");
         }
 
