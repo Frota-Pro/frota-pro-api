@@ -16,4 +16,5 @@ public class AbastecimentoResumoCaminhaoResponse {
     private String caminhao;
     private BigDecimal totalLitros;
     private BigDecimal totalValor;
+    private BigDecimal mediaKmLitro;
 }

@@ -37,6 +37,7 @@ public class ResumoAbastecimentoPorCaminhaoService {
                         .caminhao(e.getCaminhao())
                         .totalLitros(e.getTotalLitros())
                         .totalValor(e.getTotalValor())
+                        .mediaKmLitro(e.getMediaKmLitro())
                         .build()
                 ).toList();
     }

@@ -58,7 +58,11 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, UU
     @Query("""
        select c.descricao as caminhao,
               sum(a.qtLitros) as totalLitros,
-              sum(a.valorTotal) as totalValor
+              sum(a.valorTotal) as totalValor,
+              case
+                when sum(coalesce(a.qtLitros, 0)) = 0 then null
+                else sum(coalesce(a.mediaKmLitro, 0) * coalesce(a.qtLitros, 0)) / sum(coalesce(a.qtLitros, 0))
+              end as mediaKmLitro
        from Abastecimento a
        join a.caminhao c
        where a.dtAbastecimento between :inicio and :fim
