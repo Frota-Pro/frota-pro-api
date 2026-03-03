@@ -268,28 +268,29 @@ public class RelatorioPdfController {
                 .body(pdf);
     }
 
-//    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
-//    @GetMapping("/pneus/vida-util")
-//    public ResponseEntity<byte[]> vidaUtilPneuPdf(
-//            @RequestParam(value = "codigoCaminhao", required = false) String codigoCaminhao
-//    ) {
-//        RelatorioVidaUtilPneuResponse rel = vidaUtilPneuService.gerar(codigoCaminhao);
-//
-//        Map<String, Object> p = new HashMap<>();
-//        p.put("filtroCaminhao", rel.getFiltroCaminhao());
-//        p.put("totalPneus", rel.getTotalPneus());
-//        aplicarLogo(p);
-//
-//        byte[] pdf = jasperPdfService.gerarPdfFromJasper(
-//                "reports/vida_util_pneu.jasper",
-//                p,
-//                rel.getLinhas()
-//        );
-//
-//        return ResponseEntity.ok()
-//                .contentType(MediaType.APPLICATION_PDF)
-//                .header(HttpHeaders.CONTENT_DISPOSITION,
-//                        "inline; filename=\"vida-util-pneu.pdf\"")
-//                .body(pdf);
-//    }
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @GetMapping("/pneus/vida-util")
+    public ResponseEntity<byte[]> vidaUtilPneuPdf(
+            @RequestParam(value = "codigoCaminhao", required = false) String codigoCaminhao,
+            @RequestParam(value = "codigoPneu", required = false) String codigoPneu
+    ) {
+        RelatorioVidaUtilPneuResponse rel = vidaUtilPneuService.gerar(codigoCaminhao, codigoPneu);
+
+        Map<String, Object> p = new HashMap<>();
+        p.put("filtroCaminhao", rel.getFiltroCaminhao());
+        p.put("totalPneus", rel.getTotalPneus());
+        aplicarLogo(p);
+
+        byte[] pdf = jasperPdfService.gerarPdfFromJasper(
+                "reports/vida_util_pneu.jasper",
+                p,
+                rel.getLinhas()
+        );
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=\"vida-util-pneu.pdf\"")
+                .body(pdf);
+    }
 }

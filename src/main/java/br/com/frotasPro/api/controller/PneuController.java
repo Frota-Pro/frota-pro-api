@@ -5,7 +5,9 @@ import br.com.frotasPro.api.controller.request.PneuRequest;
 import br.com.frotasPro.api.controller.response.PneuMovimentacaoResponse;
 import br.com.frotasPro.api.controller.response.PneuResponse;
 import br.com.frotasPro.api.controller.response.PneuVidaUtilResponse;
+import br.com.frotasPro.api.controller.response.RelatorioVidaUtilPneuResponse;
 import br.com.frotasPro.api.service.pneu.PneuService;
+import br.com.frotasPro.api.service.relatorios.RelatorioVidaUtilPneuService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -26,6 +28,7 @@ import org.springframework.validation.annotation.Validated;
 public class PneuController {
 
     private final PneuService service;
+    private final RelatorioVidaUtilPneuService relatorioVidaUtilPneuService;
 
     @GetMapping
     public ResponseEntity<Page<PneuResponse>> listar(
@@ -107,6 +110,18 @@ public class PneuController {
             String codigo
     ) {
         return ResponseEntity.ok(service.vidaUtil(codigo));
+    }
+
+    @GetMapping("/relatorios/vida-util")
+    public ResponseEntity<RelatorioVidaUtilPneuResponse> relatorioVidaUtil(
+            @RequestParam(value = "caminhao", required = false)
+            @Size(max = 50, message = "Código do caminhão inválido")
+            String codigoCaminhao,
+            @RequestParam(value = "pneu", required = false)
+            @Size(max = 20, message = "Código do pneu inválido")
+            String codigoPneu
+    ) {
+        return ResponseEntity.ok(relatorioVidaUtilPneuService.gerar(codigoCaminhao, codigoPneu));
     }
 
     // EVENTOS
