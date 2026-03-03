@@ -5,7 +5,6 @@ import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.service.cache.CargaCachedPage;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,6 @@ public class CargaListCacheService {
 
     private final CargaRepository cargaRepository;
 
-    @Cacheable("carga_listar")
     public CargaCachedPage listar(String q, LocalDate inicio, LocalDate fim, int page, int size, Sort sort) {
         var pageable = PageRequest.of(page, size, sort);
         var resultado = cargaRepository.listarFiltrado(q, inicio, fim, pageable).map(CargaMapper::toMinResponse);
