@@ -2,7 +2,9 @@ package br.com.frotasPro.api.controller.response;
 
 import br.com.frotasPro.api.config.json.BigDecimalBrasilSerializer;
 import br.com.frotasPro.api.config.json.BigDecimalSemZerosSerializer;
+import br.com.frotasPro.api.config.json.FlexibleBigDecimalDeserializer;
 import br.com.frotasPro.api.domain.enums.Status;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,6 +32,7 @@ public class CargaResponse {
     private BigDecimal pesoCarga;
 
     @JsonSerialize(using = BigDecimalBrasilSerializer.class)
+    @JsonDeserialize(using = FlexibleBigDecimalDeserializer.class)
     private BigDecimal valorTotal;
 
     private Integer kmInicial;
