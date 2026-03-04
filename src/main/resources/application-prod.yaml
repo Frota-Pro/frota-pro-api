@@ -12,3 +12,10 @@ spring:
       password: ${REDIS_PASSWORD:}
       ssl:
         enabled: ${REDIS_SSL:false}
+
+frotapro:
+  security:
+    cors:
+      allowed-origins:
+        - ${CORS_ALLOWED_ORIGIN}
+    prometheus-permit-all: false

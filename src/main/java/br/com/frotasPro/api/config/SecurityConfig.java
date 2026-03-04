@@ -9,9 +9,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -41,20 +41,32 @@ public class SecurityConfig {
     @Value("${jwt.private.key}")
     private RSAPrivateKey rsaPrivateKey;
 
+    @Value("${frotapro.security.prometheus-permit-all:false}")
+    private boolean prometheusPermitAll;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
+        AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authorizationRegistry = http
+                .authorizeHttpRequests();
+
+        authorizationRegistry
+                .requestMatchers("/").permitAll()
+                .requestMatchers(new RegexRequestMatcher(".*/publico$", null)).permitAll()
+                .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                .requestMatchers("/actuator/health", "/actuator/info").permitAll();
+
+        if (prometheusPermitAll) {
+            authorizationRegistry.requestMatchers("/actuator/prometheus").permitAll();
+        } else {
+            authorizationRegistry.requestMatchers("/actuator/prometheus").authenticated();
+        }
+
+        authorizationRegistry.anyRequest().authenticated();
+
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/").permitAll()
-                        .requestMatchers(new RegexRequestMatcher(".*/publico$", null)).permitAll()
-                        .requestMatchers(HttpMethod.POST, "/login").permitAll()
-                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
-                        .requestMatchers("/actuator/prometheus").permitAll()
-                        .anyRequest().authenticated()
-                )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
                 )
