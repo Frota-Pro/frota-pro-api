@@ -80,6 +80,21 @@ frotapro:
     jwt:
       access-token-seconds: 900
       refresh-token-seconds: 604800
+    login:
+      rate-limit:
+        ip:
+          max-attempts: 30
+          window-seconds: 60
+        user:
+          max-attempts: 12
+          window-seconds: 60
+      block:
+        first-threshold: 5
+        first-seconds: 300
+        second-threshold: 8
+        second-seconds: 900
+        third-threshold: 10
+        third-seconds: 1800
 
 
 jwt:

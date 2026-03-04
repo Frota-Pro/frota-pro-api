@@ -6,6 +6,7 @@ import br.com.frotasPro.api.controller.response.LoginResponse;
 import br.com.frotasPro.api.service.auth.AuthTokenService;
 import br.com.frotasPro.api.service.auth.TokenPair;
 import br.com.frotasPro.api.service.usuario.UsuarioLoginService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +24,8 @@ public class LoginController {
     private final AuthTokenService authTokenService;
 
     @PostMapping
-    public LoginResponse login(@RequestBody @Valid LoginRequest request) {
-        return usuarioLoginService.login(request);
+    public LoginResponse login(@RequestBody @Valid LoginRequest request, HttpServletRequest httpRequest) {
+        return usuarioLoginService.login(request, extractClientIp(httpRequest));
     }
 
     @PostMapping("/refresh")
@@ -42,5 +43,21 @@ public class LoginController {
     public ResponseEntity<Void> logout(@RequestBody @Valid RefreshTokenRequest request) {
         authTokenService.logout(request.refreshToken());
         return ResponseEntity.noContent().build();
+    }
+
+    private String extractClientIp(HttpServletRequest request) {
+        String forwardedFor = request.getHeader("X-Forwarded-For");
+        if (forwardedFor != null && !forwardedFor.isBlank()) {
+            return forwardedFor.split(",")[0].trim();
+        }
+        String realIp = request.getHeader("X-Real-IP");
+        if (realIp != null && !realIp.isBlank()) {
+            return realIp.trim();
+        }
+        String remoteAddr = request.getRemoteAddr();
+        if (remoteAddr == null || remoteAddr.isBlank()) {
+            return "unknown";
+        }
+        return remoteAddr;
     }
 }

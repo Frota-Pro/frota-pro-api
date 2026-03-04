@@ -12,6 +12,7 @@ import br.com.frotasPro.api.repository.AcessoRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.repository.UsuarioRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,6 +30,7 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
@@ -128,8 +130,10 @@ public class UsuarioService {
     public void atualizarSenha(UUID id, UsuarioSenhaUpdateRequest request) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
+        String actor = getCurrentActorOrSystem();
         usuario.setSenha(passwordEncoder.encode(request.getNovaSenha()));
         usuarioRepository.save(usuario);
+        log.info("security_event=password_changed actor={} target_login={} target_id={}", actor, usuario.getLogin(), usuario.getId());
     }
 
     public void atualizarMinhaSenha(UsuarioSenhaSelfRequest request) {
@@ -141,6 +145,7 @@ public class UsuarioService {
 
         usuario.setSenha(passwordEncoder.encode(request.getNovaSenha()));
         usuarioRepository.save(usuario);
+        log.info("security_event=password_changed_self login={} user_id={}", usuario.getLogin(), usuario.getId());
     }
 
     public List<String> criarUsuariosPelosMotoristas(List<String> codigos) {
@@ -229,6 +234,18 @@ public class UsuarioService {
             Acesso acesso = acessoRepository.findByNome(nomeAcesso)
                     .orElseThrow(() -> new ResponseStatusException(INTERNAL_SERVER_ERROR, "Acesso não encontrado: " + nomeAcesso));
             usuario.adicionarAcesso(acesso);
+        }
+    }
+
+    private String getCurrentActorOrSystem() {
+        try {
+            String login = usuarioAutenticadoService.getLogin();
+            if (login == null || login.isBlank()) {
+                return "system";
+            }
+            return login;
+        } catch (Exception ex) {
+            return "system";
         }
     }
 }
