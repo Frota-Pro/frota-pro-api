@@ -77,6 +77,9 @@ frotapro:
         - http://localhost:3000
         - http://localhost:5173
     prometheus-permit-all: false
+    jwt:
+      access-token-seconds: 900
+      refresh-token-seconds: 604800
 
 
 jwt:
