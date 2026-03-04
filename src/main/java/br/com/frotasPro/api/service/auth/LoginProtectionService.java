@@ -61,6 +61,11 @@ public class LoginProtectionService {
     }
 
     public void registerFailure(String ip, String login) {
+        Counter.builder("security_login_failed_total")
+                .description("Quantidade de falhas de login")
+                .register(meterRegistry)
+                .increment();
+
         long loginFailures = incrementWithWindow(KEY_FAIL_LOGIN + login, 3600);
         long ipFailures = incrementWithWindow(KEY_FAIL_IP + ip, 3600);
 

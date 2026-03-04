@@ -6,8 +6,25 @@ services:
     container_name: prometheus
     volumes:
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
     ports:
       - "9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - monitoring
+    depends_on:
+      - alertmanager
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: alertmanager
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+    volumes:
+      - ./monitoring/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    ports:
+      - "9093:9093"
     networks:
       - monitoring
 
@@ -21,6 +38,8 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
       - ./monitoring/grafana/grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
     networks:
       - monitoring
     depends_on:

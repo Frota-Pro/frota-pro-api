@@ -1,0 +1,32 @@
+groups:
+  - name: frotapro-api-alerts
+    rules:
+      - alert: FrotaProApiDown
+        expr: up{job="frota-pro-api"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          service: frotapro-api
+        annotations:
+          summary: "FrotaPro API indisponivel"
+          description: "A API do FrotaPro esta sem responder ha mais de 2 minutos."
+
+      - alert: FrotaProApi5xxSpike
+        expr: sum(rate(http_server_requests_seconds_count{job="frota-pro-api",status=~"5.."}[5m])) > 0.2
+        for: 5m
+        labels:
+          severity: warning
+          service: frotapro-api
+        annotations:
+          summary: "Pico de erros 5xx na API"
+          description: "A taxa de erros 5xx esta acima de 0.2 req/s nos ultimos 5 minutos."
+
+      - alert: FrotaProLoginFailureSpike
+        expr: increase(security_login_failed_total{job="frota-pro-api"}[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+          service: frotapro-api
+        annotations:
+          summary: "Pico de falhas de login"
+          description: "Mais de 10 falhas de login nos ultimos 5 minutos."
