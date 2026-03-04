@@ -2,11 +2,13 @@
   "id": null,
   "uid": "frotapro-security-observability",
   "title": "FrotaPro - Security & API Observability",
-  "tags": ["frotapro", "security", "api"],
+  "tags": ["frotapro", "security", "api", "jvm"],
   "timezone": "browser",
   "schemaVersion": 38,
-  "version": 1,
+  "version": 2,
   "refresh": "10s",
+  "time": { "from": "now-6h", "to": "now" },
+  "templating": { "list": [] },
   "panels": [
     {
       "id": 1,
@@ -14,40 +16,60 @@
       "title": "API UP",
       "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "max(up{job=\"frota-pro-api\"})"
-        }
-      ],
+      "targets": [{ "refId": "A", "expr": "max(up{job=\"frota-pro-api\"})" }],
       "fieldConfig": {
         "defaults": {
-          "min": 0,
-          "max": 1,
-          "mappings": [
-            { "type": "value", "options": { "0": { "text": "DOWN" }, "1": { "text": "UP" } } }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "red", "value": 0 },
-              { "color": "green", "value": 1 }
-            ]
-          }
+          "mappings": [{ "type": "value", "options": { "0": { "text": "DOWN" }, "1": { "text": "UP" } } }],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": 0 }, { "color": "green", "value": 1 }] }
         },
         "overrides": []
-      },
-      "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
-        "orientation": "horizontal",
-        "colorMode": "background"
       }
     },
     {
       "id": 2,
+      "type": "stat",
+      "title": "RPS Total (5m)",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "refId": "A", "expr": "sum(rate(http_server_requests_seconds_count{job=\"frota-pro-api\"}[5m]))" }],
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "4xx (req/s)",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "refId": "A", "expr": "sum(rate(http_server_requests_seconds_count{job=\"frota-pro-api\",status=~\"4..\"}[5m]))" }],
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] }
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "5xx (req/s)",
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "refId": "A", "expr": "sum(rate(http_server_requests_seconds_count{job=\"frota-pro-api\",status=~\"5..\"}[5m]))" }],
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Latência p50/p95/p99 (ms)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "refId": "A", "expr": "histogram_quantile(0.50, sum by (le) (rate(http_server_requests_seconds_bucket{job=\"frota-pro-api\"}[5m]))) * 1000", "legendFormat": "p50" },
+        { "refId": "B", "expr": "histogram_quantile(0.95, sum by (le) (rate(http_server_requests_seconds_bucket{job=\"frota-pro-api\"}[5m]))) * 1000", "legendFormat": "p95" },
+        { "refId": "C", "expr": "histogram_quantile(0.99, sum by (le) (rate(http_server_requests_seconds_bucket{job=\"frota-pro-api\"}[5m]))) * 1000", "legendFormat": "p99" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "ms" }, "overrides": [] }
+    },
+    {
+      "id": 6,
       "type": "timeseries",
       "title": "HTTP 401/403 (req/s)",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
         {
@@ -56,72 +78,85 @@
           "legendFormat": "{{status}}"
         }
       ],
-      "fieldConfig": {
-        "defaults": { "unit": "reqps" },
-        "overrides": []
-      },
-      "options": {
-        "legend": { "showLegend": true, "displayMode": "list", "placement": "bottom" }
-      }
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] }
     },
     {
-      "id": 3,
+      "id": 7,
       "type": "timeseries",
-      "title": "Falhas de Login (/min)",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "title": "Login Security (/5m)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
-        {
-          "refId": "A",
-          "expr": "increase(security_login_failed_total{job=\"frota-pro-api\"}[1m])",
-          "legendFormat": "login_failed"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": { "unit": "short" },
-        "overrides": []
-      }
+        { "refId": "A", "expr": "increase(security_login_success_total{job=\"frota-pro-api\"}[5m])", "legendFormat": "success" },
+        { "refId": "B", "expr": "increase(security_login_failed_total{job=\"frota-pro-api\"}[5m])", "legendFormat": "failed" },
+        { "refId": "C", "expr": "increase(security_login_rate_limited_total{job=\"frota-pro-api\"}[5m])", "legendFormat": "rate_limited" }
+      ]
     },
     {
-      "id": 4,
+      "id": 8,
       "type": "timeseries",
-      "title": "Latencia /login p95 (ms)",
-      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 12 },
+      "title": "CPU Usage",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "refId": "A", "expr": "process_cpu_usage{job=\"frota-pro-api\"}", "legendFormat": "process" },
+        { "refId": "B", "expr": "system_cpu_usage{job=\"frota-pro-api\"}", "legendFormat": "system" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1 }, "overrides": [] }
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Memória JVM",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "refId": "A", "expr": "sum(jvm_memory_used_bytes{job=\"frota-pro-api\",area=\"heap\"})", "legendFormat": "heap_used" },
+        { "refId": "B", "expr": "sum(jvm_memory_max_bytes{job=\"frota-pro-api\",area=\"heap\"})", "legendFormat": "heap_max" },
+        { "refId": "C", "expr": "sum(jvm_memory_used_bytes{job=\"frota-pro-api\",area=\"nonheap\"})", "legendFormat": "nonheap_used" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "bytes" }, "overrides": [] }
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "GC Pause e Threads",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "refId": "A", "expr": "sum(rate(jvm_gc_pause_seconds_sum{job=\"frota-pro-api\"}[5m]))", "legendFormat": "gc_pause_s_rate" },
+        { "refId": "B", "expr": "jvm_threads_live_threads{job=\"frota-pro-api\"}", "legendFormat": "threads_live" },
+        { "refId": "C", "expr": "jvm_threads_peak_threads{job=\"frota-pro-api\"}", "legendFormat": "threads_peak" }
+      ]
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "Banco (Hikari)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 28 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "refId": "A", "expr": "hikaricp_connections_active{job=\"frota-pro-api\"}", "legendFormat": "active" },
+        { "refId": "B", "expr": "hikaricp_connections_idle{job=\"frota-pro-api\"}", "legendFormat": "idle" },
+        { "refId": "C", "expr": "hikaricp_connections_pending{job=\"frota-pro-api\"}", "legendFormat": "pending" }
+      ]
+    },
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "Latência /login p95 (ms)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 28 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
         {
           "refId": "A",
           "expr": "histogram_quantile(0.95, sum by (le) (rate(http_server_requests_seconds_bucket{job=\"frota-pro-api\",uri=\"/login\",method=\"POST\"}[5m]))) * 1000",
-          "legendFormat": "p95"
+          "legendFormat": "login_p95"
         }
       ],
-      "fieldConfig": {
-        "defaults": { "unit": "ms" },
-        "overrides": []
-      }
-    },
-    {
-      "id": 5,
-      "type": "timeseries",
-      "title": "HTTP 5xx (req/s)",
-      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 20 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "sum(rate(http_server_requests_seconds_count{job=\"frota-pro-api\",status=~\"5..\"}[5m]))",
-          "legendFormat": "5xx"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": { "unit": "reqps" },
-        "overrides": []
-      }
+      "fieldConfig": { "defaults": { "unit": "ms" }, "overrides": [] }
     }
   ],
-  "templating": { "list": [] },
-  "time": { "from": "now-6h", "to": "now" },
-  "timepicker": {},
   "annotations": {
     "list": [
       {
