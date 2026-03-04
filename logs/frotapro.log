@@ -1,1574 +1,249 @@
-2026-02-24T08:40:14.446 INFO  [background-preinit] o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.3.Final
-2026-02-24T08:40:14.561 INFO  [main] b.c.f.api.FrotaProApplication - Starting FrotaProApplication using Java 21.0.8 with PID 15892 (C:\Users\Arthenyo\Documents\PROJETOS\frota-pro-api\target\classes started by Arthenyo in C:\Users\Arthenyo\Documents\PROJETOS\frota-pro-api)
-2026-02-24T08:40:14.563 INFO  [main] b.c.f.api.FrotaProApplication - The following 1 profile is active: "dev"
-2026-02-24T08:40:19.009 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-02-24T08:40:19.366 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 319 ms. Found 32 JPA repository interfaces.
-2026-02-24T08:40:20.530 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
-2026-02-24T08:40:20.552 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
-2026-02-24T08:40:20.555 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
-2026-02-24T08:40:20.556 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.48]
-2026-02-24T08:40:20.664 INFO  [main] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-2026-02-24T08:40:20.665 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 5999 ms
-2026-02-24T08:40:21.328 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
-2026-02-24T08:40:21.648 INFO  [main] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@1e32037d
-2026-02-24T08:40:21.650 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
-2026-02-24T08:40:21.706 INFO  [main] org.flywaydb.core.FlywayExecutor - Database: jdbc:postgresql://localhost:5432/frotapro (PostgreSQL 15.3)
-2026-02-24T08:40:22.014 INFO  [main] o.f.core.internal.command.DbValidate - Successfully validated 35 migrations (execution time 00:00.164s)
-2026-02-24T08:40:22.052 INFO  [main] o.f.core.internal.command.DbMigrate - Current version of schema "public": 35
-2026-02-24T08:40:22.060 INFO  [main] o.f.core.internal.command.DbMigrate - Schema "public" is up to date. No migration necessary.
-2026-02-24T08:40:22.261 INFO  [main] o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
-2026-02-24T08:40:22.372 INFO  [main] org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.33.Final
-2026-02-24T08:40:22.444 INFO  [main] o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
-2026-02-24T08:40:23.019 INFO  [main] o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-02-24T08:40:23.196 INFO  [main] o.hibernate.orm.connections.pooling - HHH10001005: Database info:
-	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
-	Database driver: undefined/unknown
-	Database version: 15.3
-	Autocommit mode: undefined/unknown
-	Isolation level: undefined/unknown
-	Minimum pool size: undefined/unknown
-	Maximum pool size: undefined/unknown
-2026-02-24T08:40:26.022 INFO  [main] o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-02-24T08:40:26.257 INFO  [main] o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-02-24T08:40:26.884 INFO  [main] o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
-2026-02-24T08:40:36.624 WARN  [main] o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-02-24T08:40:37.175 INFO  [main] o.s.b.a.e.web.EndpointLinksResolver - Exposing 4 endpoints beneath base path '/actuator'
-2026-02-24T08:40:38.296 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
-2026-02-24T08:40:38.331 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
-2026-02-24T08:40:38.415 INFO  [main] o.a.k.c.consumer.ConsumerConfig - ConsumerConfig values: 
-	allow.auto.create.topics = true
-	auto.commit.interval.ms = 5000
-	auto.include.jmx.reporter = true
-	auto.offset.reset = latest
-	bootstrap.servers = [localhost:9092]
-	check.crcs = true
-	client.dns.lookup = use_all_dns_ips
-	client.id = consumer-frota-pro-api-v2-1
-	client.rack = 
-	connections.max.idle.ms = 540000
-	default.api.timeout.ms = 60000
-	enable.auto.commit = false
-	enable.metrics.push = true
-	exclude.internal.topics = true
-	fetch.max.bytes = 52428800
-	fetch.max.wait.ms = 500
-	fetch.min.bytes = 1
-	group.id = frota-pro-api-v2
-	group.instance.id = null
-	group.protocol = classic
-	group.remote.assignor = null
-	heartbeat.interval.ms = 3000
-	interceptor.classes = []
-	internal.leave.group.on.close = true
-	internal.throw.on.fetch.stable.offset.unsupported = false
-	isolation.level = read_uncommitted
-	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
-	max.partition.fetch.bytes = 1048576
-	max.poll.interval.ms = 300000
-	max.poll.records = 500
-	metadata.max.age.ms = 300000
-	metadata.recovery.strategy = none
-	metric.reporters = []
-	metrics.num.samples = 2
-	metrics.recording.level = INFO
-	metrics.sample.window.ms = 30000
-	partition.assignment.strategy = [class org.apache.kafka.clients.consumer.RangeAssignor, class org.apache.kafka.clients.consumer.CooperativeStickyAssignor]
-	receive.buffer.bytes = 65536
-	reconnect.backoff.max.ms = 1000
-	reconnect.backoff.ms = 50
-	request.timeout.ms = 30000
-	retry.backoff.max.ms = 1000
-	retry.backoff.ms = 100
-	sasl.client.callback.handler.class = null
-	sasl.jaas.config = null
-	sasl.kerberos.kinit.cmd = /usr/bin/kinit
-	sasl.kerberos.min.time.before.relogin = 60000
-	sasl.kerberos.service.name = null
-	sasl.kerberos.ticket.renew.jitter = 0.05
-	sasl.kerberos.ticket.renew.window.factor = 0.8
-	sasl.login.callback.handler.class = null
-	sasl.login.class = null
-	sasl.login.connect.timeout.ms = null
-	sasl.login.read.timeout.ms = null
-	sasl.login.refresh.buffer.seconds = 300
-	sasl.login.refresh.min.period.seconds = 60
-	sasl.login.refresh.window.factor = 0.8
-	sasl.login.refresh.window.jitter = 0.05
-	sasl.login.retry.backoff.max.ms = 10000
-	sasl.login.retry.backoff.ms = 100
-	sasl.mechanism = GSSAPI
-	sasl.oauthbearer.clock.skew.seconds = 30
-	sasl.oauthbearer.expected.audience = null
-	sasl.oauthbearer.expected.issuer = null
-	sasl.oauthbearer.header.urlencode = false
-	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
-	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
-	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
-	sasl.oauthbearer.jwks.endpoint.url = null
-	sasl.oauthbearer.scope.claim.name = scope
-	sasl.oauthbearer.sub.claim.name = sub
-	sasl.oauthbearer.token.endpoint.url = null
-	security.protocol = PLAINTEXT
-	security.providers = null
-	send.buffer.bytes = 131072
-	session.timeout.ms = 45000
-	socket.connection.setup.timeout.max.ms = 30000
-	socket.connection.setup.timeout.ms = 10000
-	ssl.cipher.suites = null
-	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
-	ssl.endpoint.identification.algorithm = https
-	ssl.engine.factory.class = null
-	ssl.key.password = null
-	ssl.keymanager.algorithm = SunX509
-	ssl.keystore.certificate.chain = null
-	ssl.keystore.key = null
-	ssl.keystore.location = null
-	ssl.keystore.password = null
-	ssl.keystore.type = JKS
-	ssl.protocol = TLSv1.3
-	ssl.provider = null
-	ssl.secure.random.implementation = null
-	ssl.trustmanager.algorithm = PKIX
-	ssl.truststore.certificates = null
-	ssl.truststore.location = null
-	ssl.truststore.password = null
-	ssl.truststore.type = JKS
-	value.deserializer = class org.springframework.kafka.support.serializer.JsonDeserializer
+2026-03-04T13:10:58.729 INFO  [background-preinit] o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.3.Final
+2026-03-04T13:10:58.894 INFO  [main] b.c.f.api.auth.AuthIntegrationTest - Starting AuthIntegrationTest using Java 21.0.8 with PID 1896 (started by Arthenyo in C:\Users\Arthenyo\Documents\PROJETOS\frota-pro-api)
+2026-03-04T13:10:58.896 INFO  [main] b.c.f.api.auth.AuthIntegrationTest - No active profile set, falling back to 1 default profile: "default"
+2026-03-04T13:11:08.085 INFO  [main] o.s.b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+2026-03-04T13:11:08.085 INFO  [main] o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+2026-03-04T13:11:08.089 INFO  [main] o.s.t.w.s.TestDispatcherServlet - Completed initialization in 3 ms
+2026-03-04T13:11:08.174 INFO  [main] b.c.f.api.auth.AuthIntegrationTest - Started AuthIntegrationTest in 10.99 seconds (process running for 13.835)
+2026-03-04T13:11:09.853 INFO  [main] o.s.t.c.s.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [br.com.frotasPro.api.FrontaProApplicationTests]: FrontaProApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-03-04T13:11:10.023 INFO  [main] o.s.b.t.c.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration br.com.frotasPro.api.FrotaProApplication for test class br.com.frotasPro.api.FrontaProApplicationTests
+2026-03-04T13:11:10.147 INFO  [main] b.c.f.api.FrontaProApplicationTests - Starting FrontaProApplicationTests using Java 21.0.8 with PID 1896 (started by Arthenyo in C:\Users\Arthenyo\Documents\PROJETOS\frota-pro-api)
+2026-03-04T13:11:10.150 INFO  [main] b.c.f.api.FrontaProApplicationTests - No active profile set, falling back to 1 default profile: "default"
+2026-03-04T13:11:13.888 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-03-04T13:11:13.892 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-03-04T13:11:14.418 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 491 ms. Found 35 JPA repository interfaces.
+2026-03-04T13:11:14.466 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-03-04T13:11:14.471 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-03-04T13:11:14.572 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.AbastecimentoRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.574 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.AcessoRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.575 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.AjudanteRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.576 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.AnexoParadaRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.576 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.ArquivoRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.577 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.CaminhaoRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.579 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.CargaNotaRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.580 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.CargaRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.580 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.CategoriaCaminhaoRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.581 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.ContaRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.581 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.DespesaParadaRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.582 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.DocumentoCaminhaoRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.582 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.DocumentoManutencaoRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.583 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.DocumentoMotoristaRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.583 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.EixoRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.584 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.GrupoContaRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.584 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.integracao.CaminhaoSyncJobRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.585 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.integracao.CargaSyncJobRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.586 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.integracao.IntegracaoWinThorConfigRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.587 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.integracao.MotoristaSyncJobRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.587 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.ManutencaoRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.588 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.MecanicoRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.590 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.MetaCategoriaCaminhaoVinculoRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.591 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.MetaRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.591 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.MotoristaRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.592 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.NotificacaoRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.593 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.NotificacaoUsuarioRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.593 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.OficinaRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.594 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.ParadaCargaRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.594 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.PneuInstalacaoAtualRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.595 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.PneuMovimentacaoRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.595 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.PneuRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.596 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.RotaRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.597 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.TrocaPneuManutencaoRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.597 INFO  [main] o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface br.com.frotasPro.api.repository.UsuarioRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-03-04T13:11:14.597 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 89 ms. Found 0 Redis repository interfaces.
+2026-03-04T13:11:15.899 WARN  [main] o.s.w.c.s.GenericWebApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: Failed to initialize dependency 'flyway' of LoadTimeWeaverAware bean 'entityManagerFactory': Error creating bean with name 'flyway' defined in class path resource [org/springframework/boot/autoconfigure/flyway/FlywayAutoConfiguration$FlywayConfiguration.class]: Failed to instantiate [org.flywaydb.core.Flyway]: Factory method 'flyway' threw exception with message: Error creating bean with name 'dataSource' defined in class path resource [org/springframework/boot/autoconfigure/jdbc/DataSourceConfiguration$Hikari.class]: Failed to instantiate [com.zaxxer.hikari.HikariDataSource]: Factory method 'dataSource' threw exception with message: Failed to determine a suitable driver class
+2026-03-04T13:11:15.976 INFO  [main] o.s.b.a.l.ConditionEvaluationReportLogger - 
 
-2026-02-24T08:40:38.499 INFO  [main] o.a.k.c.t.i.KafkaMetricsCollector - initializing Kafka metrics collector
-2026-02-24T08:40:38.716 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka version: 3.9.1
-2026-02-24T08:40:38.717 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka commitId: f745dfdcee2b9851
-2026-02-24T08:40:38.717 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka startTimeMs: 1771933238714
-2026-02-24T08:40:38.736 INFO  [main] o.a.k.c.c.i.ClassicKafkaConsumer - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Subscribed to topic(s): frotapro.motorista.sync.response
-2026-02-24T08:40:38.749 INFO  [main] o.a.k.c.consumer.ConsumerConfig - ConsumerConfig values: 
-	allow.auto.create.topics = true
-	auto.commit.interval.ms = 5000
-	auto.include.jmx.reporter = true
-	auto.offset.reset = latest
-	bootstrap.servers = [localhost:9092]
-	check.crcs = true
-	client.dns.lookup = use_all_dns_ips
-	client.id = consumer-frota-pro-api-v2-2
-	client.rack = 
-	connections.max.idle.ms = 540000
-	default.api.timeout.ms = 60000
-	enable.auto.commit = false
-	enable.metrics.push = true
-	exclude.internal.topics = true
-	fetch.max.bytes = 52428800
-	fetch.max.wait.ms = 500
-	fetch.min.bytes = 1
-	group.id = frota-pro-api-v2
-	group.instance.id = null
-	group.protocol = classic
-	group.remote.assignor = null
-	heartbeat.interval.ms = 3000
-	interceptor.classes = []
-	internal.leave.group.on.close = true
-	internal.throw.on.fetch.stable.offset.unsupported = false
-	isolation.level = read_uncommitted
-	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
-	max.partition.fetch.bytes = 1048576
-	max.poll.interval.ms = 300000
-	max.poll.records = 500
-	metadata.max.age.ms = 300000
-	metadata.recovery.strategy = none
-	metric.reporters = []
-	metrics.num.samples = 2
-	metrics.recording.level = INFO
-	metrics.sample.window.ms = 30000
-	partition.assignment.strategy = [class org.apache.kafka.clients.consumer.RangeAssignor, class org.apache.kafka.clients.consumer.CooperativeStickyAssignor]
-	receive.buffer.bytes = 65536
-	reconnect.backoff.max.ms = 1000
-	reconnect.backoff.ms = 50
-	request.timeout.ms = 30000
-	retry.backoff.max.ms = 1000
-	retry.backoff.ms = 100
-	sasl.client.callback.handler.class = null
-	sasl.jaas.config = null
-	sasl.kerberos.kinit.cmd = /usr/bin/kinit
-	sasl.kerberos.min.time.before.relogin = 60000
-	sasl.kerberos.service.name = null
-	sasl.kerberos.ticket.renew.jitter = 0.05
-	sasl.kerberos.ticket.renew.window.factor = 0.8
-	sasl.login.callback.handler.class = null
-	sasl.login.class = null
-	sasl.login.connect.timeout.ms = null
-	sasl.login.read.timeout.ms = null
-	sasl.login.refresh.buffer.seconds = 300
-	sasl.login.refresh.min.period.seconds = 60
-	sasl.login.refresh.window.factor = 0.8
-	sasl.login.refresh.window.jitter = 0.05
-	sasl.login.retry.backoff.max.ms = 10000
-	sasl.login.retry.backoff.ms = 100
-	sasl.mechanism = GSSAPI
-	sasl.oauthbearer.clock.skew.seconds = 30
-	sasl.oauthbearer.expected.audience = null
-	sasl.oauthbearer.expected.issuer = null
-	sasl.oauthbearer.header.urlencode = false
-	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
-	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
-	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
-	sasl.oauthbearer.jwks.endpoint.url = null
-	sasl.oauthbearer.scope.claim.name = scope
-	sasl.oauthbearer.sub.claim.name = sub
-	sasl.oauthbearer.token.endpoint.url = null
-	security.protocol = PLAINTEXT
-	security.providers = null
-	send.buffer.bytes = 131072
-	session.timeout.ms = 45000
-	socket.connection.setup.timeout.max.ms = 30000
-	socket.connection.setup.timeout.ms = 10000
-	ssl.cipher.suites = null
-	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
-	ssl.endpoint.identification.algorithm = https
-	ssl.engine.factory.class = null
-	ssl.key.password = null
-	ssl.keymanager.algorithm = SunX509
-	ssl.keystore.certificate.chain = null
-	ssl.keystore.key = null
-	ssl.keystore.location = null
-	ssl.keystore.password = null
-	ssl.keystore.type = JKS
-	ssl.protocol = TLSv1.3
-	ssl.provider = null
-	ssl.secure.random.implementation = null
-	ssl.trustmanager.algorithm = PKIX
-	ssl.truststore.certificates = null
-	ssl.truststore.location = null
-	ssl.truststore.password = null
-	ssl.truststore.type = JKS
-	value.deserializer = class org.springframework.kafka.support.serializer.JsonDeserializer
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-03-04T13:11:16.064 ERROR [main] o.s.b.d.LoggingFailureAnalysisReporter - 
 
-2026-02-24T08:40:38.749 INFO  [main] o.a.k.c.t.i.KafkaMetricsCollector - initializing Kafka metrics collector
-2026-02-24T08:40:38.768 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka version: 3.9.1
-2026-02-24T08:40:38.768 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka commitId: f745dfdcee2b9851
-2026-02-24T08:40:38.768 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka startTimeMs: 1771933238768
-2026-02-24T08:40:38.780 INFO  [main] o.a.k.c.c.i.ClassicKafkaConsumer - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Subscribed to topic(s): frotapro.caminhao.sync.response
-2026-02-24T08:40:38.783 INFO  [main] o.a.k.c.consumer.ConsumerConfig - ConsumerConfig values: 
-	allow.auto.create.topics = true
-	auto.commit.interval.ms = 5000
-	auto.include.jmx.reporter = true
-	auto.offset.reset = latest
-	bootstrap.servers = [localhost:9092]
-	check.crcs = true
-	client.dns.lookup = use_all_dns_ips
-	client.id = consumer-frota-pro-api-v2-3
-	client.rack = 
-	connections.max.idle.ms = 540000
-	default.api.timeout.ms = 60000
-	enable.auto.commit = false
-	enable.metrics.push = true
-	exclude.internal.topics = true
-	fetch.max.bytes = 52428800
-	fetch.max.wait.ms = 500
-	fetch.min.bytes = 1
-	group.id = frota-pro-api-v2
-	group.instance.id = null
-	group.protocol = classic
-	group.remote.assignor = null
-	heartbeat.interval.ms = 3000
-	interceptor.classes = []
-	internal.leave.group.on.close = true
-	internal.throw.on.fetch.stable.offset.unsupported = false
-	isolation.level = read_uncommitted
-	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
-	max.partition.fetch.bytes = 1048576
-	max.poll.interval.ms = 300000
-	max.poll.records = 500
-	metadata.max.age.ms = 300000
-	metadata.recovery.strategy = none
-	metric.reporters = []
-	metrics.num.samples = 2
-	metrics.recording.level = INFO
-	metrics.sample.window.ms = 30000
-	partition.assignment.strategy = [class org.apache.kafka.clients.consumer.RangeAssignor, class org.apache.kafka.clients.consumer.CooperativeStickyAssignor]
-	receive.buffer.bytes = 65536
-	reconnect.backoff.max.ms = 1000
-	reconnect.backoff.ms = 50
-	request.timeout.ms = 30000
-	retry.backoff.max.ms = 1000
-	retry.backoff.ms = 100
-	sasl.client.callback.handler.class = null
-	sasl.jaas.config = null
-	sasl.kerberos.kinit.cmd = /usr/bin/kinit
-	sasl.kerberos.min.time.before.relogin = 60000
-	sasl.kerberos.service.name = null
-	sasl.kerberos.ticket.renew.jitter = 0.05
-	sasl.kerberos.ticket.renew.window.factor = 0.8
-	sasl.login.callback.handler.class = null
-	sasl.login.class = null
-	sasl.login.connect.timeout.ms = null
-	sasl.login.read.timeout.ms = null
-	sasl.login.refresh.buffer.seconds = 300
-	sasl.login.refresh.min.period.seconds = 60
-	sasl.login.refresh.window.factor = 0.8
-	sasl.login.refresh.window.jitter = 0.05
-	sasl.login.retry.backoff.max.ms = 10000
-	sasl.login.retry.backoff.ms = 100
-	sasl.mechanism = GSSAPI
-	sasl.oauthbearer.clock.skew.seconds = 30
-	sasl.oauthbearer.expected.audience = null
-	sasl.oauthbearer.expected.issuer = null
-	sasl.oauthbearer.header.urlencode = false
-	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
-	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
-	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
-	sasl.oauthbearer.jwks.endpoint.url = null
-	sasl.oauthbearer.scope.claim.name = scope
-	sasl.oauthbearer.sub.claim.name = sub
-	sasl.oauthbearer.token.endpoint.url = null
-	security.protocol = PLAINTEXT
-	security.providers = null
-	send.buffer.bytes = 131072
-	session.timeout.ms = 45000
-	socket.connection.setup.timeout.max.ms = 30000
-	socket.connection.setup.timeout.ms = 10000
-	ssl.cipher.suites = null
-	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
-	ssl.endpoint.identification.algorithm = https
-	ssl.engine.factory.class = null
-	ssl.key.password = null
-	ssl.keymanager.algorithm = SunX509
-	ssl.keystore.certificate.chain = null
-	ssl.keystore.key = null
-	ssl.keystore.location = null
-	ssl.keystore.password = null
-	ssl.keystore.type = JKS
-	ssl.protocol = TLSv1.3
-	ssl.provider = null
-	ssl.secure.random.implementation = null
-	ssl.trustmanager.algorithm = PKIX
-	ssl.truststore.certificates = null
-	ssl.truststore.location = null
-	ssl.truststore.password = null
-	ssl.truststore.type = JKS
-	value.deserializer = class org.springframework.kafka.support.serializer.JsonDeserializer
+***************************
+APPLICATION FAILED TO START
+***************************
 
-2026-02-24T08:40:38.783 INFO  [main] o.a.k.c.t.i.KafkaMetricsCollector - initializing Kafka metrics collector
-2026-02-24T08:40:38.807 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka version: 3.9.1
-2026-02-24T08:40:38.807 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka commitId: f745dfdcee2b9851
-2026-02-24T08:40:38.807 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka startTimeMs: 1771933238806
-2026-02-24T08:40:38.815 INFO  [main] o.a.k.c.c.i.ClassicKafkaConsumer - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Subscribed to topic(s): frotapro.carga.sync.response
-2026-02-24T08:40:38.840 INFO  [main] b.c.f.api.FrotaProApplication - Started FrotaProApplication in 25.933 seconds (process running for 28.02)
-2026-02-24T08:40:39.432 INFO  [RMI TCP Connection(4)-192.168.2.63] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-02-24T08:40:39.432 INFO  [RMI TCP Connection(4)-192.168.2.63] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
-2026-02-24T08:40:39.436 INFO  [RMI TCP Connection(4)-192.168.2.63] o.s.web.servlet.DispatcherServlet - Completed initialization in 4 ms
-2026-02-24T08:40:40.119 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] org.apache.kafka.clients.Metadata - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Cluster ID: ZqbpC6XiSASmVMALn-jFHw
-2026-02-24T08:40:40.123 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] org.apache.kafka.clients.Metadata - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Cluster ID: ZqbpC6XiSASmVMALn-jFHw
-2026-02-24T08:40:40.127 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] org.apache.kafka.clients.Metadata - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Cluster ID: ZqbpC6XiSASmVMALn-jFHw
-2026-02-24T08:40:40.344 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
-2026-02-24T08:40:40.350 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
-2026-02-24T08:40:40.354 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] (Re-)joining group
-2026-02-24T08:40:40.355 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] (Re-)joining group
-2026-02-24T08:40:40.395 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
-2026-02-24T08:40:40.397 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] (Re-)joining group
-2026-02-24T08:40:40.486 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Request joining group due to: need to re-join with the given member-id: consumer-frota-pro-api-v2-1-69d35062-8f5b-4784-9757-759cc01d7233
-2026-02-24T08:40:40.486 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Request joining group due to: need to re-join with the given member-id: consumer-frota-pro-api-v2-3-47e16179-4470-47fb-84b5-082d86c60365
-2026-02-24T08:40:40.488 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] (Re-)joining group
-2026-02-24T08:40:40.488 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] (Re-)joining group
-2026-02-24T08:40:40.486 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Request joining group due to: need to re-join with the given member-id: consumer-frota-pro-api-v2-2-3e836a84-8923-4be5-a45e-45814bd967ca
-2026-02-24T08:40:40.490 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] (Re-)joining group
-2026-02-24T08:40:43.549 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Successfully joined group with generation Generation{generationId=194, memberId='consumer-frota-pro-api-v2-3-47e16179-4470-47fb-84b5-082d86c60365', protocol='range'}
-2026-02-24T08:40:43.551 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Successfully joined group with generation Generation{generationId=194, memberId='consumer-frota-pro-api-v2-1-69d35062-8f5b-4784-9757-759cc01d7233', protocol='range'}
-2026-02-24T08:40:43.552 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Successfully joined group with generation Generation{generationId=194, memberId='consumer-frota-pro-api-v2-2-3e836a84-8923-4be5-a45e-45814bd967ca', protocol='range'}
-2026-02-24T08:40:43.572 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Finished assignment for group at generation 194: {consumer-frota-pro-api-v2-3-47e16179-4470-47fb-84b5-082d86c60365=Assignment(partitions=[frotapro.carga.sync.response-0]), consumer-frota-pro-api-v2-1-69d35062-8f5b-4784-9757-759cc01d7233=Assignment(partitions=[frotapro.motorista.sync.response-0]), consumer-frota-pro-api-v2-2-3e836a84-8923-4be5-a45e-45814bd967ca=Assignment(partitions=[frotapro.caminhao.sync.response-0])}
-2026-02-24T08:40:43.622 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Successfully synced group in generation Generation{generationId=194, memberId='consumer-frota-pro-api-v2-1-69d35062-8f5b-4784-9757-759cc01d7233', protocol='range'}
-2026-02-24T08:40:43.624 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Notifying assignor about the new Assignment(partitions=[frotapro.motorista.sync.response-0])
-2026-02-24T08:40:43.624 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Successfully synced group in generation Generation{generationId=194, memberId='consumer-frota-pro-api-v2-2-3e836a84-8923-4be5-a45e-45814bd967ca', protocol='range'}
-2026-02-24T08:40:43.625 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Successfully synced group in generation Generation{generationId=194, memberId='consumer-frota-pro-api-v2-3-47e16179-4470-47fb-84b5-082d86c60365', protocol='range'}
-2026-02-24T08:40:43.625 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Notifying assignor about the new Assignment(partitions=[frotapro.caminhao.sync.response-0])
-2026-02-24T08:40:43.625 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Notifying assignor about the new Assignment(partitions=[frotapro.carga.sync.response-0])
-2026-02-24T08:40:43.629 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerRebalanceListenerInvoker - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Adding newly assigned partitions: frotapro.caminhao.sync.response-0
-2026-02-24T08:40:43.629 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerRebalanceListenerInvoker - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Adding newly assigned partitions: frotapro.carga.sync.response-0
-2026-02-24T08:40:43.629 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerRebalanceListenerInvoker - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Adding newly assigned partitions: frotapro.motorista.sync.response-0
-2026-02-24T08:40:43.666 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.internals.ConsumerUtils - Setting offset for partition frotapro.caminhao.sync.response-0 to the committed offset FetchPosition{offset=7, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9092 (id: 1 rack: null)], epoch=0}}
-2026-02-24T08:40:43.666 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.internals.ConsumerUtils - Setting offset for partition frotapro.carga.sync.response-0 to the committed offset FetchPosition{offset=23, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9092 (id: 1 rack: null)], epoch=0}}
-2026-02-24T08:40:43.666 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.internals.ConsumerUtils - Setting offset for partition frotapro.motorista.sync.response-0 to the committed offset FetchPosition{offset=8, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9092 (id: 1 rack: null)], epoch=0}}
-2026-02-24T08:40:43.669 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: partitions assigned: [frotapro.carga.sync.response-0]
-2026-02-24T08:40:43.669 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: partitions assigned: [frotapro.motorista.sync.response-0]
-2026-02-24T08:40:43.669 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: partitions assigned: [frotapro.caminhao.sync.response-0]
-2026-02-24T08:56:23.115 WARN  [http-nio-8080-exec-6] o.s.d.w.c.SpringDataJacksonConfiguration$PageModule$WarningLoggingModifier - Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
-	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
-	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
+Description:
 
-2026-02-24T09:17:18.565 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerRebalanceListenerInvoker - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Revoke previously assigned partitions frotapro.carga.sync.response-0
-2026-02-24T09:17:18.565 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerRebalanceListenerInvoker - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Revoke previously assigned partitions frotapro.caminhao.sync.response-0
-2026-02-24T09:17:18.565 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerRebalanceListenerInvoker - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Revoke previously assigned partitions frotapro.motorista.sync.response-0
-2026-02-24T09:17:18.586 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: partitions revoked: [frotapro.motorista.sync.response-0]
-2026-02-24T09:17:18.586 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: partitions revoked: [frotapro.carga.sync.response-0]
-2026-02-24T09:17:18.586 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: partitions revoked: [frotapro.caminhao.sync.response-0]
-2026-02-24T09:17:18.589 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Member consumer-frota-pro-api-v2-1-69d35062-8f5b-4784-9757-759cc01d7233 sending LeaveGroup request to coordinator localhost:9092 (id: 2147483646 rack: null) due to the consumer unsubscribed from all topics
-2026-02-24T09:17:18.590 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Member consumer-frota-pro-api-v2-3-47e16179-4470-47fb-84b5-082d86c60365 sending LeaveGroup request to coordinator localhost:9092 (id: 2147483646 rack: null) due to the consumer unsubscribed from all topics
-2026-02-24T09:17:18.590 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Member consumer-frota-pro-api-v2-2-3e836a84-8923-4be5-a45e-45814bd967ca sending LeaveGroup request to coordinator localhost:9092 (id: 2147483646 rack: null) due to the consumer unsubscribed from all topics
-2026-02-24T09:17:18.598 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Resetting generation and member id due to: consumer pro-actively leaving the group
-2026-02-24T09:17:18.598 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Resetting generation and member id due to: consumer pro-actively leaving the group
-2026-02-24T09:17:18.598 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Resetting generation and member id due to: consumer pro-actively leaving the group
-2026-02-24T09:17:18.598 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Request joining group due to: consumer pro-actively leaving the group
-2026-02-24T09:17:18.598 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Request joining group due to: consumer pro-actively leaving the group
-2026-02-24T09:17:18.598 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Request joining group due to: consumer pro-actively leaving the group
-2026-02-24T09:17:18.599 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Unsubscribed all topics or patterns and assigned partitions
-2026-02-24T09:17:18.599 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Unsubscribed all topics or patterns and assigned partitions
-2026-02-24T09:17:18.599 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Unsubscribed all topics or patterns and assigned partitions
-2026-02-24T09:17:18.623 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Resetting generation and member id due to: consumer pro-actively leaving the group
-2026-02-24T09:17:18.623 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Resetting generation and member id due to: consumer pro-actively leaving the group
-2026-02-24T09:17:18.623 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Resetting generation and member id due to: consumer pro-actively leaving the group
-2026-02-24T09:17:18.623 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Request joining group due to: consumer pro-actively leaving the group
-2026-02-24T09:17:18.624 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Request joining group due to: consumer pro-actively leaving the group
-2026-02-24T09:17:18.624 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Request joining group due to: consumer pro-actively leaving the group
-2026-02-24T09:17:18.910 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.kafka.common.metrics.Metrics - Metrics scheduler closed
-2026-02-24T09:17:18.910 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.kafka.common.metrics.Metrics - Metrics scheduler closed
-2026-02-24T09:17:18.910 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.kafka.common.metrics.Metrics - Metrics scheduler closed
-2026-02-24T09:17:18.910 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.metrics.JmxReporter
-2026-02-24T09:17:18.910 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.metrics.JmxReporter
-2026-02-24T09:17:18.910 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.metrics.JmxReporter
-2026-02-24T09:17:18.911 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
-2026-02-24T09:17:18.911 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
-2026-02-24T09:17:18.911 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
-2026-02-24T09:17:18.911 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.kafka.common.metrics.Metrics - Metrics reporters closed
-2026-02-24T09:17:18.911 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.kafka.common.metrics.Metrics - Metrics reporters closed
-2026-02-24T09:17:18.911 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.kafka.common.metrics.Metrics - Metrics reporters closed
-2026-02-24T09:17:18.957 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.kafka.common.utils.AppInfoParser - App info kafka.consumer for consumer-frota-pro-api-v2-3 unregistered
-2026-02-24T09:17:18.958 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.kafka.common.utils.AppInfoParser - App info kafka.consumer for consumer-frota-pro-api-v2-2 unregistered
-2026-02-24T09:17:18.959 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.kafka.common.utils.AppInfoParser - App info kafka.consumer for consumer-frota-pro-api-v2-1 unregistered
-2026-02-24T09:17:18.963 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: Consumer stopped
-2026-02-24T09:17:18.963 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: Consumer stopped
-2026-02-24T09:17:18.968 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: Consumer stopped
-2026-02-24T09:17:18.978 INFO  [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
-2026-02-24T09:17:19.009 INFO  [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
-2026-02-24T09:17:19.088 INFO  [SpringApplicationShutdownHook] o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
-2026-02-24T09:17:19.128 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
-2026-02-24T09:17:19.146 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
-2026-02-24T09:18:20.575 INFO  [background-preinit] o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.3.Final
-2026-02-24T09:18:20.739 INFO  [main] b.c.f.api.FrotaProApplication - Starting FrotaProApplication using Java 21.0.8 with PID 16852 (C:\Users\Arthenyo\Documents\PROJETOS\frota-pro-api\target\classes started by Arthenyo in C:\Users\Arthenyo\Documents\PROJETOS\frota-pro-api)
-2026-02-24T09:18:20.742 INFO  [main] b.c.f.api.FrotaProApplication - The following 1 profile is active: "dev"
-2026-02-24T09:18:25.170 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-02-24T09:18:25.493 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 305 ms. Found 34 JPA repository interfaces.
-2026-02-24T09:18:27.003 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
-2026-02-24T09:18:27.027 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
-2026-02-24T09:18:27.030 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
-2026-02-24T09:18:27.030 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.48]
-2026-02-24T09:18:27.162 INFO  [main] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-2026-02-24T09:18:27.163 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 6243 ms
-2026-02-24T09:18:28.293 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
-2026-02-24T09:18:28.695 INFO  [main] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@58f97013
-2026-02-24T09:18:28.697 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
-2026-02-24T09:18:28.761 INFO  [main] org.flywaydb.core.FlywayExecutor - Database: jdbc:postgresql://localhost:5432/frotapro (PostgreSQL 15.3)
-2026-02-24T09:18:29.027 INFO  [main] o.f.core.internal.command.DbValidate - Successfully validated 36 migrations (execution time 00:00.166s)
-2026-02-24T09:18:29.076 INFO  [main] o.f.core.internal.command.DbMigrate - Current version of schema "public": 35
-2026-02-24T09:18:29.111 INFO  [main] o.f.core.internal.command.DbMigrate - Migrating schema "public" to version "36 - create notificacao"
-2026-02-24T09:18:29.143 WARN  [main] o.f.c.i.s.DefaultSqlScriptExecutor - DB: extension "pgcrypto" already exists, skipping (SQL State: 42710 - Error Code: 0)
-2026-02-24T09:18:29.476 INFO  [main] o.f.core.internal.command.DbMigrate - Successfully applied 1 migration to schema "public", now at version v36 (execution time 00:00.320s)
-2026-02-24T09:18:29.717 INFO  [main] o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
-2026-02-24T09:18:29.875 INFO  [main] org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.33.Final
-2026-02-24T09:18:29.980 INFO  [main] o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
-2026-02-24T09:18:30.639 INFO  [main] o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-02-24T09:18:31.047 INFO  [main] o.hibernate.orm.connections.pooling - HHH10001005: Database info:
-	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
-	Database driver: undefined/unknown
-	Database version: 15.3
-	Autocommit mode: undefined/unknown
-	Isolation level: undefined/unknown
-	Minimum pool size: undefined/unknown
-	Maximum pool size: undefined/unknown
-2026-02-24T09:18:37.935 INFO  [main] o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-02-24T09:18:38.118 INFO  [main] o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-02-24T09:18:38.936 INFO  [main] o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
-2026-02-24T09:18:52.344 WARN  [main] o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-02-24T09:18:53.634 INFO  [main] o.s.b.a.e.web.EndpointLinksResolver - Exposing 4 endpoints beneath base path '/actuator'
-2026-02-24T09:18:55.068 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
-2026-02-24T09:18:55.117 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
-2026-02-24T09:18:55.306 INFO  [main] o.a.k.c.consumer.ConsumerConfig - ConsumerConfig values: 
-	allow.auto.create.topics = true
-	auto.commit.interval.ms = 5000
-	auto.include.jmx.reporter = true
-	auto.offset.reset = latest
-	bootstrap.servers = [localhost:9092]
-	check.crcs = true
-	client.dns.lookup = use_all_dns_ips
-	client.id = consumer-frota-pro-api-v2-1
-	client.rack = 
-	connections.max.idle.ms = 540000
-	default.api.timeout.ms = 60000
-	enable.auto.commit = false
-	enable.metrics.push = true
-	exclude.internal.topics = true
-	fetch.max.bytes = 52428800
-	fetch.max.wait.ms = 500
-	fetch.min.bytes = 1
-	group.id = frota-pro-api-v2
-	group.instance.id = null
-	group.protocol = classic
-	group.remote.assignor = null
-	heartbeat.interval.ms = 3000
-	interceptor.classes = []
-	internal.leave.group.on.close = true
-	internal.throw.on.fetch.stable.offset.unsupported = false
-	isolation.level = read_uncommitted
-	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
-	max.partition.fetch.bytes = 1048576
-	max.poll.interval.ms = 300000
-	max.poll.records = 500
-	metadata.max.age.ms = 300000
-	metadata.recovery.strategy = none
-	metric.reporters = []
-	metrics.num.samples = 2
-	metrics.recording.level = INFO
-	metrics.sample.window.ms = 30000
-	partition.assignment.strategy = [class org.apache.kafka.clients.consumer.RangeAssignor, class org.apache.kafka.clients.consumer.CooperativeStickyAssignor]
-	receive.buffer.bytes = 65536
-	reconnect.backoff.max.ms = 1000
-	reconnect.backoff.ms = 50
-	request.timeout.ms = 30000
-	retry.backoff.max.ms = 1000
-	retry.backoff.ms = 100
-	sasl.client.callback.handler.class = null
-	sasl.jaas.config = null
-	sasl.kerberos.kinit.cmd = /usr/bin/kinit
-	sasl.kerberos.min.time.before.relogin = 60000
-	sasl.kerberos.service.name = null
-	sasl.kerberos.ticket.renew.jitter = 0.05
-	sasl.kerberos.ticket.renew.window.factor = 0.8
-	sasl.login.callback.handler.class = null
-	sasl.login.class = null
-	sasl.login.connect.timeout.ms = null
-	sasl.login.read.timeout.ms = null
-	sasl.login.refresh.buffer.seconds = 300
-	sasl.login.refresh.min.period.seconds = 60
-	sasl.login.refresh.window.factor = 0.8
-	sasl.login.refresh.window.jitter = 0.05
-	sasl.login.retry.backoff.max.ms = 10000
-	sasl.login.retry.backoff.ms = 100
-	sasl.mechanism = GSSAPI
-	sasl.oauthbearer.clock.skew.seconds = 30
-	sasl.oauthbearer.expected.audience = null
-	sasl.oauthbearer.expected.issuer = null
-	sasl.oauthbearer.header.urlencode = false
-	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
-	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
-	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
-	sasl.oauthbearer.jwks.endpoint.url = null
-	sasl.oauthbearer.scope.claim.name = scope
-	sasl.oauthbearer.sub.claim.name = sub
-	sasl.oauthbearer.token.endpoint.url = null
-	security.protocol = PLAINTEXT
-	security.providers = null
-	send.buffer.bytes = 131072
-	session.timeout.ms = 45000
-	socket.connection.setup.timeout.max.ms = 30000
-	socket.connection.setup.timeout.ms = 10000
-	ssl.cipher.suites = null
-	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
-	ssl.endpoint.identification.algorithm = https
-	ssl.engine.factory.class = null
-	ssl.key.password = null
-	ssl.keymanager.algorithm = SunX509
-	ssl.keystore.certificate.chain = null
-	ssl.keystore.key = null
-	ssl.keystore.location = null
-	ssl.keystore.password = null
-	ssl.keystore.type = JKS
-	ssl.protocol = TLSv1.3
-	ssl.provider = null
-	ssl.secure.random.implementation = null
-	ssl.trustmanager.algorithm = PKIX
-	ssl.truststore.certificates = null
-	ssl.truststore.location = null
-	ssl.truststore.password = null
-	ssl.truststore.type = JKS
-	value.deserializer = class org.springframework.kafka.support.serializer.JsonDeserializer
+Failed to configure a DataSource: 'url' attribute is not specified and no embedded datasource could be configured.
 
-2026-02-24T09:18:55.439 INFO  [main] o.a.k.c.t.i.KafkaMetricsCollector - initializing Kafka metrics collector
-2026-02-24T09:18:55.687 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka version: 3.9.1
-2026-02-24T09:18:55.687 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka commitId: f745dfdcee2b9851
-2026-02-24T09:18:55.687 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka startTimeMs: 1771935535683
-2026-02-24T09:18:55.712 INFO  [main] o.a.k.c.c.i.ClassicKafkaConsumer - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Subscribed to topic(s): frotapro.motorista.sync.response
-2026-02-24T09:18:55.729 INFO  [main] o.a.k.c.consumer.ConsumerConfig - ConsumerConfig values: 
-	allow.auto.create.topics = true
-	auto.commit.interval.ms = 5000
-	auto.include.jmx.reporter = true
-	auto.offset.reset = latest
-	bootstrap.servers = [localhost:9092]
-	check.crcs = true
-	client.dns.lookup = use_all_dns_ips
-	client.id = consumer-frota-pro-api-v2-2
-	client.rack = 
-	connections.max.idle.ms = 540000
-	default.api.timeout.ms = 60000
-	enable.auto.commit = false
-	enable.metrics.push = true
-	exclude.internal.topics = true
-	fetch.max.bytes = 52428800
-	fetch.max.wait.ms = 500
-	fetch.min.bytes = 1
-	group.id = frota-pro-api-v2
-	group.instance.id = null
-	group.protocol = classic
-	group.remote.assignor = null
-	heartbeat.interval.ms = 3000
-	interceptor.classes = []
-	internal.leave.group.on.close = true
-	internal.throw.on.fetch.stable.offset.unsupported = false
-	isolation.level = read_uncommitted
-	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
-	max.partition.fetch.bytes = 1048576
-	max.poll.interval.ms = 300000
-	max.poll.records = 500
-	metadata.max.age.ms = 300000
-	metadata.recovery.strategy = none
-	metric.reporters = []
-	metrics.num.samples = 2
-	metrics.recording.level = INFO
-	metrics.sample.window.ms = 30000
-	partition.assignment.strategy = [class org.apache.kafka.clients.consumer.RangeAssignor, class org.apache.kafka.clients.consumer.CooperativeStickyAssignor]
-	receive.buffer.bytes = 65536
-	reconnect.backoff.max.ms = 1000
-	reconnect.backoff.ms = 50
-	request.timeout.ms = 30000
-	retry.backoff.max.ms = 1000
-	retry.backoff.ms = 100
-	sasl.client.callback.handler.class = null
-	sasl.jaas.config = null
-	sasl.kerberos.kinit.cmd = /usr/bin/kinit
-	sasl.kerberos.min.time.before.relogin = 60000
-	sasl.kerberos.service.name = null
-	sasl.kerberos.ticket.renew.jitter = 0.05
-	sasl.kerberos.ticket.renew.window.factor = 0.8
-	sasl.login.callback.handler.class = null
-	sasl.login.class = null
-	sasl.login.connect.timeout.ms = null
-	sasl.login.read.timeout.ms = null
-	sasl.login.refresh.buffer.seconds = 300
-	sasl.login.refresh.min.period.seconds = 60
-	sasl.login.refresh.window.factor = 0.8
-	sasl.login.refresh.window.jitter = 0.05
-	sasl.login.retry.backoff.max.ms = 10000
-	sasl.login.retry.backoff.ms = 100
-	sasl.mechanism = GSSAPI
-	sasl.oauthbearer.clock.skew.seconds = 30
-	sasl.oauthbearer.expected.audience = null
-	sasl.oauthbearer.expected.issuer = null
-	sasl.oauthbearer.header.urlencode = false
-	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
-	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
-	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
-	sasl.oauthbearer.jwks.endpoint.url = null
-	sasl.oauthbearer.scope.claim.name = scope
-	sasl.oauthbearer.sub.claim.name = sub
-	sasl.oauthbearer.token.endpoint.url = null
-	security.protocol = PLAINTEXT
-	security.providers = null
-	send.buffer.bytes = 131072
-	session.timeout.ms = 45000
-	socket.connection.setup.timeout.max.ms = 30000
-	socket.connection.setup.timeout.ms = 10000
-	ssl.cipher.suites = null
-	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
-	ssl.endpoint.identification.algorithm = https
-	ssl.engine.factory.class = null
-	ssl.key.password = null
-	ssl.keymanager.algorithm = SunX509
-	ssl.keystore.certificate.chain = null
-	ssl.keystore.key = null
-	ssl.keystore.location = null
-	ssl.keystore.password = null
-	ssl.keystore.type = JKS
-	ssl.protocol = TLSv1.3
-	ssl.provider = null
-	ssl.secure.random.implementation = null
-	ssl.trustmanager.algorithm = PKIX
-	ssl.truststore.certificates = null
-	ssl.truststore.location = null
-	ssl.truststore.password = null
-	ssl.truststore.type = JKS
-	value.deserializer = class org.springframework.kafka.support.serializer.JsonDeserializer
+Reason: Failed to determine a suitable driver class
 
-2026-02-24T09:18:55.729 INFO  [main] o.a.k.c.t.i.KafkaMetricsCollector - initializing Kafka metrics collector
-2026-02-24T09:18:55.756 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka version: 3.9.1
-2026-02-24T09:18:55.756 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka commitId: f745dfdcee2b9851
-2026-02-24T09:18:55.757 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka startTimeMs: 1771935535756
-2026-02-24T09:18:55.772 INFO  [main] o.a.k.c.c.i.ClassicKafkaConsumer - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Subscribed to topic(s): frotapro.caminhao.sync.response
-2026-02-24T09:18:55.776 INFO  [main] o.a.k.c.consumer.ConsumerConfig - ConsumerConfig values: 
-	allow.auto.create.topics = true
-	auto.commit.interval.ms = 5000
-	auto.include.jmx.reporter = true
-	auto.offset.reset = latest
-	bootstrap.servers = [localhost:9092]
-	check.crcs = true
-	client.dns.lookup = use_all_dns_ips
-	client.id = consumer-frota-pro-api-v2-3
-	client.rack = 
-	connections.max.idle.ms = 540000
-	default.api.timeout.ms = 60000
-	enable.auto.commit = false
-	enable.metrics.push = true
-	exclude.internal.topics = true
-	fetch.max.bytes = 52428800
-	fetch.max.wait.ms = 500
-	fetch.min.bytes = 1
-	group.id = frota-pro-api-v2
-	group.instance.id = null
-	group.protocol = classic
-	group.remote.assignor = null
-	heartbeat.interval.ms = 3000
-	interceptor.classes = []
-	internal.leave.group.on.close = true
-	internal.throw.on.fetch.stable.offset.unsupported = false
-	isolation.level = read_uncommitted
-	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
-	max.partition.fetch.bytes = 1048576
-	max.poll.interval.ms = 300000
-	max.poll.records = 500
-	metadata.max.age.ms = 300000
-	metadata.recovery.strategy = none
-	metric.reporters = []
-	metrics.num.samples = 2
-	metrics.recording.level = INFO
-	metrics.sample.window.ms = 30000
-	partition.assignment.strategy = [class org.apache.kafka.clients.consumer.RangeAssignor, class org.apache.kafka.clients.consumer.CooperativeStickyAssignor]
-	receive.buffer.bytes = 65536
-	reconnect.backoff.max.ms = 1000
-	reconnect.backoff.ms = 50
-	request.timeout.ms = 30000
-	retry.backoff.max.ms = 1000
-	retry.backoff.ms = 100
-	sasl.client.callback.handler.class = null
-	sasl.jaas.config = null
-	sasl.kerberos.kinit.cmd = /usr/bin/kinit
-	sasl.kerberos.min.time.before.relogin = 60000
-	sasl.kerberos.service.name = null
-	sasl.kerberos.ticket.renew.jitter = 0.05
-	sasl.kerberos.ticket.renew.window.factor = 0.8
-	sasl.login.callback.handler.class = null
-	sasl.login.class = null
-	sasl.login.connect.timeout.ms = null
-	sasl.login.read.timeout.ms = null
-	sasl.login.refresh.buffer.seconds = 300
-	sasl.login.refresh.min.period.seconds = 60
-	sasl.login.refresh.window.factor = 0.8
-	sasl.login.refresh.window.jitter = 0.05
-	sasl.login.retry.backoff.max.ms = 10000
-	sasl.login.retry.backoff.ms = 100
-	sasl.mechanism = GSSAPI
-	sasl.oauthbearer.clock.skew.seconds = 30
-	sasl.oauthbearer.expected.audience = null
-	sasl.oauthbearer.expected.issuer = null
-	sasl.oauthbearer.header.urlencode = false
-	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
-	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
-	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
-	sasl.oauthbearer.jwks.endpoint.url = null
-	sasl.oauthbearer.scope.claim.name = scope
-	sasl.oauthbearer.sub.claim.name = sub
-	sasl.oauthbearer.token.endpoint.url = null
-	security.protocol = PLAINTEXT
-	security.providers = null
-	send.buffer.bytes = 131072
-	session.timeout.ms = 45000
-	socket.connection.setup.timeout.max.ms = 30000
-	socket.connection.setup.timeout.ms = 10000
-	ssl.cipher.suites = null
-	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
-	ssl.endpoint.identification.algorithm = https
-	ssl.engine.factory.class = null
-	ssl.key.password = null
-	ssl.keymanager.algorithm = SunX509
-	ssl.keystore.certificate.chain = null
-	ssl.keystore.key = null
-	ssl.keystore.location = null
-	ssl.keystore.password = null
-	ssl.keystore.type = JKS
-	ssl.protocol = TLSv1.3
-	ssl.provider = null
-	ssl.secure.random.implementation = null
-	ssl.trustmanager.algorithm = PKIX
-	ssl.truststore.certificates = null
-	ssl.truststore.location = null
-	ssl.truststore.password = null
-	ssl.truststore.type = JKS
-	value.deserializer = class org.springframework.kafka.support.serializer.JsonDeserializer
 
-2026-02-24T09:18:55.777 INFO  [main] o.a.k.c.t.i.KafkaMetricsCollector - initializing Kafka metrics collector
-2026-02-24T09:18:55.809 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka version: 3.9.1
-2026-02-24T09:18:55.809 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka commitId: f745dfdcee2b9851
-2026-02-24T09:18:55.809 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka startTimeMs: 1771935535809
-2026-02-24T09:18:55.821 INFO  [main] o.a.k.c.c.i.ClassicKafkaConsumer - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Subscribed to topic(s): frotapro.carga.sync.response
-2026-02-24T09:18:55.856 INFO  [main] b.c.f.api.FrotaProApplication - Started FrotaProApplication in 39.334 seconds (process running for 46.659)
-2026-02-24T09:18:56.126 INFO  [RMI TCP Connection(1)-192.168.2.63] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-02-24T09:18:56.127 INFO  [RMI TCP Connection(1)-192.168.2.63] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
-2026-02-24T09:18:56.134 INFO  [RMI TCP Connection(1)-192.168.2.63] o.s.web.servlet.DispatcherServlet - Completed initialization in 7 ms
-2026-02-24T09:18:56.971 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] org.apache.kafka.clients.Metadata - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Cluster ID: ZqbpC6XiSASmVMALn-jFHw
-2026-02-24T09:18:56.971 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] org.apache.kafka.clients.Metadata - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Cluster ID: ZqbpC6XiSASmVMALn-jFHw
-2026-02-24T09:18:56.971 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] org.apache.kafka.clients.Metadata - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Cluster ID: ZqbpC6XiSASmVMALn-jFHw
-2026-02-24T09:18:56.972 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
-2026-02-24T09:18:56.973 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
-2026-02-24T09:18:56.973 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
-2026-02-24T09:18:56.980 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] (Re-)joining group
-2026-02-24T09:18:56.980 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] (Re-)joining group
-2026-02-24T09:18:56.980 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] (Re-)joining group
-2026-02-24T09:18:57.047 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Request joining group due to: need to re-join with the given member-id: consumer-frota-pro-api-v2-1-199d64f1-736f-4d39-9870-ac4e8a703703
-2026-02-24T09:18:57.048 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Request joining group due to: need to re-join with the given member-id: consumer-frota-pro-api-v2-2-9b3d9339-cc8b-4ef4-813f-8ae35fba6c3d
-2026-02-24T09:18:57.048 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Request joining group due to: need to re-join with the given member-id: consumer-frota-pro-api-v2-3-5332fdef-7944-4904-b585-b237ef680824
-2026-02-24T09:18:57.049 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] (Re-)joining group
-2026-02-24T09:18:57.049 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] (Re-)joining group
-2026-02-24T09:18:57.049 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] (Re-)joining group
-2026-02-24T09:19:00.081 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Successfully joined group with generation Generation{generationId=196, memberId='consumer-frota-pro-api-v2-1-199d64f1-736f-4d39-9870-ac4e8a703703', protocol='range'}
-2026-02-24T09:19:00.081 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Successfully joined group with generation Generation{generationId=196, memberId='consumer-frota-pro-api-v2-3-5332fdef-7944-4904-b585-b237ef680824', protocol='range'}
-2026-02-24T09:19:00.082 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Successfully joined group with generation Generation{generationId=196, memberId='consumer-frota-pro-api-v2-2-9b3d9339-cc8b-4ef4-813f-8ae35fba6c3d', protocol='range'}
-2026-02-24T09:19:00.113 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Finished assignment for group at generation 196: {consumer-frota-pro-api-v2-3-5332fdef-7944-4904-b585-b237ef680824=Assignment(partitions=[frotapro.carga.sync.response-0]), consumer-frota-pro-api-v2-2-9b3d9339-cc8b-4ef4-813f-8ae35fba6c3d=Assignment(partitions=[frotapro.caminhao.sync.response-0]), consumer-frota-pro-api-v2-1-199d64f1-736f-4d39-9870-ac4e8a703703=Assignment(partitions=[frotapro.motorista.sync.response-0])}
-2026-02-24T09:19:00.142 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Successfully synced group in generation Generation{generationId=196, memberId='consumer-frota-pro-api-v2-3-5332fdef-7944-4904-b585-b237ef680824', protocol='range'}
-2026-02-24T09:19:00.142 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Successfully synced group in generation Generation{generationId=196, memberId='consumer-frota-pro-api-v2-2-9b3d9339-cc8b-4ef4-813f-8ae35fba6c3d', protocol='range'}
-2026-02-24T09:19:00.142 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Successfully synced group in generation Generation{generationId=196, memberId='consumer-frota-pro-api-v2-1-199d64f1-736f-4d39-9870-ac4e8a703703', protocol='range'}
-2026-02-24T09:19:00.143 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Notifying assignor about the new Assignment(partitions=[frotapro.carga.sync.response-0])
-2026-02-24T09:19:00.143 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Notifying assignor about the new Assignment(partitions=[frotapro.caminhao.sync.response-0])
-2026-02-24T09:19:00.143 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Notifying assignor about the new Assignment(partitions=[frotapro.motorista.sync.response-0])
-2026-02-24T09:19:00.149 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerRebalanceListenerInvoker - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Adding newly assigned partitions: frotapro.carga.sync.response-0
-2026-02-24T09:19:00.149 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerRebalanceListenerInvoker - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Adding newly assigned partitions: frotapro.caminhao.sync.response-0
-2026-02-24T09:19:00.149 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerRebalanceListenerInvoker - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Adding newly assigned partitions: frotapro.motorista.sync.response-0
-2026-02-24T09:19:00.180 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.internals.ConsumerUtils - Setting offset for partition frotapro.caminhao.sync.response-0 to the committed offset FetchPosition{offset=7, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9092 (id: 1 rack: null)], epoch=0}}
-2026-02-24T09:19:00.180 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.internals.ConsumerUtils - Setting offset for partition frotapro.motorista.sync.response-0 to the committed offset FetchPosition{offset=8, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9092 (id: 1 rack: null)], epoch=0}}
-2026-02-24T09:19:00.180 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.internals.ConsumerUtils - Setting offset for partition frotapro.carga.sync.response-0 to the committed offset FetchPosition{offset=23, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9092 (id: 1 rack: null)], epoch=0}}
-2026-02-24T09:19:00.184 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: partitions assigned: [frotapro.motorista.sync.response-0]
-2026-02-24T09:19:00.184 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: partitions assigned: [frotapro.caminhao.sync.response-0]
-2026-02-24T09:19:00.184 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: partitions assigned: [frotapro.carga.sync.response-0]
-2026-02-24T10:00:00.605 INFO  [scheduling-1] b.c.f.a.i.k.CargaSyncRequestProducer - 📤 Enviando pedido de sync de cargas. jobId=ac88878d-10f7-4e2e-8f15-bc914c668928 dataInicial=2026-02-24 dataFinal=2026-02-24
-2026-02-24T10:00:00.623 INFO  [scheduling-1] o.a.k.c.producer.ProducerConfig - ProducerConfig values: 
-	acks = -1
-	auto.include.jmx.reporter = true
-	batch.size = 16384
-	bootstrap.servers = [localhost:9092]
-	buffer.memory = 33554432
-	client.dns.lookup = use_all_dns_ips
-	client.id = frotaPro-producer-1
-	compression.gzip.level = -1
-	compression.lz4.level = 9
-	compression.type = none
-	compression.zstd.level = 3
-	connections.max.idle.ms = 540000
-	delivery.timeout.ms = 120000
-	enable.idempotence = true
-	enable.metrics.push = true
-	interceptor.classes = []
-	key.serializer = class org.apache.kafka.common.serialization.StringSerializer
-	linger.ms = 0
-	max.block.ms = 60000
-	max.in.flight.requests.per.connection = 5
-	max.request.size = 1048576
-	metadata.max.age.ms = 300000
-	metadata.max.idle.ms = 300000
-	metadata.recovery.strategy = none
-	metric.reporters = []
-	metrics.num.samples = 2
-	metrics.recording.level = INFO
-	metrics.sample.window.ms = 30000
-	partitioner.adaptive.partitioning.enable = true
-	partitioner.availability.timeout.ms = 0
-	partitioner.class = null
-	partitioner.ignore.keys = false
-	receive.buffer.bytes = 32768
-	reconnect.backoff.max.ms = 1000
-	reconnect.backoff.ms = 50
-	request.timeout.ms = 30000
-	retries = 2147483647
-	retry.backoff.max.ms = 1000
-	retry.backoff.ms = 100
-	sasl.client.callback.handler.class = null
-	sasl.jaas.config = null
-	sasl.kerberos.kinit.cmd = /usr/bin/kinit
-	sasl.kerberos.min.time.before.relogin = 60000
-	sasl.kerberos.service.name = null
-	sasl.kerberos.ticket.renew.jitter = 0.05
-	sasl.kerberos.ticket.renew.window.factor = 0.8
-	sasl.login.callback.handler.class = null
-	sasl.login.class = null
-	sasl.login.connect.timeout.ms = null
-	sasl.login.read.timeout.ms = null
-	sasl.login.refresh.buffer.seconds = 300
-	sasl.login.refresh.min.period.seconds = 60
-	sasl.login.refresh.window.factor = 0.8
-	sasl.login.refresh.window.jitter = 0.05
-	sasl.login.retry.backoff.max.ms = 10000
-	sasl.login.retry.backoff.ms = 100
-	sasl.mechanism = GSSAPI
-	sasl.oauthbearer.clock.skew.seconds = 30
-	sasl.oauthbearer.expected.audience = null
-	sasl.oauthbearer.expected.issuer = null
-	sasl.oauthbearer.header.urlencode = false
-	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
-	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
-	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
-	sasl.oauthbearer.jwks.endpoint.url = null
-	sasl.oauthbearer.scope.claim.name = scope
-	sasl.oauthbearer.sub.claim.name = sub
-	sasl.oauthbearer.token.endpoint.url = null
-	security.protocol = PLAINTEXT
-	security.providers = null
-	send.buffer.bytes = 131072
-	socket.connection.setup.timeout.max.ms = 30000
-	socket.connection.setup.timeout.ms = 10000
-	ssl.cipher.suites = null
-	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
-	ssl.endpoint.identification.algorithm = https
-	ssl.engine.factory.class = null
-	ssl.key.password = null
-	ssl.keymanager.algorithm = SunX509
-	ssl.keystore.certificate.chain = null
-	ssl.keystore.key = null
-	ssl.keystore.location = null
-	ssl.keystore.password = null
-	ssl.keystore.type = JKS
-	ssl.protocol = TLSv1.3
-	ssl.provider = null
-	ssl.secure.random.implementation = null
-	ssl.trustmanager.algorithm = PKIX
-	ssl.truststore.certificates = null
-	ssl.truststore.location = null
-	ssl.truststore.password = null
-	ssl.truststore.type = JKS
-	transaction.timeout.ms = 60000
-	transactional.id = null
-	value.serializer = class org.springframework.kafka.support.serializer.JsonSerializer
+Action:
 
-2026-02-24T10:00:00.623 INFO  [scheduling-1] o.a.k.c.t.i.KafkaMetricsCollector - initializing Kafka metrics collector
-2026-02-24T10:00:00.668 INFO  [scheduling-1] o.a.k.clients.producer.KafkaProducer - [Producer clientId=frotaPro-producer-1] Instantiated an idempotent producer.
-2026-02-24T10:00:00.704 INFO  [scheduling-1] o.a.kafka.common.utils.AppInfoParser - Kafka version: 3.9.1
-2026-02-24T10:00:00.704 INFO  [scheduling-1] o.a.kafka.common.utils.AppInfoParser - Kafka commitId: f745dfdcee2b9851
-2026-02-24T10:00:00.704 INFO  [scheduling-1] o.a.kafka.common.utils.AppInfoParser - Kafka startTimeMs: 1771938000704
-2026-02-24T10:00:00.724 INFO  [kafka-producer-network-thread | frotaPro-producer-1] org.apache.kafka.clients.Metadata - [Producer clientId=frotaPro-producer-1] Cluster ID: ZqbpC6XiSASmVMALn-jFHw
-2026-02-24T10:00:00.860 INFO  [scheduling-1] b.c.f.api.scheduler.CargaScheduled - Job automático de sincronização de cargas disparado. jobId=ac88878d-10f7-4e2e-8f15-bc914c668928 data=2026-02-24
-2026-02-24T10:00:01.066 INFO  [kafka-producer-network-thread | frotaPro-producer-1] o.a.k.c.p.i.TransactionManager - [Producer clientId=frotaPro-producer-1] ProducerId set to 12000 with epoch 0
-2026-02-24T10:14:09.849 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerRebalanceListenerInvoker - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Revoke previously assigned partitions frotapro.carga.sync.response-0
-2026-02-24T10:14:09.849 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerRebalanceListenerInvoker - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Revoke previously assigned partitions frotapro.motorista.sync.response-0
-2026-02-24T10:14:09.851 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: partitions revoked: [frotapro.carga.sync.response-0]
-2026-02-24T10:14:09.851 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: partitions revoked: [frotapro.motorista.sync.response-0]
-2026-02-24T10:14:09.849 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerRebalanceListenerInvoker - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Revoke previously assigned partitions frotapro.caminhao.sync.response-0
-2026-02-24T10:14:09.852 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: partitions revoked: [frotapro.caminhao.sync.response-0]
-2026-02-24T10:14:09.853 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Member consumer-frota-pro-api-v2-3-5332fdef-7944-4904-b585-b237ef680824 sending LeaveGroup request to coordinator localhost:9092 (id: 2147483646 rack: null) due to the consumer unsubscribed from all topics
-2026-02-24T10:14:09.853 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Member consumer-frota-pro-api-v2-1-199d64f1-736f-4d39-9870-ac4e8a703703 sending LeaveGroup request to coordinator localhost:9092 (id: 2147483646 rack: null) due to the consumer unsubscribed from all topics
-2026-02-24T10:14:09.853 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Member consumer-frota-pro-api-v2-2-9b3d9339-cc8b-4ef4-813f-8ae35fba6c3d sending LeaveGroup request to coordinator localhost:9092 (id: 2147483646 rack: null) due to the consumer unsubscribed from all topics
-2026-02-24T10:14:09.854 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Resetting generation and member id due to: consumer pro-actively leaving the group
-2026-02-24T10:14:09.854 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Resetting generation and member id due to: consumer pro-actively leaving the group
-2026-02-24T10:14:09.854 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Resetting generation and member id due to: consumer pro-actively leaving the group
-2026-02-24T10:14:09.855 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Request joining group due to: consumer pro-actively leaving the group
-2026-02-24T10:14:09.855 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Request joining group due to: consumer pro-actively leaving the group
-2026-02-24T10:14:09.855 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Request joining group due to: consumer pro-actively leaving the group
-2026-02-24T10:14:09.855 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Unsubscribed all topics or patterns and assigned partitions
-2026-02-24T10:14:09.855 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Unsubscribed all topics or patterns and assigned partitions
-2026-02-24T10:14:09.855 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Unsubscribed all topics or patterns and assigned partitions
-2026-02-24T10:14:09.861 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Resetting generation and member id due to: consumer pro-actively leaving the group
-2026-02-24T10:14:09.861 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Request joining group due to: consumer pro-actively leaving the group
-2026-02-24T10:14:09.862 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Resetting generation and member id due to: consumer pro-actively leaving the group
-2026-02-24T10:14:09.862 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Request joining group due to: consumer pro-actively leaving the group
-2026-02-24T10:14:09.862 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Resetting generation and member id due to: consumer pro-actively leaving the group
-2026-02-24T10:14:09.863 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Request joining group due to: consumer pro-actively leaving the group
-2026-02-24T10:14:10.262 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.kafka.common.metrics.Metrics - Metrics scheduler closed
-2026-02-24T10:14:10.263 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.metrics.JmxReporter
-2026-02-24T10:14:10.263 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
-2026-02-24T10:14:10.263 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.kafka.common.metrics.Metrics - Metrics reporters closed
-2026-02-24T10:14:10.265 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.kafka.common.metrics.Metrics - Metrics scheduler closed
-2026-02-24T10:14:10.265 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.metrics.JmxReporter
-2026-02-24T10:14:10.266 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
-2026-02-24T10:14:10.267 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.kafka.common.metrics.Metrics - Metrics reporters closed
-2026-02-24T10:14:10.286 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.kafka.common.utils.AppInfoParser - App info kafka.consumer for consumer-frota-pro-api-v2-1 unregistered
-2026-02-24T10:14:10.291 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.kafka.common.metrics.Metrics - Metrics scheduler closed
-2026-02-24T10:14:10.292 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.metrics.JmxReporter
-2026-02-24T10:14:10.292 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
-2026-02-24T10:14:10.292 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.kafka.common.metrics.Metrics - Metrics reporters closed
-2026-02-24T10:14:10.293 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: Consumer stopped
-2026-02-24T10:14:10.295 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.kafka.common.utils.AppInfoParser - App info kafka.consumer for consumer-frota-pro-api-v2-2 unregistered
-2026-02-24T10:14:10.296 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: Consumer stopped
-2026-02-24T10:14:10.300 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.kafka.common.utils.AppInfoParser - App info kafka.consumer for consumer-frota-pro-api-v2-3 unregistered
-2026-02-24T10:14:10.304 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: Consumer stopped
-2026-02-24T10:14:10.307 INFO  [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
-2026-02-24T10:14:10.332 INFO  [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
-2026-02-24T10:14:10.337 INFO  [SpringApplicationShutdownHook] o.a.k.clients.producer.KafkaProducer - [Producer clientId=frotaPro-producer-1] Closing the Kafka producer with timeoutMillis = 30000 ms.
-2026-02-24T10:14:10.347 INFO  [SpringApplicationShutdownHook] o.a.kafka.common.metrics.Metrics - Metrics scheduler closed
-2026-02-24T10:14:10.347 INFO  [SpringApplicationShutdownHook] o.a.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.metrics.JmxReporter
-2026-02-24T10:14:10.347 INFO  [SpringApplicationShutdownHook] o.a.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
-2026-02-24T10:14:10.348 INFO  [SpringApplicationShutdownHook] o.a.kafka.common.metrics.Metrics - Metrics reporters closed
-2026-02-24T10:14:10.349 INFO  [SpringApplicationShutdownHook] o.a.kafka.common.utils.AppInfoParser - App info kafka.producer for frotaPro-producer-1 unregistered
-2026-02-24T10:14:10.417 INFO  [SpringApplicationShutdownHook] o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
-2026-02-24T10:14:10.422 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
-2026-02-24T10:14:10.445 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
-2026-02-24T11:16:36.944 INFO  [background-preinit] o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.3.Final
-2026-02-24T11:16:37.090 INFO  [main] b.c.f.api.FrotaProApplication - Starting FrotaProApplication using Java 21.0.8 with PID 21048 (C:\Users\Arthenyo\Documents\PROJETOS\frota-pro-api\target\classes started by Arthenyo in C:\Users\Arthenyo\Documents\PROJETOS\frota-pro-api)
-2026-02-24T11:16:37.093 INFO  [main] b.c.f.api.FrotaProApplication - The following 1 profile is active: "dev"
-2026-02-24T11:16:40.445 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-02-24T11:16:40.785 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 324 ms. Found 34 JPA repository interfaces.
-2026-02-24T11:16:42.513 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
-2026-02-24T11:16:42.540 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
-2026-02-24T11:16:42.543 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
-2026-02-24T11:16:42.543 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.48]
-2026-02-24T11:16:42.679 INFO  [main] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-2026-02-24T11:16:42.679 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 5445 ms
-2026-02-24T11:16:43.553 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
-2026-02-24T11:16:44.021 INFO  [main] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@335cdd2
-2026-02-24T11:16:44.024 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
-2026-02-24T11:16:44.111 INFO  [main] org.flywaydb.core.FlywayExecutor - Database: jdbc:postgresql://localhost:5432/frotapro (PostgreSQL 15.3)
-2026-02-24T11:16:44.479 INFO  [main] o.f.core.internal.command.DbValidate - Successfully validated 36 migrations (execution time 00:00.158s)
-2026-02-24T11:16:44.528 INFO  [main] o.f.core.internal.command.DbMigrate - Current version of schema "public": 36
-2026-02-24T11:16:44.537 INFO  [main] o.f.core.internal.command.DbMigrate - Schema "public" is up to date. No migration necessary.
-2026-02-24T11:16:44.821 INFO  [main] o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
-2026-02-24T11:16:45.046 INFO  [main] org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.33.Final
-2026-02-24T11:16:45.214 INFO  [main] o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
-2026-02-24T11:16:46.206 INFO  [main] o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-02-24T11:16:46.521 INFO  [main] o.hibernate.orm.connections.pooling - HHH10001005: Database info:
-	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
-	Database driver: undefined/unknown
-	Database version: 15.3
-	Autocommit mode: undefined/unknown
-	Isolation level: undefined/unknown
-	Minimum pool size: undefined/unknown
-	Maximum pool size: undefined/unknown
-2026-02-24T11:16:50.020 INFO  [main] o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-02-24T11:16:50.294 INFO  [main] o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-02-24T11:16:51.117 INFO  [main] o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
-2026-02-24T11:17:01.097 WARN  [main] o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-02-24T11:17:01.947 INFO  [main] o.s.b.a.e.web.EndpointLinksResolver - Exposing 4 endpoints beneath base path '/actuator'
-2026-02-24T11:17:03.213 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
-2026-02-24T11:17:03.242 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
-2026-02-24T11:17:03.320 INFO  [main] o.a.k.c.consumer.ConsumerConfig - ConsumerConfig values: 
-	allow.auto.create.topics = true
-	auto.commit.interval.ms = 5000
-	auto.include.jmx.reporter = true
-	auto.offset.reset = latest
-	bootstrap.servers = [localhost:9092]
-	check.crcs = true
-	client.dns.lookup = use_all_dns_ips
-	client.id = consumer-frota-pro-api-v2-1
-	client.rack = 
-	connections.max.idle.ms = 540000
-	default.api.timeout.ms = 60000
-	enable.auto.commit = false
-	enable.metrics.push = true
-	exclude.internal.topics = true
-	fetch.max.bytes = 52428800
-	fetch.max.wait.ms = 500
-	fetch.min.bytes = 1
-	group.id = frota-pro-api-v2
-	group.instance.id = null
-	group.protocol = classic
-	group.remote.assignor = null
-	heartbeat.interval.ms = 3000
-	interceptor.classes = []
-	internal.leave.group.on.close = true
-	internal.throw.on.fetch.stable.offset.unsupported = false
-	isolation.level = read_uncommitted
-	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
-	max.partition.fetch.bytes = 1048576
-	max.poll.interval.ms = 300000
-	max.poll.records = 500
-	metadata.max.age.ms = 300000
-	metadata.recovery.strategy = none
-	metric.reporters = []
-	metrics.num.samples = 2
-	metrics.recording.level = INFO
-	metrics.sample.window.ms = 30000
-	partition.assignment.strategy = [class org.apache.kafka.clients.consumer.RangeAssignor, class org.apache.kafka.clients.consumer.CooperativeStickyAssignor]
-	receive.buffer.bytes = 65536
-	reconnect.backoff.max.ms = 1000
-	reconnect.backoff.ms = 50
-	request.timeout.ms = 30000
-	retry.backoff.max.ms = 1000
-	retry.backoff.ms = 100
-	sasl.client.callback.handler.class = null
-	sasl.jaas.config = null
-	sasl.kerberos.kinit.cmd = /usr/bin/kinit
-	sasl.kerberos.min.time.before.relogin = 60000
-	sasl.kerberos.service.name = null
-	sasl.kerberos.ticket.renew.jitter = 0.05
-	sasl.kerberos.ticket.renew.window.factor = 0.8
-	sasl.login.callback.handler.class = null
-	sasl.login.class = null
-	sasl.login.connect.timeout.ms = null
-	sasl.login.read.timeout.ms = null
-	sasl.login.refresh.buffer.seconds = 300
-	sasl.login.refresh.min.period.seconds = 60
-	sasl.login.refresh.window.factor = 0.8
-	sasl.login.refresh.window.jitter = 0.05
-	sasl.login.retry.backoff.max.ms = 10000
-	sasl.login.retry.backoff.ms = 100
-	sasl.mechanism = GSSAPI
-	sasl.oauthbearer.clock.skew.seconds = 30
-	sasl.oauthbearer.expected.audience = null
-	sasl.oauthbearer.expected.issuer = null
-	sasl.oauthbearer.header.urlencode = false
-	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
-	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
-	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
-	sasl.oauthbearer.jwks.endpoint.url = null
-	sasl.oauthbearer.scope.claim.name = scope
-	sasl.oauthbearer.sub.claim.name = sub
-	sasl.oauthbearer.token.endpoint.url = null
-	security.protocol = PLAINTEXT
-	security.providers = null
-	send.buffer.bytes = 131072
-	session.timeout.ms = 45000
-	socket.connection.setup.timeout.max.ms = 30000
-	socket.connection.setup.timeout.ms = 10000
-	ssl.cipher.suites = null
-	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
-	ssl.endpoint.identification.algorithm = https
-	ssl.engine.factory.class = null
-	ssl.key.password = null
-	ssl.keymanager.algorithm = SunX509
-	ssl.keystore.certificate.chain = null
-	ssl.keystore.key = null
-	ssl.keystore.location = null
-	ssl.keystore.password = null
-	ssl.keystore.type = JKS
-	ssl.protocol = TLSv1.3
-	ssl.provider = null
-	ssl.secure.random.implementation = null
-	ssl.trustmanager.algorithm = PKIX
-	ssl.truststore.certificates = null
-	ssl.truststore.location = null
-	ssl.truststore.password = null
-	ssl.truststore.type = JKS
-	value.deserializer = class org.springframework.kafka.support.serializer.JsonDeserializer
+Consider the following:
+	If you want an embedded database (H2, HSQL or Derby), please put it on the classpath.
+	If you have database settings to be loaded from a particular profile you may need to activate it (no profiles are currently active).
 
-2026-02-24T11:17:03.409 INFO  [main] o.a.k.c.t.i.KafkaMetricsCollector - initializing Kafka metrics collector
-2026-02-24T11:17:03.658 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka version: 3.9.1
-2026-02-24T11:17:03.658 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka commitId: f745dfdcee2b9851
-2026-02-24T11:17:03.658 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka startTimeMs: 1771942623654
-2026-02-24T11:17:03.679 INFO  [main] o.a.k.c.c.i.ClassicKafkaConsumer - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Subscribed to topic(s): frotapro.motorista.sync.response
-2026-02-24T11:17:03.694 INFO  [main] o.a.k.c.consumer.ConsumerConfig - ConsumerConfig values: 
-	allow.auto.create.topics = true
-	auto.commit.interval.ms = 5000
-	auto.include.jmx.reporter = true
-	auto.offset.reset = latest
-	bootstrap.servers = [localhost:9092]
-	check.crcs = true
-	client.dns.lookup = use_all_dns_ips
-	client.id = consumer-frota-pro-api-v2-2
-	client.rack = 
-	connections.max.idle.ms = 540000
-	default.api.timeout.ms = 60000
-	enable.auto.commit = false
-	enable.metrics.push = true
-	exclude.internal.topics = true
-	fetch.max.bytes = 52428800
-	fetch.max.wait.ms = 500
-	fetch.min.bytes = 1
-	group.id = frota-pro-api-v2
-	group.instance.id = null
-	group.protocol = classic
-	group.remote.assignor = null
-	heartbeat.interval.ms = 3000
-	interceptor.classes = []
-	internal.leave.group.on.close = true
-	internal.throw.on.fetch.stable.offset.unsupported = false
-	isolation.level = read_uncommitted
-	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
-	max.partition.fetch.bytes = 1048576
-	max.poll.interval.ms = 300000
-	max.poll.records = 500
-	metadata.max.age.ms = 300000
-	metadata.recovery.strategy = none
-	metric.reporters = []
-	metrics.num.samples = 2
-	metrics.recording.level = INFO
-	metrics.sample.window.ms = 30000
-	partition.assignment.strategy = [class org.apache.kafka.clients.consumer.RangeAssignor, class org.apache.kafka.clients.consumer.CooperativeStickyAssignor]
-	receive.buffer.bytes = 65536
-	reconnect.backoff.max.ms = 1000
-	reconnect.backoff.ms = 50
-	request.timeout.ms = 30000
-	retry.backoff.max.ms = 1000
-	retry.backoff.ms = 100
-	sasl.client.callback.handler.class = null
-	sasl.jaas.config = null
-	sasl.kerberos.kinit.cmd = /usr/bin/kinit
-	sasl.kerberos.min.time.before.relogin = 60000
-	sasl.kerberos.service.name = null
-	sasl.kerberos.ticket.renew.jitter = 0.05
-	sasl.kerberos.ticket.renew.window.factor = 0.8
-	sasl.login.callback.handler.class = null
-	sasl.login.class = null
-	sasl.login.connect.timeout.ms = null
-	sasl.login.read.timeout.ms = null
-	sasl.login.refresh.buffer.seconds = 300
-	sasl.login.refresh.min.period.seconds = 60
-	sasl.login.refresh.window.factor = 0.8
-	sasl.login.refresh.window.jitter = 0.05
-	sasl.login.retry.backoff.max.ms = 10000
-	sasl.login.retry.backoff.ms = 100
-	sasl.mechanism = GSSAPI
-	sasl.oauthbearer.clock.skew.seconds = 30
-	sasl.oauthbearer.expected.audience = null
-	sasl.oauthbearer.expected.issuer = null
-	sasl.oauthbearer.header.urlencode = false
-	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
-	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
-	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
-	sasl.oauthbearer.jwks.endpoint.url = null
-	sasl.oauthbearer.scope.claim.name = scope
-	sasl.oauthbearer.sub.claim.name = sub
-	sasl.oauthbearer.token.endpoint.url = null
-	security.protocol = PLAINTEXT
-	security.providers = null
-	send.buffer.bytes = 131072
-	session.timeout.ms = 45000
-	socket.connection.setup.timeout.max.ms = 30000
-	socket.connection.setup.timeout.ms = 10000
-	ssl.cipher.suites = null
-	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
-	ssl.endpoint.identification.algorithm = https
-	ssl.engine.factory.class = null
-	ssl.key.password = null
-	ssl.keymanager.algorithm = SunX509
-	ssl.keystore.certificate.chain = null
-	ssl.keystore.key = null
-	ssl.keystore.location = null
-	ssl.keystore.password = null
-	ssl.keystore.type = JKS
-	ssl.protocol = TLSv1.3
-	ssl.provider = null
-	ssl.secure.random.implementation = null
-	ssl.trustmanager.algorithm = PKIX
-	ssl.truststore.certificates = null
-	ssl.truststore.location = null
-	ssl.truststore.password = null
-	ssl.truststore.type = JKS
-	value.deserializer = class org.springframework.kafka.support.serializer.JsonDeserializer
-
-2026-02-24T11:17:03.695 INFO  [main] o.a.k.c.t.i.KafkaMetricsCollector - initializing Kafka metrics collector
-2026-02-24T11:17:03.717 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka version: 3.9.1
-2026-02-24T11:17:03.717 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka commitId: f745dfdcee2b9851
-2026-02-24T11:17:03.717 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka startTimeMs: 1771942623717
-2026-02-24T11:17:03.731 INFO  [main] o.a.k.c.c.i.ClassicKafkaConsumer - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Subscribed to topic(s): frotapro.caminhao.sync.response
-2026-02-24T11:17:03.734 INFO  [main] o.a.k.c.consumer.ConsumerConfig - ConsumerConfig values: 
-	allow.auto.create.topics = true
-	auto.commit.interval.ms = 5000
-	auto.include.jmx.reporter = true
-	auto.offset.reset = latest
-	bootstrap.servers = [localhost:9092]
-	check.crcs = true
-	client.dns.lookup = use_all_dns_ips
-	client.id = consumer-frota-pro-api-v2-3
-	client.rack = 
-	connections.max.idle.ms = 540000
-	default.api.timeout.ms = 60000
-	enable.auto.commit = false
-	enable.metrics.push = true
-	exclude.internal.topics = true
-	fetch.max.bytes = 52428800
-	fetch.max.wait.ms = 500
-	fetch.min.bytes = 1
-	group.id = frota-pro-api-v2
-	group.instance.id = null
-	group.protocol = classic
-	group.remote.assignor = null
-	heartbeat.interval.ms = 3000
-	interceptor.classes = []
-	internal.leave.group.on.close = true
-	internal.throw.on.fetch.stable.offset.unsupported = false
-	isolation.level = read_uncommitted
-	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
-	max.partition.fetch.bytes = 1048576
-	max.poll.interval.ms = 300000
-	max.poll.records = 500
-	metadata.max.age.ms = 300000
-	metadata.recovery.strategy = none
-	metric.reporters = []
-	metrics.num.samples = 2
-	metrics.recording.level = INFO
-	metrics.sample.window.ms = 30000
-	partition.assignment.strategy = [class org.apache.kafka.clients.consumer.RangeAssignor, class org.apache.kafka.clients.consumer.CooperativeStickyAssignor]
-	receive.buffer.bytes = 65536
-	reconnect.backoff.max.ms = 1000
-	reconnect.backoff.ms = 50
-	request.timeout.ms = 30000
-	retry.backoff.max.ms = 1000
-	retry.backoff.ms = 100
-	sasl.client.callback.handler.class = null
-	sasl.jaas.config = null
-	sasl.kerberos.kinit.cmd = /usr/bin/kinit
-	sasl.kerberos.min.time.before.relogin = 60000
-	sasl.kerberos.service.name = null
-	sasl.kerberos.ticket.renew.jitter = 0.05
-	sasl.kerberos.ticket.renew.window.factor = 0.8
-	sasl.login.callback.handler.class = null
-	sasl.login.class = null
-	sasl.login.connect.timeout.ms = null
-	sasl.login.read.timeout.ms = null
-	sasl.login.refresh.buffer.seconds = 300
-	sasl.login.refresh.min.period.seconds = 60
-	sasl.login.refresh.window.factor = 0.8
-	sasl.login.refresh.window.jitter = 0.05
-	sasl.login.retry.backoff.max.ms = 10000
-	sasl.login.retry.backoff.ms = 100
-	sasl.mechanism = GSSAPI
-	sasl.oauthbearer.clock.skew.seconds = 30
-	sasl.oauthbearer.expected.audience = null
-	sasl.oauthbearer.expected.issuer = null
-	sasl.oauthbearer.header.urlencode = false
-	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
-	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
-	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
-	sasl.oauthbearer.jwks.endpoint.url = null
-	sasl.oauthbearer.scope.claim.name = scope
-	sasl.oauthbearer.sub.claim.name = sub
-	sasl.oauthbearer.token.endpoint.url = null
-	security.protocol = PLAINTEXT
-	security.providers = null
-	send.buffer.bytes = 131072
-	session.timeout.ms = 45000
-	socket.connection.setup.timeout.max.ms = 30000
-	socket.connection.setup.timeout.ms = 10000
-	ssl.cipher.suites = null
-	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
-	ssl.endpoint.identification.algorithm = https
-	ssl.engine.factory.class = null
-	ssl.key.password = null
-	ssl.keymanager.algorithm = SunX509
-	ssl.keystore.certificate.chain = null
-	ssl.keystore.key = null
-	ssl.keystore.location = null
-	ssl.keystore.password = null
-	ssl.keystore.type = JKS
-	ssl.protocol = TLSv1.3
-	ssl.provider = null
-	ssl.secure.random.implementation = null
-	ssl.trustmanager.algorithm = PKIX
-	ssl.truststore.certificates = null
-	ssl.truststore.location = null
-	ssl.truststore.password = null
-	ssl.truststore.type = JKS
-	value.deserializer = class org.springframework.kafka.support.serializer.JsonDeserializer
-
-2026-02-24T11:17:03.735 INFO  [main] o.a.k.c.t.i.KafkaMetricsCollector - initializing Kafka metrics collector
-2026-02-24T11:17:03.764 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka version: 3.9.1
-2026-02-24T11:17:03.764 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka commitId: f745dfdcee2b9851
-2026-02-24T11:17:03.764 INFO  [main] o.a.kafka.common.utils.AppInfoParser - Kafka startTimeMs: 1771942623764
-2026-02-24T11:17:03.774 INFO  [main] o.a.k.c.c.i.ClassicKafkaConsumer - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Subscribed to topic(s): frotapro.carga.sync.response
-2026-02-24T11:17:03.803 INFO  [main] b.c.f.api.FrotaProApplication - Started FrotaProApplication in 29.072 seconds (process running for 31.978)
-2026-02-24T11:17:04.255 INFO  [RMI TCP Connection(2)-192.168.2.63] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-02-24T11:17:04.256 INFO  [RMI TCP Connection(2)-192.168.2.63] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
-2026-02-24T11:17:04.261 INFO  [RMI TCP Connection(2)-192.168.2.63] o.s.web.servlet.DispatcherServlet - Completed initialization in 5 ms
-2026-02-24T11:17:05.103 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] org.apache.kafka.clients.Metadata - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Cluster ID: ZqbpC6XiSASmVMALn-jFHw
-2026-02-24T11:17:05.103 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] org.apache.kafka.clients.Metadata - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Cluster ID: ZqbpC6XiSASmVMALn-jFHw
-2026-02-24T11:17:05.103 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] org.apache.kafka.clients.Metadata - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Cluster ID: ZqbpC6XiSASmVMALn-jFHw
-2026-02-24T11:17:05.105 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
-2026-02-24T11:17:05.105 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
-2026-02-24T11:17:05.105 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
-2026-02-24T11:17:05.113 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] (Re-)joining group
-2026-02-24T11:17:05.113 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] (Re-)joining group
-2026-02-24T11:17:05.113 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] (Re-)joining group
-2026-02-24T11:17:05.245 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Request joining group due to: need to re-join with the given member-id: consumer-frota-pro-api-v2-3-87f9f4f0-121b-444c-bdb1-7ebb5e399dba
-2026-02-24T11:17:05.245 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Request joining group due to: need to re-join with the given member-id: consumer-frota-pro-api-v2-2-0ca9ce13-e128-434c-9f09-e38ba0a2c30e
-2026-02-24T11:17:05.245 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] (Re-)joining group
-2026-02-24T11:17:05.245 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Request joining group due to: need to re-join with the given member-id: consumer-frota-pro-api-v2-1-0a4063d9-00ad-48d7-af70-44a664df662e
-2026-02-24T11:17:05.247 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] (Re-)joining group
-2026-02-24T11:17:05.248 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] (Re-)joining group
-2026-02-24T11:17:08.303 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Successfully joined group with generation Generation{generationId=198, memberId='consumer-frota-pro-api-v2-3-87f9f4f0-121b-444c-bdb1-7ebb5e399dba', protocol='range'}
-2026-02-24T11:17:08.305 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Successfully joined group with generation Generation{generationId=198, memberId='consumer-frota-pro-api-v2-2-0ca9ce13-e128-434c-9f09-e38ba0a2c30e', protocol='range'}
-2026-02-24T11:17:08.308 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Successfully joined group with generation Generation{generationId=198, memberId='consumer-frota-pro-api-v2-1-0a4063d9-00ad-48d7-af70-44a664df662e', protocol='range'}
-2026-02-24T11:17:08.330 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Finished assignment for group at generation 198: {consumer-frota-pro-api-v2-3-87f9f4f0-121b-444c-bdb1-7ebb5e399dba=Assignment(partitions=[frotapro.carga.sync.response-0]), consumer-frota-pro-api-v2-2-0ca9ce13-e128-434c-9f09-e38ba0a2c30e=Assignment(partitions=[frotapro.caminhao.sync.response-0]), consumer-frota-pro-api-v2-1-0a4063d9-00ad-48d7-af70-44a664df662e=Assignment(partitions=[frotapro.motorista.sync.response-0])}
-2026-02-24T11:17:08.387 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Successfully synced group in generation Generation{generationId=198, memberId='consumer-frota-pro-api-v2-2-0ca9ce13-e128-434c-9f09-e38ba0a2c30e', protocol='range'}
-2026-02-24T11:17:08.388 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Notifying assignor about the new Assignment(partitions=[frotapro.caminhao.sync.response-0])
-2026-02-24T11:17:08.389 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Successfully synced group in generation Generation{generationId=198, memberId='consumer-frota-pro-api-v2-1-0a4063d9-00ad-48d7-af70-44a664df662e', protocol='range'}
-2026-02-24T11:17:08.389 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Successfully synced group in generation Generation{generationId=198, memberId='consumer-frota-pro-api-v2-3-87f9f4f0-121b-444c-bdb1-7ebb5e399dba', protocol='range'}
-2026-02-24T11:17:08.389 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Notifying assignor about the new Assignment(partitions=[frotapro.motorista.sync.response-0])
-2026-02-24T11:17:08.389 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Notifying assignor about the new Assignment(partitions=[frotapro.carga.sync.response-0])
-2026-02-24T11:17:08.393 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerRebalanceListenerInvoker - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Adding newly assigned partitions: frotapro.carga.sync.response-0
-2026-02-24T11:17:08.393 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerRebalanceListenerInvoker - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Adding newly assigned partitions: frotapro.motorista.sync.response-0
-2026-02-24T11:17:08.393 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerRebalanceListenerInvoker - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Adding newly assigned partitions: frotapro.caminhao.sync.response-0
-2026-02-24T11:17:08.424 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.internals.ConsumerUtils - Setting offset for partition frotapro.motorista.sync.response-0 to the committed offset FetchPosition{offset=8, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9092 (id: 1 rack: null)], epoch=0}}
-2026-02-24T11:17:08.424 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.internals.ConsumerUtils - Setting offset for partition frotapro.caminhao.sync.response-0 to the committed offset FetchPosition{offset=7, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9092 (id: 1 rack: null)], epoch=0}}
-2026-02-24T11:17:08.424 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.internals.ConsumerUtils - Setting offset for partition frotapro.carga.sync.response-0 to the committed offset FetchPosition{offset=23, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9092 (id: 1 rack: null)], epoch=0}}
-2026-02-24T11:17:08.426 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: partitions assigned: [frotapro.caminhao.sync.response-0]
-2026-02-24T11:17:08.426 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: partitions assigned: [frotapro.motorista.sync.response-0]
-2026-02-24T11:17:08.426 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: partitions assigned: [frotapro.carga.sync.response-0]
-2026-02-24T11:19:50.471 WARN  [http-nio-8080-exec-1] o.s.d.w.c.SpringDataJacksonConfiguration$PageModule$WarningLoggingModifier - Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
-	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
-	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
-
-2026-02-24T12:00:00.357 INFO  [scheduling-1] b.c.f.a.i.k.CargaSyncRequestProducer - 📤 Enviando pedido de sync de cargas. jobId=ff6537eb-071c-4bc4-8c4d-ff3275ed5ac8 dataInicial=2026-02-24 dataFinal=2026-02-24
-2026-02-24T12:00:00.532 INFO  [scheduling-1] o.a.k.c.producer.ProducerConfig - ProducerConfig values: 
-	acks = -1
-	auto.include.jmx.reporter = true
-	batch.size = 16384
-	bootstrap.servers = [localhost:9092]
-	buffer.memory = 33554432
-	client.dns.lookup = use_all_dns_ips
-	client.id = frotaPro-producer-1
-	compression.gzip.level = -1
-	compression.lz4.level = 9
-	compression.type = none
-	compression.zstd.level = 3
-	connections.max.idle.ms = 540000
-	delivery.timeout.ms = 120000
-	enable.idempotence = true
-	enable.metrics.push = true
-	interceptor.classes = []
-	key.serializer = class org.apache.kafka.common.serialization.StringSerializer
-	linger.ms = 0
-	max.block.ms = 60000
-	max.in.flight.requests.per.connection = 5
-	max.request.size = 1048576
-	metadata.max.age.ms = 300000
-	metadata.max.idle.ms = 300000
-	metadata.recovery.strategy = none
-	metric.reporters = []
-	metrics.num.samples = 2
-	metrics.recording.level = INFO
-	metrics.sample.window.ms = 30000
-	partitioner.adaptive.partitioning.enable = true
-	partitioner.availability.timeout.ms = 0
-	partitioner.class = null
-	partitioner.ignore.keys = false
-	receive.buffer.bytes = 32768
-	reconnect.backoff.max.ms = 1000
-	reconnect.backoff.ms = 50
-	request.timeout.ms = 30000
-	retries = 2147483647
-	retry.backoff.max.ms = 1000
-	retry.backoff.ms = 100
-	sasl.client.callback.handler.class = null
-	sasl.jaas.config = null
-	sasl.kerberos.kinit.cmd = /usr/bin/kinit
-	sasl.kerberos.min.time.before.relogin = 60000
-	sasl.kerberos.service.name = null
-	sasl.kerberos.ticket.renew.jitter = 0.05
-	sasl.kerberos.ticket.renew.window.factor = 0.8
-	sasl.login.callback.handler.class = null
-	sasl.login.class = null
-	sasl.login.connect.timeout.ms = null
-	sasl.login.read.timeout.ms = null
-	sasl.login.refresh.buffer.seconds = 300
-	sasl.login.refresh.min.period.seconds = 60
-	sasl.login.refresh.window.factor = 0.8
-	sasl.login.refresh.window.jitter = 0.05
-	sasl.login.retry.backoff.max.ms = 10000
-	sasl.login.retry.backoff.ms = 100
-	sasl.mechanism = GSSAPI
-	sasl.oauthbearer.clock.skew.seconds = 30
-	sasl.oauthbearer.expected.audience = null
-	sasl.oauthbearer.expected.issuer = null
-	sasl.oauthbearer.header.urlencode = false
-	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
-	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
-	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
-	sasl.oauthbearer.jwks.endpoint.url = null
-	sasl.oauthbearer.scope.claim.name = scope
-	sasl.oauthbearer.sub.claim.name = sub
-	sasl.oauthbearer.token.endpoint.url = null
-	security.protocol = PLAINTEXT
-	security.providers = null
-	send.buffer.bytes = 131072
-	socket.connection.setup.timeout.max.ms = 30000
-	socket.connection.setup.timeout.ms = 10000
-	ssl.cipher.suites = null
-	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
-	ssl.endpoint.identification.algorithm = https
-	ssl.engine.factory.class = null
-	ssl.key.password = null
-	ssl.keymanager.algorithm = SunX509
-	ssl.keystore.certificate.chain = null
-	ssl.keystore.key = null
-	ssl.keystore.location = null
-	ssl.keystore.password = null
-	ssl.keystore.type = JKS
-	ssl.protocol = TLSv1.3
-	ssl.provider = null
-	ssl.secure.random.implementation = null
-	ssl.trustmanager.algorithm = PKIX
-	ssl.truststore.certificates = null
-	ssl.truststore.location = null
-	ssl.truststore.password = null
-	ssl.truststore.type = JKS
-	transaction.timeout.ms = 60000
-	transactional.id = null
-	value.serializer = class org.springframework.kafka.support.serializer.JsonSerializer
-
-2026-02-24T12:00:00.548 INFO  [scheduling-1] o.a.k.c.t.i.KafkaMetricsCollector - initializing Kafka metrics collector
-2026-02-24T12:00:00.689 INFO  [scheduling-1] o.a.k.clients.producer.KafkaProducer - [Producer clientId=frotaPro-producer-1] Instantiated an idempotent producer.
-2026-02-24T12:00:00.787 INFO  [scheduling-1] o.a.kafka.common.utils.AppInfoParser - Kafka version: 3.9.1
-2026-02-24T12:00:00.787 INFO  [scheduling-1] o.a.kafka.common.utils.AppInfoParser - Kafka commitId: f745dfdcee2b9851
-2026-02-24T12:00:00.787 INFO  [scheduling-1] o.a.kafka.common.utils.AppInfoParser - Kafka startTimeMs: 1771945200786
-2026-02-24T12:00:01.013 INFO  [kafka-producer-network-thread | frotaPro-producer-1] org.apache.kafka.clients.Metadata - [Producer clientId=frotaPro-producer-1] Cluster ID: ZqbpC6XiSASmVMALn-jFHw
-2026-02-24T12:00:01.286 INFO  [scheduling-1] b.c.f.api.scheduler.CargaScheduled - Job automático de sincronização de cargas disparado. jobId=ff6537eb-071c-4bc4-8c4d-ff3275ed5ac8 data=2026-02-24
-2026-02-24T12:00:02.041 INFO  [kafka-producer-network-thread | frotaPro-producer-1] o.a.k.c.p.i.TransactionManager - [Producer clientId=frotaPro-producer-1] ProducerId set to 13000 with epoch 0
-2026-02-24T12:05:57.016 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerRebalanceListenerInvoker - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Revoke previously assigned partitions frotapro.motorista.sync.response-0
-2026-02-24T12:05:57.016 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerRebalanceListenerInvoker - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Revoke previously assigned partitions frotapro.caminhao.sync.response-0
-2026-02-24T12:05:57.016 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerRebalanceListenerInvoker - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Revoke previously assigned partitions frotapro.carga.sync.response-0
-2026-02-24T12:05:57.019 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: partitions revoked: [frotapro.carga.sync.response-0]
-2026-02-24T12:05:57.019 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: partitions revoked: [frotapro.motorista.sync.response-0]
-2026-02-24T12:05:57.019 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: partitions revoked: [frotapro.caminhao.sync.response-0]
-2026-02-24T12:05:57.021 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Member consumer-frota-pro-api-v2-2-0ca9ce13-e128-434c-9f09-e38ba0a2c30e sending LeaveGroup request to coordinator localhost:9092 (id: 2147483646 rack: null) due to the consumer unsubscribed from all topics
-2026-02-24T12:05:57.021 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Member consumer-frota-pro-api-v2-3-87f9f4f0-121b-444c-bdb1-7ebb5e399dba sending LeaveGroup request to coordinator localhost:9092 (id: 2147483646 rack: null) due to the consumer unsubscribed from all topics
-2026-02-24T12:05:57.021 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Member consumer-frota-pro-api-v2-1-0a4063d9-00ad-48d7-af70-44a664df662e sending LeaveGroup request to coordinator localhost:9092 (id: 2147483646 rack: null) due to the consumer unsubscribed from all topics
-2026-02-24T12:05:57.025 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Resetting generation and member id due to: consumer pro-actively leaving the group
-2026-02-24T12:05:57.025 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Resetting generation and member id due to: consumer pro-actively leaving the group
-2026-02-24T12:05:57.025 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Resetting generation and member id due to: consumer pro-actively leaving the group
-2026-02-24T12:05:57.025 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Request joining group due to: consumer pro-actively leaving the group
-2026-02-24T12:05:57.025 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Request joining group due to: consumer pro-actively leaving the group
-2026-02-24T12:05:57.025 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Unsubscribed all topics or patterns and assigned partitions
-2026-02-24T12:05:57.025 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Request joining group due to: consumer pro-actively leaving the group
-2026-02-24T12:05:57.025 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Unsubscribed all topics or patterns and assigned partitions
-2026-02-24T12:05:57.025 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Unsubscribed all topics or patterns and assigned partitions
-2026-02-24T12:05:57.034 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Resetting generation and member id due to: consumer pro-actively leaving the group
-2026-02-24T12:05:57.035 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-2, groupId=frota-pro-api-v2] Request joining group due to: consumer pro-actively leaving the group
-2026-02-24T12:05:57.034 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Resetting generation and member id due to: consumer pro-actively leaving the group
-2026-02-24T12:05:57.035 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Resetting generation and member id due to: consumer pro-actively leaving the group
-2026-02-24T12:05:57.035 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-1, groupId=frota-pro-api-v2] Request joining group due to: consumer pro-actively leaving the group
-2026-02-24T12:05:57.035 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.k.c.c.i.ConsumerCoordinator - [Consumer clientId=consumer-frota-pro-api-v2-3, groupId=frota-pro-api-v2] Request joining group due to: consumer pro-actively leaving the group
-2026-02-24T12:05:57.199 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.kafka.common.metrics.Metrics - Metrics scheduler closed
-2026-02-24T12:05:57.199 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.kafka.common.metrics.Metrics - Metrics scheduler closed
-2026-02-24T12:05:57.199 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.metrics.JmxReporter
-2026-02-24T12:05:57.199 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.metrics.JmxReporter
-2026-02-24T12:05:57.200 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
-2026-02-24T12:05:57.200 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
-2026-02-24T12:05:57.200 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.kafka.common.metrics.Metrics - Metrics reporters closed
-2026-02-24T12:05:57.200 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.kafka.common.metrics.Metrics - Metrics reporters closed
-2026-02-24T12:05:57.236 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.a.kafka.common.utils.AppInfoParser - App info kafka.consumer for consumer-frota-pro-api-v2-1 unregistered
-2026-02-24T12:05:57.240 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.a.kafka.common.utils.AppInfoParser - App info kafka.consumer for consumer-frota-pro-api-v2-3 unregistered
-2026-02-24T12:05:57.243 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#2-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: Consumer stopped
-2026-02-24T12:05:57.243 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: Consumer stopped
-2026-02-24T12:05:57.489 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.kafka.common.metrics.Metrics - Metrics scheduler closed
-2026-02-24T12:05:57.489 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.metrics.JmxReporter
-2026-02-24T12:05:57.490 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
-2026-02-24T12:05:57.490 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.kafka.common.metrics.Metrics - Metrics reporters closed
-2026-02-24T12:05:57.505 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.a.kafka.common.utils.AppInfoParser - App info kafka.consumer for consumer-frota-pro-api-v2-2 unregistered
-2026-02-24T12:05:57.509 INFO  [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer - frota-pro-api-v2: Consumer stopped
-2026-02-24T12:05:57.522 INFO  [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
-2026-02-24T12:05:57.570 INFO  [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
-2026-02-24T12:05:57.587 INFO  [SpringApplicationShutdownHook] o.a.k.clients.producer.KafkaProducer - [Producer clientId=frotaPro-producer-1] Closing the Kafka producer with timeoutMillis = 30000 ms.
-2026-02-24T12:05:57.603 INFO  [SpringApplicationShutdownHook] o.a.kafka.common.metrics.Metrics - Metrics scheduler closed
-2026-02-24T12:05:57.603 INFO  [SpringApplicationShutdownHook] o.a.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.metrics.JmxReporter
-2026-02-24T12:05:57.603 INFO  [SpringApplicationShutdownHook] o.a.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
-2026-02-24T12:05:57.603 INFO  [SpringApplicationShutdownHook] o.a.kafka.common.metrics.Metrics - Metrics reporters closed
-2026-02-24T12:05:57.605 INFO  [SpringApplicationShutdownHook] o.a.kafka.common.utils.AppInfoParser - App info kafka.producer for frotaPro-producer-1 unregistered
-2026-02-24T12:05:57.666 INFO  [SpringApplicationShutdownHook] o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
-2026-02-24T12:05:57.688 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
-2026-02-24T12:05:57.698 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
-2026-02-24T13:07:17.076 INFO  [background-preinit] o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.3.Final
-2026-02-24T13:07:17.162 INFO  [main] b.c.f.api.FrotaProApplication - Starting FrotaProApplication using Java 21.0.8 with PID 9700 (C:\Users\Arthenyo\Documents\PROJETOS\frota-pro-api\target\classes started by Arthenyo in C:\Users\Arthenyo\Documents\PROJETOS\frota-pro-api)
-2026-02-24T13:07:17.162 INFO  [main] b.c.f.api.FrotaProApplication - The following 1 profile is active: "dev"
-2026-02-24T13:07:19.298 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-02-24T13:07:19.494 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 186 ms. Found 34 JPA repository interfaces.
-2026-02-24T13:07:20.550 INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
-2026-02-24T13:07:20.673 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 3463 ms
-2026-02-24T13:07:21.327 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
-2026-02-24T13:07:21.705 INFO  [main] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@4f2d8175
-2026-02-24T13:07:21.708 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
-2026-02-24T13:07:21.762 INFO  [main] org.flywaydb.core.FlywayExecutor - Database: jdbc:postgresql://localhost:5432/frotapro (PostgreSQL 15.3)
-2026-02-24T13:07:21.967 INFO  [main] o.f.core.internal.command.DbValidate - Successfully validated 36 migrations (execution time 00:00.110s)
-2026-02-24T13:07:22.011 INFO  [main] o.f.core.internal.command.DbMigrate - Current version of schema "public": 36
-2026-02-24T13:07:22.019 INFO  [main] o.f.core.internal.command.DbMigrate - Schema "public" is up to date. No migration necessary.
-2026-02-24T13:07:22.243 INFO  [main] o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
-2026-02-24T13:07:22.383 INFO  [main] org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.33.Final
-2026-02-24T13:07:22.492 INFO  [main] o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
-2026-02-24T13:07:23.195 INFO  [main] o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-02-24T13:07:23.433 INFO  [main] o.hibernate.orm.connections.pooling - HHH10001005: Database info:
-	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
-	Database driver: undefined/unknown
-	Database version: 15.3
-	Autocommit mode: undefined/unknown
-	Isolation level: undefined/unknown
-	Minimum pool size: undefined/unknown
-	Maximum pool size: undefined/unknown
-2026-02-24T13:07:26.726 INFO  [main] o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-02-24T13:07:26.932 INFO  [main] o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-02-24T13:07:27.517 INFO  [main] o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-03-04T13:11:16.075 WARN  [main] o.s.test.context.TestContextManager - Caught exception while allowing TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener] to prepare test instance [br.com.frotasPro.api.FrontaProApplicationTests@7df0bb1]
+java.lang.IllegalStateException: Failed to load ApplicationContext for [WebMergedContextConfiguration@73790bb5 testClass = br.com.frotasPro.api.FrontaProApplicationTests, locations = [], classes = [br.com.frotasPro.api.FrotaProApplication], contextInitializerClasses = [], activeProfiles = [], propertySourceDescriptors = [], propertySourceProperties = ["org.springframework.boot.test.context.SpringBootTestContextBootstrapper=true"], contextCustomizers = [org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@69f1a286, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@345f69f3, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@0, org.springframework.boot.test.web.client.TestRestTemplateContextCustomizer@180e33b0, org.springframework.boot.test.web.reactor.netty.DisableReactorResourceFactoryGlobalResourcesContextCustomizerFactory$DisableReactorResourceFactoryGlobalResourcesContextCustomizerCustomizer@2421cc4, org.springframework.boot.test.autoconfigure.OnFailureConditionReportContextCustomizerFactory$OnFailureConditionReportContextCustomizer@338c99c8, org.springframework.boot.test.autoconfigure.actuate.observability.ObservabilityContextCustomizerFactory$DisableObservabilityContextCustomizer@1f, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@0, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizer@36328d33, org.springframework.test.context.support.DynamicPropertiesContextCustomizer@0, org.springframework.boot.test.context.SpringBootTestAnnotation@9902db2f], resourceBasePath = "src/main/webapp", contextLoader = org.springframework.boot.test.context.SpringBootContextLoader, parent = null]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:180)
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:130)
+	at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:200)
+	at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:139)
+	at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260)
+	at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:159)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$10(ClassBasedTestDescriptor.java:383)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.executeAndMaskThrowable(ClassBasedTestDescriptor.java:388)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$11(ClassBasedTestDescriptor.java:382)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1708)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.invokeTestInstancePostProcessors(ClassBasedTestDescriptor.java:382)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$instantiateAndPostProcessTestInstance$6(ClassBasedTestDescriptor.java:293)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.instantiateAndPostProcessTestInstance(ClassBasedTestDescriptor.java:292)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$4(ClassBasedTestDescriptor.java:281)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$5(ClassBasedTestDescriptor.java:280)
+	at org.junit.jupiter.engine.execution.TestInstancesProvider.getTestInstances(TestInstancesProvider.java:27)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$prepare$0(TestMethodTestDescriptor.java:112)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:111)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:69)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$prepare$2(NodeTestTask.java:128)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.prepare(NodeTestTask.java:128)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:201)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:170)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:94)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:59)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:142)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:58)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.junit.platform.launcher.core.InterceptingLauncher.lambda$execute$1(InterceptingLauncher.java:39)
+	at org.junit.platform.launcher.core.ClasspathAlignmentCheckingLauncherInterceptor.intercept(ClasspathAlignmentCheckingLauncherInterceptor.java:25)
+	at org.junit.platform.launcher.core.InterceptingLauncher.execute(InterceptingLauncher.java:38)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.apache.maven.surefire.junitplatform.LauncherAdapter.executeWithoutCancellationToken(LauncherAdapter.java:60)
+	at org.apache.maven.surefire.junitplatform.LauncherAdapter.execute(LauncherAdapter.java:52)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:203)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:168)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:136)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162)
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495)
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: Failed to initialize dependency 'flyway' of LoadTimeWeaverAware bean 'entityManagerFactory': Error creating bean with name 'flyway' defined in class path resource [org/springframework/boot/autoconfigure/flyway/FlywayAutoConfiguration$FlywayConfiguration.class]: Failed to instantiate [org.flywaydb.core.Flyway]: Factory method 'flyway' threw exception with message: Error creating bean with name 'dataSource' defined in class path resource [org/springframework/boot/autoconfigure/jdbc/DataSourceConfiguration$Hikari.class]: Failed to instantiate [com.zaxxer.hikari.HikariDataSource]: Factory method 'dataSource' threw exception with message: Failed to determine a suitable driver class
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:328)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:207)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:973)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.test.context.SpringBootContextLoader.lambda$loadContext$3(SpringBootContextLoader.java:144)
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:58)
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:46)
+	at org.springframework.boot.SpringApplication.withHook(SpringApplication.java:1461)
+	at org.springframework.boot.test.context.SpringBootContextLoader$ContextLoaderHook.run(SpringBootContextLoader.java:563)
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:144)
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:110)
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:225)
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:152)
+	... 80 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'flyway' defined in class path resource [org/springframework/boot/autoconfigure/flyway/FlywayAutoConfiguration$FlywayConfiguration.class]: Failed to instantiate [org.flywaydb.core.Flyway]: Factory method 'flyway' threw exception with message: Error creating bean with name 'dataSource' defined in class path resource [org/springframework/boot/autoconfigure/jdbc/DataSourceConfiguration$Hikari.class]: Failed to instantiate [com.zaxxer.hikari.HikariDataSource]: Factory method 'dataSource' threw exception with message: Failed to determine a suitable driver class
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:657)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:645)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1375)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1205)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:315)
+	... 95 common frames omitted
+Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [org.flywaydb.core.Flyway]: Factory method 'flyway' threw exception with message: Error creating bean with name 'dataSource' defined in class path resource [org/springframework/boot/autoconfigure/jdbc/DataSourceConfiguration$Hikari.class]: Failed to instantiate [com.zaxxer.hikari.HikariDataSource]: Factory method 'dataSource' threw exception with message: Failed to determine a suitable driver class
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.lambda$instantiate$0(SimpleInstantiationStrategy.java:200)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiateWithFactoryMethod(SimpleInstantiationStrategy.java:89)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:169)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:653)
+	... 105 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'dataSource' defined in class path resource [org/springframework/boot/autoconfigure/jdbc/DataSourceConfiguration$Hikari.class]: Failed to instantiate [com.zaxxer.hikari.HikariDataSource]: Factory method 'dataSource' threw exception with message: Failed to determine a suitable driver class
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:657)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:645)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1375)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1205)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1708)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory$DependencyObjectProvider.getIfUnique(DefaultListableBeanFactory.java:2604)
+	at org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration$FlywayConfiguration.flyway(FlywayAutoConfiguration.java:155)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.lambda$instantiate$0(SimpleInstantiationStrategy.java:172)
+	... 108 common frames omitted
+Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [com.zaxxer.hikari.HikariDataSource]: Factory method 'dataSource' threw exception with message: Failed to determine a suitable driver class
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.lambda$instantiate$0(SimpleInstantiationStrategy.java:200)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiateWithFactoryMethod(SimpleInstantiationStrategy.java:89)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:169)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:653)
+	... 123 common frames omitted
+Caused by: org.springframework.boot.autoconfigure.jdbc.DataSourceProperties$DataSourceBeanCreationException: Failed to determine a suitable driver class
+	at org.springframework.boot.autoconfigure.jdbc.DataSourceProperties.determineDriverClassName(DataSourceProperties.java:176)
+	at org.springframework.boot.autoconfigure.jdbc.PropertiesJdbcConnectionDetails.getDriverClassName(PropertiesJdbcConnectionDetails.java:49)
+	at org.springframework.boot.autoconfigure.jdbc.DataSourceConfiguration.createDataSource(DataSourceConfiguration.java:62)
+	at org.springframework.boot.autoconfigure.jdbc.DataSourceConfiguration$Hikari.dataSource(DataSourceConfiguration.java:127)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.lambda$instantiate$0(SimpleInstantiationStrategy.java:172)
+	... 126 common frames omitted
+2026-03-04T13:13:20.881 INFO  [background-preinit] o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.3.Final
+2026-03-04T13:13:21.002 INFO  [main] b.c.f.api.auth.AuthIntegrationTest - Starting AuthIntegrationTest using Java 21.0.8 with PID 14420 (started by Arthenyo in C:\Users\Arthenyo\Documents\PROJETOS\frota-pro-api)
+2026-03-04T13:13:21.005 INFO  [main] b.c.f.api.auth.AuthIntegrationTest - No active profile set, falling back to 1 default profile: "default"
+2026-03-04T13:13:30.360 INFO  [main] o.s.b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+2026-03-04T13:13:30.361 INFO  [main] o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+2026-03-04T13:13:30.365 INFO  [main] o.s.t.w.s.TestDispatcherServlet - Completed initialization in 3 ms
+2026-03-04T13:13:30.488 INFO  [main] b.c.f.api.auth.AuthIntegrationTest - Started AuthIntegrationTest in 10.839 seconds (process running for 14.924)
+2026-03-04T13:15:27.773 INFO  [background-preinit] o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.3.Final
+2026-03-04T13:15:27.893 INFO  [main] b.c.f.api.auth.AuthIntegrationTest - Starting AuthIntegrationTest using Java 21.0.8 with PID 4328 (started by Arthenyo in C:\Users\Arthenyo\Documents\PROJETOS\frota-pro-api)
+2026-03-04T13:15:27.895 INFO  [main] b.c.f.api.auth.AuthIntegrationTest - No active profile set, falling back to 1 default profile: "default"
+2026-03-04T13:15:37.301 INFO  [main] o.s.b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+2026-03-04T13:15:37.302 INFO  [main] o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+2026-03-04T13:15:37.306 INFO  [main] o.s.t.w.s.TestDispatcherServlet - Completed initialization in 3 ms
+2026-03-04T13:15:37.388 INFO  [main] b.c.f.api.auth.AuthIntegrationTest - Started AuthIntegrationTest in 10.717 seconds (process running for 13.801)
+2026-03-04T13:16:58.825 INFO  [background-preinit] o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.3.Final
+2026-03-04T13:16:58.923 INFO  [main] b.c.f.api.auth.AuthIntegrationTest - Starting AuthIntegrationTest using Java 21.0.8 with PID 31124 (started by Arthenyo in C:\Users\Arthenyo\Documents\PROJETOS\frota-pro-api)
+2026-03-04T13:16:58.927 INFO  [main] b.c.f.api.auth.AuthIntegrationTest - No active profile set, falling back to 1 default profile: "default"
+2026-03-04T13:17:06.398 INFO  [main] o.s.b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+2026-03-04T13:17:06.398 INFO  [main] o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+2026-03-04T13:17:06.401 INFO  [main] o.s.t.w.s.TestDispatcherServlet - Completed initialization in 2 ms
+2026-03-04T13:17:06.466 INFO  [main] b.c.f.api.auth.AuthIntegrationTest - Started AuthIntegrationTest in 8.731 seconds (process running for 11.896)
