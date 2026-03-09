@@ -54,8 +54,11 @@ public class SecurityConfig {
                 .requestMatchers(new RegexRequestMatcher(".*/publico$", null)).permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/login/refresh").permitAll()
+                .requestMatchers(HttpMethod.POST, "/auth/login/refresh").permitAll()
                 .requestMatchers(HttpMethod.POST, "/login/logout").permitAll()
+                .requestMatchers(HttpMethod.POST, "/auth/login/logout").permitAll()
                 .requestMatchers("/actuator/health", "/actuator/info").permitAll();
 
         if (prometheusPermitAll) {
