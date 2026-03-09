@@ -52,6 +52,7 @@ public class SecurityConfig {
         authorizationRegistry
                 .requestMatchers("/").permitAll()
                 .requestMatchers(new RegexRequestMatcher(".*/publico$", null)).permitAll()
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/login/refresh").permitAll()
                 .requestMatchers(HttpMethod.POST, "/login/logout").permitAll()

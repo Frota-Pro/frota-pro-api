@@ -17,7 +17,7 @@ frotapro:
   security:
     cors:
       allowed-origins:
-        - ${CORS_ALLOWED_ORIGIN}
+        - ${CORS_ALLOWED_ORIGIN:*}
         - http://localhost:*
         - http://127.0.0.1:*
     prometheus-permit-all: false
