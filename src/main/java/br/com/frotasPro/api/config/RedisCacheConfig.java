@@ -1,8 +1,10 @@
 package br.com.frotasPro.api.config;
 
+import br.com.frotasPro.api.config.json.FlexibleBigDecimalDeserializer;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +15,7 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 
 import java.time.Duration;
+import java.math.BigDecimal;
 
 @Configuration
 @Profile("prod")
@@ -22,6 +25,7 @@ public class RedisCacheConfig {
     public RedisCacheConfiguration redisCacheConfiguration(ObjectMapper objectMapper) {
         ObjectMapper mapper = objectMapper.copy();
         mapper.registerModule(new JavaTimeModule());
+        mapper.registerModule(new SimpleModule().addDeserializer(BigDecimal.class, new FlexibleBigDecimalDeserializer()));
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         mapper.activateDefaultTyping(
                 LaissezFaireSubTypeValidator.instance,
