@@ -6,6 +6,7 @@ import br.com.frotasPro.api.controller.response.CargaResponse;
 import br.com.frotasPro.api.controller.response.ClienteCargaResponse;
 import br.com.frotasPro.api.domain.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.stream.Collectors.*;
@@ -100,7 +101,7 @@ public class CargaMapper {
                                 .map(Ajudante::getCodigo)
                                 .toList()
                 )
-                .ordemEntregaClientes(carga.getOrdemEntregaClientes())
+                .ordemEntregaClientes(new ArrayList<>(carga.getOrdemEntregaClientes()))
                 .observacaoMotorista(carga.getObservacaoMotorista())
                 .build();
     }
