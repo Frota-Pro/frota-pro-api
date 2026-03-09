@@ -74,8 +74,8 @@ frotapro:
   security:
     cors:
       allowed-origins:
-        - http://localhost:3000
-        - http://localhost:5173
+        - http://localhost:*
+        - http://127.0.0.1:*
     prometheus-permit-all: false
     jwt:
       access-token-seconds: 900
