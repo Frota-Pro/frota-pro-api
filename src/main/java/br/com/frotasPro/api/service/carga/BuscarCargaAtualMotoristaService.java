@@ -25,7 +25,7 @@ public class BuscarCargaAtualMotoristaService {
     private final UsuarioAutenticadoService usuarioAutenticadoService;
 
     @Transactional(readOnly = true)
-    public CargaResponse buscar() {
+    public List<CargaResponse> buscar() {
 
         UUID usuarioIdLogado = usuarioAutenticadoService.getUsuarioIdLogado();
 
@@ -35,11 +35,14 @@ public class BuscarCargaAtualMotoristaService {
 
         List<Status> status = List.of(Status.SINCRONIZADA, Status.EM_ROTA);
 
-        Carga carga = cargaRepository
-                .buscarCargaAtualDoMotorista(motorista.getCodigo(), status)
-                .orElseThrow(() -> new ObjectNotFound(
-                        "Nenhuma carga SINCRONIZADA ou EM_ROTA para este motorista"));
+        List<Carga> cargas = cargaRepository.buscarCargaAtualDoMotorista(motorista.getCodigo(), status);
 
-        return CargaMapper.toResponse(carga);
+        if (cargas.isEmpty()) {
+            throw new ObjectNotFound("Nenhuma carga SINCRONIZADA ou EM_ROTA para este motorista");
+        }
+
+        return cargas.stream()
+                .map(CargaMapper::toResponse)
+                .toList();
     }
 }

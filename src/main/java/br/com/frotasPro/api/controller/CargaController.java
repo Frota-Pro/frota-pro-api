@@ -134,8 +134,8 @@ public class CargaController {
 
     @PreAuthorize("hasAuthority('ROLE_MOTORISTA')")
     @GetMapping("/minha-carga-atual")
-    public ResponseEntity<CargaResponse> minhaCargaAtual() {
-        CargaResponse response = buscarCargaAtualMotoristaService.buscar();
+    public ResponseEntity<List<CargaResponse>> minhaCargaAtual() {
+        List<CargaResponse> response = buscarCargaAtualMotoristaService.buscar();
         return ResponseEntity.ok(response);
     }
 

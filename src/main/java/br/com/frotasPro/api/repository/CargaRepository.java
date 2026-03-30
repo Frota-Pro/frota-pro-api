@@ -54,7 +54,7 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
              and c.statusCarga in :status
            order by c.dtSaida desc
            """)
-    Optional<Carga> buscarCargaAtualDoMotorista(
+    List<Carga> buscarCargaAtualDoMotorista(
             @Param("codmotorista") String codmotorista,
             @Param("status") List<Status> status);
 
