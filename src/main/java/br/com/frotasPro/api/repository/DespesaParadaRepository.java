@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,4 +25,11 @@ public interface DespesaParadaRepository extends JpaRepository<DespesaParada, UU
             @Param("inicio") LocalDateTime inicio,
             @Param("fim") LocalDateTime fim
     );
+
+    @Query("""
+        select coalesce(sum(d.valor), 0)
+        from DespesaParada d
+        where d.paradaCarga.id = :paradaId
+    """)
+    BigDecimal sumValorByParadaId(@Param("paradaId") UUID paradaId);
 }

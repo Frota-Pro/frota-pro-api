@@ -128,19 +128,19 @@
             <element kind="textField" x="0" y="1" width="70" height="15" hTextAlign="Center">
                 <expression><![CDATA[$F{tipo}]]></expression>
             </element>
-            <element kind="textField" x="70" y="1" width="80" height="15" hTextAlign="Center">
+            <element kind="textField" x="70" y="1" width="80" height="15" hTextAlign="Center" blankWhenNull="true">
                 <expression><![CDATA[$F{data}]]></expression>
             </element>
             <element kind="textField" x="150" y="1" width="360" height="15">
                 <expression><![CDATA[$F{descricao}]]></expression>
             </element>
-            <element kind="textField" x="510" y="1" width="140" height="15">
+            <element kind="textField" x="510" y="1" width="140" height="15" blankWhenNull="true">
                 <expression><![CDATA[$F{cidade}]]></expression>
             </element>
-            <element kind="textField" x="650" y="1" width="80" height="15" pattern="'R$ ' #,##0.00" hTextAlign="Right">
+            <element kind="textField" x="650" y="1" width="80" height="15" pattern="'R$ ' #,##0.00" hTextAlign="Right" blankWhenNull="true">
                 <expression><![CDATA[$F{valor}]]></expression>
             </element>
-            <element kind="textField" x="730" y="1" width="72" height="15" pattern="#,##0.00" hTextAlign="Right">
+            <element kind="textField" x="730" y="1" width="72" height="15" pattern="#,##0.00" hTextAlign="Right" blankWhenNull="true">
                 <expression><![CDATA[$F{km}]]></expression>
             </element>
         </band>

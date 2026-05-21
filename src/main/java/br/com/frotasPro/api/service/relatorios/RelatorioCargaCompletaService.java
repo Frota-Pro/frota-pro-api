@@ -5,6 +5,7 @@ import br.com.frotasPro.api.domain.Carga;
 import br.com.frotasPro.api.domain.CargaNota;
 import br.com.frotasPro.api.domain.ParadaCarga;
 import br.com.frotasPro.api.repository.CargaRepository;
+import br.com.frotasPro.api.repository.DespesaParadaRepository;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class RelatorioCargaCompletaService {
 
     private final CargaRepository cargaRepository;
     private final ParadaCargaRepository paradaCargaRepository;
+    private final DespesaParadaRepository despesaParadaRepository;
 
     public RelatorioCargaCompletaResponse gerar(String numeroCarga) {
 
@@ -38,7 +40,7 @@ public class RelatorioCargaCompletaService {
                         .tipo("NOTA")
                         .data(carga.getDtChegada())
                         .descricao("Nota " + n.getNota() + " - Cliente " + n.getCliente())
-                        .valor(nvl(n.getCarga().getValorTotal()))
+                        .valor(null)
                         .km(null)
                         .build());
             }
@@ -49,10 +51,10 @@ public class RelatorioCargaCompletaService {
             for (ParadaCarga p : carga.getParadas()) {
                 linhas.add(RelatorioCargaCompletaResponse.Linha.builder()
                         .tipo("PARADA")
-                        .data(LocalDate.from(p.getDtFim()))
-                        .descricao(p.getTipoParada() == null ? "Parada" : p.getTipoParada().name())
+                        .data(dataParada(p))
+                        .descricao(descricaoParada(p))
                         .cidade(p.getCidade())
-                        .valor(null)
+                        .valor(despesaParadaRepository.sumValorByParadaId(p.getId()))
                         .km(p.getKmOdometro() == null ? null : new BigDecimal(p.getKmOdometro()))
                         .build());
             }
@@ -79,5 +81,20 @@ public class RelatorioCargaCompletaService {
 
     private BigDecimal nvl(BigDecimal v) {
         return v == null ? BigDecimal.ZERO : v;
+    }
+
+    private LocalDate dataParada(ParadaCarga parada) {
+        if (parada.getDtFim() != null) {
+            return parada.getDtFim().toLocalDate();
+        }
+        return parada.getDtInicio() != null ? parada.getDtInicio().toLocalDate() : null;
+    }
+
+    private String descricaoParada(ParadaCarga parada) {
+        String tipo = parada.getTipoParada() == null ? "Parada" : parada.getTipoParada().name();
+        if (parada.getLocal() == null || parada.getLocal().isBlank()) {
+            return tipo;
+        }
+        return tipo + " - " + parada.getLocal();
     }
 }
