@@ -122,7 +122,11 @@ public class RelatorioMetaMensalMotoristaService {
                     .findFirst()
                     .orElse(null);
 
-            BigDecimal mediaKmLitro = calcularMediaKmLitro(kmRodado, litros, mediaManual, metaConsumo);
+            BigDecimal mediaReferencia = buscarMediaReferenciaConsumo(carga.getCaminhao(), mediaManual, metaConsumo);
+            BigDecimal mediaKmLitro = calcularMediaKmLitro(kmRodado, litros, mediaReferencia);
+            if ((litros == null || litros.compareTo(BigDecimal.ZERO) == 0) && mediaReferencia != null) {
+                litros = calcularLitrosEstimados(kmRodado, mediaReferencia);
+            }
 
             LinhaRelatorioMetaMensalMotoristaResponse linha =
                     LinhaRelatorioMetaMensalMotoristaResponse.builder()
@@ -186,12 +190,30 @@ public class RelatorioMetaMensalMotoristaService {
 
     private BigDecimal calcularMediaKmLitro(long kmRodado,
                                             BigDecimal litros,
-                                            BigDecimal mediaManual,
-                                            BigDecimal metaConsumo) {
+                                            BigDecimal mediaReferencia) {
         if (litros != null && litros.compareTo(BigDecimal.ZERO) > 0) {
             return BigDecimal.valueOf(kmRodado).divide(litros, 2, RoundingMode.HALF_UP);
         }
-        if (mediaManual != null) {
+        return mediaReferencia;
+    }
+
+    private BigDecimal calcularLitrosEstimados(long kmRodado, BigDecimal mediaReferencia) {
+        if (kmRodado <= 0 || mediaReferencia.compareTo(BigDecimal.ZERO) <= 0) {
+            return BigDecimal.ZERO;
+        }
+        return BigDecimal.valueOf(kmRodado).divide(mediaReferencia, 3, RoundingMode.HALF_UP);
+    }
+
+    private BigDecimal buscarMediaReferenciaConsumo(Caminhao caminhao,
+                                                    BigDecimal mediaManual,
+                                                    BigDecimal metaConsumo) {
+        if (caminhao != null) {
+            BigDecimal mediaCaminhao = abastecimentoRepository.mediaKmLitroPonderadaPorCaminhao(caminhao.getId());
+            if (mediaCaminhao != null && mediaCaminhao.compareTo(BigDecimal.ZERO) > 0) {
+                return mediaCaminhao;
+            }
+        }
+        if (mediaManual != null && mediaManual.compareTo(BigDecimal.ZERO) > 0) {
             return mediaManual;
         }
         return metaConsumo;

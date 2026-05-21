@@ -252,4 +252,29 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
             @Param("fim") java.time.LocalDate fim
     );
 
+    interface DesempenhoMotoristaRow {
+        UUID getMotoristaId();
+        Long getTotalCargas();
+        java.math.BigDecimal getTotalTonelada();
+        Long getTotalKmRodado();
+    }
+
+    @Query("""
+        select
+          m.id as motoristaId,
+          count(c.id) as totalCargas,
+          coalesce(sum(c.pesoCarga), 0) as totalTonelada,
+          coalesce(sum(c.kmFinal - c.kmInicial), 0) as totalKmRodado
+        from Carga c
+        join c.motorista m
+        where c.statusCarga = :status
+          and c.dtChegada between :inicio and :fim
+        group by m.id
+    """)
+    List<DesempenhoMotoristaRow> desempenhoMotoristasNoPeriodo(
+            @Param("inicio") java.time.LocalDate inicio,
+            @Param("fim") java.time.LocalDate fim,
+            @Param("status") Status status
+    );
+
 }

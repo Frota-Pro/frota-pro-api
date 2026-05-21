@@ -194,6 +194,25 @@ public interface MetaRepository extends JpaRepository <Meta, UUID>{
             StatusMeta statusMeta
     );
 
+    @Query("""
+       select m
+       from Meta m
+       join fetch m.motorista mot
+       where m.tipoMeta = :tipoMeta
+         and m.statusMeta = :status
+         and m.dataIncio <= :fim
+         and m.dataFim >= :inicio
+         and mot.id in :motoristaIds
+       order by m.dataIncio desc
+       """)
+    List<Meta> findMetasMotoristasNoPeriodo(
+            @Param("tipoMeta") TipoMeta tipoMeta,
+            @Param("status") StatusMeta status,
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim,
+            @Param("motoristaIds") List<UUID> motoristaIds
+    );
+
     Optional<Meta> findFirstByTipoMetaAndCaminhaoAndStatusMetaOrderByDataIncioDesc(
             TipoMeta tipoMeta,
             Caminhao caminhao,

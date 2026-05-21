@@ -1,6 +1,7 @@
 package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.response.*;
+import br.com.frotasPro.api.domain.enums.TipoMeta;
 import br.com.frotasPro.api.service.relatorios.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -29,6 +30,7 @@ public class RelatorioPdfController {
     private final RelatorioHistoricoManutencaoService historicoManutencaoService;
     private final RelatorioVidaUtilPneuService vidaUtilPneuService;
     private final RelatorioDespesaCategoriaPeriodoService despesaCategoriaPeriodoService;
+    private final RelatorioMetasMotoristasService metasMotoristasService;
 
     private static final String LOGO_CLASSPATH = "reports/logo.png";
 
@@ -200,6 +202,37 @@ public class RelatorioPdfController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "inline; filename=\"ranking-motoristas-" + inicio + "-a-" + fim + ".pdf\"")
+                .body(pdf);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @GetMapping("/motoristas/metas")
+    public ResponseEntity<byte[]> metasMotoristasPdf(
+            @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam("fim")    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim,
+            @RequestParam(value = "tipoMeta", required = false) TipoMeta tipoMeta
+    ) {
+        RelatorioMetasMotoristasResponse rel = metasMotoristasService.gerar(inicio, fim, tipoMeta);
+
+        Map<String, Object> p = new HashMap<>();
+        p.put("periodoInicio", rel.getPeriodoInicio());
+        p.put("periodoFim", rel.getPeriodoFim());
+        p.put("tipoMeta", rel.getTipoMeta().getDescricao());
+        p.put("totalMotoristas", rel.getTotalMotoristas());
+        p.put("totalDentroMeta", rel.getTotalDentroMeta());
+        p.put("totalForaMeta", rel.getTotalForaMeta());
+        aplicarLogo(p);
+
+        byte[] pdf = jasperPdfService.gerarPdfFromJasper(
+                "reports/metas_motoristas.jasper",
+                p,
+                rel.getLinhas()
+        );
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=\"metas-motoristas-" + inicio + "-a-" + fim + ".pdf\"")
                 .body(pdf);
     }
 
