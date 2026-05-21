@@ -16,11 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -77,34 +74,7 @@ public class RelatorioMetaMensalMotoristaService {
             Integer kmFin = carga.getKmFinal();
             long kmRodado = (kmIni != null && kmFin != null) ? kmFin - kmIni : 0L;
 
-            Map<java.util.UUID, Abastecimento> abastecimentosDaViagem = new LinkedHashMap<>();
-
-            if (kmIni != null && kmFin != null) {
-                List<Abastecimento> porKm = abastecimentoRepository.findByCaminhaoAndKmRodado(
-                        carga.getCaminhao().getId(),
-                        kmIni,
-                        kmFin
-                );
-                for (Abastecimento a : porKm) {
-                    abastecimentosDaViagem.put(a.getId(), a);
-                }
-            }
-
-            LocalDate inicioViagem = carga.getDtSaida() != null ? carga.getDtSaida() : inicio;
-            LocalDate fimViagem = carga.getDtChegada() != null ? carga.getDtChegada() : inicioViagem;
-            LocalDateTime dtInicioViagem = inicioViagem.atStartOfDay();
-            LocalDateTime dtFimViagem = fimViagem.atTime(23, 59, 59);
-
-            List<Abastecimento> porPeriodo = abastecimentoRepository.findByCaminhaoAndPeriodo(
-                    carga.getCaminhao().getId(),
-                    dtInicioViagem,
-                    dtFimViagem
-            );
-            for (Abastecimento a : porPeriodo) {
-                abastecimentosDaViagem.put(a.getId(), a);
-            }
-
-            List<Abastecimento> abastecimentos = new ArrayList<>(abastecimentosDaViagem.values());
+            List<Abastecimento> abastecimentos = abastecimentoRepository.findByCargaId(carga.getId());
 
             BigDecimal litros = abastecimentos.stream()
                     .map(Abastecimento::getQtLitros)
@@ -116,17 +86,7 @@ public class RelatorioMetaMensalMotoristaService {
                     .filter(v -> v != null)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            BigDecimal mediaManual = abastecimentos.stream()
-                    .map(Abastecimento::getMediaKmLitro)
-                    .filter(m -> m != null)
-                    .findFirst()
-                    .orElse(null);
-
-            BigDecimal mediaReferencia = buscarMediaReferenciaConsumo(carga.getCaminhao(), mediaManual, metaConsumo);
-            BigDecimal mediaKmLitro = calcularMediaKmLitro(kmRodado, litros, mediaReferencia);
-            if ((litros == null || litros.compareTo(BigDecimal.ZERO) == 0) && mediaReferencia != null) {
-                litros = calcularLitrosEstimados(kmRodado, mediaReferencia);
-            }
+            BigDecimal mediaKmLitro = calcularMediaKmLitro(kmRodado, litros, null);
 
             LinhaRelatorioMetaMensalMotoristaResponse linha =
                     LinhaRelatorioMetaMensalMotoristaResponse.builder()
@@ -195,28 +155,6 @@ public class RelatorioMetaMensalMotoristaService {
             return BigDecimal.valueOf(kmRodado).divide(litros, 2, RoundingMode.HALF_UP);
         }
         return mediaReferencia;
-    }
-
-    private BigDecimal calcularLitrosEstimados(long kmRodado, BigDecimal mediaReferencia) {
-        if (kmRodado <= 0 || mediaReferencia.compareTo(BigDecimal.ZERO) <= 0) {
-            return BigDecimal.ZERO;
-        }
-        return BigDecimal.valueOf(kmRodado).divide(mediaReferencia, 3, RoundingMode.HALF_UP);
-    }
-
-    private BigDecimal buscarMediaReferenciaConsumo(Caminhao caminhao,
-                                                    BigDecimal mediaManual,
-                                                    BigDecimal metaConsumo) {
-        if (caminhao != null) {
-            BigDecimal mediaCaminhao = abastecimentoRepository.mediaKmLitroPonderadaPorCaminhao(caminhao.getId());
-            if (mediaCaminhao != null && mediaCaminhao.compareTo(BigDecimal.ZERO) > 0) {
-                return mediaCaminhao;
-            }
-        }
-        if (mediaManual != null && mediaManual.compareTo(BigDecimal.ZERO) > 0) {
-            return mediaManual;
-        }
-        return metaConsumo;
     }
 
     private BigDecimal buscarMetaTonelada(Motorista motorista, Caminhao caminhao, CategoriaCaminhao categoriaCaminhao) {

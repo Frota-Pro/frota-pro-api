@@ -118,9 +118,7 @@ public class RelatorioMetasMotoristasService {
         BigDecimal valorMeta = meta != null ? meta.getValorMeta() : null;
         BigDecimal realizado = calcularRealizado(motorista, desempenho, tipoMeta, inicio, fim);
         BigDecimal percentual = calcularPercentual(realizado, valorMeta);
-        boolean dentroMeta = valorMeta != null
-                && valorMeta.compareTo(BigDecimal.ZERO) > 0
-                && realizado.compareTo(valorMeta) >= 0;
+        boolean dentroMeta = dentroDaMeta(tipoMeta, realizado, valorMeta);
 
         return RelatorioMetasMotoristasResponse.Linha.builder()
                 .codigoMotorista(motorista.getCodigo())
@@ -132,6 +130,18 @@ public class RelatorioMetasMotoristasService {
                 .dentroMeta(dentroMeta)
                 .status(meta == null ? "SEM META" : dentroMeta ? "DENTRO" : "FORA")
                 .build();
+    }
+
+    private boolean dentroDaMeta(TipoMeta tipoMeta, BigDecimal realizado, BigDecimal valorMeta) {
+        if (valorMeta == null || valorMeta.compareTo(BigDecimal.ZERO) <= 0 || realizado == null) {
+            return false;
+        }
+
+        if (tipoMeta == TipoMeta.CONSUMO_COMBUSTIVEL) {
+            return realizado.compareTo(valorMeta) <= 0;
+        }
+
+        return realizado.compareTo(valorMeta) >= 0;
     }
 
     private BigDecimal calcularRealizado(Motorista motorista,

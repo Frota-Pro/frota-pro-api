@@ -16,6 +16,8 @@ import br.com.frotasPro.api.excption.BusinessException;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
+import br.com.frotasPro.api.util.AtualizarMetaConsumoCombustivelService;
+import br.com.frotasPro.api.util.CalcularMediaKmLitroService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +34,8 @@ import static br.com.frotasPro.api.mapper.ParadaCargaMapper.toResponse;
 public class AtualizarParadaCargaService {
 
     private final ParadaCargaRepository paradaRepository;
+    private final AtualizarMetaConsumoCombustivelService atualizarMetaConsumoCombustivelService;
+    private final CalcularMediaKmLitroService calcularMediaKmLitroService;
     private final NotificacaoService notificacaoService;
 
     @Transactional
@@ -112,6 +116,14 @@ public class AtualizarParadaCargaService {
             abastecimento.setUf(abReq.getUf());
             abastecimento.setNumNotaOuCupom(abReq.getNumNotaOuCupom());
 
+            BigDecimal media = calcularMediaKmLitroService.calcular(
+                    carga.getCaminhao(),
+                    abastecimento.getDtAbastecimento(),
+                    request.getKmOdometro(),
+                    abReq.getQtLitros()
+            );
+            abastecimento.setMediaKmLitro(media != null ? media : abReq.getMediaKmLitro());
+
             parada.getAbastecimentos().add(abastecimento);
 
             DespesaParada despesa = DespesaParada.builder()
@@ -179,7 +191,22 @@ public class AtualizarParadaCargaService {
                 carga != null ? carga.getNumeroCarga() : null
         );
 
+        atualizarMetasConsumoSeTiverAbastecimento(parada);
+
         return toResponse(parada);
+    }
+
+    private void atualizarMetasConsumoSeTiverAbastecimento(ParadaCarga parada) {
+        if (parada.getAbastecimentos() == null || parada.getAbastecimentos().isEmpty()) {
+            return;
+        }
+
+        Abastecimento abastecimento = parada.getAbastecimentos().get(0);
+        atualizarMetaConsumoCombustivelService.atualizar(
+                abastecimento.getCaminhao(),
+                abastecimento.getMotorista(),
+                abastecimento.getDtAbastecimento() != null ? abastecimento.getDtAbastecimento().toLocalDate() : null
+        );
     }
 
     private TipoDespesa mapearTipoDespesa(TipoParada tipoParada) {

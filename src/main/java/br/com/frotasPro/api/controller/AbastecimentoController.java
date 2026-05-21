@@ -117,7 +117,12 @@ public class AbastecimentoController {
             @CacheEvict(value = "abastecimento_periodo_forma", allEntries = true),
             @CacheEvict(value = "abastecimento_relatorio_gasto", allEntries = true),
             @CacheEvict(value = "abastecimento_relatorio_resumo", allEntries = true),
-            @CacheEvict(value = "abastecimento_caminhao", allEntries = true)
+            @CacheEvict(value = "abastecimento_caminhao", allEntries = true),
+            @CacheEvict(value = "meta_buscar_id", allEntries = true),
+            @CacheEvict(value = "meta_listar", allEntries = true),
+            @CacheEvict(value = "meta_ativas_caminhao", allEntries = true),
+            @CacheEvict(value = "meta_historico", allEntries = true),
+            @CacheEvict(value = "meta_historico_caminhao", allEntries = true)
     })
     public ResponseEntity<AbastecimentoResponse> criar(@Valid @RequestBody AbastecimentoRequest request) {
         AbastecimentoResponse response = criarService.criar(request);
@@ -141,7 +146,12 @@ public class AbastecimentoController {
             @CacheEvict(value = "abastecimento_periodo_forma", allEntries = true),
             @CacheEvict(value = "abastecimento_relatorio_gasto", allEntries = true),
             @CacheEvict(value = "abastecimento_relatorio_resumo", allEntries = true),
-            @CacheEvict(value = "abastecimento_caminhao", allEntries = true)
+            @CacheEvict(value = "abastecimento_caminhao", allEntries = true),
+            @CacheEvict(value = "meta_buscar_id", allEntries = true),
+            @CacheEvict(value = "meta_listar", allEntries = true),
+            @CacheEvict(value = "meta_ativas_caminhao", allEntries = true),
+            @CacheEvict(value = "meta_historico", allEntries = true),
+            @CacheEvict(value = "meta_historico_caminhao", allEntries = true)
     })
     public ResponseEntity<AbastecimentoResponse> atualizar(
             @PathVariable String codigo,
@@ -161,7 +171,12 @@ public class AbastecimentoController {
             @CacheEvict(value = "abastecimento_periodo_forma", allEntries = true),
             @CacheEvict(value = "abastecimento_relatorio_gasto", allEntries = true),
             @CacheEvict(value = "abastecimento_relatorio_resumo", allEntries = true),
-            @CacheEvict(value = "abastecimento_caminhao", allEntries = true)
+            @CacheEvict(value = "abastecimento_caminhao", allEntries = true),
+            @CacheEvict(value = "meta_buscar_id", allEntries = true),
+            @CacheEvict(value = "meta_listar", allEntries = true),
+            @CacheEvict(value = "meta_ativas_caminhao", allEntries = true),
+            @CacheEvict(value = "meta_historico", allEntries = true),
+            @CacheEvict(value = "meta_historico_caminhao", allEntries = true)
     })
     public ResponseEntity<Void> deletar(@PathVariable String codigo) {
         deletarService.deletar(codigo);

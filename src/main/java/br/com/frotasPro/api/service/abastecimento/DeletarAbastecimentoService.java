@@ -7,15 +7,19 @@ import br.com.frotasPro.api.excption.BusinessException;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
+import br.com.frotasPro.api.util.AtualizarMetaConsumoCombustivelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
 public class DeletarAbastecimentoService {
 
     private final AbastecimentoRepository repository;
+    private final AtualizarMetaConsumoCombustivelService atualizarMetaConsumoCombustivelService;
     private final NotificacaoService notificacaoService;
 
     @Transactional
@@ -29,7 +33,13 @@ public class DeletarAbastecimentoService {
 
         String codigoRef = entity.getCodigo() != null ? entity.getCodigo() : "ID-" + entity.getId();
         var idRef = entity.getId();
+        var caminhao = entity.getCaminhao();
+        var motorista = entity.getMotorista();
+        LocalDate dataReferencia = entity.getDtAbastecimento() != null
+                ? entity.getDtAbastecimento().toLocalDate()
+                : null;
         repository.delete(entity);
+        atualizarMetaConsumoCombustivelService.atualizar(caminhao, motorista, dataReferencia);
 
         notificacaoService.notificar(
                 EventoNotificacao.ABASTECIMENTO_APAGADO,

@@ -60,8 +60,9 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, UU
               sum(a.qtLitros) as totalLitros,
               sum(a.valorTotal) as totalValor,
               case
-                when sum(coalesce(a.qtLitros, 0)) = 0 then null
-                else sum(coalesce(a.mediaKmLitro, 0) * coalesce(a.qtLitros, 0)) / sum(coalesce(a.qtLitros, 0))
+                when sum(case when a.mediaKmLitro is not null then coalesce(a.qtLitros, 0) else 0 end) = 0 then null
+                else sum(a.mediaKmLitro * coalesce(a.qtLitros, 0))
+                     / sum(case when a.mediaKmLitro is not null then coalesce(a.qtLitros, 0) else 0 end)
               end as mediaKmLitro
        from Abastecimento a
        join a.caminhao c
@@ -121,8 +122,9 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, UU
 
     @Query("""
        select case
-                when sum(coalesce(a.qtLitros, 0)) = 0 then null
-                else sum(coalesce(a.mediaKmLitro, 0) * coalesce(a.qtLitros, 0)) / sum(coalesce(a.qtLitros, 0))
+                when sum(case when a.mediaKmLitro is not null then coalesce(a.qtLitros, 0) else 0 end) = 0 then null
+                else sum(a.mediaKmLitro * coalesce(a.qtLitros, 0))
+                     / sum(case when a.mediaKmLitro is not null then coalesce(a.qtLitros, 0) else 0 end)
               end
        from Abastecimento a
        where a.caminhao.id = :caminhaoId
@@ -132,8 +134,9 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, UU
 
     @Query("""
        select case
-                when sum(coalesce(a.qtLitros, 0)) = 0 then null
-                else sum(coalesce(a.mediaKmLitro, 0) * coalesce(a.qtLitros, 0)) / sum(coalesce(a.qtLitros, 0))
+                when sum(case when a.mediaKmLitro is not null then coalesce(a.qtLitros, 0) else 0 end) = 0 then null
+                else sum(a.mediaKmLitro * coalesce(a.qtLitros, 0))
+                     / sum(case when a.mediaKmLitro is not null then coalesce(a.qtLitros, 0) else 0 end)
               end
        from Abastecimento a
        where a.caminhao.id = :caminhaoId
@@ -143,8 +146,9 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, UU
 
     @Query("""
        select case
-                when sum(coalesce(a.qtLitros, 0)) = 0 then null
-                else sum(coalesce(a.mediaKmLitro, 0) * coalesce(a.qtLitros, 0)) / sum(coalesce(a.qtLitros, 0))
+                when sum(case when a.mediaKmLitro is not null then coalesce(a.qtLitros, 0) else 0 end) = 0 then null
+                else sum(a.mediaKmLitro * coalesce(a.qtLitros, 0))
+                     / sum(case when a.mediaKmLitro is not null then coalesce(a.qtLitros, 0) else 0 end)
               end
        from Abastecimento a
        where a.motorista.id = :motoristaId
@@ -320,4 +324,13 @@ and (cast(:fim as timestamp) is null or a.dt_abastecimento <= cast(:fim as times
             @Param("inicio") LocalDateTime inicio,
             @Param("fim") LocalDateTime fim
     );
+
+    @Query("""
+       select a
+       from Abastecimento a
+       join a.paradaCarga p
+       where p.carga.id = :cargaId
+       order by a.dtAbastecimento
+       """)
+    List<Abastecimento> findByCargaId(@Param("cargaId") UUID cargaId);
 }

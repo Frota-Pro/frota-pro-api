@@ -143,6 +143,28 @@ public interface MetaRepository extends JpaRepository <Meta, UUID>{
             @Param("motoristaCodigo") String motoristaCodigo
     );
 
+    @Query("""
+       select distinct m
+       from Meta m
+       left join m.caminhao cam
+       left join m.motorista mot
+       where m.tipoMeta = :tipoMeta
+         and m.statusMeta in :status
+         and m.dataIncio <= :data
+         and m.dataFim >= :data
+         and (
+              (:caminhaoId is not null and cam.id = :caminhaoId)
+              or (:motoristaId is not null and mot.id = :motoristaId)
+         )
+       """)
+    List<Meta> buscarMetasAtivasConsumoPorAbastecimento(
+            @Param("tipoMeta") TipoMeta tipoMeta,
+            @Param("status") List<StatusMeta> status,
+            @Param("data") LocalDate data,
+            @Param("caminhaoId") UUID caminhaoId,
+            @Param("motoristaId") UUID motoristaId
+    );
+
 
     @Query("""
             select m
