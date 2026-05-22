@@ -102,6 +102,24 @@ public interface MetaRepository extends JpaRepository <Meta, UUID>{
 
     List<Meta> findByStatusMetaInAndDataFimBetween(List<StatusMeta> statusMeta, LocalDate inicio, LocalDate fim);
 
+    @Query("""
+        select m
+        from Meta m
+        left join fetch m.caminhao cam
+        left join fetch m.motorista mot
+        left join fetch m.categoria cat
+        where m.statusMeta <> br.com.frotasPro.api.domain.enums.StatusMeta.CANCELADA
+          and m.dataIncio <= :fim
+          and m.dataFim >= :inicio
+          and (:tipoMeta is null or m.tipoMeta = :tipoMeta)
+        order by m.dataIncio desc
+    """)
+    List<Meta> buscarMetasParaDesempenho(
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim,
+            @Param("tipoMeta") TipoMeta tipoMeta
+    );
+
     boolean existsByTipoMetaAndStatusMetaAndDataIncioAndCaminhaoAndCategoriaAndMotorista(
             TipoMeta tipoMeta,
             StatusMeta statusMeta,

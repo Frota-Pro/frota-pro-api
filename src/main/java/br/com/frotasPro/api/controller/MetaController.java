@@ -3,9 +3,11 @@ package br.com.frotasPro.api.controller;
 import br.com.frotasPro.api.controller.request.MetaRequest;
 import br.com.frotasPro.api.controller.response.MetaCategoriaDesempenhoResponse;
 import br.com.frotasPro.api.controller.response.MetaResponse;
+import br.com.frotasPro.api.controller.response.RelatorioDesempenhoMetasResponse;
 import br.com.frotasPro.api.controller.response.TipoMetaRegraResponse;
 import br.com.frotasPro.api.domain.enums.TipoMeta;
 import br.com.frotasPro.api.service.meta.*;
+import br.com.frotasPro.api.service.relatorios.RelatorioDesempenhoMetasService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,7 @@ public class MetaController {
     private final BuscarMetaAtivaComProgressoService buscarMetaAtivaComProgressoService;
     private final BuscarHistoricoMetaComProgressoService buscarHistoricoMetaComProgressoService;
     private final BuscarDesempenhoMetaCategoriaService buscarDesempenhoMetaCategoriaService;
+    private final RelatorioDesempenhoMetasService relatorioDesempenhoMetasService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @PostMapping
@@ -103,6 +106,26 @@ public class MetaController {
                                 .build())
                         .toList()
         );
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
+    @GetMapping("/desempenho")
+    public ResponseEntity<RelatorioDesempenhoMetasResponse> desempenho(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim,
+            @RequestParam(value = "tipoMeta", required = false) TipoMeta tipoMeta,
+            @RequestParam(value = "caminhao", required = false) String caminhao,
+            @RequestParam(value = "motorista", required = false) String motorista,
+            @RequestParam(value = "categoria", required = false) String categoria
+    ) {
+        return ResponseEntity.ok(relatorioDesempenhoMetasService.gerar(
+                inicio,
+                fim,
+                tipoMeta,
+                caminhao,
+                motorista,
+                categoria
+        ));
     }
 
 

@@ -32,6 +32,7 @@ public class RelatorioPdfController {
     private final RelatorioDespesaCategoriaPeriodoService despesaCategoriaPeriodoService;
     private final RelatorioMetasMotoristasService metasMotoristasService;
     private final RelatorioMetaCategoriaService metaCategoriaService;
+    private final RelatorioDesempenhoMetasService desempenhoMetasService;
 
     private static final String LOGO_CLASSPATH = "reports/logo.png";
 
@@ -280,6 +281,51 @@ public class RelatorioPdfController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "inline; filename=\"metas-categoria-" + codigoCategoria + ".pdf\"")
+                .body(pdf);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @GetMapping("/metas/desempenho")
+    public ResponseEntity<byte[]> desempenhoMetasPdf(
+            @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam("fim") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim,
+            @RequestParam(value = "tipoMeta", required = false) TipoMeta tipoMeta,
+            @RequestParam(value = "caminhao", required = false) String caminhao,
+            @RequestParam(value = "motorista", required = false) String motorista,
+            @RequestParam(value = "categoria", required = false) String categoria
+    ) {
+        RelatorioDesempenhoMetasResponse rel = desempenhoMetasService.gerar(
+                inicio,
+                fim,
+                tipoMeta,
+                caminhao,
+                motorista,
+                categoria
+        );
+
+        Map<String, Object> p = new HashMap<>();
+        p.put("periodoInicio", rel.getPeriodoInicio());
+        p.put("periodoFim", rel.getPeriodoFim());
+        p.put("tipoMeta", rel.getTipoMeta() == null ? "Todas" : rel.getTipoMeta().getDescricao());
+        p.put("filtroCaminhao", rel.getFiltroCaminhao() == null ? "-" : rel.getFiltroCaminhao());
+        p.put("filtroMotorista", rel.getFiltroMotorista() == null ? "-" : rel.getFiltroMotorista());
+        p.put("filtroCategoria", rel.getFiltroCategoria() == null ? "-" : rel.getFiltroCategoria());
+        p.put("totalLinhas", rel.getTotalLinhas());
+        p.put("totalDentroMeta", rel.getTotalDentroMeta());
+        p.put("totalForaMeta", rel.getTotalForaMeta());
+        p.put("percentualSucesso", rel.getPercentualSucesso());
+        aplicarLogo(p);
+
+        byte[] pdf = jasperPdfService.gerarPdfFromJasper(
+                "reports/desempenho_metas.jasper",
+                p,
+                rel.getLinhas()
+        );
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=\"desempenho-metas-" + inicio + "-a-" + fim + ".pdf\"")
                 .body(pdf);
     }
 
