@@ -167,6 +167,8 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
 
     List<Carga> findTop5ByOrderByCriadoEmDesc();
 
+    List<Carga> findByTransferenciaPendenteTrueAndNumeroCargaExternoIsNotNull();
+
     @Query("""
    select c
    from Carga c

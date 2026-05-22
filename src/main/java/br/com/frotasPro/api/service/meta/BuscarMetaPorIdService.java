@@ -27,10 +27,9 @@ public class BuscarMetaPorIdService {
                 .orElseThrow(() -> new ObjectNotFound("Meta não encontrada para o id: " + id));
 
         BigDecimal valorRealizado = metaProgressoService.calcularValorRealizado(meta, null, null);
-        if (valorRealizado != null) {
-            meta.setValorRealizado(valorRealizado);
-        }
+        BigDecimal percentual = metaProgressoService.calcularPercentual(valorRealizado, meta.getValorMeta());
+        Boolean metaAtingida = metaProgressoService.metaAtingida(meta.getTipoMeta(), valorRealizado, meta.getValorMeta());
 
-        return MetaMapper.toResponse(meta);
+        return MetaMapper.toResponse(meta, valorRealizado, percentual, metaAtingida);
     }
 }

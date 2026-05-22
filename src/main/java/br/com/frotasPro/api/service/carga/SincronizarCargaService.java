@@ -4,12 +4,14 @@ import br.com.frotasPro.api.domain.Carga;
 import br.com.frotasPro.api.domain.CargaNota;
 import br.com.frotasPro.api.domain.Rota;
 import br.com.frotasPro.api.domain.enums.Status;
+import br.com.frotasPro.api.domain.enums.StatusTransferenciaCarga;
 import br.com.frotasPro.api.integracao.dto.CargaSyncResponseEvent;
 import br.com.frotasPro.api.integracao.dto.CargaWinThorDto;
 import br.com.frotasPro.api.integracao.dto.ClienteCargaWinThorDto;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.CargaNotaRepository;
 import br.com.frotasPro.api.repository.CargaRepository;
+import br.com.frotasPro.api.repository.CargaTransferenciaRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.repository.RotaRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,6 +40,7 @@ public class SincronizarCargaService {
     private final CaminhaoRepository caminhaoRepository;
     private final RotaRepository rotaRepository;
     private final CargaNotaRepository cargaNotaRepository;
+    private final CargaTransferenciaRepository cargaTransferenciaRepository;
 
     @Caching(evict = {
             @CacheEvict(value = "carga_listar", allEntries = true),
@@ -184,6 +188,7 @@ public class SincronizarCargaService {
 
         // Flush ajuda a detectar conflitos cedo e reduz surpresa no commit do listener.
         cargaRepository.saveAndFlush(carga);
+        concluirTransferenciaPendenteSeNecessario(carga);
 
         log.info("Carga {} sincronizada. {} clientes, {} notas",
                 dto.getNumMdfe(),
@@ -193,6 +198,28 @@ public class SincronizarCargaService {
 
     private static String notaKey(String cliente, String nota) {
         return cliente + "||" + nota;
+    }
+
+    private void concluirTransferenciaPendenteSeNecessario(Carga carga) {
+        if (!carga.isTransferenciaPendente()
+                || carga.getStatusTransferencia() != StatusTransferenciaCarga.PENDENTE_SYNC) {
+            return;
+        }
+
+        carga.setTransferenciaPendente(false);
+        carga.setStatusTransferencia(StatusTransferenciaCarga.CONCLUIDA);
+
+        var transferencias = cargaTransferenciaRepository.findByCargaOrigemIdAndStatus(
+                carga.getId(),
+                StatusTransferenciaCarga.PENDENTE_SYNC
+        );
+
+        for (var transferencia : transferencias) {
+            transferencia.setStatus(StatusTransferenciaCarga.CONCLUIDA);
+            transferencia.setConcluidoEm(LocalDateTime.now());
+        }
+
+        cargaTransferenciaRepository.saveAll(transferencias);
     }
 
 }

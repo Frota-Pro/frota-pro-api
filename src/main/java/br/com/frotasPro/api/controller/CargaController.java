@@ -3,8 +3,11 @@ package br.com.frotasPro.api.controller;
 import br.com.frotasPro.api.controller.request.AtualizarObservacaoMotoristaRequest;
 import br.com.frotasPro.api.controller.request.AtualizarOrdemEntregaRequest;
 import br.com.frotasPro.api.controller.request.CargaRequest;
+import br.com.frotasPro.api.controller.request.MarcarTransferenciaCargaRequest;
+import br.com.frotasPro.api.controller.request.TransferirNotasCargaRequest;
 import br.com.frotasPro.api.controller.response.CargaMinResponse;
 import br.com.frotasPro.api.controller.response.CargaResponse;
+import br.com.frotasPro.api.controller.response.TransferirNotasCargaResponse;
 import br.com.frotasPro.api.service.carga.*;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -38,6 +41,8 @@ public class CargaController {
     private final BuscarCargaAtualMotoristaService buscarCargaAtualMotoristaService;
     private final AtualizarOrdemEntregaService atualizarOrdemEntregaService;
     private final AtualizarObservacaoMotoristaService atualizarObservacaoMotoristaService;
+    private final TransferirNotasCargaService transferirNotasCargaService;
+    private final MarcarTransferenciaCargaService marcarTransferenciaCargaService;
 
     // ========= BUSCA ÚNICA =========
 
@@ -228,6 +233,48 @@ public class CargaController {
     ) {
         atualizarObservacaoMotoristaService.atualizar(numeroCarga, request.getObservacao());
         return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PatchMapping("/{numeroCarga}/transferir-notas")
+    @Caching(evict = {
+            @CacheEvict(value = "carga_buscar_numero", allEntries = true),
+            @CacheEvict(value = "carga_buscar_codigo_externo", allEntries = true),
+            @CacheEvict(value = "carga_listar", allEntries = true),
+            @CacheEvict(value = "carga_data_saida", allEntries = true),
+            @CacheEvict(value = "carga_periodo_saida", allEntries = true),
+            @CacheEvict(value = "carga_periodo_criacao", allEntries = true),
+            @CacheEvict(value = "carga_motorista", allEntries = true),
+            @CacheEvict(value = "carga_caminhao", allEntries = true),
+            @CacheEvict(value = "carga_minha_atual", allEntries = true)
+    })
+    public ResponseEntity<TransferirNotasCargaResponse> transferirNotas(
+            @PathVariable String numeroCarga,
+            @Valid @RequestBody TransferirNotasCargaRequest request
+    ) {
+        TransferirNotasCargaResponse response = transferirNotasCargaService.transferir(numeroCarga, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PatchMapping("/{numeroCarga}/marcar-transferencia")
+    @Caching(evict = {
+            @CacheEvict(value = "carga_buscar_numero", allEntries = true),
+            @CacheEvict(value = "carga_buscar_codigo_externo", allEntries = true),
+            @CacheEvict(value = "carga_listar", allEntries = true),
+            @CacheEvict(value = "carga_data_saida", allEntries = true),
+            @CacheEvict(value = "carga_periodo_saida", allEntries = true),
+            @CacheEvict(value = "carga_periodo_criacao", allEntries = true),
+            @CacheEvict(value = "carga_motorista", allEntries = true),
+            @CacheEvict(value = "carga_caminhao", allEntries = true),
+            @CacheEvict(value = "carga_minha_atual", allEntries = true)
+    })
+    public ResponseEntity<CargaResponse> marcarTransferencia(
+            @PathVariable String numeroCarga,
+            @Valid @RequestBody(required = false) MarcarTransferenciaCargaRequest request
+    ) {
+        CargaResponse response = marcarTransferenciaCargaService.marcar(numeroCarga, request);
+        return ResponseEntity.ok(response);
     }
 
     // ========= CRUD =========

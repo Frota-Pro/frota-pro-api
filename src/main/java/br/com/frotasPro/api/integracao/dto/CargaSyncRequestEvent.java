@@ -23,6 +23,7 @@ public class CargaSyncRequestEvent {
 
     private LocalDate dataInicial;
     private LocalDate dataFinal;
+    private List<Integer> codigosCargas;
     private List<Integer> codigosCaminhoes;
     private List<Integer> codigosMotoristas;
 

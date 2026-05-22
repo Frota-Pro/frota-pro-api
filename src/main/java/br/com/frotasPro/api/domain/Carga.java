@@ -1,6 +1,7 @@
 package br.com.frotasPro.api.domain;
 
 import br.com.frotasPro.api.domain.enums.Status;
+import br.com.frotasPro.api.domain.enums.StatusTransferenciaCarga;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -64,6 +65,13 @@ public class Carga extends AuditoriaBase {
 
     @Column(name = "observacao_motorista", columnDefinition = "text")
     private String observacaoMotorista;
+
+    @Column(name = "transferencia_pendente", nullable = false)
+    private boolean transferenciaPendente = false;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status_transferencia", nullable = false, length = 30)
+    private StatusTransferenciaCarga statusTransferencia = StatusTransferenciaCarga.SEM_TRANSFERENCIA;
 
     @OneToMany(mappedBy = "carga", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CargaNota> notas = new ArrayList<>();

@@ -51,13 +51,13 @@ public class BuscarHistoricoMetaComProgressoService {
         List<Meta> metas = metaRepository.historicoMetas(caminhao, categoria, motorista, inicio, fim);
         return metas.stream()
                 .map(meta -> {
+                    var valorRealizado = meta.getValorRealizado();
                     if (caminhaoRef != null) {
-                        var valorRealizado = metaProgressoService.calcularValorRealizado(meta, caminhaoRef, null);
-                        if (valorRealizado != null) {
-                            meta.setValorRealizado(valorRealizado);
-                        }
+                        valorRealizado = metaProgressoService.calcularValorRealizado(meta, caminhaoRef, null);
                     }
-                    return MetaMapper.toResponse(meta);
+                    var percentual = metaProgressoService.calcularPercentual(valorRealizado, meta.getValorMeta());
+                    var metaAtingida = metaProgressoService.metaAtingida(meta.getTipoMeta(), valorRealizado, meta.getValorMeta());
+                    return MetaMapper.toResponse(meta, valorRealizado, percentual, metaAtingida);
                 })
                 .toList();
     }

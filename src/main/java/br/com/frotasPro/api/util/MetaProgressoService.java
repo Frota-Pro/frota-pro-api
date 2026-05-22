@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -83,5 +84,25 @@ public class MetaProgressoService {
         }
 
         return meta.getValorRealizado();
+    }
+
+    public BigDecimal calcularPercentual(BigDecimal realizado, BigDecimal valorMeta) {
+        if (realizado == null || valorMeta == null || valorMeta.compareTo(BigDecimal.ZERO) <= 0) {
+            return BigDecimal.ZERO;
+        }
+
+        return realizado.multiply(BigDecimal.valueOf(100)).divide(valorMeta, 2, RoundingMode.HALF_UP);
+    }
+
+    public Boolean metaAtingida(TipoMeta tipoMeta, BigDecimal realizado, BigDecimal valorMeta) {
+        if (tipoMeta == null || realizado == null || valorMeta == null || valorMeta.compareTo(BigDecimal.ZERO) <= 0) {
+            return false;
+        }
+
+        if (tipoMeta == TipoMeta.CONSUMO_COMBUSTIVEL) {
+            return realizado.compareTo(valorMeta) <= 0;
+        }
+
+        return realizado.compareTo(valorMeta) >= 0;
     }
 }

@@ -90,6 +90,8 @@ public class CargaMapper {
                                 .toList()
                 )
                 .statusCarga(carga.getStatusCarga())
+                .transferenciaPendente(carga.isTransferenciaPendente())
+                .statusTransferencia(carga.getStatusTransferencia())
                 .codigoMotorista(carga.getMotorista().getCodigo())
                 .nomeMotorista(carga.getMotorista().getNome())
                 .codigoCaminhao(carga.getCaminhao().getCodigo())
@@ -115,6 +117,8 @@ public class CargaMapper {
                 .pesoCarga(carga.getPesoCarga())
                 .valorTotal(carga.getValorTotal())
                 .statusCarga(carga.getStatusCarga())
+                .transferenciaPendente(carga.isTransferenciaPendente())
+                .statusTransferencia(carga.getStatusTransferencia())
                 .nomeMotorista(carga.getMotorista().getNome())
                 .placaCaminhao(carga.getCaminhao().getPlaca())
                 .build();

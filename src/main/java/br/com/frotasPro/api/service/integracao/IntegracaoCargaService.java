@@ -1,11 +1,13 @@
 package br.com.frotasPro.api.service.integracao;
 
 import br.com.frotasPro.api.integracao.dto.CargaSyncRequestEvent;
+import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.integracao.kafka.CargaSyncRequestProducer;
 import br.com.frotasPro.api.service.carga.CargaSyncJobService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -18,6 +20,7 @@ public class IntegracaoCargaService {
     private final CargaSyncJobService jobService;
     private final CargaSyncRequestProducer producer;
     private final IntegracaoWinThorConfigService configService;
+    private final CargaRepository cargaRepository;
 
     public UUID solicitarSincronizacao(UUID empresaId, LocalDate data) {
         return solicitarSincronizacao(empresaId, data, data, null, null, "FATURADA", "API_FROTAPRO", "sistema");
@@ -38,6 +41,7 @@ public class IntegracaoCargaService {
         LocalDate fim = dataFinal != null ? dataFinal : inicio;
         List<Integer> codigosCaminhoesResolvidos = resolverCodigosCaminhoes(empresaId, codigosCaminhoes);
         List<Integer> codigosMotoristasResolvidos = resolverCodigosMotoristas(empresaId, codigosMotoristas);
+        List<Integer> codigosCargasTransferencia = buscarCodigosCargasComTransferenciaPendente();
 
         var job = jobService.criarJob(empresaId, fim);
 
@@ -46,6 +50,7 @@ public class IntegracaoCargaService {
                 .empresaId(empresaId)
                 .dataInicial(inicio)
                 .dataFinal(fim)
+                .codigosCargas(codigosCargasTransferencia)
                 .codigosCaminhoes(codigosCaminhoesResolvidos)
                 .codigosMotoristas(codigosMotoristasResolvidos)
                 .tipoCarga(tipoCarga)
@@ -57,6 +62,18 @@ public class IntegracaoCargaService {
         producer.enviar(event);
 
         return job.getId();
+    }
+
+    private List<Integer> buscarCodigosCargasComTransferenciaPendente() {
+        List<Integer> codigos = new ArrayList<>();
+        for (var carga : cargaRepository.findByTransferenciaPendenteTrueAndNumeroCargaExternoIsNotNull()) {
+            try {
+                codigos.add(Integer.valueOf(carga.getNumeroCargaExterno().trim()));
+            } catch (NumberFormatException ignored) {
+                // Codigo externo invalido nao deve impedir a sincronizacao normal.
+            }
+        }
+        return codigos.isEmpty() ? null : codigos;
     }
 
     private List<Integer> normalizarCodigos(List<Integer> codigos) {

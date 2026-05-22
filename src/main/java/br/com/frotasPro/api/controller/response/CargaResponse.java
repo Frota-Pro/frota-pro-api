@@ -4,6 +4,7 @@ import br.com.frotasPro.api.config.json.BigDecimalBrasilSerializer;
 import br.com.frotasPro.api.config.json.BigDecimalSemZerosSerializer;
 import br.com.frotasPro.api.config.json.FlexibleBigDecimalDeserializer;
 import br.com.frotasPro.api.domain.enums.Status;
+import br.com.frotasPro.api.domain.enums.StatusTransferenciaCarga;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Builder;
@@ -44,6 +45,8 @@ public class CargaResponse {
     private List<ClienteCargaResponse> clientes;
 
     private Status statusCarga;
+    private boolean transferenciaPendente;
+    private StatusTransferenciaCarga statusTransferencia;
 
     private String codigoMotorista;
     private String nomeMotorista;

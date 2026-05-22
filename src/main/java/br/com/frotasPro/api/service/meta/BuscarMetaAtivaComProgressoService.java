@@ -78,10 +78,9 @@ public class BuscarMetaAtivaComProgressoService {
                 .sorted(Comparator.comparing(Meta::getTipoMeta))
                 .map(meta -> {
                     var valorRealizado = metaProgressoService.calcularValorRealizado(meta, caminhao, null);
-                    if (valorRealizado != null) {
-                        meta.setValorRealizado(valorRealizado);
-                    }
-                    return MetaMapper.toResponse(meta);
+                    var percentual = metaProgressoService.calcularPercentual(valorRealizado, meta.getValorMeta());
+                    var metaAtingida = metaProgressoService.metaAtingida(meta.getTipoMeta(), valorRealizado, meta.getValorMeta());
+                    return MetaMapper.toResponse(meta, valorRealizado, percentual, metaAtingida);
                 })
                 .toList();
     }
