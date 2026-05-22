@@ -8,11 +8,14 @@ import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.mapper.CaminhaoMapper;
 import br.com.frotasPro.api.repository.CategoriaCaminhaoRepository;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
+import br.com.frotasPro.api.service.meta.MetaCategoriaCaminhaoVinculoService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.util.StringUtils.hasText;
+import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -20,15 +23,24 @@ public class AtualizarCaminhaoService {
 
     private final CaminhaoRepository caminhaoRepository;
     private final CategoriaCaminhaoRepository categoriaCaminhaoRepository;
+    private final MetaCategoriaCaminhaoVinculoService metaCategoriaCaminhaoVinculoService;
 
     @Transactional
     public CaminhaoResponse atualizar(String codigo, CaminhaoRequest request) {
         Caminhao caminhao = caminhaoRepository.findByCodigoAndAtivoTrue(codigo)
                 .orElseThrow(() -> new ObjectNotFound("ERRO: Caminhão não encontrado: " + codigo));
 
+        UUID categoriaAnteriorId = caminhao.getCategoria() != null ? caminhao.getCategoria().getId() : null;
+
         copyDtoToEntity(request, caminhao);
 
         caminhao = caminhaoRepository.save(caminhao);
+        UUID categoriaAtualId = caminhao.getCategoria() != null ? caminhao.getCategoria().getId() : null;
+
+        if (!Objects.equals(categoriaAnteriorId, categoriaAtualId)) {
+            metaCategoriaCaminhaoVinculoService.sincronizarMetasAtivasDaCategoria(categoriaAnteriorId);
+            metaCategoriaCaminhaoVinculoService.sincronizarMetasAtivasDaCategoria(categoriaAtualId);
+        }
 
         return CaminhaoMapper.toResponse(caminhao);
     }

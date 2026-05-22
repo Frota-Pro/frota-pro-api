@@ -133,15 +133,7 @@ public class RelatorioMetasMotoristasService {
     }
 
     private boolean dentroDaMeta(TipoMeta tipoMeta, BigDecimal realizado, BigDecimal valorMeta) {
-        if (valorMeta == null || valorMeta.compareTo(BigDecimal.ZERO) <= 0 || realizado == null) {
-            return false;
-        }
-
-        if (tipoMeta == TipoMeta.CONSUMO_COMBUSTIVEL) {
-            return realizado.compareTo(valorMeta) <= 0;
-        }
-
-        return realizado.compareTo(valorMeta) >= 0;
+        return tipoMeta.metaAtingida(realizado, valorMeta);
     }
 
     private BigDecimal calcularRealizado(Motorista motorista,

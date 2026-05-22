@@ -23,15 +23,16 @@ public class BuscarHistoricoMetaComProgressoService {
     private final MetaRepository metaRepository;
     private final CaminhaoRepository caminhaoRepository;
     private final MetaProgressoService metaProgressoService;
+    private final MetaResultadoService metaResultadoService;
 
     @Cacheable("meta_historico")
-    @Transactional(readOnly = true)
+    @Transactional
     public List<MetaResponse> historico(String caminhao, String categoria, String motorista, LocalDate inicio, LocalDate fim) {
         return buscarHistoricoComProgresso(caminhao, categoria, motorista, inicio, fim);
     }
 
     @Cacheable("meta_historico_caminhao")
-    @Transactional(readOnly = true)
+    @Transactional
     public List<MetaResponse> historicoPorCaminhao(String codigoCaminhao, LocalDate inicio, LocalDate fim) {
         return buscarHistoricoComProgresso(codigoCaminhao, null, null, inicio, fim);
     }
@@ -57,6 +58,9 @@ public class BuscarHistoricoMetaComProgressoService {
                     }
                     var percentual = metaProgressoService.calcularPercentual(valorRealizado, meta.getValorMeta());
                     var metaAtingida = metaProgressoService.metaAtingida(meta.getTipoMeta(), valorRealizado, meta.getValorMeta());
+                    if (caminhaoRef != null) {
+                        metaResultadoService.registrar(meta, caminhaoRef, valorRealizado, percentual, metaAtingida);
+                    }
                     return MetaMapper.toResponse(meta, valorRealizado, percentual, metaAtingida);
                 })
                 .toList();

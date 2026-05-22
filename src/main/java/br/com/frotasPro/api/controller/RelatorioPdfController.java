@@ -31,6 +31,7 @@ public class RelatorioPdfController {
     private final RelatorioVidaUtilPneuService vidaUtilPneuService;
     private final RelatorioDespesaCategoriaPeriodoService despesaCategoriaPeriodoService;
     private final RelatorioMetasMotoristasService metasMotoristasService;
+    private final RelatorioMetaCategoriaService metaCategoriaService;
 
     private static final String LOGO_CLASSPATH = "reports/logo.png";
 
@@ -233,6 +234,52 @@ public class RelatorioPdfController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "inline; filename=\"metas-motoristas-" + inicio + "-a-" + fim + ".pdf\"")
+                .body(pdf);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @GetMapping("/metas/categorias/{codigoCategoria}")
+    public ResponseEntity<byte[]> metaCategoriaPdf(
+            @PathVariable String codigoCategoria,
+            @RequestParam(value = "dataReferencia", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataReferencia,
+            @RequestParam(value = "inicio", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam(value = "fim", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim
+    ) {
+        RelatorioMetaCategoriaResponse rel;
+        if (inicio != null || fim != null) {
+            if (inicio == null || fim == null) {
+                throw new IllegalArgumentException("Informe inicio e fim para gerar relatório por período.");
+            }
+            rel = metaCategoriaService.gerarPorPeriodo(codigoCategoria, inicio, fim);
+        } else {
+            if (dataReferencia == null) {
+                throw new IllegalArgumentException("Informe dataReferencia ou inicio/fim.");
+            }
+            rel = metaCategoriaService.gerar(codigoCategoria, dataReferencia);
+        }
+
+        Map<String, Object> p = new HashMap<>();
+        p.put("categoriaCodigo", rel.getCategoriaCodigo());
+        p.put("categoriaDescricao", rel.getCategoriaDescricao());
+        p.put("dataReferencia", rel.getDataReferencia());
+        p.put("periodoInicio", rel.getPeriodoInicio());
+        p.put("periodoFim", rel.getPeriodoFim());
+        p.put("totalLinhas", rel.getTotalLinhas());
+        p.put("totalDentroMeta", rel.getTotalDentroMeta());
+        p.put("totalForaMeta", rel.getTotalForaMeta());
+        p.put("percentualSucesso", rel.getPercentualSucesso());
+        aplicarLogo(p);
+
+        byte[] pdf = jasperPdfService.gerarPdfFromJasper(
+                "reports/metas_categoria.jasper",
+                p,
+                rel.getLinhas()
+        );
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=\"metas-categoria-" + codigoCategoria + ".pdf\"")
                 .body(pdf);
     }
 

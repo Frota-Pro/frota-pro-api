@@ -29,9 +29,10 @@ public class BuscarMetaAtivaComProgressoService {
     private final MetaRepository metaRepository;
     private final CaminhaoRepository caminhaoRepository;
     private final MetaProgressoService metaProgressoService;
+    private final MetaResultadoService metaResultadoService;
 
     @Cacheable(value = "meta_ativas_caminhao", key = "#codigoCaminhao + '|' + #dataReferencia")
-    @Transactional(readOnly = true)
+    @Transactional
     public List<MetaResponse> buscar(String codigoCaminhao, LocalDate dataReferencia) {
 
         Caminhao caminhao = caminhaoRepository.findByCaminhaoPorCodigoOuPorCodigoExterno(codigoCaminhao)
@@ -80,6 +81,7 @@ public class BuscarMetaAtivaComProgressoService {
                     var valorRealizado = metaProgressoService.calcularValorRealizado(meta, caminhao, null);
                     var percentual = metaProgressoService.calcularPercentual(valorRealizado, meta.getValorMeta());
                     var metaAtingida = metaProgressoService.metaAtingida(meta.getTipoMeta(), valorRealizado, meta.getValorMeta());
+                    metaResultadoService.registrar(meta, caminhao, valorRealizado, percentual, metaAtingida);
                     return MetaMapper.toResponse(meta, valorRealizado, percentual, metaAtingida);
                 })
                 .toList();

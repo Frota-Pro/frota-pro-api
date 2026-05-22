@@ -19,6 +19,7 @@ public class MetaResponse {
     private LocalDate dataIncio;
     private LocalDate dataFim;
     private TipoMeta tipoMeta;
+    private String regraAtingimento;
     @JsonSerialize(using = BigDecimalSemZerosSerializer.class)
     private BigDecimal valorMeta;
     @JsonSerialize(using = BigDecimalSemZerosSerializer.class)

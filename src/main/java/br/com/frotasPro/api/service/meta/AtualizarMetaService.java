@@ -61,7 +61,11 @@ public class AtualizarMetaService {
         meta.setValorMeta(request.getValorMeta());
         meta.setValorRealizado(request.getValorRealizado());
         meta.setUnidade(request.getUnidade());
-        meta.setStatusMeta(request.getStatusMeta());
+        if (request.getStatusMeta() == StatusMeta.CANCELADA) {
+            meta.setStatusMeta(StatusMeta.CANCELADA);
+        } else {
+            meta.setStatusMeta(statusPorPeriodo(request.getDataIncio(), request.getDataFim()));
+        }
         meta.setDescricao(request.getDescricao());
         if (request.getRenovarAutomaticamente() != null) {
             meta.setRenovarAutomaticamente(Boolean.TRUE.equals(request.getRenovarAutomaticamente()));
@@ -161,5 +165,16 @@ public class AtualizarMetaService {
         if (existe) {
             throw new BusinessException("Já existe uma meta desse tipo ativa para o alvo informado no período.");
         }
+    }
+
+    private StatusMeta statusPorPeriodo(java.time.LocalDate inicio, java.time.LocalDate fim) {
+        java.time.LocalDate hoje = java.time.LocalDate.now();
+        if (hoje.isBefore(inicio)) {
+            return StatusMeta.NAO_INICIADA;
+        }
+        if (hoje.isAfter(fim)) {
+            return StatusMeta.CONCLUIDA;
+        }
+        return StatusMeta.EM_ANDAMENTO;
     }
 }

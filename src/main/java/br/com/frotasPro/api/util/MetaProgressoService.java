@@ -23,12 +23,20 @@ public class MetaProgressoService {
     private final AbastecimentoRepository abastecimentoRepository;
 
     public BigDecimal calcularValorRealizado(Meta meta, Caminhao caminhaoReferencia, Motorista motoristaReferencia) {
+        if (meta == null) {
+            return null;
+        }
+        return calcularValorRealizado(meta, caminhaoReferencia, motoristaReferencia, meta.getDataIncio(), meta.getDataFim());
+    }
+
+    public BigDecimal calcularValorRealizado(Meta meta, Caminhao caminhaoReferencia, Motorista motoristaReferencia,
+                                             LocalDate inicioReferencia, LocalDate fimReferencia) {
         if (meta == null || meta.getTipoMeta() == null) {
             return null;
         }
 
-        LocalDate inicio = meta.getDataIncio();
-        LocalDate fim = meta.getDataFim();
+        LocalDate inicio = inicioReferencia;
+        LocalDate fim = fimReferencia;
         if (inicio == null || fim == null) {
             return meta.getValorRealizado();
         }
@@ -95,14 +103,10 @@ public class MetaProgressoService {
     }
 
     public Boolean metaAtingida(TipoMeta tipoMeta, BigDecimal realizado, BigDecimal valorMeta) {
-        if (tipoMeta == null || realizado == null || valorMeta == null || valorMeta.compareTo(BigDecimal.ZERO) <= 0) {
+        if (tipoMeta == null) {
             return false;
         }
 
-        if (tipoMeta == TipoMeta.CONSUMO_COMBUSTIVEL) {
-            return realizado.compareTo(valorMeta) <= 0;
-        }
-
-        return realizado.compareTo(valorMeta) >= 0;
+        return tipoMeta.metaAtingida(realizado, valorMeta);
     }
 }

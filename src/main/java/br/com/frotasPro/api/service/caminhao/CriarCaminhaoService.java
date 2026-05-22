@@ -9,6 +9,7 @@ import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.mapper.CaminhaoMapper;
 import br.com.frotasPro.api.repository.CategoriaCaminhaoRepository;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
+import br.com.frotasPro.api.service.meta.MetaCategoriaCaminhaoVinculoService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,7 @@ public class CriarCaminhaoService {
 
     private final CaminhaoRepository caminhaoRepository;
     private final CategoriaCaminhaoRepository categoriaCaminhaoRepository;
+    private final MetaCategoriaCaminhaoVinculoService metaCategoriaCaminhaoVinculoService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -39,6 +41,10 @@ public class CriarCaminhaoService {
 
         entityManager.flush();
         entityManager.refresh(caminhao);
+
+        if (caminhao.getCategoria() != null) {
+            metaCategoriaCaminhaoVinculoService.sincronizarMetasAtivasDaCategoria(caminhao.getCategoria().getId());
+        }
 
         return CaminhaoMapper.toResponse(caminhao);
     }

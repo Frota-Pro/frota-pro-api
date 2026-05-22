@@ -3,6 +3,7 @@ package br.com.frotasPro.api.service.caminhao;
 import br.com.frotasPro.api.domain.Caminhao;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
+import br.com.frotasPro.api.service.meta.MetaCategoriaCaminhaoVinculoService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AtivarCaminhaoService {
 
     private final CaminhaoRepository caminhaoRepository;
+    private final MetaCategoriaCaminhaoVinculoService metaCategoriaCaminhaoVinculoService;
 
     @Transactional
     public void ativar(String codigo) {
@@ -20,5 +22,8 @@ public class AtivarCaminhaoService {
 
         caminhao.setAtivo(true);
         caminhaoRepository.save(caminhao);
+        if (caminhao.getCategoria() != null) {
+            metaCategoriaCaminhaoVinculoService.sincronizarMetasAtivasDaCategoria(caminhao.getCategoria().getId());
+        }
     }
 }

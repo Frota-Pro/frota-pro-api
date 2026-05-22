@@ -2,11 +2,16 @@ package br.com.frotasPro.api.service.meta;
 
 import br.com.frotasPro.api.domain.Meta;
 import br.com.frotasPro.api.domain.MetaCategoriaCaminhaoVinculo;
+import br.com.frotasPro.api.domain.enums.StatusMeta;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.MetaCategoriaCaminhaoVinculoRepository;
+import br.com.frotasPro.api.repository.MetaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -14,6 +19,7 @@ public class MetaCategoriaCaminhaoVinculoService {
 
     private final CaminhaoRepository caminhaoRepository;
     private final MetaCategoriaCaminhaoVinculoRepository vinculoRepository;
+    private final MetaRepository metaRepository;
 
     @Transactional
     public void sincronizar(Meta meta) {
@@ -40,5 +46,19 @@ public class MetaCategoriaCaminhaoVinculoService {
                 .toList();
 
         vinculoRepository.saveAll(vinculos);
+    }
+
+    @Transactional
+    public void sincronizarMetasAtivasDaCategoria(UUID categoriaId) {
+        if (categoriaId == null) {
+            return;
+        }
+
+        List<Meta> metas = metaRepository.findByCategoriaIdAndStatusMetaIn(
+                categoriaId,
+                List.of(StatusMeta.EM_ANDAMENTO, StatusMeta.NAO_INICIADA)
+        );
+
+        metas.forEach(this::sincronizar);
     }
 }

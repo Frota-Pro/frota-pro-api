@@ -81,7 +81,10 @@ public class CaminhaoController {
             @CacheEvict(value = "caminhao_buscar_placa", allEntries = true),
             @CacheEvict(value = "caminhao_buscar_codigo_externo", allEntries = true),
             @CacheEvict(value = "caminhao_documentos", allEntries = true),
-            @CacheEvict(value = "caminhao_detalhes", allEntries = true)
+            @CacheEvict(value = "caminhao_detalhes", allEntries = true),
+            @CacheEvict(value = "meta_ativas_caminhao", allEntries = true),
+            @CacheEvict(value = "meta_historico", allEntries = true),
+            @CacheEvict(value = "meta_historico_caminhao", allEntries = true)
     })
     public ResponseEntity<CaminhaoResponse> registrar(
             @Valid @RequestBody CaminhaoRequest request) {
@@ -105,7 +108,10 @@ public class CaminhaoController {
             @CacheEvict(value = "caminhao_buscar_placa", allEntries = true),
             @CacheEvict(value = "caminhao_buscar_codigo_externo", allEntries = true),
             @CacheEvict(value = "caminhao_documentos", allEntries = true),
-            @CacheEvict(value = "caminhao_detalhes", allEntries = true)
+            @CacheEvict(value = "caminhao_detalhes", allEntries = true),
+            @CacheEvict(value = "meta_ativas_caminhao", allEntries = true),
+            @CacheEvict(value = "meta_historico", allEntries = true),
+            @CacheEvict(value = "meta_historico_caminhao", allEntries = true)
     })
     public ResponseEntity<CaminhaoResponse> atualizar(
             @PathVariable String codigo,
@@ -124,7 +130,10 @@ public class CaminhaoController {
             @CacheEvict(value = "caminhao_buscar_placa", allEntries = true),
             @CacheEvict(value = "caminhao_buscar_codigo_externo", allEntries = true),
             @CacheEvict(value = "caminhao_documentos", allEntries = true),
-            @CacheEvict(value = "caminhao_detalhes", allEntries = true)
+            @CacheEvict(value = "caminhao_detalhes", allEntries = true),
+            @CacheEvict(value = "meta_ativas_caminhao", allEntries = true),
+            @CacheEvict(value = "meta_historico", allEntries = true),
+            @CacheEvict(value = "meta_historico_caminhao", allEntries = true)
     })
     public ResponseEntity<Void> deletar(@PathVariable String codigo) {
         deletarCaminhaoService.deletar(codigo);
@@ -139,7 +148,10 @@ public class CaminhaoController {
             @CacheEvict(value = "caminhao_buscar_placa", allEntries = true),
             @CacheEvict(value = "caminhao_buscar_codigo_externo", allEntries = true),
             @CacheEvict(value = "caminhao_documentos", allEntries = true),
-            @CacheEvict(value = "caminhao_detalhes", allEntries = true)
+            @CacheEvict(value = "caminhao_detalhes", allEntries = true),
+            @CacheEvict(value = "meta_ativas_caminhao", allEntries = true),
+            @CacheEvict(value = "meta_historico", allEntries = true),
+            @CacheEvict(value = "meta_historico_caminhao", allEntries = true)
     })
     public ResponseEntity<Void> ativar(@PathVariable String codigo) {
         ativarCaminhaoService.ativar(codigo);
@@ -199,7 +211,10 @@ public class CaminhaoController {
             @CacheEvict(value = "caminhao_buscar_codigo", allEntries = true),
             @CacheEvict(value = "caminhao_buscar_placa", allEntries = true),
             @CacheEvict(value = "caminhao_buscar_codigo_externo", allEntries = true),
-            @CacheEvict(value = "caminhao_detalhes", allEntries = true)
+            @CacheEvict(value = "caminhao_detalhes", allEntries = true),
+            @CacheEvict(value = "meta_ativas_caminhao", allEntries = true),
+            @CacheEvict(value = "meta_historico", allEntries = true),
+            @CacheEvict(value = "meta_historico_caminhao", allEntries = true)
     })
     public ResponseEntity<Void> vincularCategoriaEmLote(
             @Valid @RequestBody VincularCategoriaCaminhaoEmLoteRequest request

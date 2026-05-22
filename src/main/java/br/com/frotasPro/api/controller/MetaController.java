@@ -1,7 +1,10 @@
 package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.MetaRequest;
+import br.com.frotasPro.api.controller.response.MetaCategoriaDesempenhoResponse;
 import br.com.frotasPro.api.controller.response.MetaResponse;
+import br.com.frotasPro.api.controller.response.TipoMetaRegraResponse;
+import br.com.frotasPro.api.domain.enums.TipoMeta;
 import br.com.frotasPro.api.service.meta.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -33,6 +36,7 @@ public class MetaController {
     private final DeletarMetaService deletarMetaService;
     private final BuscarMetaAtivaComProgressoService buscarMetaAtivaComProgressoService;
     private final BuscarHistoricoMetaComProgressoService buscarHistoricoMetaComProgressoService;
+    private final BuscarDesempenhoMetaCategoriaService buscarDesempenhoMetaCategoriaService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @PostMapping
@@ -86,6 +90,21 @@ public class MetaController {
         return ResponseEntity.ok(page);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
+    @GetMapping("/tipos")
+    public ResponseEntity<List<TipoMetaRegraResponse>> tipos() {
+        return ResponseEntity.ok(
+                java.util.Arrays.stream(TipoMeta.values())
+                        .map(tipo -> TipoMetaRegraResponse.builder()
+                                .tipoMeta(tipo)
+                                .descricao(tipo.getDescricao())
+                                .regraAtingimento(tipo.getRegraAtingimento())
+                                .regraAtingimentoTexto(regraTexto(tipo.getRegraAtingimento()))
+                                .build())
+                        .toList()
+        );
+    }
+
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @DeleteMapping("/{id}")
@@ -112,6 +131,29 @@ public class MetaController {
         return ResponseEntity.ok(metas);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
+    @GetMapping("/categorias/{codigoCategoria}/desempenho")
+    public ResponseEntity<MetaCategoriaDesempenhoResponse> desempenhoCategoria(
+            @PathVariable @NotBlank String codigoCategoria,
+            @RequestParam(value = "dataReferencia", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataReferencia,
+            @RequestParam(value = "inicio", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam(value = "fim", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim
+    ) {
+        if (inicio != null || fim != null) {
+            if (inicio == null || fim == null) {
+                throw new IllegalArgumentException("Informe inicio e fim para consultar por período.");
+            }
+            return ResponseEntity.ok(buscarDesempenhoMetaCategoriaService.buscarPorPeriodo(codigoCategoria, inicio, fim));
+        }
+        if (dataReferencia == null) {
+            throw new IllegalArgumentException("Informe dataReferencia ou inicio/fim.");
+        }
+        return ResponseEntity.ok(buscarDesempenhoMetaCategoriaService.buscar(codigoCategoria, dataReferencia));
+    }
+
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/historico")
@@ -133,6 +175,16 @@ public class MetaController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim
     ) {
         return ResponseEntity.ok(buscarHistoricoMetaComProgressoService.historicoPorCaminhao(codigoCaminhao, inicio, fim));
+    }
+
+    private String regraTexto(String regra) {
+        if ("MENOR_OU_IGUAL".equals(regra)) {
+            return "Menor ou igual a meta";
+        }
+        if ("MAIOR_OU_IGUAL".equals(regra)) {
+            return "Maior ou igual a meta";
+        }
+        return regra;
     }
 
 }

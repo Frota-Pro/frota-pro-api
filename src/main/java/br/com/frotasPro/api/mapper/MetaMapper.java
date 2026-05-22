@@ -21,6 +21,7 @@ public class MetaMapper {
                 .dataIncio(meta.getDataIncio())
                 .dataFim(meta.getDataFim())
                 .tipoMeta(meta.getTipoMeta())
+                .regraAtingimento(meta.getTipoMeta() != null ? meta.getTipoMeta().getRegraAtingimento() : null)
                 .valorMeta(meta.getValorMeta())
                 .valorRealizado(valorRealizado)
                 .percentual(percentual)

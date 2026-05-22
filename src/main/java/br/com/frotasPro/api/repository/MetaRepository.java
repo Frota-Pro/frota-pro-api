@@ -71,6 +71,8 @@ public interface MetaRepository extends JpaRepository <Meta, UUID>{
             LocalDate dataFim
     );
 
+    List<Meta> findByCategoriaIdAndStatusMetaIn(UUID categoriaId, List<StatusMeta> statusMeta);
+
     @Query("""
         select distinct m
         from Meta m
@@ -87,6 +89,18 @@ public interface MetaRepository extends JpaRepository <Meta, UUID>{
     );
 
     List<Meta> findByDataFimBeforeAndStatusMeta(LocalDate data, StatusMeta statusMeta);
+
+    List<Meta> findByStatusMetaNot(StatusMeta statusMeta);
+
+    long countByStatusMetaAndDataIncioLessThanEqualAndDataFimGreaterThanEqual(
+            StatusMeta statusMeta,
+            LocalDate dataInicio,
+            LocalDate dataFim
+    );
+
+    long countByStatusMetaInAndDataFimBetween(List<StatusMeta> statusMeta, LocalDate inicio, LocalDate fim);
+
+    List<Meta> findByStatusMetaInAndDataFimBetween(List<StatusMeta> statusMeta, LocalDate inicio, LocalDate fim);
 
     boolean existsByTipoMetaAndStatusMetaAndDataIncioAndCaminhaoAndCategoriaAndMotorista(
             TipoMeta tipoMeta,

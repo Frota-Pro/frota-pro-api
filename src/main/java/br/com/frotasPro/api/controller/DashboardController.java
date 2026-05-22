@@ -1,6 +1,8 @@
 package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.response.DashboardResumoResponse;
+import br.com.frotasPro.api.controller.response.DashboardMetasResponse;
+import br.com.frotasPro.api.service.dashboard.BuscarDashboardMetasService;
 import br.com.frotasPro.api.service.dashboard.BuscarDashboardResumoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,10 +17,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class DashboardController {
 
     private final BuscarDashboardResumoService buscarDashboardResumoService;
+    private final BuscarDashboardMetasService buscarDashboardMetasService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/resumo")
     public ResponseEntity<DashboardResumoResponse> resumo() {
         return ResponseEntity.ok(buscarDashboardResumoService.executar());
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @GetMapping("/metas")
+    public ResponseEntity<DashboardMetasResponse> metas() {
+        return ResponseEntity.ok(buscarDashboardMetasService.executar());
     }
 }
