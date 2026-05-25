@@ -59,9 +59,28 @@ public class IntegracaoCargaService {
                 .timestampSolicitacao(OffsetDateTime.now())
                 .build();
 
-        producer.enviar(event);
+        try {
+            var envio = producer.enviar(event);
+            jobService.marcarProcessando(job.getId());
+            envio.whenComplete((resultado, erro) -> {
+                if (erro != null) {
+                    jobService.marcarErro(job.getId(), mensagemErro("Falha ao publicar pedido de sincronizacao de cargas", erro));
+                }
+            });
+        } catch (RuntimeException ex) {
+            jobService.marcarErro(job.getId(), mensagemErro("Falha ao enviar pedido de sincronizacao de cargas", ex));
+            throw ex;
+        }
 
         return job.getId();
+    }
+
+    private String mensagemErro(String contexto, Throwable ex) {
+        String detalhe = ex.getMessage();
+        if (detalhe == null || detalhe.isBlank()) {
+            return contexto;
+        }
+        return contexto + ": " + detalhe;
     }
 
     private List<Integer> buscarCodigosCargasComTransferenciaPendente() {

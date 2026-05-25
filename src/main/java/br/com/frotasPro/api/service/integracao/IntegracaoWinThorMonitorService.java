@@ -120,8 +120,18 @@ public class IntegracaoWinThorMonitorService {
                 .timestampSolicitacao(OffsetDateTime.now())
                 .build();
 
-        cargaProducer.enviar(event);
-        cargaJobService.marcarProcessando(job.getId());
+        try {
+            var envio = cargaProducer.enviar(event);
+            cargaJobService.marcarProcessando(job.getId());
+            envio.whenComplete((resultado, erro) -> {
+                if (erro != null) {
+                    cargaJobService.marcarErro(job.getId(), mensagemErroPublicacaoCarga(erro));
+                }
+            });
+        } catch (RuntimeException ex) {
+            cargaJobService.marcarErro(job.getId(), mensagemErroPublicacaoCarga(ex));
+            throw ex;
+        }
         notificacaoService.notificar(
                 EventoNotificacao.SINCRONIZACAO_PENDENTE,
                 TipoNotificacao.INFO,
@@ -240,5 +250,13 @@ public class IntegracaoWinThorMonitorService {
             return null;
         }
         return codigos;
+    }
+
+    private String mensagemErroPublicacaoCarga(Throwable erro) {
+        String detalhe = erro.getMessage();
+        if (detalhe == null || detalhe.isBlank()) {
+            return "Falha ao publicar retry de sincronizacao de cargas.";
+        }
+        return "Falha ao publicar retry de sincronizacao de cargas: " + detalhe;
     }
 }

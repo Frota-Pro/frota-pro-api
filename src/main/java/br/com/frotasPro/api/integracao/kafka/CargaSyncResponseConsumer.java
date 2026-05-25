@@ -28,6 +28,7 @@ public class CargaSyncResponseConsumer {
                 event.getJobId(), event.getTotalCargas());
 
         try {
+            jobService.marcarProcessando(event.getJobId());
             cargaService.sincronizarCargasWinThor(event);
 
             jobService.concluirJob(event.getJobId(), event.getTotalCargas());
@@ -35,7 +36,16 @@ public class CargaSyncResponseConsumer {
         } catch (Exception e) {
             log.error("❌ [API] Falha ao processar sync de cargas. jobId={} totalCargas={}",
                     event.getJobId(), event.getTotalCargas(), e);
+            jobService.marcarErro(event.getJobId(), mensagemErro(e));
             throw e;
         }
+    }
+
+    private String mensagemErro(Exception ex) {
+        String detalhe = ex.getMessage();
+        if (detalhe == null || detalhe.isBlank()) {
+            return "Falha ao processar resposta de sincronizacao de cargas.";
+        }
+        return "Falha ao processar resposta de sincronizacao de cargas: " + detalhe;
     }
 }

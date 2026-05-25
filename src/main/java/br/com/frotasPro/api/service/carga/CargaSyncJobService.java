@@ -19,6 +19,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CargaSyncJobService {
 
+    private static final int TAMANHO_MAXIMO_MENSAGEM_ERRO = 500;
+
     private final CargaSyncJobRepository repository;
     private final CargaSyncRequestProducer requestProducer;
     private final NotificacaoService notificacaoService;
@@ -59,9 +61,18 @@ public class CargaSyncJobService {
                 .timestampSolicitacao(OffsetDateTime.now())
                 .build();
 
-        requestProducer.enviar(event);
-
-        marcarProcessando(job.getId());
+        try {
+            var envio = requestProducer.enviar(event);
+            marcarProcessando(job.getId());
+            envio.whenComplete((resultado, erro) -> {
+                if (erro != null) {
+                    marcarErro(job.getId(), mensagemErroPublicacao(erro));
+                }
+            });
+        } catch (RuntimeException ex) {
+            marcarErro(job.getId(), mensagemErroPublicacao(ex));
+            throw ex;
+        }
 
         return job.getId();
     }
@@ -96,7 +107,7 @@ public class CargaSyncJobService {
     public void marcarErro(UUID jobId, String mensagemErro) {
         repository.findById(jobId).ifPresent(job -> {
             job.setStatus(StatusSincronizacao.ERRO);
-            job.setMensagemErro(mensagemErro);
+            job.setMensagemErro(limitarMensagemErro(mensagemErro));
             job.setAtualizadoEm(OffsetDateTime.now());
             repository.save(job);
 
@@ -104,11 +115,29 @@ public class CargaSyncJobService {
                     EventoNotificacao.SINCRONIZACAO_ERRO,
                     TipoNotificacao.ERRO,
                     "Erro na sincronização de cargas",
-                    "Job " + job.getId() + " falhou: " + mensagemErro,
+                    "Job " + job.getId() + " falhou: " + job.getMensagemErro(),
                     "SYNC_CARGA",
                     job.getId(),
                     "JOB-" + job.getId()
             );
         });
+    }
+
+    private String limitarMensagemErro(String mensagemErro) {
+        if (mensagemErro == null) {
+            return null;
+        }
+        if (mensagemErro.length() <= TAMANHO_MAXIMO_MENSAGEM_ERRO) {
+            return mensagemErro;
+        }
+        return mensagemErro.substring(0, TAMANHO_MAXIMO_MENSAGEM_ERRO);
+    }
+
+    private String mensagemErroPublicacao(Throwable erro) {
+        String detalhe = erro.getMessage();
+        if (detalhe == null || detalhe.isBlank()) {
+            return "Falha ao publicar pedido de sincronizacao de cargas.";
+        }
+        return "Falha ao publicar pedido de sincronizacao de cargas: " + detalhe;
     }
 }
