@@ -20,7 +20,7 @@ public class PneuMovimentacaoRequest {
     @NotBlank(message = "Tipo de movimentação é obrigatório")
     @Size(max = 30, message = "Tipo de movimentação inválido")
     @Pattern(
-            regexp = "INSTALACAO|REMOVER|RODIZIO|TROCA_MANUTENCAO|ENVIO_RECAPAGEM|RETORNO_RECAPAGEM|DESCARTE",
+            regexp = "INSTALACAO|ATUALIZACAO_KM|REMOVER|RODIZIO|TROCA_MANUTENCAO|ENVIO_RECAPAGEM|RETORNO_RECAPAGEM|DESCARTE",
             message = "Tipo de movimentação inválido"
     )
     public String tipo;            // TipoMovimentacaoPneu

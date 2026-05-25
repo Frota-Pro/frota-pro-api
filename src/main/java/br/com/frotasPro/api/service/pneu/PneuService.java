@@ -178,7 +178,6 @@ public class PneuService {
         var tipo = TipoMovimentacaoPneu.valueOf(req.tipo);
         UUID caminhaoId = resolverCaminhaoId(req);
 
-        // salva movimentação
         var mov = PneuMovimentacao.builder()
                 .pneu(pneu)
                 .tipo(tipo)
@@ -191,7 +190,6 @@ public class PneuService {
                 .lado(req.lado)
                 .posicao(req.posicao)
                 .build();
-        movRepository.save(mov);
 
         // regras por tipo
         switch (tipo) {
@@ -216,6 +214,29 @@ public class PneuService {
 
                 instalacaoRepository.save(inst);
                 pneu.setStatus(StatusPneu.EM_USO);
+            }
+
+            case ATUALIZACAO_KM -> {
+                var inst = instalacaoRepository.findByPneu_Codigo(codigoPneu)
+                        .orElseThrow(() -> new IllegalArgumentException(
+                                "Pneu precisa estar instalado para registrar ATUALIZACAO_KM"));
+                if (pneu.getStatus() != StatusPneu.EM_USO) {
+                    throw new IllegalArgumentException("Pneu precisa estar EM_USO para registrar ATUALIZACAO_KM");
+                }
+                if (req.kmEvento == null) {
+                    throw new IllegalArgumentException("kmEvento é obrigatório em ATUALIZACAO_KM");
+                }
+
+                BigDecimal ultimoKm = ultimoKmEventoDoPneu(codigoPneu).orElse(inst.getKmInstalacao());
+                if (req.kmEvento.compareTo(inst.getKmInstalacao()) < 0
+                        || req.kmEvento.compareTo(ultimoKm) < 0) {
+                    throw new IllegalArgumentException("kmEvento não pode ser menor que a última leitura do pneu");
+                }
+
+                mov.setCaminhaoId(inst.getCaminhaoId());
+                mov.setEixoNumero(inst.getEixoNumero());
+                mov.setLado(inst.getLado());
+                mov.setPosicao(inst.getPosicao());
             }
 
             case REMOVER -> {
@@ -255,6 +276,7 @@ public class PneuService {
             }
         }
 
+        movRepository.save(mov);
         pneuRepository.save(pneu);
     }
 
