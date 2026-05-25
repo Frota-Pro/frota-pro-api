@@ -106,7 +106,21 @@ public class MetaProgressoService {
         if (tipoMeta == null) {
             return false;
         }
+        if (naoIniciado(realizado)) {
+            return false;
+        }
 
         return tipoMeta.metaAtingida(realizado, valorMeta);
+    }
+
+    public boolean naoIniciado(BigDecimal realizado) {
+        return realizado == null || realizado.compareTo(BigDecimal.ZERO) <= 0;
+    }
+
+    public String statusDesempenho(BigDecimal realizado, Boolean metaAtingida) {
+        if (naoIniciado(realizado)) {
+            return "NAO_INICIADO";
+        }
+        return Boolean.TRUE.equals(metaAtingida) ? "BATEU" : "NAO_BATEU";
     }
 }

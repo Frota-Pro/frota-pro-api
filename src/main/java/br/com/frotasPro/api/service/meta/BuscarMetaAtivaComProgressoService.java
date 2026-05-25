@@ -81,8 +81,9 @@ public class BuscarMetaAtivaComProgressoService {
                     var valorRealizado = metaProgressoService.calcularValorRealizado(meta, caminhao, null);
                     var percentual = metaProgressoService.calcularPercentual(valorRealizado, meta.getValorMeta());
                     var metaAtingida = metaProgressoService.metaAtingida(meta.getTipoMeta(), valorRealizado, meta.getValorMeta());
+                    var statusDesempenho = metaProgressoService.statusDesempenho(valorRealizado, metaAtingida);
                     metaResultadoService.registrar(meta, caminhao, valorRealizado, percentual, metaAtingida);
-                    return MetaMapper.toResponse(meta, valorRealizado, percentual, metaAtingida);
+                    return MetaMapper.toResponse(meta, valorRealizado, percentual, metaAtingida, statusDesempenho);
                 })
                 .toList();
     }

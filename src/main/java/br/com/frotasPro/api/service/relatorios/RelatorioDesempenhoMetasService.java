@@ -186,7 +186,7 @@ public class RelatorioDesempenhoMetasService {
                 .percentual(percentual)
                 .unidade(meta.getUnidade())
                 .metaAtingida(atingida)
-                .status(Boolean.TRUE.equals(atingida) ? "BATEU" : "NAO BATEU")
+                .status(metaProgressoService.statusDesempenho(realizado, atingida))
                 .periodoCalculoInicio(inicio)
                 .periodoCalculoFim(fim);
     }

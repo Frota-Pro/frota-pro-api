@@ -29,7 +29,8 @@ public class BuscarMetaPorIdService {
         BigDecimal valorRealizado = metaProgressoService.calcularValorRealizado(meta, null, null);
         BigDecimal percentual = metaProgressoService.calcularPercentual(valorRealizado, meta.getValorMeta());
         Boolean metaAtingida = metaProgressoService.metaAtingida(meta.getTipoMeta(), valorRealizado, meta.getValorMeta());
+        String statusDesempenho = metaProgressoService.statusDesempenho(valorRealizado, metaAtingida);
 
-        return MetaMapper.toResponse(meta, valorRealizado, percentual, metaAtingida);
+        return MetaMapper.toResponse(meta, valorRealizado, percentual, metaAtingida, statusDesempenho);
     }
 }

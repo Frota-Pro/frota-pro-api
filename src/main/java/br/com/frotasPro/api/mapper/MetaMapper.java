@@ -12,6 +12,10 @@ public class MetaMapper {
     }
 
     public static MetaResponse toResponse(Meta meta, BigDecimal valorRealizado, BigDecimal percentual, Boolean metaAtingida) {
+        return toResponse(meta, valorRealizado, percentual, metaAtingida, null);
+    }
+
+    public static MetaResponse toResponse(Meta meta, BigDecimal valorRealizado, BigDecimal percentual, Boolean metaAtingida, String statusDesempenho) {
         if (meta == null) {
             return null;
         }
@@ -26,6 +30,7 @@ public class MetaMapper {
                 .valorRealizado(valorRealizado)
                 .percentual(percentual)
                 .metaAtingida(metaAtingida)
+                .statusDesempenho(statusDesempenho)
                 .unidade(meta.getUnidade())
                 .statusMeta(meta.getStatusMeta())
                 .descricao(meta.getDescricao())

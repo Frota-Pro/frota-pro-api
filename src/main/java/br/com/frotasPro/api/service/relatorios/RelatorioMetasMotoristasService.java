@@ -10,6 +10,7 @@ import br.com.frotasPro.api.repository.AbastecimentoRepository;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.MetaRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
+import br.com.frotasPro.api.util.MetaProgressoService;
 import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ public class RelatorioMetasMotoristasService {
     private final MetaRepository metaRepository;
     private final CargaRepository cargaRepository;
     private final AbastecimentoRepository abastecimentoRepository;
+    private final MetaProgressoService metaProgressoService;
 
     @Transactional(readOnly = true)
     public RelatorioMetasMotoristasResponse gerar(LocalDate inicio, LocalDate fim, TipoMeta tipoMeta) {
@@ -128,11 +130,14 @@ public class RelatorioMetasMotoristasService {
                 .percentual(percentual)
                 .unidade(meta != null ? meta.getUnidade() : unidadePadrao(tipoMeta))
                 .dentroMeta(dentroMeta)
-                .status(meta == null ? "SEM META" : dentroMeta ? "DENTRO" : "FORA")
+                .status(meta == null ? "SEM META" : metaProgressoService.statusDesempenho(realizado, dentroMeta))
                 .build();
     }
 
     private boolean dentroDaMeta(TipoMeta tipoMeta, BigDecimal realizado, BigDecimal valorMeta) {
+        if (metaProgressoService.naoIniciado(realizado)) {
+            return false;
+        }
         return tipoMeta.metaAtingida(realizado, valorMeta);
     }
 

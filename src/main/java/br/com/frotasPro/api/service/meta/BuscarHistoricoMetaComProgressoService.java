@@ -58,10 +58,11 @@ public class BuscarHistoricoMetaComProgressoService {
                     }
                     var percentual = metaProgressoService.calcularPercentual(valorRealizado, meta.getValorMeta());
                     var metaAtingida = metaProgressoService.metaAtingida(meta.getTipoMeta(), valorRealizado, meta.getValorMeta());
+                    var statusDesempenho = metaProgressoService.statusDesempenho(valorRealizado, metaAtingida);
                     if (caminhaoRef != null) {
                         metaResultadoService.registrar(meta, caminhaoRef, valorRealizado, percentual, metaAtingida);
                     }
-                    return MetaMapper.toResponse(meta, valorRealizado, percentual, metaAtingida);
+                    return MetaMapper.toResponse(meta, valorRealizado, percentual, metaAtingida, statusDesempenho);
                 })
                 .toList();
     }

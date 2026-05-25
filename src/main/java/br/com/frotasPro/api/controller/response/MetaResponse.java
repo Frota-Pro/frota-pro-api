@@ -27,6 +27,7 @@ public class MetaResponse {
     @JsonSerialize(using = BigDecimalSemZerosSerializer.class)
     private BigDecimal percentual;
     private Boolean metaAtingida;
+    private String statusDesempenho;
     private String unidade;
     private StatusMeta statusMeta;
     private String descricao;

@@ -3,6 +3,7 @@ package br.com.frotasPro.api.service.relatorios;
 import br.com.frotasPro.api.controller.response.MetaCategoriaDesempenhoResponse;
 import br.com.frotasPro.api.controller.response.RelatorioMetaCategoriaResponse;
 import br.com.frotasPro.api.service.meta.BuscarDesempenhoMetaCategoriaService;
+import br.com.frotasPro.api.util.MetaProgressoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import java.util.List;
 public class RelatorioMetaCategoriaService {
 
     private final BuscarDesempenhoMetaCategoriaService desempenhoService;
+    private final MetaProgressoService metaProgressoService;
 
     public RelatorioMetaCategoriaResponse gerar(String codigoCategoria, LocalDate dataReferencia) {
         return montar(desempenhoService.buscar(codigoCategoria, dataReferencia));
@@ -40,7 +42,7 @@ public class RelatorioMetaCategoriaService {
                         .valorRealizado(linha.getValorRealizado())
                         .percentual(linha.getPercentual())
                         .metaAtingida(linha.getMetaAtingida())
-                        .status(Boolean.TRUE.equals(linha.getMetaAtingida()) ? "BATEU" : "NAO BATEU")
+                        .status(metaProgressoService.statusDesempenho(linha.getValorRealizado(), linha.getMetaAtingida()))
                         .build())
                 .toList();
 
