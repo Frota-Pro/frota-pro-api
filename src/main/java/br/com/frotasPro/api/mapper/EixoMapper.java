@@ -9,7 +9,7 @@ public class EixoMapper {
         return EixoResponse.builder()
                 .id(eixo.getId())
                 .numero(eixo.getNumero())
-                .Codigocaminhao(eixo.getCaminhao().getCodigo())
+                .codigoCaminhao(eixo.getCaminhao().getCodigo())
                 .caminhao(eixo.getCaminhao().getDescricao())
                 .build();
     }

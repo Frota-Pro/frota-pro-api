@@ -11,6 +11,6 @@ public class EixoResponse {
 
     private UUID id;
     private int numero;
-    private String Codigocaminhao;
+    private String codigoCaminhao;
     private String caminhao;
 }

@@ -14,6 +14,8 @@ import java.util.UUID;
 
 public interface TrocaPneuManutencaoRepository extends JpaRepository<TrocaPneuManutencao, UUID> {
 
+    boolean existsByEixoId(UUID eixoId);
+
     @Query("""
            select t
            from TrocaPneuManutencao t

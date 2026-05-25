@@ -10,5 +10,6 @@ import java.util.UUID;
 public interface PneuInstalacaoAtualRepository extends JpaRepository<PneuInstalacaoAtual, UUID> {
     Optional<PneuInstalacaoAtual> findByPneu_Codigo(String codigoPneu);
     List<PneuInstalacaoAtual> findAllByCaminhaoId(UUID caminhaoId);
+    boolean existsByCaminhaoIdAndEixoNumero(UUID caminhaoId, Integer eixoNumero);
     void deleteByPneu_Codigo(String codigoPneu);
 }

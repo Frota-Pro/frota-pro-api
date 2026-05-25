@@ -72,7 +72,7 @@ public class EixoController {
         return ResponseEntity.ok(atualizarEixoService.atualizar(id, request));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable UUID id) {
         deletarEixoService.deletar(id);

@@ -1,6 +1,7 @@
 package br.com.frotasPro.api.controller.handlers;
 
 import br.com.frotasPro.api.excption.BusinessException;
+import br.com.frotasPro.api.excption.ConflictException;
 import br.com.frotasPro.api.excption.CustomException;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.excption.ValidationError;
@@ -30,6 +31,13 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<CustomException> handleBusinessException(BusinessException e, HttpServletRequest request) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
+        CustomException err = new CustomException(Instant.now(), status.value(), e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<CustomException> conflict(ConflictException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
         CustomException err = new CustomException(Instant.now(), status.value(), e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
     }
