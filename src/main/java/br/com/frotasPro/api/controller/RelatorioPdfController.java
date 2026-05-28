@@ -100,6 +100,7 @@ public class RelatorioPdfController {
         p.put("periodoFim", rel.getPeriodoFim());
         p.put("totalCombustivel", rel.getTotalCombustivel());
         p.put("totalManutencao", rel.getTotalManutencao());
+        p.put("totalKmSemCarga", rel.getTotalKmSemCarga());
         p.put("totalGeral", rel.getTotalGeral());
         aplicarLogo(p);
 
@@ -375,6 +376,7 @@ public class RelatorioPdfController {
         p.put("totalGeral", rel.getTotalGeral());
         p.put("totalAbastecimento", rel.getTotalAbastecimento());
         p.put("totalManutencoes", rel.getTotalManutencoes());
+        p.put("totalKmSemCarga", rel.getTotalKmSemCarga());
         p.put("totalPneu", rel.getTotalPneu());
         p.put("totalAlimentacao", rel.getTotalAlimentacao());
         p.put("totalPernoite", rel.getTotalPernoite());

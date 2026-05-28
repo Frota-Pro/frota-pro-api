@@ -61,6 +61,7 @@ public class FinalizarCargaService {
         Caminhao caminhao = carga.getCaminhao();
         if(caminhao != null){
             caminhao.setStatus(Status.DISPONIVEL);
+            caminhao.setOdometroUltimaCarga(kmFinal);
         }
 
         carga.setDtChegada(LocalDate.now());

@@ -23,6 +23,7 @@ public class CaminhaoMapper {
                 .chassi(caminhao.getChassi())
                 .tara(caminhao.getTara())
                 .maxPeso(caminhao.getMaxPeso())
+                .odometroUltimaCarga(caminhao.getOdometroUltimaCarga())
                 .dtLicenciamento(caminhao.getDataLicenciamento())
                 .status(caminhao.getStatus())
                 .ativo(caminhao.isAtivo());

@@ -23,6 +23,7 @@ public class RelatorioDespesaCategoriaPeriodoResponse {
 
     private BigDecimal totalAbastecimento;
     private BigDecimal totalManutencoes;
+    private BigDecimal totalKmSemCarga;
     private BigDecimal totalPneu;
     private BigDecimal totalAlimentacao;
     private BigDecimal totalPernoite;

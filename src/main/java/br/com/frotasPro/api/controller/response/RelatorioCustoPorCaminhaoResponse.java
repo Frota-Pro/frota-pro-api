@@ -22,6 +22,7 @@ public class RelatorioCustoPorCaminhaoResponse {
 
     private BigDecimal totalCombustivel;
     private BigDecimal totalManutencao;
+    private BigDecimal totalKmSemCarga;
     private BigDecimal totalGeral;
 
     private List<Linha> linhas;

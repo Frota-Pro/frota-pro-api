@@ -4,10 +4,12 @@ import br.com.frotasPro.api.controller.response.RelatorioDespesaCategoriaPeriodo
 import br.com.frotasPro.api.domain.Abastecimento;
 import br.com.frotasPro.api.domain.DespesaParada;
 import br.com.frotasPro.api.domain.Manutencao;
+import br.com.frotasPro.api.domain.MovimentacaoSemCarga;
 import br.com.frotasPro.api.domain.enums.TipoDespesa;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
 import br.com.frotasPro.api.repository.DespesaParadaRepository;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
+import br.com.frotasPro.api.repository.MovimentacaoSemCargaRepository;
 import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ public class RelatorioDespesaCategoriaPeriodoService {
     private final AbastecimentoRepository abastecimentoRepository;
     private final ManutencaoRepository manutencaoRepository;
     private final DespesaParadaRepository despesaParadaRepository;
+    private final MovimentacaoSemCargaRepository movimentacaoSemCargaRepository;
 
     public RelatorioDespesaCategoriaPeriodoResponse gerar(LocalDate inicio, LocalDate fim) {
         PeriodoValidator.obrigatorio(inicio, fim, "periodo");
@@ -74,6 +77,25 @@ public class RelatorioDespesaCategoriaPeriodoService {
                     .build());
         }
 
+        List<MovimentacaoSemCarga> movimentacoesSemCarga =
+                movimentacaoSemCargaRepository.findByPeriodoComFiltro(inicio, fim, null);
+        for (MovimentacaoSemCarga m : movimentacoesSemCarga) {
+            String referencia = m.getCaminhao().getPlaca() + " (" + m.getCaminhao().getCodigo() + ")";
+            String descricao = "Carga inicial " + m.getCargaInicio().getNumeroCarga()
+                    + " | " + m.getKmRodado() + " km sem carga"
+                    + " | odômetro " + m.getKmOrigem() + " -> " + m.getKmDestino();
+
+            linhas.add(RelatorioDespesaCategoriaPeriodoResponse.Linha.builder()
+                    .data(m.getDataMovimentacao())
+                    .categoriaPrincipal(CATEGORIA_FROTA)
+                    .subcategoria("Km sem carga")
+                    .referencia(referencia)
+                    .descricao(descricao)
+                    .cidade("-")
+                    .valor(nvl(m.getCustoEstimado()))
+                    .build());
+        }
+
         List<DespesaParada> despesasParada = despesaParadaRepository.findByPeriodo(inicioDt, fimDt);
         for (DespesaParada d : despesasParada) {
             String subcategoria = mapearSubcategoriaDespesaParada(d.getTipoDespesa());
@@ -104,11 +126,12 @@ public class RelatorioDespesaCategoriaPeriodoService {
 
         BigDecimal totalAbastecimento = totalPorSubcategoria(linhas, "Abastecimento");
         BigDecimal totalManutencoes = totalPorSubcategoria(linhas, "Manutenções");
+        BigDecimal totalKmSemCarga = totalPorSubcategoria(linhas, "Km sem carga");
         BigDecimal totalPneu = totalPorSubcategoria(linhas, "Pneu");
         BigDecimal totalAlimentacao = totalPorSubcategoria(linhas, "Alimentação");
         BigDecimal totalPernoite = totalPorSubcategoria(linhas, "Pernoite");
 
-        BigDecimal totalFrota = totalAbastecimento.add(totalManutencoes).add(totalPneu);
+        BigDecimal totalFrota = totalAbastecimento.add(totalManutencoes).add(totalKmSemCarga).add(totalPneu);
         BigDecimal totalPessoal = totalAlimentacao.add(totalPernoite);
         BigDecimal totalGeral = totalFrota.add(totalPessoal);
 
@@ -120,6 +143,7 @@ public class RelatorioDespesaCategoriaPeriodoService {
                 .totalGeral(totalGeral)
                 .totalAbastecimento(totalAbastecimento)
                 .totalManutencoes(totalManutencoes)
+                .totalKmSemCarga(totalKmSemCarga)
                 .totalPneu(totalPneu)
                 .totalAlimentacao(totalAlimentacao)
                 .totalPernoite(totalPernoite)

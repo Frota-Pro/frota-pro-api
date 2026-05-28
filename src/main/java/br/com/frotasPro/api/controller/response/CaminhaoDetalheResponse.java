@@ -24,6 +24,8 @@ public class CaminhaoDetalheResponse {
 
     private BigDecimal pesoTransportado;
 
+    private long kmSemCarga;
+
     private long ordensServicoAbertas;
 
     private List<MetaResponse> metasAtivas;

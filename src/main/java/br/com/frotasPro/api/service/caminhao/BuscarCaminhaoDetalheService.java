@@ -11,6 +11,7 @@ import br.com.frotasPro.api.repository.AbastecimentoRepository;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
+import br.com.frotasPro.api.repository.MovimentacaoSemCargaRepository;
 import br.com.frotasPro.api.service.meta.BuscarMetaAtivaComProgressoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class BuscarCaminhaoDetalheService {
     private final CargaRepository cargaRepository;
     private final AbastecimentoRepository abastecimentoRepository;
     private final ManutencaoRepository manutencaoRepository;
+    private final MovimentacaoSemCargaRepository movimentacaoSemCargaRepository;
     private final BuscarMetaAtivaComProgressoService buscarMetaAtivaComProgressoService;
 
     @Transactional(readOnly = true)
@@ -46,6 +48,7 @@ public class BuscarCaminhaoDetalheService {
         BigDecimal valor = abastecimentoRepository.sumValorPorCaminhaoCodigoOuCodigoExterno(codigo);
 
         BigDecimal peso = cargaRepository.sumPesoPorCaminhaoCodigoOuCodigoExterno(codigo);
+        Long kmSemCarga = movimentacaoSemCargaRepository.sumKmPorCaminhaoCodigoOuCodigoExterno(codigo);
 
         long osAbertas = manutencaoRepository.countAbertasPorCaminhaoCodigo(
                 codigo,
@@ -66,6 +69,7 @@ public class BuscarCaminhaoDetalheService {
                 litros,
                 valor,
                 peso,
+                kmSemCarga == null ? 0L : kmSemCarga,
                 osAbertas,
                 metasAtivas
         );

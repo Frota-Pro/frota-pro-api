@@ -146,6 +146,16 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, UU
 
     @Query("""
        select case
+                when coalesce(sum(a.qtLitros), 0) = 0 then null
+                else sum(coalesce(a.valorTotal, 0)) / sum(a.qtLitros)
+              end
+       from Abastecimento a
+       where a.caminhao.id = :caminhaoId
+       """)
+    BigDecimal valorLitroMedioPorCaminhao(UUID caminhaoId);
+
+    @Query("""
+       select case
                 when sum(case when a.mediaKmLitro is not null then coalesce(a.qtLitros, 0) else 0 end) = 0 then null
                 else sum(a.mediaKmLitro * coalesce(a.qtLitros, 0))
                      / sum(case when a.mediaKmLitro is not null then coalesce(a.qtLitros, 0) else 0 end)

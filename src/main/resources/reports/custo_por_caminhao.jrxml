@@ -9,6 +9,7 @@
     <parameter name="periodoFim" class="java.time.LocalDate"/>
     <parameter name="totalCombustivel" class="java.math.BigDecimal"/>
     <parameter name="totalManutencao" class="java.math.BigDecimal"/>
+    <parameter name="totalKmSemCarga" class="java.math.BigDecimal"/>
     <parameter name="totalGeral" class="java.math.BigDecimal"/>
 
     <field name="data" class="java.time.LocalDate"/>
@@ -30,24 +31,31 @@
             <expression><![CDATA["Período: " + $P{periodoInicio} + " até " + $P{periodoFim}]]></expression>
         </element>
 
-        <element kind="staticText" mode="Opaque" x="0" y="64" width="258" height="22" forecolor="#FFFFFF" backcolor="#0F766E" bold="true" hTextAlign="Center" vTextAlign="Middle">
+        <element kind="staticText" mode="Opaque" x="0" y="64" width="190" height="22" forecolor="#FFFFFF" backcolor="#0F766E" bold="true" hTextAlign="Center" vTextAlign="Middle">
             <text><![CDATA[COMBUSTÍVEL]]></text>
         </element>
-        <element kind="textField" mode="Opaque" x="0" y="86" width="258" height="22" pattern="'R$ ' #,##0.00" forecolor="#134E4A" backcolor="#CCFBF1" bold="true" hTextAlign="Center" vTextAlign="Middle">
+        <element kind="textField" mode="Opaque" x="0" y="86" width="190" height="22" pattern="'R$ ' #,##0.00" forecolor="#134E4A" backcolor="#CCFBF1" bold="true" hTextAlign="Center" vTextAlign="Middle">
             <expression><![CDATA[$P{totalCombustivel}]]></expression>
         </element>
 
-        <element kind="staticText" mode="Opaque" x="272" y="64" width="258" height="22" forecolor="#FFFFFF" backcolor="#1D4ED8" bold="true" hTextAlign="Center" vTextAlign="Middle">
+        <element kind="staticText" mode="Opaque" x="204" y="64" width="190" height="22" forecolor="#FFFFFF" backcolor="#1D4ED8" bold="true" hTextAlign="Center" vTextAlign="Middle">
             <text><![CDATA[MANUTENÇÃO]]></text>
         </element>
-        <element kind="textField" mode="Opaque" x="272" y="86" width="258" height="22" pattern="'R$ ' #,##0.00" forecolor="#1E3A8A" backcolor="#DBEAFE" bold="true" hTextAlign="Center" vTextAlign="Middle">
+        <element kind="textField" mode="Opaque" x="204" y="86" width="190" height="22" pattern="'R$ ' #,##0.00" forecolor="#1E3A8A" backcolor="#DBEAFE" bold="true" hTextAlign="Center" vTextAlign="Middle">
             <expression><![CDATA[$P{totalManutencao}]]></expression>
         </element>
 
-        <element kind="staticText" mode="Opaque" x="544" y="64" width="258" height="22" forecolor="#FFFFFF" backcolor="#B45309" bold="true" hTextAlign="Center" vTextAlign="Middle">
+        <element kind="staticText" mode="Opaque" x="408" y="64" width="190" height="22" forecolor="#FFFFFF" backcolor="#475569" bold="true" hTextAlign="Center" vTextAlign="Middle">
+            <text><![CDATA[KM SEM CARGA]]></text>
+        </element>
+        <element kind="textField" mode="Opaque" x="408" y="86" width="190" height="22" pattern="'R$ ' #,##0.00" forecolor="#334155" backcolor="#E2E8F0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+            <expression><![CDATA[$P{totalKmSemCarga}]]></expression>
+        </element>
+
+        <element kind="staticText" mode="Opaque" x="612" y="64" width="190" height="22" forecolor="#FFFFFF" backcolor="#B45309" bold="true" hTextAlign="Center" vTextAlign="Middle">
             <text><![CDATA[TOTAL GERAL]]></text>
         </element>
-        <element kind="textField" mode="Opaque" x="544" y="86" width="258" height="22" pattern="'R$ ' #,##0.00" forecolor="#7C2D12" backcolor="#FFEDD5" bold="true" hTextAlign="Center" vTextAlign="Middle">
+        <element kind="textField" mode="Opaque" x="612" y="86" width="190" height="22" pattern="'R$ ' #,##0.00" forecolor="#7C2D12" backcolor="#FFEDD5" bold="true" hTextAlign="Center" vTextAlign="Middle">
             <expression><![CDATA[$P{totalGeral}]]></expression>
         </element>
     </title>

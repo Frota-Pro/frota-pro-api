@@ -157,7 +157,12 @@ public class CargaController {
             @CacheEvict(value = "carga_periodo_criacao", allEntries = true),
             @CacheEvict(value = "carga_motorista", allEntries = true),
             @CacheEvict(value = "carga_caminhao", allEntries = true),
-            @CacheEvict(value = "carga_minha_atual", allEntries = true)
+            @CacheEvict(value = "carga_minha_atual", allEntries = true),
+            @CacheEvict(value = "caminhao_listar", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_codigo", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_placa", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_codigo_externo", allEntries = true),
+            @CacheEvict(value = "caminhao_detalhes", allEntries = true)
     })
     public ResponseEntity<String> iniciarCarga(
             @RequestParam("carga") String numeroCarga,
@@ -181,7 +186,12 @@ public class CargaController {
             @CacheEvict(value = "carga_periodo_criacao", allEntries = true),
             @CacheEvict(value = "carga_motorista", allEntries = true),
             @CacheEvict(value = "carga_caminhao", allEntries = true),
-            @CacheEvict(value = "carga_minha_atual", allEntries = true)
+            @CacheEvict(value = "carga_minha_atual", allEntries = true),
+            @CacheEvict(value = "caminhao_listar", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_codigo", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_placa", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_codigo_externo", allEntries = true),
+            @CacheEvict(value = "caminhao_detalhes", allEntries = true)
     })
     public ResponseEntity<String> finalizarCarga(
             @RequestParam("carga") String numeroCarga,

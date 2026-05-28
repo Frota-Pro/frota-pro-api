@@ -71,6 +71,9 @@ public class Caminhao extends AuditoriaBase{
     @Column(name = "data_licenciamento")
     private LocalDate dataLicenciamento;
 
+    @Column(name = "odometro_ultima_carga")
+    private Integer odometroUltimaCarga;
+
     @Column(length = 100)
     private String seguro;
 

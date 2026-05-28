@@ -26,6 +26,7 @@ public class CaminhaoResponse {
     private String chassi;
     private BigDecimal tara;
     private BigDecimal maxPeso;
+    private Integer odometroUltimaCarga;
 
     private String categoriaCodigo;
     private String categoriaDescricao;

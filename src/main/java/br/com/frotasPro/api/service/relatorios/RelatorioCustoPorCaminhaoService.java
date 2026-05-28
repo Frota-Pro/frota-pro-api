@@ -4,9 +4,11 @@ import br.com.frotasPro.api.controller.response.RelatorioCustoPorCaminhaoRespons
 import br.com.frotasPro.api.domain.Abastecimento;
 import br.com.frotasPro.api.domain.Caminhao;
 import br.com.frotasPro.api.domain.Manutencao;
+import br.com.frotasPro.api.domain.MovimentacaoSemCarga;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
+import br.com.frotasPro.api.repository.MovimentacaoSemCargaRepository;
 import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ public class RelatorioCustoPorCaminhaoService {
     private final CaminhaoRepository caminhaoRepository;
     private final AbastecimentoRepository abastecimentoRepository;
     private final ManutencaoRepository manutencaoRepository;
+    private final MovimentacaoSemCargaRepository movimentacaoSemCargaRepository;
 
     public RelatorioCustoPorCaminhaoResponse gerar(String codigoCaminhao, LocalDate inicio, LocalDate fim) {
 
@@ -62,10 +65,27 @@ public class RelatorioCustoPorCaminhaoService {
                     .build());
         }
 
+        List<MovimentacaoSemCarga> movimentacoesSemCarga =
+                movimentacaoSemCargaRepository.findByPeriodoComFiltro(inicio, fim, caminhao.getCodigo());
+        for (MovimentacaoSemCarga m : movimentacoesSemCarga) {
+            linhas.add(RelatorioCustoPorCaminhaoResponse.Linha.builder()
+                    .data(m.getDataMovimentacao())
+                    .tipo("KM_SEM_CARGA")
+                    .descricao("Carga inicial " + m.getCargaInicio().getNumeroCarga()
+                            + " | " + m.getKmRodado() + " km sem carga"
+                            + " | odômetro " + m.getKmOrigem() + " -> " + m.getKmDestino())
+                    .valor(nvl(m.getCustoEstimado()))
+                    .build());
+        }
+
         linhas.sort(Comparator.comparing(RelatorioCustoPorCaminhaoResponse.Linha::getData, Comparator.nullsLast(Comparator.naturalOrder())));
 
         BigDecimal totalComb = abs.stream().map(Abastecimento::getValorTotal).map(this::nvl).reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal totalMan = mans.stream().map(Manutencao::getValor).map(this::nvl).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalKmSemCarga = movimentacoesSemCarga.stream()
+                .map(MovimentacaoSemCarga::getCustoEstimado)
+                .map(this::nvl)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return RelatorioCustoPorCaminhaoResponse.builder()
                 .codigoCaminhao(caminhao.getCodigo())
@@ -74,7 +94,8 @@ public class RelatorioCustoPorCaminhaoService {
                 .periodoFim(fim)
                 .totalCombustivel(totalComb)
                 .totalManutencao(totalMan)
-                .totalGeral(totalComb.add(totalMan))
+                .totalKmSemCarga(totalKmSemCarga)
+                .totalGeral(totalComb.add(totalMan).add(totalKmSemCarga))
                 .linhas(linhas)
                 .build();
     }

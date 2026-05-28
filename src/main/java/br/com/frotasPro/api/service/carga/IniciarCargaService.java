@@ -10,6 +10,7 @@ import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.AjudanteRepository;
 import br.com.frotasPro.api.repository.CargaRepository;
+import br.com.frotasPro.api.service.movimentacaoSemCarga.RegistrarMovimentacaoSemCargaService;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class IniciarCargaService {
     private final CargaRepository cargaRepository;
     private final AjudanteRepository ajudanteRepository;
     private final NotificacaoService notificacaoService;
+    private final RegistrarMovimentacaoSemCargaService registrarMovimentacaoSemCargaService;
 
     @Transactional
     public String iniciarCarga(String numCarga, Integer kmInicial, List<String> ajudanteCodigos) {
@@ -62,6 +64,7 @@ public class IniciarCargaService {
         motorista.setStatus(Status.EM_ROTA);
 
         Caminhao caminhao = carga.getCaminhao();
+        registrarMovimentacaoSemCargaService.registrarSeHouver(carga, kmInicial);
         caminhao.setStatus(Status.EM_ROTA);
 
         carga.setDtSaida(LocalDate.now());
