@@ -10,7 +10,9 @@ import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
 import br.com.frotasPro.api.repository.MovimentacaoSemCargaRepository;
 import br.com.frotasPro.api.utils.PeriodoValidator;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,6 +22,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -66,7 +69,7 @@ public class RelatorioCustoPorCaminhaoService {
         }
 
         List<MovimentacaoSemCarga> movimentacoesSemCarga =
-                movimentacaoSemCargaRepository.findByPeriodoComFiltro(inicio, fim, caminhao.getCodigo());
+                movimentacaoSemCargaRepository.findAll(movimentacaoFiltros(inicio, fim, caminhao.getCodigo()));
         for (MovimentacaoSemCarga m : movimentacoesSemCarga) {
             linhas.add(RelatorioCustoPorCaminhaoResponse.Linha.builder()
                     .data(m.getDataMovimentacao())
@@ -102,5 +105,28 @@ public class RelatorioCustoPorCaminhaoService {
 
     private BigDecimal nvl(BigDecimal v) {
         return v == null ? BigDecimal.ZERO : v;
+    }
+
+    private Specification<MovimentacaoSemCarga> movimentacaoFiltros(LocalDate inicio, LocalDate fim, String codigoCaminhao) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(cb.between(root.get("dataMovimentacao"), inicio, fim));
+
+            if (codigoCaminhao != null && !codigoCaminhao.isBlank()) {
+                String codigo = codigoCaminhao.trim();
+                String placa = codigo.replace("-", "").toLowerCase(Locale.ROOT);
+                var caminhao = root.get("caminhao");
+                predicates.add(cb.or(
+                        cb.equal(caminhao.get("codigo"), codigo),
+                        cb.equal(caminhao.get("codigoExterno"), codigo),
+                        cb.equal(
+                                cb.lower(cb.function("replace", String.class, cb.coalesce(caminhao.get("placa"), ""), cb.literal("-"), cb.literal(""))),
+                                placa
+                        )
+                ));
+            }
+
+            return cb.and(predicates.toArray(Predicate[]::new));
+        };
     }
 }

@@ -11,7 +11,9 @@ import br.com.frotasPro.api.repository.DespesaParadaRepository;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
 import br.com.frotasPro.api.repository.MovimentacaoSemCargaRepository;
 import br.com.frotasPro.api.utils.PeriodoValidator;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -78,7 +80,7 @@ public class RelatorioDespesaCategoriaPeriodoService {
         }
 
         List<MovimentacaoSemCarga> movimentacoesSemCarga =
-                movimentacaoSemCargaRepository.findByPeriodoComFiltro(inicio, fim, null);
+                movimentacaoSemCargaRepository.findAll(movimentacaoFiltros(inicio, fim));
         for (MovimentacaoSemCarga m : movimentacoesSemCarga) {
             String referencia = m.getCaminhao().getPlaca() + " (" + m.getCaminhao().getCodigo() + ")";
             String descricao = "Carga inicial " + m.getCargaInicio().getNumeroCarga()
@@ -182,5 +184,13 @@ public class RelatorioDespesaCategoriaPeriodoService {
 
     private String valorOuTraco(String valor) {
         return valor == null || valor.isBlank() ? "-" : valor;
+    }
+
+    private Specification<MovimentacaoSemCarga> movimentacaoFiltros(LocalDate inicio, LocalDate fim) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(cb.between(root.get("dataMovimentacao"), inicio, fim));
+            return cb.and(predicates.toArray(Predicate[]::new));
+        };
     }
 }
