@@ -155,6 +155,30 @@ public interface MetaRepository extends JpaRepository <Meta, UUID>{
     );
 
     @Query("""
+       select (count(m) > 0)
+       from Meta m
+       where m.tipoMeta = :tipoMeta
+         and m.statusMeta <> br.com.frotasPro.api.domain.enums.StatusMeta.CANCELADA
+         and m.dataIncio <= :dataFim
+         and m.dataFim >= :dataInicio
+         and (
+              (:caminhao is not null and m.caminhao = :caminhao)
+              or (:categoria is not null and m.categoria = :categoria)
+              or (:motorista is not null and m.motorista = :motorista)
+         )
+         and (:id is null or m.id <> :id)
+       """)
+    boolean existsMetaNaoCanceladaConflitante(
+            @Param("tipoMeta") TipoMeta tipoMeta,
+            @Param("dataInicio") LocalDate dataInicio,
+            @Param("dataFim") LocalDate dataFim,
+            @Param("caminhao") Caminhao caminhao,
+            @Param("categoria") CategoriaCaminhao categoria,
+            @Param("motorista") Motorista motorista,
+            @Param("id") UUID id
+    );
+
+    @Query("""
        select m
        from Meta m
        left join m.caminhao c

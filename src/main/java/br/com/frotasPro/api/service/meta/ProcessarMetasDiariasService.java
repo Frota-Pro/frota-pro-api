@@ -51,13 +51,11 @@ public class ProcessarMetasDiariasService {
         for (Meta meta : metasConcluidas) {
             if (!meta.isRenovarAutomaticamente()) continue;
 
-            Period periodo = Period.between(meta.getDataIncio(), meta.getDataFim());
             LocalDate novoInicio = meta.getDataFim().plusDays(1);
-            LocalDate novoFim = novoInicio.plus(periodo);
+            LocalDate novoFim = calcularDataFimRenovacao(meta, novoInicio);
 
-            boolean jaExiste = metaRepository.existsMetaAtivaConflitante(
+            boolean jaExiste = metaRepository.existsMetaNaoCanceladaConflitante(
                     meta.getTipoMeta(),
-                    List.of(StatusMeta.EM_ANDAMENTO, StatusMeta.NAO_INICIADA),
                     novoInicio,
                     novoFim,
                     meta.getCaminhao(),
@@ -87,6 +85,24 @@ public class ProcessarMetasDiariasService {
             Meta novaSalva = metaRepository.save(nova);
             metaCategoriaCaminhaoVinculoService.sincronizar(novaSalva);
         }
+    }
+
+    LocalDate calcularDataFimRenovacao(Meta meta, LocalDate novoInicio) {
+        if (isMesCalendarioCompleto(meta)) {
+            return novoInicio.withDayOfMonth(novoInicio.lengthOfMonth());
+        }
+
+        Period periodo = Period.between(meta.getDataIncio(), meta.getDataFim());
+        return novoInicio.plus(periodo);
+    }
+
+    private boolean isMesCalendarioCompleto(Meta meta) {
+        LocalDate inicio = meta.getDataIncio();
+        LocalDate fim = meta.getDataFim();
+        return inicio != null
+                && fim != null
+                && inicio.getDayOfMonth() == 1
+                && fim.equals(inicio.withDayOfMonth(inicio.lengthOfMonth()));
     }
 
     private void atualizarStatusAutomatico(LocalDate hoje) {
