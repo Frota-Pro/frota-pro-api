@@ -39,6 +39,7 @@ public class CargaController {
     private final IniciarCargaService iniciarCargaService;
     private final FinalizarCargaService finalizarCargaService;
     private final BuscarCargaAtualMotoristaService buscarCargaAtualMotoristaService;
+    private final BuscarCargasFinalizadasMotoristaService buscarCargasFinalizadasMotoristaService;
     private final AtualizarOrdemEntregaService atualizarOrdemEntregaService;
     private final AtualizarObservacaoMotoristaService atualizarObservacaoMotoristaService;
     private final TransferirNotasCargaService transferirNotasCargaService;
@@ -141,6 +142,13 @@ public class CargaController {
     @GetMapping("/minha-carga-atual")
     public ResponseEntity<List<CargaResponse>> minhaCargaAtual() {
         List<CargaResponse> response = buscarCargaAtualMotoristaService.buscar();
+        return ResponseEntity.ok(response);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_MOTORISTA')")
+    @GetMapping("/minhas-cargas-finalizadas")
+    public ResponseEntity<Page<CargaResponse>> minhasCargasFinalizadas(Pageable pageable) {
+        Page<CargaResponse> response = buscarCargasFinalizadasMotoristaService.buscar(pageable);
         return ResponseEntity.ok(response);
     }
 

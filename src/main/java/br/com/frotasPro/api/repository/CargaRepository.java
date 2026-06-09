@@ -58,6 +58,12 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
             @Param("codmotorista") String codmotorista,
             @Param("status") List<Status> status);
 
+    Page<Carga> findByMotoristaIdAndStatusCargaOrderByDtChegadaDesc(
+            UUID motoristaId,
+            Status statusCarga,
+            Pageable pageable
+    );
+
     @Query("""
             select c
             from Carga c
