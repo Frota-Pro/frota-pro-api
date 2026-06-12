@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.controller;
+﻿package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.AbastecimentoRequest;
 import br.com.frotasPro.api.controller.response.AbastecimentoGastoPorCombustivelResponse;
@@ -42,20 +42,20 @@ public class AbastecimentoController {
     private final BuscarAbastecimentosPorCaminhaoService buscarAbastecimentosPorCaminhaoService;
     private final BuscarAbastecimentosFiltradoService buscarAbastecimentosFiltradoService;
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/{codigo}")
     public ResponseEntity<AbastecimentoResponse> buscarPorCodigo(@PathVariable String codigo) {
         AbastecimentoResponse abastecimento = buscarAbastecimentoPorCodigoService.buscar(codigo);
         return ResponseEntity.ok(abastecimento);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping
     public ResponseEntity<Page<AbastecimentoResponse>> listar(Pageable pageable) {
         return ResponseEntity.ok(listarService.listar(pageable));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/filtrar")
     public ResponseEntity<Page<AbastecimentoResponse>> filtrar(
             @RequestParam(value = "q", required = false) String q,
@@ -74,7 +74,7 @@ public class AbastecimentoController {
         );
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/periodo")
     public ResponseEntity<Page<AbastecimentoResponse>> buscarPorPeriodo(
             @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
@@ -84,7 +84,7 @@ public class AbastecimentoController {
         return ResponseEntity.ok(buscarPorPeriodoService.buscar(inicio, fim, pageable));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/periodo/combustivel")
     public ResponseEntity<Page<AbastecimentoResponse>> buscarPorTipoCombustivel(
             @RequestParam TipoCombustivel tipo,
@@ -95,7 +95,7 @@ public class AbastecimentoController {
         return ResponseEntity.ok(buscarPorCombustivelPeriodoService.buscar(tipo, inicio, fim, pageable));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/periodo/formapagamento")
     public ResponseEntity<Page<AbastecimentoResponse>> buscarPorFormaPagamento(
             @RequestParam FormaPagamento forma,
@@ -106,7 +106,7 @@ public class AbastecimentoController {
         return ResponseEntity.ok(buscarPorFormaPagamentoPeriodoService.buscar(forma, inicio, fim, pageable));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PostMapping
     @Caching(evict = {
             @CacheEvict(value = "abastecimento_buscar_codigo", allEntries = true),
@@ -135,7 +135,7 @@ public class AbastecimentoController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PutMapping("/{codigo}")
     @Caching(evict = {
             @CacheEvict(value = "abastecimento_buscar_codigo", allEntries = true),
@@ -160,7 +160,7 @@ public class AbastecimentoController {
         return ResponseEntity.ok(atualizarService.atualizar(codigo, request));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @DeleteMapping("/{codigo}")
     @Caching(evict = {
             @CacheEvict(value = "abastecimento_buscar_codigo", allEntries = true),
@@ -183,7 +183,7 @@ public class AbastecimentoController {
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/relatorios/gasto-por-combustivel")
     public ResponseEntity<List<AbastecimentoGastoPorCombustivelResponse>> gastoPorCombustivel(
             @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
@@ -192,7 +192,7 @@ public class AbastecimentoController {
         return ResponseEntity.ok(relatorioService.gastoPorCombustivel(inicio, fim));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/relatorio/resumo-caminhao")
     public ResponseEntity<List<AbastecimentoResumoCaminhaoResponse>> resumoPorCaminhao(
             @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
@@ -201,7 +201,7 @@ public class AbastecimentoController {
         return ResponseEntity.ok(resumoPorCaminhaoService.gerar(inicio, fim));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/caminhao")
     public ResponseEntity<Page<AbastecimentoResponse>> buscarPorCaminhao(
             @RequestParam("codigo") String codigoCaminhao,

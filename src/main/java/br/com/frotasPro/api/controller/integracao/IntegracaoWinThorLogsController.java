@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.controller.integracao;
+﻿package br.com.frotasPro.api.controller.integracao;
 
 import br.com.frotasPro.api.controller.integracao.dto.IntegracaoWinThorLogsResponse;
 import br.com.frotasPro.api.service.integracao.IntegracaoWinThorLogsService;
@@ -13,7 +13,7 @@ public class IntegracaoWinThorLogsController {
 
     private final IntegracaoWinThorLogsService logsService;
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/logs")
     public IntegracaoWinThorLogsResponse logs(
             @RequestParam(value = "source", defaultValue = "API") String source,

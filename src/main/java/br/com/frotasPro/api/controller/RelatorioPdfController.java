@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.controller;
+﻿package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.response.*;
 import br.com.frotasPro.api.domain.enums.TipoMeta;
@@ -42,7 +42,7 @@ public class RelatorioPdfController {
     }
 
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/motorista/{codigoMotorista}/meta-mensal")
     public ResponseEntity<byte[]> metaMensalMotoristaPdf(
             @PathVariable String codigoMotorista,
@@ -84,7 +84,7 @@ public class RelatorioPdfController {
                 .body(pdf);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/caminhao/{codigoCaminhao}/custo")
     public ResponseEntity<byte[]> custoPorCaminhaoPdf(
             @PathVariable String codigoCaminhao,
@@ -117,7 +117,7 @@ public class RelatorioPdfController {
                 .body(pdf);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/abastecimentos")
     public ResponseEntity<byte[]> abastecimentoPeriodoPdf(
             @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
@@ -149,7 +149,7 @@ public class RelatorioPdfController {
                 .body(pdf);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/carga/{numeroCarga}/completo")
     public ResponseEntity<byte[]> cargaCompletaPdf(@PathVariable String numeroCarga) {
         RelatorioCargaCompletaResponse rel = cargaCompletaService.gerar(numeroCarga);
@@ -181,7 +181,7 @@ public class RelatorioPdfController {
                 .body(pdf);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/motoristas/ranking")
     public ResponseEntity<byte[]> rankingMotoristasPdf(
             @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
@@ -208,7 +208,7 @@ public class RelatorioPdfController {
                 .body(pdf);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/motoristas/metas")
     public ResponseEntity<byte[]> metasMotoristasPdf(
             @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
@@ -239,7 +239,7 @@ public class RelatorioPdfController {
                 .body(pdf);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/metas/categorias/{codigoCategoria}")
     public ResponseEntity<byte[]> metaCategoriaPdf(
             @PathVariable String codigoCategoria,
@@ -285,7 +285,7 @@ public class RelatorioPdfController {
                 .body(pdf);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/metas/desempenho")
     public ResponseEntity<byte[]> desempenhoMetasPdf(
             @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
@@ -330,7 +330,7 @@ public class RelatorioPdfController {
                 .body(pdf);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/caminhao/{codigoCaminhao}/manutencoes")
     public ResponseEntity<byte[]> historicoManutencaoPdf(
             @PathVariable String codigoCaminhao,
@@ -360,7 +360,7 @@ public class RelatorioPdfController {
                 .body(pdf);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/despesas/categorias")
     public ResponseEntity<byte[]> despesaCategoriaPeriodoPdf(
             @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
@@ -396,7 +396,7 @@ public class RelatorioPdfController {
                 .body(pdf);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/pneus/vida-util")
     public ResponseEntity<byte[]> vidaUtilPneuPdf(
             @RequestParam(value = "codigoCaminhao", required = false) String codigoCaminhao,

@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.controller;
+﻿package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.EixoRequest;
 import br.com.frotasPro.api.controller.response.EixoResponse;
@@ -27,7 +27,7 @@ public class EixoController {
     private final AtualizarEixoService atualizarEixoService;
     private final DeletarEixoService deletarEixoService;
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_GERENTE_LOGISTICA')")
     @PostMapping
     public ResponseEntity<EixoResponse> criar(@Valid @RequestBody EixoRequest request) {
         EixoResponse eixo = criarEixoService.criar(request);
@@ -40,19 +40,19 @@ public class EixoController {
         return ResponseEntity.created(location).body(eixo);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/{id}")
     public ResponseEntity<EixoResponse> buscarPorId(@PathVariable UUID id) {
         return ResponseEntity.ok(buscarEixoPorIdService.buscar(id));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping
     public ResponseEntity<Page<EixoResponse>> listar(Pageable pageable) {
         return ResponseEntity.ok(listarEixosService.listar(pageable));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/caminhao/{codigoCaminhao}")
     public ResponseEntity<Page<EixoResponse>> listarPorCaminhao(
             @PathVariable String codigoCaminhao,
@@ -63,7 +63,7 @@ public class EixoController {
         );
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_GERENTE_LOGISTICA')")
     @PutMapping("/{id}")
     public ResponseEntity<EixoResponse> atualizar(
             @PathVariable UUID id,
@@ -72,7 +72,7 @@ public class EixoController {
         return ResponseEntity.ok(atualizarEixoService.atualizar(id, request));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_GERENTE_LOGISTICA')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable UUID id) {
         deletarEixoService.deletar(id);

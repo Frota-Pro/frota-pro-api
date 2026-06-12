@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.controller.integracao;
+﻿package br.com.frotasPro.api.controller.integracao;
 
 import br.com.frotasPro.api.controller.integracao.dto.*;
 import br.com.frotasPro.api.domain.enums.StatusSincronizacao;
@@ -34,7 +34,7 @@ public class IntegracaoWinThorAdminController {
         return empresaId != null ? empresaId : empresaIdPadrao;
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/config")
     public ResponseEntity<IntegracaoWinThorConfigResponse> buscarConfig(
             @RequestParam(value = "empresaId", required = false) UUID empresaId
@@ -42,7 +42,7 @@ public class IntegracaoWinThorAdminController {
         return ResponseEntity.ok(configService.buscar(empresa(empresaId)));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PutMapping("/config")
     public ResponseEntity<IntegracaoWinThorConfigResponse> atualizarConfig(
             @RequestParam(value = "empresaId", required = false) UUID empresaId,
@@ -51,7 +51,7 @@ public class IntegracaoWinThorAdminController {
         return ResponseEntity.ok(configService.atualizar(empresa(empresaId), req));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/jobs")
     public ResponseEntity<List<IntegracaoWinThorJobResponse>> listarJobs(
             @RequestParam(value = "empresaId", required = false) UUID empresaId,
@@ -65,7 +65,7 @@ public class IntegracaoWinThorAdminController {
         return ResponseEntity.ok(monitorService.listarJobs(empresa(empresaId), t, st, page, size));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PostMapping("/jobs/{tipo}/{jobId}/retry")
     public ResponseEntity<?> retry(
             @RequestParam(value = "empresaId", required = false) UUID empresaId,
@@ -77,7 +77,7 @@ public class IntegracaoWinThorAdminController {
         return ResponseEntity.accepted().body(Map.of("jobId", jobId, "tipo", t.name()));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/status")
     public ResponseEntity<IntegracaoWinThorStatusResponse> status() {
         return ResponseEntity.ok(statusService.verificar());
@@ -87,7 +87,7 @@ public class IntegracaoWinThorAdminController {
     // Disparo manual (empresaId fixo por enquanto)
     // ============================
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PostMapping("/sync/motoristas")
     public ResponseEntity<?> syncMotoristas(
             @RequestParam(value = "codigosMotoristas", required = false) List<Integer> codigosMotoristas
@@ -96,7 +96,7 @@ public class IntegracaoWinThorAdminController {
         return ResponseEntity.accepted().body(Map.of("jobId", jobId));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PostMapping("/sync/caminhoes")
     public ResponseEntity<?> syncCaminhoes(
             @RequestParam(value = "codFilial", required = false) Integer codFilial,
@@ -106,7 +106,7 @@ public class IntegracaoWinThorAdminController {
         return ResponseEntity.accepted().body(Map.of("jobId", jobId));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PostMapping("/sync/cargas")
     public ResponseEntity<?> syncCargas(
             @RequestParam(value = "data", required = false)

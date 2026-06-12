@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.controller;
+﻿package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.MetaRequest;
 import br.com.frotasPro.api.controller.response.MetaCategoriaDesempenhoResponse;
@@ -41,7 +41,7 @@ public class MetaController {
     private final BuscarDesempenhoMetaCategoriaService buscarDesempenhoMetaCategoriaService;
     private final RelatorioDesempenhoMetasService relatorioDesempenhoMetasService;
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_GERENTE_LOGISTICA')")
     @PostMapping
     @Caching(evict = {
             @CacheEvict(value = "meta_buscar_id", allEntries = true),
@@ -62,7 +62,7 @@ public class MetaController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_GERENTE_LOGISTICA')")
     @PutMapping("/{id}")
     @Caching(evict = {
             @CacheEvict(value = "meta_buscar_id", allEntries = true),
@@ -79,21 +79,21 @@ public class MetaController {
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/{id}")
     public ResponseEntity<MetaResponse> buscarPorId(@PathVariable UUID id) {
         MetaResponse response = buscarMetaPorIdService.buscarPorId(id);
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @GetMapping
     public ResponseEntity<Page<MetaResponse>> listar(Pageable pageable) {
         Page<MetaResponse> page = buscarTodasMetasService.listar(pageable);
         return ResponseEntity.ok(page);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/tipos")
     public ResponseEntity<List<TipoMetaRegraResponse>> tipos() {
         return ResponseEntity.ok(
@@ -108,7 +108,7 @@ public class MetaController {
         );
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/desempenho")
     public ResponseEntity<RelatorioDesempenhoMetasResponse> desempenho(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
@@ -129,7 +129,7 @@ public class MetaController {
     }
 
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_GERENTE_LOGISTICA')")
     @DeleteMapping("/{id}")
     @Caching(evict = {
             @CacheEvict(value = "meta_buscar_id", allEntries = true),
@@ -143,7 +143,7 @@ public class MetaController {
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/ativas/caminhao/{codigoCaminhao}")
     public ResponseEntity<List<MetaResponse>> metaAtivaCaminhao(
             @PathVariable @NotBlank String codigoCaminhao,
@@ -154,7 +154,7 @@ public class MetaController {
         return ResponseEntity.ok(metas);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/categorias/{codigoCategoria}/desempenho")
     public ResponseEntity<MetaCategoriaDesempenhoResponse> desempenhoCategoria(
             @PathVariable @NotBlank String codigoCategoria,
@@ -178,7 +178,7 @@ public class MetaController {
     }
 
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/historico")
     public ResponseEntity<List<MetaResponse>> historico(
             @RequestParam(required = false) String caminhao,
@@ -190,7 +190,7 @@ public class MetaController {
         return ResponseEntity.ok(buscarHistoricoMetaComProgressoService.historico(caminhao, categoria, motorista, inicio, fim));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/historico/caminhao/{codigoCaminhao}")
     public ResponseEntity<List<MetaResponse>> historicoPorCaminhao(
             @PathVariable @NotBlank String codigoCaminhao,

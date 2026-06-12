@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.controller;
+﻿package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.AjudanteRequest;
 import br.com.frotasPro.api.controller.request.CaminhaoRequest;
@@ -27,21 +27,21 @@ public class AjudanteController {
     private final AtualizarAjudanteService atualizarAjudanteService;
     private final DeletarAjudanteService deletarAjudanteService;
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_CONSULTA\',)")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping
     public ResponseEntity<Page<AjudanteResponse>> listar(Pageable pageable) {
         Page<AjudanteResponse> ajudantes = listarAjudanteService.listar(pageable);
         return ResponseEntity.ok(ajudantes);
     }
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_CONSULTA\',)")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/{codigo}")
     public ResponseEntity<AjudanteResponse> buscarPorCodigo(@PathVariable String codigo) {
         AjudanteResponse ajudante = buscarAjudanteService.buscarPorCodigo(codigo);
         return ResponseEntity.ok(ajudante);
     }
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PostMapping
     public ResponseEntity<AjudanteResponse> registrar(
             @Valid @RequestBody AjudanteRequest request) {
@@ -56,7 +56,7 @@ public class AjudanteController {
         return ResponseEntity.created(location).body(ajudante);
     }
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PutMapping("/{codigo}")
     public ResponseEntity<AjudanteResponse> atualizar(
             @PathVariable String codigo,
@@ -66,7 +66,7 @@ public class AjudanteController {
         return ResponseEntity.ok(ajudanteAtualizado);
     }
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @DeleteMapping("/{codigo}")
     public ResponseEntity<Void> deletar(@PathVariable String codigo) {
         deletarAjudanteService.desativar(codigo);

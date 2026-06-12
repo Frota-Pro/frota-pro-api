@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.controller;
+﻿package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.response.MovimentacaoSemCargaResponse;
 import br.com.frotasPro.api.controller.response.ResumoMovimentacaoSemCargaResponse;
@@ -23,7 +23,7 @@ public class MovimentacaoSemCargaController {
 
     private final ListarMovimentacaoSemCargaService service;
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping
     public ResponseEntity<Page<MovimentacaoSemCargaResponse>> listar(
             @RequestParam(value = "codigoCaminhao", required = false) String codigoCaminhao,
@@ -34,7 +34,7 @@ public class MovimentacaoSemCargaController {
         return ResponseEntity.ok(service.listar(codigoCaminhao, inicio, fim, pageable));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/resumo")
     public ResponseEntity<ResumoMovimentacaoSemCargaResponse> resumo(
             @RequestParam(value = "codigoCaminhao", required = false) String codigoCaminhao,

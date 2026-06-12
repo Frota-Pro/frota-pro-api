@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.controller;
+﻿package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.RotaRequest;
 import br.com.frotasPro.api.controller.response.RotaResponse;
@@ -25,21 +25,21 @@ public class RotaController {
     private final AtualizarRotaService atualizarRotaService;
     private final DeletarRotaService deletarRotaService;
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/{codigo}")
     public ResponseEntity<RotaResponse> buscarPorCodigo(@PathVariable String codigo) {
         RotaResponse rota = buscarRotaService.buscar(codigo);
         return ResponseEntity.ok(rota);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping
     public ResponseEntity<Page<RotaResponse>> listar(Pageable pageable) {
         Page<RotaResponse> rotas = listarRotaService.listar(pageable);
         return ResponseEntity.ok(rotas);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PostMapping
     public ResponseEntity<RotaResponse> registrar(@Valid @RequestBody RotaRequest request) {
 
@@ -53,7 +53,7 @@ public class RotaController {
         return ResponseEntity.created(location).body(rota);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PutMapping("/{codigo}")
     public ResponseEntity<RotaResponse> atualizar(@PathVariable String codigo,
                                                   @Valid @RequestBody RotaRequest request) {
@@ -62,7 +62,7 @@ public class RotaController {
         return ResponseEntity.ok(rotaAtualizada);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @DeleteMapping("/{codigo}")
     public ResponseEntity<Void> deletar(@PathVariable String codigo) {
         deletarRotaService.deletar(codigo);

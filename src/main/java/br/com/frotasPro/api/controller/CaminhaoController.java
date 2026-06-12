@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.controller;
+﻿package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.CaminhaoRequest;
 import br.com.frotasPro.api.controller.request.VincularCategoriaCaminhaoEmLoteRequest;
@@ -39,7 +39,7 @@ public class CaminhaoController {
     private final VincularCategoriaCaminhaoEmLoteService vincularCategoriaCaminhaoEmLoteService;
 
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping
     public ResponseEntity<Page<CaminhaoResponse>> listar(
             @RequestParam(required = false) Boolean ativo,
@@ -49,7 +49,7 @@ public class CaminhaoController {
         return ResponseEntity.ok(listarCaminhaoService.listar(ativo, q, pageable));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/{codigo}")
     public ResponseEntity<CaminhaoResponse> buscarPorCodigo(@PathVariable String codigo) {
         CaminhaoResponse caminhao = buscarCaminhaoService.porCodigo(codigo);
@@ -57,7 +57,7 @@ public class CaminhaoController {
     }
 
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/placa/{placa}")
     public ResponseEntity<CaminhaoResponse> buscarPorPlaca(@PathVariable String placa) {
         CaminhaoResponse caminhao = buscarCaminhaoService.porPlaca(placa);
@@ -65,7 +65,7 @@ public class CaminhaoController {
     }
 
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/codigo-externo/{codigoExterno}")
     public ResponseEntity<CaminhaoResponse> buscarPorCodigoExterno(@PathVariable String codigoExterno) {
         CaminhaoResponse caminhao = buscarCaminhaoService.porCodigoExterno(codigoExterno);
@@ -73,7 +73,7 @@ public class CaminhaoController {
     }
 
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PostMapping
     @Caching(evict = {
             @CacheEvict(value = "caminhao_listar", allEntries = true),
@@ -100,7 +100,7 @@ public class CaminhaoController {
     }
 
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PutMapping("/{codigo}")
     @Caching(evict = {
             @CacheEvict(value = "caminhao_listar", allEntries = true),
@@ -122,7 +122,7 @@ public class CaminhaoController {
     }
 
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @DeleteMapping("/{codigo}")
     @Caching(evict = {
             @CacheEvict(value = "caminhao_listar", allEntries = true),
@@ -140,7 +140,7 @@ public class CaminhaoController {
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PatchMapping("/{codigo}/ativar")
     @Caching(evict = {
             @CacheEvict(value = "caminhao_listar", allEntries = true),
@@ -158,7 +158,7 @@ public class CaminhaoController {
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PostMapping(
             value = "/{codigo}/documentos",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
@@ -185,7 +185,7 @@ public class CaminhaoController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/{codigo}/documentos")
     public ResponseEntity<Page<DocumentoCaminhaoResponse>> listarDocumentosCaminhao(
             @PathVariable String codigo,
@@ -197,14 +197,14 @@ public class CaminhaoController {
         return ResponseEntity.ok(documentos);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/{codigo}/detalhes")
     public ResponseEntity<CaminhaoDetalheResponse> detalhes(@PathVariable String codigo) {
         CaminhaoDetalheResponse response = buscarCaminhaoDetalheService.detalhes(codigo);
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PutMapping("/categoria")
     @Caching(evict = {
             @CacheEvict(value = "caminhao_listar", allEntries = true),

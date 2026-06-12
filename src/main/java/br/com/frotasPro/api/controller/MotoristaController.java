@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.controller;
+﻿package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.MotoristaRequest;
 import br.com.frotasPro.api.controller.response.DocumentoMotoristaResponse;
@@ -40,14 +40,14 @@ public class MotoristaController {
     private final ListarDocumentoMotoristaService listarDocumentoMotoristaService;
     private final RegistrarDocumentoMotoristaService registrarDocumentoMotoristaService;
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_CONSULTA\')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/{codigo}")
     public ResponseEntity<MotoristaResponse> buscarPorCodigo(@PathVariable String codigo) {
         MotoristaResponse motorista = buscarMotoristaService.buscar(codigo);
         return ResponseEntity.ok(motorista);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping
     public ResponseEntity<Page<MotoristaResponse>> listar(
             @RequestParam(required = false) Boolean ativo,
@@ -58,7 +58,7 @@ public class MotoristaController {
         return ResponseEntity.ok(motoristas);
     }
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PostMapping
     @Caching(evict = {
             @CacheEvict(value = "motorista_buscar_codigo", allEntries = true),
@@ -77,7 +77,7 @@ public class MotoristaController {
         return ResponseEntity.created(location).body(motorista);
     }
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PutMapping("/{codigo}")
     @Caching(evict = {
             @CacheEvict(value = "motorista_buscar_codigo", allEntries = true),
@@ -93,7 +93,7 @@ public class MotoristaController {
         return ResponseEntity.ok(motoristaAtualizado);
     }
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @DeleteMapping("/{codigo}")
     @Caching(evict = {
             @CacheEvict(value = "motorista_buscar_codigo", allEntries = true),
@@ -106,7 +106,7 @@ public class MotoristaController {
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/{codigoMotorista}/meta-mensal")
     public ResponseEntity<RelatorioMetaMensalMotoristaResponse> gerar(
             @PathVariable String codigoMotorista,
@@ -121,7 +121,7 @@ public class MotoristaController {
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
+    @PreAuthorize("hasAnyAuthority('ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
     @PostMapping(
             value = "/{motoristaId}/documentos",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
@@ -145,7 +145,7 @@ public class MotoristaController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
+    @PreAuthorize("hasAnyAuthority('ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
     @GetMapping("/{motoristaId}/documentos")
     public ResponseEntity<List<DocumentoMotoristaResponse>> listarDocumentosMotorista(
             @PathVariable UUID motoristaId

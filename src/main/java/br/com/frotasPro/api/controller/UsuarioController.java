@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.controller;
+﻿package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.UsuarioRequest;
 import br.com.frotasPro.api.controller.request.UsuarioSenhaSelfRequest;
@@ -33,7 +33,7 @@ public class UsuarioController {
 
     private final UsuarioService usuarioService;
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PostMapping
     @Caching(evict = {
             @CacheEvict(value = "usuario_listar", allEntries = true),
@@ -43,7 +43,7 @@ public class UsuarioController {
         return usuarioService.registar(request);
     }
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @GetMapping
     public Page<UsuarioResponse> listar(
             @RequestParam(value = "q", required = false)
@@ -55,13 +55,13 @@ public class UsuarioController {
         return usuarioService.listar(q, ativo, pageable);
     }
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/{id}")
     public UsuarioResponse buscarPorId(@PathVariable UUID id) {
         return usuarioService.buscarPorId(id);
     }
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\')")
+    @PreAuthorize("hasAuthority('ROLE_GERENTE_LOGISTICA')")
     @PutMapping("/{id}")
     @Caching(evict = {
             @CacheEvict(value = "usuario_listar", allEntries = true),
@@ -71,7 +71,7 @@ public class UsuarioController {
         return usuarioService.atualizar(id, request);
     }
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\')")
+    @PreAuthorize("hasAuthority('ROLE_GERENTE_LOGISTICA')")
     @PatchMapping("/{id}/ativo")
     @Caching(evict = {
             @CacheEvict(value = "usuario_listar", allEntries = true),
@@ -81,7 +81,7 @@ public class UsuarioController {
         return usuarioService.atualizarAtivo(id, ativo);
     }
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\')")
+    @PreAuthorize("hasAuthority('ROLE_GERENTE_LOGISTICA')")
     @PutMapping("/{id}/senha")
     @Caching(evict = {
             @CacheEvict(value = "usuario_listar", allEntries = true),
@@ -103,7 +103,7 @@ public class UsuarioController {
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PostMapping("/motoristas")
     @Caching(evict = {
             @CacheEvict(value = "usuario_listar", allEntries = true),

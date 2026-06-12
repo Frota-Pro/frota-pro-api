@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.controller;
+﻿package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.MecanicoRequest;
 import br.com.frotasPro.api.controller.response.MecanicoResponse;
@@ -27,21 +27,21 @@ public class MecanicoController {
     private final AtualizarMecanicoService atualizarMecanicoService;
     private final DeletarMecanicoService deletarMecanicoService;
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping
     public ResponseEntity<Page<MecanicoResponse>> listar(Pageable pageable) {
         Page<MecanicoResponse> page = buscarTodosMecanicosService.listar(pageable);
         return ResponseEntity.ok(page);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/codigo/{codigo}")
     public ResponseEntity<MecanicoResponse> buscarPorCodigo(@PathVariable String codigo) {
         MecanicoResponse response = buscarMecanicosPorCodigoService.BuscarPorCodigo(codigo);
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/oficina/{codigoOficina}")
     public ResponseEntity<Page<MecanicoResponse>> listarPorOficina(
             @PathVariable String codigoOficina,
@@ -51,7 +51,7 @@ public class MecanicoController {
         return ResponseEntity.ok(page);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<MecanicoResponse> criar(@Valid @RequestBody MecanicoRequest request) {
         MecanicoResponse response = criarMecanicoService.criar(request);
@@ -64,7 +64,7 @@ public class MecanicoController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PutMapping("/{codigo}")
     public ResponseEntity<MecanicoResponse> atualizar(
             @PathVariable String codigo,
@@ -74,7 +74,7 @@ public class MecanicoController {
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{codigo}")
     public ResponseEntity<Void> deletar(@PathVariable String codigo) {
         deletarMecanicoService.deletar(codigo);

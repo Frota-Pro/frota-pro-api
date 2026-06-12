@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.controller;
+﻿package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.AtualizarObservacaoMotoristaRequest;
 import br.com.frotasPro.api.controller.request.AtualizarOrdemEntregaRequest;
@@ -47,14 +47,14 @@ public class CargaController {
 
     // ========= BUSCA ÚNICA =========
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/{numeroCarga}")
     public ResponseEntity<CargaResponse> buscarPorNumero(@PathVariable String numeroCarga) {
         CargaResponse carga = buscarCargaService.porCodigo(numeroCarga);
         return ResponseEntity.ok(carga);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/externo/{codigoExterno}")
     public ResponseEntity<CargaResponse> buscarPorCodigoExterno(@PathVariable String codigoExterno) {
         CargaResponse carga = buscarCargaService.porCodigoExterno(codigoExterno);
@@ -63,7 +63,7 @@ public class CargaController {
 
     // ========= LISTAGEM GERAL (FILTROS) =========
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping
     public ResponseEntity<Page<CargaMinResponse>> listar(
             @RequestParam(value = "q", required = false) String q,
@@ -79,7 +79,7 @@ public class CargaController {
 
     // ========= BUSCAS POR DATA =========
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/data-saida")
     public ResponseEntity<Page<CargaResponse>> buscarPorDataSaida(
             @RequestParam("data")
@@ -90,7 +90,7 @@ public class CargaController {
         return ResponseEntity.ok(cargas);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/periodo-saida")
     public ResponseEntity<Page<CargaResponse>> buscarPorPeriodoSaida(
             @RequestParam("inicio")
@@ -103,7 +103,7 @@ public class CargaController {
         return ResponseEntity.ok(cargas);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/periodo-criacao")
     public ResponseEntity<Page<CargaResponse>> buscarPorPeriodoCriacao(
             @RequestParam("inicio")
@@ -118,7 +118,7 @@ public class CargaController {
 
     // ========= BUSCAS POR MOTORISTA / CAMINHÃO =========
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/motorista")
     public ResponseEntity<Page<CargaResponse>> buscarPorMotorista(
             @RequestParam("codigo") String codigoMotorista,
@@ -128,7 +128,7 @@ public class CargaController {
         return ResponseEntity.ok(cargas);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/caminhao")
     public ResponseEntity<Page<CargaResponse>> buscarPorCaminhao(
             @RequestParam("codigo") String codigoCaminhao,
@@ -154,7 +154,7 @@ public class CargaController {
 
     //========== INICIAR CARGA ========
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
+    @PreAuthorize("hasAnyAuthority('ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
     @PatchMapping("/iniciar")
     @Caching(evict = {
             @CacheEvict(value = "carga_buscar_numero", allEntries = true),
@@ -183,7 +183,7 @@ public class CargaController {
 
     //========== FINALIZAR CARGA ========
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
+    @PreAuthorize("hasAnyAuthority('ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
     @PatchMapping("/finalizar")
     @Caching(evict = {
             @CacheEvict(value = "carga_buscar_numero", allEntries = true),
@@ -211,7 +211,7 @@ public class CargaController {
 
     // ========= ORDEM DE ENTREGA / OBSERVAÇÃO MOTORISTA =========
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PatchMapping("/{numeroCarga}/ordem-entrega")
     @Caching(evict = {
             @CacheEvict(value = "carga_buscar_numero", allEntries = true),
@@ -232,7 +232,7 @@ public class CargaController {
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
+    @PreAuthorize("hasAnyAuthority('ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
     @PatchMapping("/{numeroCarga}/observacao")
     @Caching(evict = {
             @CacheEvict(value = "carga_buscar_numero", allEntries = true),
@@ -253,7 +253,7 @@ public class CargaController {
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PatchMapping("/{numeroCarga}/transferir-notas")
     @Caching(evict = {
             @CacheEvict(value = "carga_buscar_numero", allEntries = true),
@@ -274,7 +274,7 @@ public class CargaController {
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PatchMapping("/{numeroCarga}/marcar-transferencia")
     @Caching(evict = {
             @CacheEvict(value = "carga_buscar_numero", allEntries = true),
@@ -297,7 +297,7 @@ public class CargaController {
 
     // ========= CRUD =========
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PostMapping
     @Caching(evict = {
             @CacheEvict(value = "carga_buscar_numero", allEntries = true),
@@ -323,7 +323,7 @@ public class CargaController {
         return ResponseEntity.created(uri).body(carga);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PutMapping("/{numeroCarga}")
     @Caching(evict = {
             @CacheEvict(value = "carga_buscar_numero", allEntries = true),
@@ -344,7 +344,7 @@ public class CargaController {
         return ResponseEntity.ok(carga);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @DeleteMapping("/{numeroCarga}")
     @Caching(evict = {
             @CacheEvict(value = "carga_buscar_numero", allEntries = true),

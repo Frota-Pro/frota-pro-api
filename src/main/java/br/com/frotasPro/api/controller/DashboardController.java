@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.controller;
+﻿package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.response.DashboardResumoResponse;
 import br.com.frotasPro.api.controller.response.DashboardMetasResponse;
@@ -19,13 +19,13 @@ public class DashboardController {
     private final BuscarDashboardResumoService buscarDashboardResumoService;
     private final BuscarDashboardMetasService buscarDashboardMetasService;
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/resumo")
     public ResponseEntity<DashboardResumoResponse> resumo() {
         return ResponseEntity.ok(buscarDashboardResumoService.executar());
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/metas")
     public ResponseEntity<DashboardMetasResponse> metas() {
         return ResponseEntity.ok(buscarDashboardMetasService.executar());

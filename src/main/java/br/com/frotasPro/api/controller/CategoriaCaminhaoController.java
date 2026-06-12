@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.controller;
+﻿package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.CategoriaCaminhaoRequest;
 import br.com.frotasPro.api.controller.response.CategoriaCaminhaoResponse;
@@ -26,7 +26,7 @@ public class CategoriaCaminhaoController {
     private final ListarCategoriaCaminhaoService listarService;
     private final DeletarCategoriaCaminhaoService deletarService;
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_GERENTE_LOGISTICA')")
     @PostMapping
     public ResponseEntity<CategoriaCaminhaoResponse> criar(
             @Valid @RequestBody CategoriaCaminhaoRequest request) {
@@ -41,7 +41,7 @@ public class CategoriaCaminhaoController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_GERENTE_LOGISTICA')")
     @PutMapping("/{id}")
     public ResponseEntity<CategoriaCaminhaoResponse> atualizar(
             @PathVariable UUID id,
@@ -51,21 +51,21 @@ public class CategoriaCaminhaoController {
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/{codigo}")
     public ResponseEntity<CategoriaCaminhaoResponse> buscarPorId(@PathVariable String codigo) {
         CategoriaCaminhaoResponse response = buscarService.buscarPorCodigo(codigo);
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @GetMapping
     public ResponseEntity<Page<CategoriaCaminhaoResponse>> listar(Pageable pageable) {
         Page<CategoriaCaminhaoResponse> page = listarService.listar(pageable);
         return ResponseEntity.ok(page);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_GERENTE_LOGISTICA')")
     @DeleteMapping("/{codigo}")
     public ResponseEntity<Void> deletar(@PathVariable String codigo) {
         deletarService.deletar(codigo);

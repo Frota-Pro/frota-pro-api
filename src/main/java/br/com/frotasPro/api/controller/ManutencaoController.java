@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.controller;
+﻿package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.ManutencaoRequest;
 import br.com.frotasPro.api.controller.response.DocumentoManutencaoResponse;
@@ -46,7 +46,7 @@ public class ManutencaoController {
     private final RegistrarDocumentoManutencaoService registrarDocumentoManutencaoService;
     private final ListarDocumentoManutencaoService listarDocumentoManutencaoService;
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_GERENTE_LOGISTICA')")
     @PostMapping
     @Caching(evict = {
             @CacheEvict(value = "manutencao_buscar_codigo", allEntries = true),
@@ -69,7 +69,7 @@ public class ManutencaoController {
         return ResponseEntity.created(location).body(manutencao);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/{codigo}")
     public ResponseEntity<ManutencaoResponse> buscarPorCodigo(
             @PathVariable
@@ -80,13 +80,13 @@ public class ManutencaoController {
         return ResponseEntity.ok(buscarManutencaoPorCodigoService.buscar(codigo));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping
     public ResponseEntity<Page<ManutencaoResponse>> listar(Pageable pageable) {
         return ResponseEntity.ok(listarManutencoesPaginadoService.listar(pageable));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_GERENTE_LOGISTICA')")
     @PutMapping("/{codigo}")
     @Caching(evict = {
             @CacheEvict(value = "manutencao_buscar_codigo", allEntries = true),
@@ -105,7 +105,7 @@ public class ManutencaoController {
         return ResponseEntity.ok(atualizarManutencaoService.atualizar(codigo, request));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{codigo}")
     @Caching(evict = {
             @CacheEvict(value = "manutencao_buscar_codigo", allEntries = true),
@@ -122,7 +122,7 @@ public class ManutencaoController {
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/caminhao/{codigoCaminhao}")
     public ResponseEntity<Page<ManutencaoResponse>> buscarPorCaminhao(
             @PathVariable
@@ -136,7 +136,7 @@ public class ManutencaoController {
         );
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/caminhao/{codigoCaminhao}/periodo")
     public ResponseEntity<Page<ManutencaoResponse>> buscarPorCaminhaoEPeriodo(
             @PathVariable
@@ -156,7 +156,7 @@ public class ManutencaoController {
         );
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/periodo")
     public ResponseEntity<Page<ManutencaoResponse>> buscarPorPeriodo(
             @RequestParam("inicio")
@@ -172,7 +172,7 @@ public class ManutencaoController {
         );
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/oficina/{codigoOficina}/periodo")
     public ResponseEntity<Page<ManutencaoResponse>> buscarPorOficinaEPeriodo(
             @PathVariable
@@ -192,7 +192,7 @@ public class ManutencaoController {
         );
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/relatorios/caminhao")
     public ResponseEntity<RelatorioManutencaoCaminhaoResponse> relatorioPorCaminhaoEPeriodo(
             @RequestParam("caminhao")
@@ -215,7 +215,7 @@ public class ManutencaoController {
     // DOCUMENTOS / ANEXOS
     // =========================
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PostMapping(
             value = "/{codigo}/documentos",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
@@ -244,7 +244,7 @@ public class ManutencaoController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/{codigo}/documentos")
     public ResponseEntity<Page<DocumentoManutencaoResponse>> listarDocumentosManutencao(
             @PathVariable

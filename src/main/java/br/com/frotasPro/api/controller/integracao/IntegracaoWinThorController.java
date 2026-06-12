@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.controller.integracao;
+﻿package br.com.frotasPro.api.controller.integracao;
 
 import br.com.frotasPro.api.service.integracao.IntegracaoCargaService;
 import br.com.frotasPro.api.service.integracao.IntegracaoCaminhaoService;
@@ -23,7 +23,7 @@ public class IntegracaoWinThorController {
     private final IntegracaoCaminhaoService caminhaoIntegracaoService;
     private final IntegracaoCargaService integracaoCargaService;
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PostMapping("/motoristas/sincronizar")
     public ResponseEntity<?> sincronizarMotoristas(
             @RequestParam UUID empresaId,
@@ -33,7 +33,7 @@ public class IntegracaoWinThorController {
         return ResponseEntity.accepted().body(Map.of("jobId", jobId));
     }
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PostMapping("/caminhoes/sincronizar")
     public ResponseEntity<?> sincronizarCaminhoes(
             @RequestParam UUID empresaId,
@@ -44,7 +44,7 @@ public class IntegracaoWinThorController {
         return ResponseEntity.accepted().body(Map.of("jobId", jobId));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @PostMapping("/cargas/sincronizar")
     public ResponseEntity<?> sincronizar(
             @RequestParam("empresaId") UUID empresaId,

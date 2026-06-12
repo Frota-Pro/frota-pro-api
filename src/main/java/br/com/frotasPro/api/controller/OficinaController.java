@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.controller;
+﻿package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.OficinaRequest;
 import br.com.frotasPro.api.controller.response.OficinaDashboardResponse;
@@ -35,14 +35,14 @@ public class OficinaController {
     private final OficinaDashboardService oficinaDashboardService;
 
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping
     public ResponseEntity<Page<OficinaResponse>> listar(Pageable pageable) {
         Page<OficinaResponse> page = buscarTodasOficinasService.listar(pageable);
         return ResponseEntity.ok(page);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/codigo/{codigo}")
     public ResponseEntity<OficinaResponse> buscarPorCodigo(
             @PathVariable
@@ -54,7 +54,7 @@ public class OficinaController {
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping
     @Caching(evict = {
             @CacheEvict(value = "oficina_listar", allEntries = true),
@@ -72,7 +72,7 @@ public class OficinaController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PutMapping("/{codigo}")
     @Caching(evict = {
             @CacheEvict(value = "oficina_listar", allEntries = true),
@@ -90,7 +90,7 @@ public class OficinaController {
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{codigo}")
     @Caching(evict = {
             @CacheEvict(value = "oficina_listar", allEntries = true),

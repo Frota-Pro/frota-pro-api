@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.controller;
+﻿package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.ParadaCargaRequest;
 import br.com.frotasPro.api.controller.response.AnexoParadaResponse;
@@ -36,7 +36,7 @@ public class ParadaCargaController {
     private final ListarAnexosParadaService listarAnexosParadaService;
     private final BuscarParadaCargaService buscarParadaCargaService;
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
+    @PreAuthorize("hasAnyAuthority('ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
     @PostMapping
     public ResponseEntity<ParadaCargaResponse> registrar(
             @Valid @RequestBody ParadaCargaRequest request) {
@@ -51,7 +51,7 @@ public class ParadaCargaController {
         return ResponseEntity.created(location).body(parada);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/carga/{numeroCarga}")
     public ResponseEntity<Page<ParadaCargaResponse>> listarPorCarga(
             @PathVariable String numeroCarga,
@@ -62,7 +62,7 @@ public class ParadaCargaController {
         return ResponseEntity.ok(page);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/carga/{numeroCarga}/tipo")
     public ResponseEntity<Page<ParadaCargaResponse>> listarPorCargaETipo(
             @PathVariable String numeroCarga,
@@ -74,7 +74,7 @@ public class ParadaCargaController {
         return ResponseEntity.ok(page);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/carga/{numeroCarga}/abastecimentos")
     public ResponseEntity<Page<ParadaCargaResponse>> listarAbastecimentosPorCarga(
             @PathVariable String numeroCarga,
@@ -85,7 +85,7 @@ public class ParadaCargaController {
         return ResponseEntity.ok(page);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/carga/{numeroCarga}/alimentacao")
     public ResponseEntity<Page<ParadaCargaResponse>> listarAlimentacaoPorCarga(
             @PathVariable String numeroCarga,
@@ -96,7 +96,7 @@ public class ParadaCargaController {
         return ResponseEntity.ok(page);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_CONSULTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/carga/{numeroCarga}/manutencoes")
     public ResponseEntity<Page<ParadaCargaResponse>> listarParadasComManutencao(
             @PathVariable String numeroCarga,
@@ -107,7 +107,7 @@ public class ParadaCargaController {
         return ResponseEntity.ok(page);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
+    @PreAuthorize("hasAnyAuthority('ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
     @PutMapping("/{id}")
     public ResponseEntity<ParadaCargaResponse> atualizar(
             @PathVariable UUID id,
@@ -118,7 +118,7 @@ public class ParadaCargaController {
     }
 
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable UUID id) {
 
@@ -126,7 +126,7 @@ public class ParadaCargaController {
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
+    @PreAuthorize("hasAnyAuthority('ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
     @PostMapping(
             value = "/{paradaId}/anexos",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
@@ -149,7 +149,7 @@ public class ParadaCargaController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
+    @PreAuthorize("hasAnyAuthority('ROLE_OPERADOR_LOGISTICA', 'ROLE_MOTORISTA')")
     @GetMapping("/{paradaId}/anexos")
     public ResponseEntity<List<AnexoParadaResponse>> listarAnexos(@PathVariable UUID paradaId) {
 
@@ -157,7 +157,7 @@ public class ParadaCargaController {
         return ResponseEntity.ok(anexos);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA','ROLE_MOTORISTA')")
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
     @GetMapping("/{id}")
     public ResponseEntity<ParadaCargaResponse> buscar(@PathVariable UUID id) {
         return ResponseEntity.ok(buscarParadaCargaService.buscar(id));
