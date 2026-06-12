@@ -12,7 +12,7 @@ import br.com.frotasPro.api.repository.AbastecimentoRepository;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;
-import br.com.frotasPro.api.service.notificacao.NotificacaoService;
+import br.com.frotasPro.api.modules.notificacao.service.NotificacaoService;
 import br.com.frotasPro.api.util.AtualizarMetaConsumoCombustivelService;
 import br.com.frotasPro.api.util.CalcularMediaKmLitroService;
 import lombok.RequiredArgsConstructor;

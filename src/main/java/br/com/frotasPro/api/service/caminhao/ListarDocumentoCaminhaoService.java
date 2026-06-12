@@ -1,8 +1,8 @@
 package br.com.frotasPro.api.service.caminhao;
 
-import br.com.frotasPro.api.controller.response.ArquivoResponse;
+import br.com.frotasPro.api.modules.arquivo.dto.response.ArquivoResponse;
 import br.com.frotasPro.api.controller.response.DocumentoCaminhaoResponse;
-import br.com.frotasPro.api.domain.Arquivo;
+import br.com.frotasPro.api.modules.arquivo.domain.Arquivo;
 import br.com.frotasPro.api.domain.Caminhao;
 import br.com.frotasPro.api.domain.DocumentoCaminhao;
 import br.com.frotasPro.api.excption.ObjectNotFound;

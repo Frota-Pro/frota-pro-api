@@ -1,15 +1,15 @@
-package br.com.frotasPro.api.service.notificacao;
+package br.com.frotasPro.api.modules.notificacao.service;
 
-import br.com.frotasPro.api.controller.response.NotificacaoResponse;
-import br.com.frotasPro.api.domain.Notificacao;
-import br.com.frotasPro.api.domain.NotificacaoUsuario;
+import br.com.frotasPro.api.modules.notificacao.dto.response.NotificacaoResponse;
+import br.com.frotasPro.api.modules.notificacao.domain.Notificacao;
+import br.com.frotasPro.api.modules.notificacao.domain.NotificacaoUsuario;
 import br.com.frotasPro.api.modules.auth.domain.Usuario;
 import br.com.frotasPro.api.domain.enums.EventoNotificacao;
 import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.excption.ObjectNotFound;
-import br.com.frotasPro.api.mapper.NotificacaoMapper;
-import br.com.frotasPro.api.repository.NotificacaoRepository;
-import br.com.frotasPro.api.repository.NotificacaoUsuarioRepository;
+import br.com.frotasPro.api.modules.notificacao.mapper.NotificacaoMapper;
+import br.com.frotasPro.api.modules.notificacao.repository.NotificacaoRepository;
+import br.com.frotasPro.api.modules.notificacao.repository.NotificacaoUsuarioRepository;
 import br.com.frotasPro.api.modules.auth.repository.UsuarioRepository;
 import br.com.frotasPro.api.modules.auth.service.UsuarioAutenticadoService;
 import lombok.RequiredArgsConstructor;

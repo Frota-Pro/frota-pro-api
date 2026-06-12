@@ -1,8 +1,8 @@
-package br.com.frotasPro.api.controller;
+package br.com.frotasPro.api.modules.arquivo.controller;
 
-import br.com.frotasPro.api.domain.Arquivo;
+import br.com.frotasPro.api.modules.arquivo.domain.Arquivo;
 import br.com.frotasPro.api.excption.ObjectNotFound;
-import br.com.frotasPro.api.repository.ArquivoRepository;
+import br.com.frotasPro.api.modules.arquivo.repository.ArquivoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;

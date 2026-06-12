@@ -9,7 +9,7 @@ import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.domain.enums.TipoMovimentacaoPneu;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.*;
-import br.com.frotasPro.api.service.notificacao.NotificacaoService;
+import br.com.frotasPro.api.modules.notificacao.service.NotificacaoService;
 import br.com.frotasPro.api.service.pneu.PneuService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

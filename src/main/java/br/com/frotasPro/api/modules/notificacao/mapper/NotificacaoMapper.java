@@ -1,7 +1,7 @@
-package br.com.frotasPro.api.mapper;
+package br.com.frotasPro.api.modules.notificacao.mapper;
 
-import br.com.frotasPro.api.controller.response.NotificacaoResponse;
-import br.com.frotasPro.api.domain.NotificacaoUsuario;
+import br.com.frotasPro.api.modules.notificacao.dto.response.NotificacaoResponse;
+import br.com.frotasPro.api.modules.notificacao.domain.NotificacaoUsuario;
 
 public class NotificacaoMapper {
 

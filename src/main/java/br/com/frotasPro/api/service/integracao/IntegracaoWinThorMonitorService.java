@@ -19,7 +19,7 @@ import br.com.frotasPro.api.repository.integracao.MotoristaSyncJobRepository;
 import br.com.frotasPro.api.service.caminhao.CaminhaoSyncJobService;
 import br.com.frotasPro.api.service.carga.CargaSyncJobService;
 import br.com.frotasPro.api.service.motorista.MotoristaSyncJobService;
-import br.com.frotasPro.api.service.notificacao.NotificacaoService;
+import br.com.frotasPro.api.modules.notificacao.service.NotificacaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

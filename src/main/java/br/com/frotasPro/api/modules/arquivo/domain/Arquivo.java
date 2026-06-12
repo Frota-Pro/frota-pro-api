@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.domain;
+package br.com.frotasPro.api.modules.arquivo.domain;
 
 import jakarta.persistence.*;
 import lombok.*;

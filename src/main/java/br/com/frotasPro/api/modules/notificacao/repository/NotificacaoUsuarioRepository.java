@@ -1,6 +1,6 @@
-package br.com.frotasPro.api.repository;
+package br.com.frotasPro.api.modules.notificacao.repository;
 
-import br.com.frotasPro.api.domain.NotificacaoUsuario;
+import br.com.frotasPro.api.modules.notificacao.domain.NotificacaoUsuario;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;

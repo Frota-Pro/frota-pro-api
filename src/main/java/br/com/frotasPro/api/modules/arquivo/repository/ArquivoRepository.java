@@ -1,6 +1,6 @@
-package br.com.frotasPro.api.repository;
+package br.com.frotasPro.api.modules.arquivo.repository;
 
-import br.com.frotasPro.api.domain.Arquivo;
+import br.com.frotasPro.api.modules.arquivo.domain.Arquivo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

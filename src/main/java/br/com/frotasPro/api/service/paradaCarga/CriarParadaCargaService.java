@@ -16,7 +16,7 @@ import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.EixoRepository;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;
 import br.com.frotasPro.api.repository.PneuRepository;
-import br.com.frotasPro.api.service.notificacao.NotificacaoService;
+import br.com.frotasPro.api.modules.notificacao.service.NotificacaoService;
 import br.com.frotasPro.api.service.pneu.PneuService;
 import br.com.frotasPro.api.util.AtualizarMetaConsumoCombustivelService;
 import br.com.frotasPro.api.util.CalcularMediaKmLitroService;

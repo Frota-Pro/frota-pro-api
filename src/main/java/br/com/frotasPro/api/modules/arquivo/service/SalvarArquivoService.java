@@ -1,8 +1,8 @@
-package br.com.frotasPro.api.service.arquivo;
+package br.com.frotasPro.api.modules.arquivo.service;
 
-import br.com.frotasPro.api.domain.Arquivo;
+import br.com.frotasPro.api.modules.arquivo.domain.Arquivo;
 import br.com.frotasPro.api.excption.BusinessException;
-import br.com.frotasPro.api.repository.ArquivoRepository;
+import br.com.frotasPro.api.modules.arquivo.repository.ArquivoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,8 +1,8 @@
 package br.com.frotasPro.api.service.motorista;
 
-import br.com.frotasPro.api.controller.response.ArquivoResponse;
+import br.com.frotasPro.api.modules.arquivo.dto.response.ArquivoResponse;
 import br.com.frotasPro.api.controller.response.DocumentoMotoristaResponse;
-import br.com.frotasPro.api.domain.Arquivo;
+import br.com.frotasPro.api.modules.arquivo.domain.Arquivo;
 import br.com.frotasPro.api.domain.DocumentoMotorista;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.DocumentoMotoristaRepository;

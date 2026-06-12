@@ -1,15 +1,15 @@
 package br.com.frotasPro.api.service.caminhao;
 
-import br.com.frotasPro.api.controller.response.ArquivoResponse;
+import br.com.frotasPro.api.modules.arquivo.dto.response.ArquivoResponse;
 import br.com.frotasPro.api.controller.response.DocumentoCaminhaoResponse;
-import br.com.frotasPro.api.domain.Arquivo;
+import br.com.frotasPro.api.modules.arquivo.domain.Arquivo;
 import br.com.frotasPro.api.domain.Caminhao;
 import br.com.frotasPro.api.domain.DocumentoCaminhao;
 import br.com.frotasPro.api.domain.enums.TipoDocumentoCaminhao;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.DocumentoCaminhaoRepository;
-import br.com.frotasPro.api.service.arquivo.SalvarArquivoService;
+import br.com.frotasPro.api.modules.arquivo.service.SalvarArquivoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

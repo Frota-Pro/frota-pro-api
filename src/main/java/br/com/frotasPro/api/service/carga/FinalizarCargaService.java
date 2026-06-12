@@ -9,7 +9,7 @@ import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
-import br.com.frotasPro.api.service.notificacao.NotificacaoService;
+import br.com.frotasPro.api.modules.notificacao.service.NotificacaoService;
 import br.com.frotasPro.api.util.AtualizarMetaCargaTransportadaService;
 import br.com.frotasPro.api.util.AtualizarMetaQuilometragemService;
 import br.com.frotasPro.api.util.AtualizarMetaToneladaService;

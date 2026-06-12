@@ -1,9 +1,9 @@
 package br.com.frotasPro.api.service.paradaCarga;
 
 import br.com.frotasPro.api.controller.response.AnexoParadaResponse;
-import br.com.frotasPro.api.controller.response.ArquivoResponse;
+import br.com.frotasPro.api.modules.arquivo.dto.response.ArquivoResponse;
 import br.com.frotasPro.api.domain.AnexoParada;
-import br.com.frotasPro.api.domain.Arquivo;
+import br.com.frotasPro.api.modules.arquivo.domain.Arquivo;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.AnexoParadaRepository;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;

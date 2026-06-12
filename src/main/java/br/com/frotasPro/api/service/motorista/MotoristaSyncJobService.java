@@ -5,7 +5,7 @@ import br.com.frotasPro.api.domain.enums.StatusSincronizacao;
 import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.domain.integracao.MotoristaSyncJob;
 import br.com.frotasPro.api.repository.integracao.MotoristaSyncJobRepository;
-import br.com.frotasPro.api.service.notificacao.NotificacaoService;
+import br.com.frotasPro.api.modules.notificacao.service.NotificacaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

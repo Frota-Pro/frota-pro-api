@@ -1,15 +1,15 @@
 package br.com.frotasPro.api.service.manutencao;
 
-import br.com.frotasPro.api.controller.response.ArquivoResponse;
+import br.com.frotasPro.api.modules.arquivo.dto.response.ArquivoResponse;
 import br.com.frotasPro.api.controller.response.DocumentoManutencaoResponse;
-import br.com.frotasPro.api.domain.Arquivo;
+import br.com.frotasPro.api.modules.arquivo.domain.Arquivo;
 import br.com.frotasPro.api.domain.DocumentoManutencao;
 import br.com.frotasPro.api.domain.Manutencao;
 import br.com.frotasPro.api.domain.enums.TipoDocumentoManutencao;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.DocumentoManutencaoRepository;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
-import br.com.frotasPro.api.service.arquivo.SalvarArquivoService;
+import br.com.frotasPro.api.modules.arquivo.service.SalvarArquivoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

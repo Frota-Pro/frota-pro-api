@@ -1,7 +1,7 @@
-﻿package br.com.frotasPro.api.controller;
+﻿package br.com.frotasPro.api.modules.notificacao.controller;
 
-import br.com.frotasPro.api.controller.response.NotificacaoResponse;
-import br.com.frotasPro.api.service.notificacao.NotificacaoService;
+import br.com.frotasPro.api.modules.notificacao.dto.response.NotificacaoResponse;
+import br.com.frotasPro.api.modules.notificacao.service.NotificacaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

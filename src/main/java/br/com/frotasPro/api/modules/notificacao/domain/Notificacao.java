@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.domain;
+package br.com.frotasPro.api.modules.notificacao.domain;
 
 import br.com.frotasPro.api.domain.enums.EventoNotificacao;
 import br.com.frotasPro.api.domain.enums.TipoNotificacao;

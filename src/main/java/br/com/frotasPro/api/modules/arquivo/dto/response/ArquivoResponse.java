@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.controller.response;
+package br.com.frotasPro.api.modules.arquivo.dto.response;
 
 import lombok.Getter;
 import lombok.Setter;

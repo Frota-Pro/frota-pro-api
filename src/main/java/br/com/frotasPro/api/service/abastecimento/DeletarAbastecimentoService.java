@@ -6,7 +6,7 @@ import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.excption.BusinessException;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
-import br.com.frotasPro.api.service.notificacao.NotificacaoService;
+import br.com.frotasPro.api.modules.notificacao.service.NotificacaoService;
 import br.com.frotasPro.api.util.AtualizarMetaConsumoCombustivelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
