@@ -1,7 +1,8 @@
 package br.com.frotasPro.api.modules.frota.dto.response;
 
-import br.com.frotasPro.api.domain.enums.Status;
 import com.fasterxml.jackson.annotation.JsonFormat;
+
+import br.com.frotasPro.api.shared.enums.Status;
 import lombok.*;
 
 import java.math.BigDecimal;

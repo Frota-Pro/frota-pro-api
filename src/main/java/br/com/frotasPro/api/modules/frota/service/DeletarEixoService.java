@@ -1,11 +1,11 @@
 package br.com.frotasPro.api.modules.frota.service;
 
 import br.com.frotasPro.api.modules.frota.domain.Eixo;
-import br.com.frotasPro.api.excption.ConflictException;
-import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.modules.frota.repository.EixoRepository;
 import br.com.frotasPro.api.modules.frota.repository.PneuInstalacaoAtualRepository;
 import br.com.frotasPro.api.modules.frota.repository.TrocaPneuManutencaoRepository;
+import br.com.frotasPro.api.shared.exception.ConflictException;
+import br.com.frotasPro.api.shared.exception.ObjectNotFound;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

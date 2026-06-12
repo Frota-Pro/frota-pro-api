@@ -7,7 +7,7 @@ import br.com.frotasPro.api.modules.frota.dto.response.PneuResponse;
 import br.com.frotasPro.api.modules.frota.dto.response.PneuVidaUtilResponse;
 import br.com.frotasPro.api.modules.frota.dto.response.RelatorioVidaUtilPneuResponse;
 import br.com.frotasPro.api.modules.frota.service.PneuService;
-import br.com.frotasPro.api.service.relatorios.RelatorioVidaUtilPneuService;
+import br.com.frotasPro.api.modules.relatorio.service.RelatorioVidaUtilPneuService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

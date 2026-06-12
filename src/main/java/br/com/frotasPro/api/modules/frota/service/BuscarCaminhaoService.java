@@ -2,9 +2,9 @@ package br.com.frotasPro.api.modules.frota.service;
 
 import br.com.frotasPro.api.modules.frota.dto.response.CaminhaoResponse;
 import br.com.frotasPro.api.modules.frota.domain.Caminhao;
-import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.modules.frota.mapper.CaminhaoMapper;
 import br.com.frotasPro.api.modules.frota.repository.CaminhaoRepository;
+import br.com.frotasPro.api.shared.exception.ObjectNotFound;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;

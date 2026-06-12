@@ -1,14 +1,16 @@
 package br.com.frotasPro.api.service.meta;
 
-import br.com.frotasPro.api.domain.Caminhao;
-import br.com.frotasPro.api.domain.Meta;
-import br.com.frotasPro.api.domain.enums.StatusMeta;
-import br.com.frotasPro.api.domain.enums.TipoMeta;
-import br.com.frotasPro.api.repository.CaminhaoRepository;
-import br.com.frotasPro.api.repository.MetaRepository;
-import br.com.frotasPro.api.repository.NotificacaoRepository;
-import br.com.frotasPro.api.service.notificacao.NotificacaoService;
-import br.com.frotasPro.api.util.MetaProgressoService;
+import br.com.frotasPro.api.modules.frota.domain.Caminhao;
+import br.com.frotasPro.api.modules.frota.repository.CaminhaoRepository;
+import br.com.frotasPro.api.modules.meta.domain.Meta;
+import br.com.frotasPro.api.modules.meta.repository.MetaRepository;
+import br.com.frotasPro.api.modules.meta.service.MetaCategoriaCaminhaoVinculoService;
+import br.com.frotasPro.api.modules.meta.service.MetaProgressoService;
+import br.com.frotasPro.api.modules.meta.service.ProcessarMetasDiariasService;
+import br.com.frotasPro.api.modules.notificacao.repository.NotificacaoRepository;
+import br.com.frotasPro.api.modules.notificacao.service.NotificacaoService;
+import br.com.frotasPro.api.shared.enums.StatusMeta;
+import br.com.frotasPro.api.shared.enums.TipoMeta;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

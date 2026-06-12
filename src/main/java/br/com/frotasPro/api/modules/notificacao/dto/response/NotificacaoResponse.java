@@ -1,11 +1,12 @@
 package br.com.frotasPro.api.modules.notificacao.dto.response;
 
-import br.com.frotasPro.api.domain.enums.EventoNotificacao;
-import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import br.com.frotasPro.api.shared.enums.EventoNotificacao;
+import br.com.frotasPro.api.shared.enums.TipoNotificacao;
 
 @Getter
 @Setter

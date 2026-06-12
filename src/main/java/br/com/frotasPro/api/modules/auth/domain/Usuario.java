@@ -9,6 +9,8 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import br.com.frotasPro.api.shared.domain.AuditoriaBase;
 @Getter
 @Setter
 @AllArgsConstructor

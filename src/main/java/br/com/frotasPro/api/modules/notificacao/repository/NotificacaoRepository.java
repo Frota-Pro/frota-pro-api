@@ -1,7 +1,8 @@
 package br.com.frotasPro.api.modules.notificacao.repository;
 
 import br.com.frotasPro.api.modules.notificacao.domain.Notificacao;
-import br.com.frotasPro.api.domain.enums.EventoNotificacao;
+import br.com.frotasPro.api.shared.enums.EventoNotificacao;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;

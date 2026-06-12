@@ -1,12 +1,15 @@
 package br.com.frotasPro.api.modules.frota.domain;
 
-import br.com.frotasPro.api.domain.enums.LadoPneu;
-import br.com.frotasPro.api.domain.enums.PosicaoPneu;
-import br.com.frotasPro.api.domain.enums.TipoTrocaPneu;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.UUID;
+
+import br.com.frotasPro.api.modules.manutencao.domain.Manutencao;
+import br.com.frotasPro.api.shared.domain.AuditoriaBase;
+import br.com.frotasPro.api.shared.enums.LadoPneu;
+import br.com.frotasPro.api.shared.enums.PosicaoPneu;
+import br.com.frotasPro.api.shared.enums.TipoTrocaPneu;
 
 @Getter
 @Setter

@@ -1,6 +1,5 @@
 package br.com.frotasPro.api.modules.frota.domain;
 
-import br.com.frotasPro.api.domain.enums.StatusPneu;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,6 +7,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import br.com.frotasPro.api.shared.enums.StatusPneu;
 
 @Getter
 @Setter

@@ -1,8 +1,10 @@
 package br.com.frotasPro.api.integracao.kafka;
 
-import br.com.frotasPro.api.integracao.dto.CargaSyncResponseEvent;
-import br.com.frotasPro.api.service.carga.CargaSyncJobService;
-import br.com.frotasPro.api.service.carga.SincronizarCargaService;
+import br.com.frotasPro.api.modules.integracao.dto.response.CargaSyncResponseEvent;
+import br.com.frotasPro.api.modules.integracao.kafka.CargaSyncResponseConsumer;
+import br.com.frotasPro.api.modules.logistica.service.CargaSyncJobService;
+import br.com.frotasPro.api.modules.logistica.service.SincronizarCargaService;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;

@@ -1,0 +1,75 @@
+﻿package br.com.frotasPro.api.modules.logistica.controller;
+
+import br.com.frotasPro.api.modules.logistica.dto.request.AjudanteRequest;
+import br.com.frotasPro.api.modules.frota.dto.request.CaminhaoRequest;
+import br.com.frotasPro.api.modules.logistica.dto.response.AjudanteResponse;
+import br.com.frotasPro.api.modules.frota.dto.response.CaminhaoResponse;
+import br.com.frotasPro.api.modules.logistica.service.*;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
+
+@RestController
+@RequestMapping("/ajudantes")
+@RequiredArgsConstructor
+public class AjudanteController {
+
+    private final ListarAjudanteService listarAjudanteService;
+    private final BuscarAjudanteService buscarAjudanteService;
+    private final CriarAjudanteService criarAjudanteService;
+    private final AtualizarAjudanteService atualizarAjudanteService;
+    private final DeletarAjudanteService deletarAjudanteService;
+
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
+    @GetMapping
+    public ResponseEntity<Page<AjudanteResponse>> listar(Pageable pageable) {
+        Page<AjudanteResponse> ajudantes = listarAjudanteService.listar(pageable);
+        return ResponseEntity.ok(ajudantes);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
+    @GetMapping("/{codigo}")
+    public ResponseEntity<AjudanteResponse> buscarPorCodigo(@PathVariable String codigo) {
+        AjudanteResponse ajudante = buscarAjudanteService.buscarPorCodigo(codigo);
+        return ResponseEntity.ok(ajudante);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
+    @PostMapping
+    public ResponseEntity<AjudanteResponse> registrar(
+            @Valid @RequestBody AjudanteRequest request) {
+
+        AjudanteResponse ajudante = criarAjudanteService.criar(request);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{codigo}")
+                .buildAndExpand(ajudante.getCodigo())
+                .toUri();
+
+        return ResponseEntity.created(location).body(ajudante);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
+    @PutMapping("/{codigo}")
+    public ResponseEntity<AjudanteResponse> atualizar(
+            @PathVariable String codigo,
+            @Valid @RequestBody AjudanteRequest request) {
+
+        AjudanteResponse ajudanteAtualizado = atualizarAjudanteService.atualizar(codigo, request);
+        return ResponseEntity.ok(ajudanteAtualizado);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
+    @DeleteMapping("/{codigo}")
+    public ResponseEntity<Void> deletar(@PathVariable String codigo) {
+        deletarAjudanteService.desativar(codigo);
+        return ResponseEntity.noContent().build();
+    }
+}

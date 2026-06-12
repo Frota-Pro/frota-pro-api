@@ -1,14 +1,16 @@
 package br.com.frotasPro.api.service.eixo;
 
-import br.com.frotasPro.api.domain.Caminhao;
-import br.com.frotasPro.api.domain.Eixo;
-import br.com.frotasPro.api.repository.EixoRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+
+import br.com.frotasPro.api.modules.frota.domain.Caminhao;
+import br.com.frotasPro.api.modules.frota.domain.Eixo;
+import br.com.frotasPro.api.modules.frota.repository.EixoRepository;
+import br.com.frotasPro.api.modules.frota.service.ListarEixosPorCaminhaoService;
 
 import java.util.List;
 import java.util.UUID;

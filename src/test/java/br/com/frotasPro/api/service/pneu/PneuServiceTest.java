@@ -1,15 +1,17 @@
 package br.com.frotasPro.api.service.pneu;
 
-import br.com.frotasPro.api.controller.request.PneuMovimentacaoRequest;
-import br.com.frotasPro.api.domain.Pneu;
-import br.com.frotasPro.api.domain.PneuInstalacaoAtual;
-import br.com.frotasPro.api.domain.PneuMovimentacao;
-import br.com.frotasPro.api.domain.enums.StatusPneu;
-import br.com.frotasPro.api.domain.enums.TipoMovimentacaoPneu;
-import br.com.frotasPro.api.repository.CaminhaoRepository;
-import br.com.frotasPro.api.repository.PneuInstalacaoAtualRepository;
-import br.com.frotasPro.api.repository.PneuMovimentacaoRepository;
-import br.com.frotasPro.api.repository.PneuRepository;
+import br.com.frotasPro.api.modules.frota.domain.Pneu;
+import br.com.frotasPro.api.modules.frota.domain.PneuInstalacaoAtual;
+import br.com.frotasPro.api.modules.frota.domain.PneuMovimentacao;
+import br.com.frotasPro.api.modules.frota.dto.request.PneuMovimentacaoRequest;
+import br.com.frotasPro.api.modules.frota.repository.CaminhaoRepository;
+import br.com.frotasPro.api.modules.frota.repository.PneuInstalacaoAtualRepository;
+import br.com.frotasPro.api.modules.frota.repository.PneuMovimentacaoRepository;
+import br.com.frotasPro.api.modules.frota.repository.PneuRepository;
+import br.com.frotasPro.api.modules.frota.service.PneuService;
+import br.com.frotasPro.api.shared.enums.StatusPneu;
+import br.com.frotasPro.api.shared.enums.TipoMovimentacaoPneu;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -5,6 +5,8 @@ import lombok.Setter;
 
 import java.util.UUID;
 
+import br.com.frotasPro.api.modules.arquivo.dto.response.ArquivoResponse;
+
 @Getter
 @Setter
 public class DocumentoCaminhaoResponse {

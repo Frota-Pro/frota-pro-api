@@ -1,13 +1,5 @@
 package br.com.frotasPro.api.auth;
 
-import br.com.frotasPro.api.controller.LoginController;
-import br.com.frotasPro.api.controller.AuthController;
-import br.com.frotasPro.api.controller.request.LoginRequest;
-import br.com.frotasPro.api.controller.response.LoginResponse;
-import br.com.frotasPro.api.domain.Usuario;
-import br.com.frotasPro.api.repository.UsuarioRepository;
-import br.com.frotasPro.api.service.auth.AuthTokenService;
-import br.com.frotasPro.api.service.usuario.UsuarioLoginService;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.JOSEException;
@@ -19,6 +11,16 @@ import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+
+import br.com.frotasPro.api.modules.auth.controller.AuthController;
+import br.com.frotasPro.api.modules.auth.controller.LoginController;
+import br.com.frotasPro.api.modules.auth.domain.Usuario;
+import br.com.frotasPro.api.modules.auth.dto.request.LoginRequest;
+import br.com.frotasPro.api.modules.auth.dto.response.LoginResponse;
+import br.com.frotasPro.api.modules.auth.repository.UsuarioRepository;
+import br.com.frotasPro.api.modules.auth.service.AuthTokenService;
+import br.com.frotasPro.api.modules.auth.service.UsuarioLoginService;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.springframework.boot.test.context.TestConfiguration;

@@ -6,6 +6,9 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import br.com.frotasPro.api.modules.auth.domain.Usuario;
+import br.com.frotasPro.api.shared.domain.AuditoriaBase;
+
 @Getter
 @Setter
 @AllArgsConstructor

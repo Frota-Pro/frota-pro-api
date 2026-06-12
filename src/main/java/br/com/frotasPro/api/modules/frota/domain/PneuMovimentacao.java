@@ -1,12 +1,13 @@
 package br.com.frotasPro.api.modules.frota.domain;
 
-import br.com.frotasPro.api.domain.enums.TipoMovimentacaoPneu;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import br.com.frotasPro.api.shared.enums.TipoMovimentacaoPneu;
 
 @Getter
 @Setter

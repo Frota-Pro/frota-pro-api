@@ -1,11 +1,11 @@
 package br.com.frotasPro.api.modules.frota.service;
 
-import br.com.frotasPro.api.domain.enums.EventoNotificacao;
-import br.com.frotasPro.api.domain.enums.StatusSincronizacao;
-import br.com.frotasPro.api.domain.enums.TipoNotificacao;
-import br.com.frotasPro.api.domain.integracao.CaminhaoSyncJob;
-import br.com.frotasPro.api.repository.integracao.CaminhaoSyncJobRepository;
+import br.com.frotasPro.api.modules.integracao.domain.CaminhaoSyncJob;
+import br.com.frotasPro.api.modules.integracao.repository.CaminhaoSyncJobRepository;
 import br.com.frotasPro.api.modules.notificacao.service.NotificacaoService;
+import br.com.frotasPro.api.shared.enums.EventoNotificacao;
+import br.com.frotasPro.api.shared.enums.StatusSincronizacao;
+import br.com.frotasPro.api.shared.enums.TipoNotificacao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

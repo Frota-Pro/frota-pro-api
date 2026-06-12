@@ -5,10 +5,10 @@ import br.com.frotasPro.api.modules.frota.dto.response.DocumentoCaminhaoResponse
 import br.com.frotasPro.api.modules.arquivo.domain.Arquivo;
 import br.com.frotasPro.api.modules.frota.domain.Caminhao;
 import br.com.frotasPro.api.modules.frota.domain.DocumentoCaminhao;
-import br.com.frotasPro.api.domain.enums.TipoDocumentoCaminhao;
-import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.modules.frota.repository.CaminhaoRepository;
 import br.com.frotasPro.api.modules.frota.repository.DocumentoCaminhaoRepository;
+import br.com.frotasPro.api.shared.enums.TipoDocumentoCaminhao;
+import br.com.frotasPro.api.shared.exception.ObjectNotFound;
 import br.com.frotasPro.api.modules.arquivo.service.SalvarArquivoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

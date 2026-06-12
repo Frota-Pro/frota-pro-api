@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.util.UUID;
 
+import br.com.frotasPro.api.shared.domain.AuditoriaBase;
+
 @Getter
 @Setter
 @AllArgsConstructor

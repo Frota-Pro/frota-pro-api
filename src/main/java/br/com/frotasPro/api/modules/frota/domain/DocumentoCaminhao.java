@@ -1,11 +1,14 @@
 package br.com.frotasPro.api.modules.frota.domain;
 
-import br.com.frotasPro.api.domain.enums.TipoDocumentoCaminhao;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.util.UUID;
+
+import br.com.frotasPro.api.modules.arquivo.domain.Arquivo;
+import br.com.frotasPro.api.shared.domain.AuditoriaBase;
+import br.com.frotasPro.api.shared.enums.TipoDocumentoCaminhao;
 
 @Getter
 @Setter

@@ -1,0 +1,72 @@
+package br.com.frotasPro.api.modules.logistica.domain;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import br.com.frotasPro.api.modules.abastecimento.domain.Abastecimento;
+import br.com.frotasPro.api.modules.manutencao.domain.Manutencao;
+import br.com.frotasPro.api.shared.domain.AuditoriaBase;
+import br.com.frotasPro.api.shared.enums.TipoParada;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Entity
+@Table(name = "tb_parada_carga")
+public class ParadaCarga extends AuditoriaBase{
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(columnDefinition = "uuid")
+    private UUID id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "carga_id", nullable = false)
+    private Carga carga;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_parada", length = 30, nullable = false)
+    private TipoParada tipoParada;
+
+    @Column(name = "dt_inicio", nullable = false)
+    private LocalDateTime dtInicio;
+
+    @Column(name = "dt_fim")
+    private LocalDateTime dtFim;
+
+    @Column(length = 150)
+    private String cidade;
+
+    @Column(length = 150)
+    private String local;
+
+    @Column(name = "km_odometro")
+    private Integer kmOdometro;
+
+    @Column(length = 500)
+    private String observacao;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "paradaCarga", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DespesaParada> despesaParadas = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "parada", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AnexoParada> anexos = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "paradaCarga", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Abastecimento> abastecimentos = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "paradaCarga", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Manutencao> manutencoes = new ArrayList<>();
+
+}

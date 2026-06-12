@@ -1,8 +1,8 @@
 package br.com.frotasPro.api.modules.frota.dto.request;
 
-import br.com.frotasPro.api.domain.enums.LadoPneu;
-import br.com.frotasPro.api.domain.enums.PosicaoPneu;
-import br.com.frotasPro.api.domain.enums.TipoTrocaPneu;
+import br.com.frotasPro.api.shared.enums.LadoPneu;
+import br.com.frotasPro.api.shared.enums.PosicaoPneu;
+import br.com.frotasPro.api.shared.enums.TipoTrocaPneu;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;

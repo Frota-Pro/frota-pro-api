@@ -1,9 +1,9 @@
 package br.com.frotasPro.api.modules.frota.service;
 
 import br.com.frotasPro.api.modules.frota.domain.Caminhao;
-import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.modules.frota.repository.CaminhaoRepository;
-import br.com.frotasPro.api.service.meta.MetaCategoriaCaminhaoVinculoService;
+import br.com.frotasPro.api.modules.meta.service.MetaCategoriaCaminhaoVinculoService;
+import br.com.frotasPro.api.shared.exception.ObjectNotFound;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

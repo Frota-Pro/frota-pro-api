@@ -8,6 +8,8 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.util.List;
 
+import br.com.frotasPro.api.modules.meta.dto.response.MetaResponse;
+
 @Getter
 @Setter
 @AllArgsConstructor

@@ -5,11 +5,12 @@ import br.com.frotasPro.api.modules.auth.dto.request.UsuarioSenhaSelfRequest;
 import br.com.frotasPro.api.modules.auth.dto.request.UsuarioSenhaUpdateRequest;
 import br.com.frotasPro.api.modules.auth.dto.request.UsuarioUpdateRequest;
 import br.com.frotasPro.api.modules.auth.dto.response.UsuarioResponse;
+import br.com.frotasPro.api.modules.auth.mapper.UsuarioMapper;
 import br.com.frotasPro.api.modules.auth.domain.Acesso;
-import br.com.frotasPro.api.domain.Motorista;
+import br.com.frotasPro.api.modules.logistica.domain.Motorista;
 import br.com.frotasPro.api.modules.auth.domain.Usuario;
 import br.com.frotasPro.api.modules.auth.repository.AcessoRepository;
-import br.com.frotasPro.api.repository.MotoristaRepository;
+import br.com.frotasPro.api.modules.logistica.repository.MotoristaRepository;
 import br.com.frotasPro.api.modules.auth.repository.UsuarioRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static br.com.frotasPro.api.mapper.UsuarioMapper.toResponse;
+import static br.com.frotasPro.api.modules.auth.mapper.UsuarioMapper.toResponse;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @Service
@@ -76,7 +77,7 @@ public class UsuarioService {
     }
 
     public org.springframework.data.domain.Page<UsuarioResponse> listar(String q, Boolean ativo, org.springframework.data.domain.Pageable pageable) {
-        return usuarioRepository.search(q, ativo, pageable).map(br.com.frotasPro.api.mapper.UsuarioMapper::toResponse);
+        return usuarioRepository.search(q, ativo, pageable).map(UsuarioMapper::toResponse);
     }
 
     @Cacheable("usuario_buscar_id")

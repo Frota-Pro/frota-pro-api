@@ -1,11 +1,13 @@
 package br.com.frotasPro.api.modules.notificacao.domain;
 
-import br.com.frotasPro.api.domain.enums.EventoNotificacao;
-import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.UUID;
+
+import br.com.frotasPro.api.shared.domain.AuditoriaBase;
+import br.com.frotasPro.api.shared.enums.EventoNotificacao;
+import br.com.frotasPro.api.shared.enums.TipoNotificacao;
 
 @Getter
 @Setter

@@ -1,7 +1,8 @@
 package br.com.frotasPro.api.modules.frota.repository;
 
 import br.com.frotasPro.api.modules.frota.domain.Pneu;
-import br.com.frotasPro.api.domain.enums.StatusPneu;
+import br.com.frotasPro.api.shared.enums.StatusPneu;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

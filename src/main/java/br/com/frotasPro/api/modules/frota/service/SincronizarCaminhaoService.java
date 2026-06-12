@@ -1,10 +1,10 @@
 package br.com.frotasPro.api.modules.frota.service;
 
 import br.com.frotasPro.api.modules.frota.domain.Caminhao;
-import br.com.frotasPro.api.domain.enums.Status;
-import br.com.frotasPro.api.integracao.dto.CaminhaoSyncResponseEvent;
-import br.com.frotasPro.api.integracao.dto.CaminhaoWinThorDto;
 import br.com.frotasPro.api.modules.frota.repository.CaminhaoRepository;
+import br.com.frotasPro.api.modules.integracao.dto.CaminhaoWinThorDto;
+import br.com.frotasPro.api.modules.integracao.dto.response.CaminhaoSyncResponseEvent;
+import br.com.frotasPro.api.shared.enums.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

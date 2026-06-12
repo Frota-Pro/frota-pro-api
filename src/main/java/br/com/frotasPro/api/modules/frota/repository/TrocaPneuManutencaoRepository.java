@@ -1,8 +1,9 @@
 package br.com.frotasPro.api.modules.frota.repository;
 
 import br.com.frotasPro.api.modules.frota.domain.TrocaPneuManutencao;
-import br.com.frotasPro.api.domain.enums.LadoPneu;
-import br.com.frotasPro.api.domain.enums.PosicaoPneu;
+import br.com.frotasPro.api.shared.enums.LadoPneu;
+import br.com.frotasPro.api.shared.enums.PosicaoPneu;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

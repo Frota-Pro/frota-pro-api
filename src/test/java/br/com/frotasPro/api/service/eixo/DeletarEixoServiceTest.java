@@ -1,12 +1,14 @@
 package br.com.frotasPro.api.service.eixo;
 
-import br.com.frotasPro.api.domain.Caminhao;
-import br.com.frotasPro.api.domain.Eixo;
-import br.com.frotasPro.api.excption.ConflictException;
-import br.com.frotasPro.api.excption.ObjectNotFound;
-import br.com.frotasPro.api.repository.EixoRepository;
-import br.com.frotasPro.api.repository.PneuInstalacaoAtualRepository;
-import br.com.frotasPro.api.repository.TrocaPneuManutencaoRepository;
+import br.com.frotasPro.api.modules.frota.domain.Caminhao;
+import br.com.frotasPro.api.modules.frota.domain.Eixo;
+import br.com.frotasPro.api.modules.frota.repository.EixoRepository;
+import br.com.frotasPro.api.modules.frota.repository.PneuInstalacaoAtualRepository;
+import br.com.frotasPro.api.modules.frota.repository.TrocaPneuManutencaoRepository;
+import br.com.frotasPro.api.modules.frota.service.DeletarEixoService;
+import br.com.frotasPro.api.shared.exception.ConflictException;
+import br.com.frotasPro.api.shared.exception.ObjectNotFound;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

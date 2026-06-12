@@ -1,0 +1,17 @@
+package br.com.frotasPro.api.modules.manutencao.dto.response;
+
+import lombok.Builder;
+import lombok.Getter;
+
+import java.util.UUID;
+
+@Getter
+@Builder
+public class MecanicoResponse {
+
+    private UUID id;
+    private String nome;
+    private String codigo;
+    private String codigoOficina;
+    private String oficina;
+}

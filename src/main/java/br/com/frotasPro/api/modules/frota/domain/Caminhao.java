@@ -1,6 +1,5 @@
 package br.com.frotasPro.api.modules.frota.domain;
 
-import br.com.frotasPro.api.domain.enums.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,6 +11,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import br.com.frotasPro.api.modules.meta.domain.Meta;
+import br.com.frotasPro.api.shared.domain.AuditoriaBase;
+import br.com.frotasPro.api.shared.enums.Status;
 
 @Getter
 @Setter

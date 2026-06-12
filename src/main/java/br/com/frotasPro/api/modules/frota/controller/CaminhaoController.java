@@ -5,8 +5,8 @@ import br.com.frotasPro.api.modules.frota.dto.request.VincularCategoriaCaminhaoE
 import br.com.frotasPro.api.modules.frota.dto.response.CaminhaoDetalheResponse;
 import br.com.frotasPro.api.modules.frota.dto.response.CaminhaoResponse;
 import br.com.frotasPro.api.modules.frota.dto.response.DocumentoCaminhaoResponse;
-import br.com.frotasPro.api.domain.enums.TipoDocumentoCaminhao;
 import br.com.frotasPro.api.modules.frota.service.*;
+import br.com.frotasPro.api.shared.enums.TipoDocumentoCaminhao;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
