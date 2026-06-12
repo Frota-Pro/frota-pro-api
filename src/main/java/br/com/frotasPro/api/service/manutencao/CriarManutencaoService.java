@@ -1,7 +1,7 @@
 package br.com.frotasPro.api.service.manutencao;
 
 import br.com.frotasPro.api.controller.request.ManutencaoRequest;
-import br.com.frotasPro.api.controller.request.PneuMovimentacaoRequest;
+import br.com.frotasPro.api.modules.frota.dto.request.PneuMovimentacaoRequest;
 import br.com.frotasPro.api.controller.response.ManutencaoResponse;
 import br.com.frotasPro.api.domain.*;
 import br.com.frotasPro.api.domain.enums.EventoNotificacao;
@@ -10,7 +10,7 @@ import br.com.frotasPro.api.domain.enums.TipoMovimentacaoPneu;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.*;
 import br.com.frotasPro.api.modules.notificacao.service.NotificacaoService;
-import br.com.frotasPro.api.service.pneu.PneuService;
+import br.com.frotasPro.api.modules.frota.service.PneuService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

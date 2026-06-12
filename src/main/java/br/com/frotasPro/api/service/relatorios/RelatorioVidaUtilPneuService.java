@@ -1,16 +1,16 @@
 package br.com.frotasPro.api.service.relatorios;
 
-import br.com.frotasPro.api.controller.response.RelatorioVidaUtilPneuResponse;
-import br.com.frotasPro.api.controller.response.VidaUtilPneuResponse;
-import br.com.frotasPro.api.domain.Caminhao;
-import br.com.frotasPro.api.domain.Pneu;
-import br.com.frotasPro.api.domain.PneuInstalacaoAtual;
-import br.com.frotasPro.api.domain.TrocaPneuManutencao;
-import br.com.frotasPro.api.repository.CaminhaoRepository;
-import br.com.frotasPro.api.repository.PneuInstalacaoAtualRepository;
-import br.com.frotasPro.api.repository.PneuMovimentacaoRepository;
-import br.com.frotasPro.api.repository.PneuRepository;
-import br.com.frotasPro.api.repository.TrocaPneuManutencaoRepository;
+import br.com.frotasPro.api.modules.frota.dto.response.RelatorioVidaUtilPneuResponse;
+import br.com.frotasPro.api.modules.frota.dto.response.VidaUtilPneuResponse;
+import br.com.frotasPro.api.modules.frota.domain.Caminhao;
+import br.com.frotasPro.api.modules.frota.domain.Pneu;
+import br.com.frotasPro.api.modules.frota.domain.PneuInstalacaoAtual;
+import br.com.frotasPro.api.modules.frota.domain.TrocaPneuManutencao;
+import br.com.frotasPro.api.modules.frota.repository.CaminhaoRepository;
+import br.com.frotasPro.api.modules.frota.repository.PneuInstalacaoAtualRepository;
+import br.com.frotasPro.api.modules.frota.repository.PneuMovimentacaoRepository;
+import br.com.frotasPro.api.modules.frota.repository.PneuRepository;
+import br.com.frotasPro.api.modules.frota.repository.TrocaPneuManutencaoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

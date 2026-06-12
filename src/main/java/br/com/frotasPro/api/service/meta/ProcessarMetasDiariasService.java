@@ -1,11 +1,11 @@
 package br.com.frotasPro.api.service.meta;
 
-import br.com.frotasPro.api.domain.Caminhao;
+import br.com.frotasPro.api.modules.frota.domain.Caminhao;
 import br.com.frotasPro.api.domain.Meta;
 import br.com.frotasPro.api.domain.enums.EventoNotificacao;
 import br.com.frotasPro.api.domain.enums.StatusMeta;
 import br.com.frotasPro.api.domain.enums.TipoNotificacao;
-import br.com.frotasPro.api.repository.CaminhaoRepository;
+import br.com.frotasPro.api.modules.frota.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.MetaRepository;
 import br.com.frotasPro.api.modules.notificacao.repository.NotificacaoRepository;
 import br.com.frotasPro.api.modules.notificacao.service.NotificacaoService;

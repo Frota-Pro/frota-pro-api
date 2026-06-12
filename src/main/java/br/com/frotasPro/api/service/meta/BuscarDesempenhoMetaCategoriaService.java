@@ -1,13 +1,13 @@
 package br.com.frotasPro.api.service.meta;
 
 import br.com.frotasPro.api.controller.response.MetaCategoriaDesempenhoResponse;
-import br.com.frotasPro.api.domain.Caminhao;
-import br.com.frotasPro.api.domain.CategoriaCaminhao;
+import br.com.frotasPro.api.modules.frota.domain.Caminhao;
+import br.com.frotasPro.api.modules.frota.domain.CategoriaCaminhao;
 import br.com.frotasPro.api.domain.Meta;
 import br.com.frotasPro.api.domain.enums.StatusMeta;
 import br.com.frotasPro.api.excption.ObjectNotFound;
-import br.com.frotasPro.api.repository.CaminhaoRepository;
-import br.com.frotasPro.api.repository.CategoriaCaminhaoRepository;
+import br.com.frotasPro.api.modules.frota.repository.CaminhaoRepository;
+import br.com.frotasPro.api.modules.frota.repository.CategoriaCaminhaoRepository;
 import br.com.frotasPro.api.repository.MetaRepository;
 import br.com.frotasPro.api.util.MetaProgressoService;
 import lombok.RequiredArgsConstructor;

@@ -16,7 +16,7 @@ import br.com.frotasPro.api.integracao.kafka.MotoristaSyncRequestProducer;
 import br.com.frotasPro.api.repository.integracao.CaminhaoSyncJobRepository;
 import br.com.frotasPro.api.repository.integracao.CargaSyncJobRepository;
 import br.com.frotasPro.api.repository.integracao.MotoristaSyncJobRepository;
-import br.com.frotasPro.api.service.caminhao.CaminhaoSyncJobService;
+import br.com.frotasPro.api.modules.frota.service.CaminhaoSyncJobService;
 import br.com.frotasPro.api.service.carga.CargaSyncJobService;
 import br.com.frotasPro.api.service.motorista.MotoristaSyncJobService;
 import br.com.frotasPro.api.modules.notificacao.service.NotificacaoService;

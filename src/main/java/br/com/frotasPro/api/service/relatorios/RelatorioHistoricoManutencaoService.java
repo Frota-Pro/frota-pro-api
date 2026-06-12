@@ -1,9 +1,9 @@
 package br.com.frotasPro.api.service.relatorios;
 
 import br.com.frotasPro.api.controller.response.RelatorioHistoricoManutencaoResponse;
-import br.com.frotasPro.api.domain.Caminhao;
+import br.com.frotasPro.api.modules.frota.domain.Caminhao;
 import br.com.frotasPro.api.domain.Manutencao;
-import br.com.frotasPro.api.repository.CaminhaoRepository;
+import br.com.frotasPro.api.modules.frota.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
 import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.RequiredArgsConstructor;

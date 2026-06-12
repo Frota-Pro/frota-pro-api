@@ -2,7 +2,7 @@ package br.com.frotasPro.api.service.manutencao;
 
 import br.com.frotasPro.api.controller.request.ManutencaoRequest;
 import br.com.frotasPro.api.controller.response.ManutencaoResponse;
-import br.com.frotasPro.api.domain.Caminhao;
+import br.com.frotasPro.api.modules.frota.domain.Caminhao;
 import br.com.frotasPro.api.domain.Manutencao;
 import br.com.frotasPro.api.domain.ManutencaoItem;
 import br.com.frotasPro.api.domain.Oficina;
@@ -10,7 +10,7 @@ import br.com.frotasPro.api.domain.ParadaCarga;
 import br.com.frotasPro.api.domain.enums.EventoNotificacao;
 import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.excption.ObjectNotFound;
-import br.com.frotasPro.api.repository.CaminhaoRepository;
+import br.com.frotasPro.api.modules.frota.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
 import br.com.frotasPro.api.repository.OficinaRepository;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;

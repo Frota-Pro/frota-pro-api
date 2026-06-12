@@ -1,8 +1,8 @@
 package br.com.frotasPro.api.integracao.kafka;
 
 import br.com.frotasPro.api.integracao.dto.CaminhaoSyncResponseEvent;
-import br.com.frotasPro.api.service.caminhao.CaminhaoSyncJobService;
-import br.com.frotasPro.api.service.caminhao.SincronizarCaminhaoService;
+import br.com.frotasPro.api.modules.frota.service.CaminhaoSyncJobService;
+import br.com.frotasPro.api.modules.frota.service.SincronizarCaminhaoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;

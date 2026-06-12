@@ -1,7 +1,7 @@
 package br.com.frotasPro.api.service.paradaCarga;
 
 import br.com.frotasPro.api.controller.request.ParadaCargaRequest;
-import br.com.frotasPro.api.controller.request.PneuMovimentacaoRequest;
+import br.com.frotasPro.api.modules.frota.dto.request.PneuMovimentacaoRequest;
 import br.com.frotasPro.api.controller.response.ParadaCargaResponse;
 import br.com.frotasPro.api.domain.*;
 import br.com.frotasPro.api.domain.enums.TipoDespesa;
@@ -13,11 +13,11 @@ import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.excption.BusinessException;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.CargaRepository;
-import br.com.frotasPro.api.repository.EixoRepository;
+import br.com.frotasPro.api.modules.frota.repository.EixoRepository;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;
-import br.com.frotasPro.api.repository.PneuRepository;
+import br.com.frotasPro.api.modules.frota.repository.PneuRepository;
 import br.com.frotasPro.api.modules.notificacao.service.NotificacaoService;
-import br.com.frotasPro.api.service.pneu.PneuService;
+import br.com.frotasPro.api.modules.frota.service.PneuService;
 import br.com.frotasPro.api.util.AtualizarMetaConsumoCombustivelService;
 import br.com.frotasPro.api.util.CalcularMediaKmLitroService;
 import lombok.RequiredArgsConstructor;

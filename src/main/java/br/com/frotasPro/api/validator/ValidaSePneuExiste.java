@@ -1,6 +1,6 @@
 package br.com.frotasPro.api.validator;
 
-import br.com.frotasPro.api.repository.PneuRepository;
+import br.com.frotasPro.api.modules.frota.repository.PneuRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;

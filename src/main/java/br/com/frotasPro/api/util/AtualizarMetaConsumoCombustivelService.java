@@ -1,6 +1,6 @@
 package br.com.frotasPro.api.util;
 
-import br.com.frotasPro.api.domain.Caminhao;
+import br.com.frotasPro.api.modules.frota.domain.Caminhao;
 import br.com.frotasPro.api.domain.Meta;
 import br.com.frotasPro.api.domain.Motorista;
 import br.com.frotasPro.api.domain.enums.StatusMeta;

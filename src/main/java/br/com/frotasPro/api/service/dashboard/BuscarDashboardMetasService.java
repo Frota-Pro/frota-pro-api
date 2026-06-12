@@ -1,7 +1,7 @@
 package br.com.frotasPro.api.service.dashboard;
 
 import br.com.frotasPro.api.controller.response.DashboardMetasResponse;
-import br.com.frotasPro.api.domain.CategoriaCaminhao;
+import br.com.frotasPro.api.modules.frota.domain.CategoriaCaminhao;
 import br.com.frotasPro.api.domain.MetaResultado;
 import br.com.frotasPro.api.domain.enums.StatusMeta;
 import br.com.frotasPro.api.repository.MetaRepository;

@@ -8,7 +8,7 @@ import br.com.frotasPro.api.domain.enums.StatusTransferenciaCarga;
 import br.com.frotasPro.api.integracao.dto.CargaSyncResponseEvent;
 import br.com.frotasPro.api.integracao.dto.CargaWinThorDto;
 import br.com.frotasPro.api.integracao.dto.ClienteCargaWinThorDto;
-import br.com.frotasPro.api.repository.CaminhaoRepository;
+import br.com.frotasPro.api.modules.frota.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.CargaNotaRepository;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.CargaTransferenciaRepository;

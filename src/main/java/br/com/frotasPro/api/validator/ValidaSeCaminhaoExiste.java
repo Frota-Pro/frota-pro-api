@@ -1,6 +1,6 @@
 package br.com.frotasPro.api.validator;
 
-import br.com.frotasPro.api.repository.CaminhaoRepository;
+import br.com.frotasPro.api.modules.frota.repository.CaminhaoRepository;
 import lombok.AllArgsConstructor;
 
 import org.springframework.stereotype.Component;

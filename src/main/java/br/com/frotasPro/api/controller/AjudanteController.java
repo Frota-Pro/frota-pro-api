@@ -1,9 +1,9 @@
 ﻿package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.AjudanteRequest;
-import br.com.frotasPro.api.controller.request.CaminhaoRequest;
+import br.com.frotasPro.api.modules.frota.dto.request.CaminhaoRequest;
 import br.com.frotasPro.api.controller.response.AjudanteResponse;
-import br.com.frotasPro.api.controller.response.CaminhaoResponse;
+import br.com.frotasPro.api.modules.frota.dto.response.CaminhaoResponse;
 import br.com.frotasPro.api.service.ajudante.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

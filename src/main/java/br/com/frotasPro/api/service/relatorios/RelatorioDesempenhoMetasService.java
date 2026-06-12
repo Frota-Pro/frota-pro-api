@@ -1,14 +1,14 @@
 package br.com.frotasPro.api.service.relatorios;
 
 import br.com.frotasPro.api.controller.response.RelatorioDesempenhoMetasResponse;
-import br.com.frotasPro.api.domain.Caminhao;
+import br.com.frotasPro.api.modules.frota.domain.Caminhao;
 import br.com.frotasPro.api.domain.Meta;
 import br.com.frotasPro.api.domain.MetaCategoriaCaminhaoVinculo;
 import br.com.frotasPro.api.domain.Motorista;
 import br.com.frotasPro.api.domain.enums.TipoMeta;
 import br.com.frotasPro.api.excption.ObjectNotFound;
-import br.com.frotasPro.api.repository.CaminhaoRepository;
-import br.com.frotasPro.api.repository.CategoriaCaminhaoRepository;
+import br.com.frotasPro.api.modules.frota.repository.CaminhaoRepository;
+import br.com.frotasPro.api.modules.frota.repository.CategoriaCaminhaoRepository;
 import br.com.frotasPro.api.repository.MetaCategoriaCaminhaoVinculoRepository;
 import br.com.frotasPro.api.repository.MetaRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;

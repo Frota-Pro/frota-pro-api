@@ -2,7 +2,7 @@ package br.com.frotasPro.api.util;
 
 import br.com.frotasPro.api.domain.Meta;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
-import br.com.frotasPro.api.repository.CaminhaoRepository;
+import br.com.frotasPro.api.modules.frota.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.MetaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -2,10 +2,10 @@ package br.com.frotasPro.api.service.relatorios;
 
 import br.com.frotasPro.api.controller.response.RelatorioAbastecimentoPeriodoResponse;
 import br.com.frotasPro.api.domain.Abastecimento;
-import br.com.frotasPro.api.domain.Caminhao;
+import br.com.frotasPro.api.modules.frota.domain.Caminhao;
 import br.com.frotasPro.api.domain.Motorista;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
-import br.com.frotasPro.api.repository.CaminhaoRepository;
+import br.com.frotasPro.api.modules.frota.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.RequiredArgsConstructor;

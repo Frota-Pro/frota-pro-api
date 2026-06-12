@@ -1,7 +1,7 @@
 package br.com.frotasPro.api.util;
 
 import br.com.frotasPro.api.domain.Abastecimento;
-import br.com.frotasPro.api.domain.Caminhao;
+import br.com.frotasPro.api.modules.frota.domain.Caminhao;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

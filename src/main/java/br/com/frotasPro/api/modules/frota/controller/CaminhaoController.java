@@ -1,0 +1,226 @@
+﻿package br.com.frotasPro.api.modules.frota.controller;
+
+import br.com.frotasPro.api.modules.frota.dto.request.CaminhaoRequest;
+import br.com.frotasPro.api.modules.frota.dto.request.VincularCategoriaCaminhaoEmLoteRequest;
+import br.com.frotasPro.api.modules.frota.dto.response.CaminhaoDetalheResponse;
+import br.com.frotasPro.api.modules.frota.dto.response.CaminhaoResponse;
+import br.com.frotasPro.api.modules.frota.dto.response.DocumentoCaminhaoResponse;
+import br.com.frotasPro.api.domain.enums.TipoDocumentoCaminhao;
+import br.com.frotasPro.api.modules.frota.service.*;
+import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
+
+@RestController
+@RequestMapping("/caminhao")
+@AllArgsConstructor
+public class CaminhaoController {
+
+    private final ListarCaminhaoService listarCaminhaoService;
+    private final BuscarCaminhaoService buscarCaminhaoService;
+    private final CriarCaminhaoService criarCaminhaoService;
+    private final AtualizarCaminhaoService atualizarCaminhaoService;
+    private final DeletarCaminhaoService deletarCaminhaoService;
+    private final AtivarCaminhaoService ativarCaminhaoService;
+    private final ListarDocumentoCaminhaoService listarDocumentoCaminhaoService;
+    private final RegistrarDocumentoCaminhaoService registrarDocumentoCaminhaoService;
+    private final BuscarCaminhaoDetalheService buscarCaminhaoDetalheService;
+    private final VincularCategoriaCaminhaoEmLoteService vincularCategoriaCaminhaoEmLoteService;
+
+
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
+    @GetMapping
+    public ResponseEntity<Page<CaminhaoResponse>> listar(
+            @RequestParam(required = false) Boolean ativo,
+            @RequestParam(required = false) String q,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(listarCaminhaoService.listar(ativo, q, pageable));
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
+    @GetMapping("/{codigo}")
+    public ResponseEntity<CaminhaoResponse> buscarPorCodigo(@PathVariable String codigo) {
+        CaminhaoResponse caminhao = buscarCaminhaoService.porCodigo(codigo);
+        return ResponseEntity.ok(caminhao);
+    }
+
+
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
+    @GetMapping("/placa/{placa}")
+    public ResponseEntity<CaminhaoResponse> buscarPorPlaca(@PathVariable String placa) {
+        CaminhaoResponse caminhao = buscarCaminhaoService.porPlaca(placa);
+        return ResponseEntity.ok(caminhao);
+    }
+
+
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
+    @GetMapping("/codigo-externo/{codigoExterno}")
+    public ResponseEntity<CaminhaoResponse> buscarPorCodigoExterno(@PathVariable String codigoExterno) {
+        CaminhaoResponse caminhao = buscarCaminhaoService.porCodigoExterno(codigoExterno);
+        return ResponseEntity.ok(caminhao);
+    }
+
+
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
+    @PostMapping
+    @Caching(evict = {
+            @CacheEvict(value = "caminhao_listar", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_codigo", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_placa", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_codigo_externo", allEntries = true),
+            @CacheEvict(value = "caminhao_documentos", allEntries = true),
+            @CacheEvict(value = "caminhao_detalhes", allEntries = true),
+            @CacheEvict(value = "meta_ativas_caminhao", allEntries = true),
+            @CacheEvict(value = "meta_historico", allEntries = true),
+            @CacheEvict(value = "meta_historico_caminhao", allEntries = true)
+    })
+    public ResponseEntity<CaminhaoResponse> registrar(
+            @Valid @RequestBody CaminhaoRequest request) {
+
+        CaminhaoResponse caminhao = criarCaminhaoService.criar(request);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{codigo}")
+                .buildAndExpand(caminhao.getCodigo())
+                .toUri();
+
+        return ResponseEntity.created(location).body(caminhao);
+    }
+
+
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
+    @PutMapping("/{codigo}")
+    @Caching(evict = {
+            @CacheEvict(value = "caminhao_listar", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_codigo", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_placa", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_codigo_externo", allEntries = true),
+            @CacheEvict(value = "caminhao_documentos", allEntries = true),
+            @CacheEvict(value = "caminhao_detalhes", allEntries = true),
+            @CacheEvict(value = "meta_ativas_caminhao", allEntries = true),
+            @CacheEvict(value = "meta_historico", allEntries = true),
+            @CacheEvict(value = "meta_historico_caminhao", allEntries = true)
+    })
+    public ResponseEntity<CaminhaoResponse> atualizar(
+            @PathVariable String codigo,
+            @Valid @RequestBody CaminhaoRequest request) {
+
+        CaminhaoResponse caminhaoAtualizado = atualizarCaminhaoService.atualizar(codigo, request);
+        return ResponseEntity.ok(caminhaoAtualizado);
+    }
+
+
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
+    @DeleteMapping("/{codigo}")
+    @Caching(evict = {
+            @CacheEvict(value = "caminhao_listar", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_codigo", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_placa", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_codigo_externo", allEntries = true),
+            @CacheEvict(value = "caminhao_documentos", allEntries = true),
+            @CacheEvict(value = "caminhao_detalhes", allEntries = true),
+            @CacheEvict(value = "meta_ativas_caminhao", allEntries = true),
+            @CacheEvict(value = "meta_historico", allEntries = true),
+            @CacheEvict(value = "meta_historico_caminhao", allEntries = true)
+    })
+    public ResponseEntity<Void> deletar(@PathVariable String codigo) {
+        deletarCaminhaoService.deletar(codigo);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
+    @PatchMapping("/{codigo}/ativar")
+    @Caching(evict = {
+            @CacheEvict(value = "caminhao_listar", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_codigo", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_placa", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_codigo_externo", allEntries = true),
+            @CacheEvict(value = "caminhao_documentos", allEntries = true),
+            @CacheEvict(value = "caminhao_detalhes", allEntries = true),
+            @CacheEvict(value = "meta_ativas_caminhao", allEntries = true),
+            @CacheEvict(value = "meta_historico", allEntries = true),
+            @CacheEvict(value = "meta_historico_caminhao", allEntries = true)
+    })
+    public ResponseEntity<Void> ativar(@PathVariable String codigo) {
+        ativarCaminhaoService.ativar(codigo);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
+    @PostMapping(
+            value = "/{codigo}/documentos",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    @Caching(evict = {
+            @CacheEvict(value = "caminhao_documentos", allEntries = true),
+            @CacheEvict(value = "caminhao_detalhes", allEntries = true)
+    })
+    public ResponseEntity<DocumentoCaminhaoResponse> uploadDocumentoCaminhao(
+            @PathVariable String codigo,
+            @RequestParam("tipoDocumento") TipoDocumentoCaminhao tipoDocumento,
+            @RequestParam(value = "observacao", required = false) String observacao,
+            @RequestPart("arquivo") MultipartFile arquivo
+    ) {
+        DocumentoCaminhaoResponse response =
+                registrarDocumentoCaminhaoService.registrar(codigo, tipoDocumento, observacao, arquivo);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(response.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(response);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
+    @GetMapping("/{codigo}/documentos")
+    public ResponseEntity<Page<DocumentoCaminhaoResponse>> listarDocumentosCaminhao(
+            @PathVariable String codigo,
+            Pageable pageable
+    ) {
+        Page<DocumentoCaminhaoResponse> documentos =
+                listarDocumentoCaminhaoService.listarPorCaminhao(codigo, pageable);
+
+        return ResponseEntity.ok(documentos);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_CONSULTA')")
+    @GetMapping("/{codigo}/detalhes")
+    public ResponseEntity<CaminhaoDetalheResponse> detalhes(@PathVariable String codigo) {
+        CaminhaoDetalheResponse response = buscarCaminhaoDetalheService.detalhes(codigo);
+        return ResponseEntity.ok(response);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_OPERADOR_LOGISTICA')")
+    @PutMapping("/categoria")
+    @Caching(evict = {
+            @CacheEvict(value = "caminhao_listar", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_codigo", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_placa", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_codigo_externo", allEntries = true),
+            @CacheEvict(value = "caminhao_detalhes", allEntries = true),
+            @CacheEvict(value = "meta_ativas_caminhao", allEntries = true),
+            @CacheEvict(value = "meta_historico", allEntries = true),
+            @CacheEvict(value = "meta_historico_caminhao", allEntries = true)
+    })
+    public ResponseEntity<Void> vincularCategoriaEmLote(
+            @Valid @RequestBody VincularCategoriaCaminhaoEmLoteRequest request
+    ) {
+        vincularCategoriaCaminhaoEmLoteService.vincular(request);
+        return ResponseEntity.noContent().build();
+    }
+
+}

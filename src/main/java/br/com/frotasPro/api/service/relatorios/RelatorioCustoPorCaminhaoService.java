@@ -2,11 +2,11 @@ package br.com.frotasPro.api.service.relatorios;
 
 import br.com.frotasPro.api.controller.response.RelatorioCustoPorCaminhaoResponse;
 import br.com.frotasPro.api.domain.Abastecimento;
-import br.com.frotasPro.api.domain.Caminhao;
+import br.com.frotasPro.api.modules.frota.domain.Caminhao;
 import br.com.frotasPro.api.domain.Manutencao;
 import br.com.frotasPro.api.domain.MovimentacaoSemCarga;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
-import br.com.frotasPro.api.repository.CaminhaoRepository;
+import br.com.frotasPro.api.modules.frota.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
 import br.com.frotasPro.api.repository.MovimentacaoSemCargaRepository;
 import br.com.frotasPro.api.utils.PeriodoValidator;

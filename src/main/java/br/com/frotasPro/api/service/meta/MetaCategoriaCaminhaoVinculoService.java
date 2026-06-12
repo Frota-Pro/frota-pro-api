@@ -3,7 +3,7 @@ package br.com.frotasPro.api.service.meta;
 import br.com.frotasPro.api.domain.Meta;
 import br.com.frotasPro.api.domain.MetaCategoriaCaminhaoVinculo;
 import br.com.frotasPro.api.domain.enums.StatusMeta;
-import br.com.frotasPro.api.repository.CaminhaoRepository;
+import br.com.frotasPro.api.modules.frota.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.MetaCategoriaCaminhaoVinculoRepository;
 import br.com.frotasPro.api.repository.MetaRepository;
 import lombok.RequiredArgsConstructor;

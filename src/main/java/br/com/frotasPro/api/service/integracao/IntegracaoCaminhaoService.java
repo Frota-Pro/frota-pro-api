@@ -2,7 +2,7 @@ package br.com.frotasPro.api.service.integracao;
 
 import br.com.frotasPro.api.integracao.dto.CaminhaoSyncRequestEvent;
 import br.com.frotasPro.api.integracao.kafka.CaminhaoSyncRequestProducer;
-import br.com.frotasPro.api.service.caminhao.CaminhaoSyncJobService;
+import br.com.frotasPro.api.modules.frota.service.CaminhaoSyncJobService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

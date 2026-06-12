@@ -1,7 +1,7 @@
 package br.com.frotasPro.api.service.carga;
 
 import br.com.frotasPro.api.domain.Ajudante;
-import br.com.frotasPro.api.domain.Caminhao;
+import br.com.frotasPro.api.modules.frota.domain.Caminhao;
 import br.com.frotasPro.api.domain.Carga;
 import br.com.frotasPro.api.domain.Motorista;
 import br.com.frotasPro.api.domain.enums.EventoNotificacao;

@@ -1,6 +1,6 @@
 package br.com.frotasPro.api.service.movimentacaoSemCarga;
 
-import br.com.frotasPro.api.domain.Caminhao;
+import br.com.frotasPro.api.modules.frota.domain.Caminhao;
 import br.com.frotasPro.api.domain.Carga;
 import br.com.frotasPro.api.domain.MovimentacaoSemCarga;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
