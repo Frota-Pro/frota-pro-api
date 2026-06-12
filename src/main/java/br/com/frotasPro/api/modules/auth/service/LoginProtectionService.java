@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.service.auth;
+package br.com.frotasPro.api.modules.auth.service;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;

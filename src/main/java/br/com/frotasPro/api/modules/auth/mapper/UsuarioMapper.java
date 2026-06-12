@@ -1,7 +1,7 @@
-package br.com.frotasPro.api.mapper;
+package br.com.frotasPro.api.modules.auth.mapper;
 
-import br.com.frotasPro.api.controller.response.UsuarioResponse;
-import br.com.frotasPro.api.domain.Usuario;
+import br.com.frotasPro.api.modules.auth.dto.response.UsuarioResponse;
+import br.com.frotasPro.api.modules.auth.domain.Usuario;
 
 public class UsuarioMapper {
     public static UsuarioResponse toResponse(Usuario usuario) {

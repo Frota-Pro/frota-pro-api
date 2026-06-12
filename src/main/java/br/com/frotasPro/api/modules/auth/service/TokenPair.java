@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.service.auth;
+package br.com.frotasPro.api.modules.auth.service;
 
 public record TokenPair(
         String accessToken,

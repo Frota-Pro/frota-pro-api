@@ -1,7 +1,7 @@
-package br.com.frotasPro.api.service.usuario;
+package br.com.frotasPro.api.modules.auth.service;
 
-import br.com.frotasPro.api.domain.Usuario;
-import br.com.frotasPro.api.repository.UsuarioRepository;
+import br.com.frotasPro.api.modules.auth.domain.Usuario;
+import br.com.frotasPro.api.modules.auth.repository.UsuarioRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

@@ -1,8 +1,8 @@
-package br.com.frotasPro.api.controller;
+package br.com.frotasPro.api.modules.auth.controller;
 
-import br.com.frotasPro.api.controller.response.AuthMeResponse;
-import br.com.frotasPro.api.domain.Usuario;
-import br.com.frotasPro.api.repository.UsuarioRepository;
+import br.com.frotasPro.api.modules.auth.dto.response.AuthMeResponse;
+import br.com.frotasPro.api.modules.auth.domain.Usuario;
+import br.com.frotasPro.api.modules.auth.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

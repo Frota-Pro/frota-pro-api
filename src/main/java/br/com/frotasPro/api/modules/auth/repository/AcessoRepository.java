@@ -1,6 +1,6 @@
-package br.com.frotasPro.api.repository;
+package br.com.frotasPro.api.modules.auth.repository;
 
-import br.com.frotasPro.api.domain.Acesso;
+import br.com.frotasPro.api.modules.auth.domain.Acesso;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

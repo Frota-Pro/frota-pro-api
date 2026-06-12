@@ -1,11 +1,11 @@
-package br.com.frotasPro.api.service.usuario;
+package br.com.frotasPro.api.modules.auth.service;
 
-import br.com.frotasPro.api.controller.request.LoginRequest;
-import br.com.frotasPro.api.controller.response.LoginResponse;
-import br.com.frotasPro.api.domain.Usuario;
-import br.com.frotasPro.api.service.auth.AuthTokenService;
-import br.com.frotasPro.api.service.auth.LoginProtectionService;
-import br.com.frotasPro.api.service.auth.TokenPair;
+import br.com.frotasPro.api.modules.auth.dto.request.LoginRequest;
+import br.com.frotasPro.api.modules.auth.dto.response.LoginResponse;
+import br.com.frotasPro.api.modules.auth.domain.Usuario;
+import br.com.frotasPro.api.modules.auth.service.AuthTokenService;
+import br.com.frotasPro.api.modules.auth.service.LoginProtectionService;
+import br.com.frotasPro.api.modules.auth.service.TokenPair;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

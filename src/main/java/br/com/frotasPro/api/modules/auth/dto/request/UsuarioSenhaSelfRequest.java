@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.controller.request;
+package br.com.frotasPro.api.modules.auth.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -7,7 +7,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UsuarioSenhaUpdateRequest {
+public class UsuarioSenhaSelfRequest {
+
+    @NotBlank(message = "Senha atual é obrigatória")
+    private String senhaAtual;
 
     @NotBlank(message = "Nova senha é obrigatória")
     @Size(min = 6, max = 100, message = "Senha deve ter entre 6 e 100 caracteres")

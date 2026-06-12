@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.domain;
+package br.com.frotasPro.api.modules.auth.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

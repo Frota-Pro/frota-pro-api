@@ -1,11 +1,11 @@
-package br.com.frotasPro.api.controller;
+package br.com.frotasPro.api.modules.auth.controller;
 
-import br.com.frotasPro.api.controller.request.LoginRequest;
-import br.com.frotasPro.api.controller.request.RefreshTokenRequest;
-import br.com.frotasPro.api.controller.response.LoginResponse;
-import br.com.frotasPro.api.service.auth.AuthTokenService;
-import br.com.frotasPro.api.service.auth.TokenPair;
-import br.com.frotasPro.api.service.usuario.UsuarioLoginService;
+import br.com.frotasPro.api.modules.auth.dto.request.LoginRequest;
+import br.com.frotasPro.api.modules.auth.dto.request.RefreshTokenRequest;
+import br.com.frotasPro.api.modules.auth.dto.response.LoginResponse;
+import br.com.frotasPro.api.modules.auth.service.AuthTokenService;
+import br.com.frotasPro.api.modules.auth.service.TokenPair;
+import br.com.frotasPro.api.modules.auth.service.UsuarioLoginService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

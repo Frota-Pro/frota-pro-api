@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.controller.response;
+package br.com.frotasPro.api.modules.auth.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

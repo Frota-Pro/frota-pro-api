@@ -1,11 +1,11 @@
-﻿package br.com.frotasPro.api.controller;
+﻿package br.com.frotasPro.api.modules.auth.controller;
 
-import br.com.frotasPro.api.controller.request.UsuarioRequest;
-import br.com.frotasPro.api.controller.request.UsuarioSenhaSelfRequest;
-import br.com.frotasPro.api.controller.request.UsuarioSenhaUpdateRequest;
-import br.com.frotasPro.api.controller.request.UsuarioUpdateRequest;
-import br.com.frotasPro.api.controller.response.UsuarioResponse;
-import br.com.frotasPro.api.service.usuario.UsuarioService;
+import br.com.frotasPro.api.modules.auth.dto.request.UsuarioRequest;
+import br.com.frotasPro.api.modules.auth.dto.request.UsuarioSenhaSelfRequest;
+import br.com.frotasPro.api.modules.auth.dto.request.UsuarioSenhaUpdateRequest;
+import br.com.frotasPro.api.modules.auth.dto.request.UsuarioUpdateRequest;
+import br.com.frotasPro.api.modules.auth.dto.response.UsuarioResponse;
+import br.com.frotasPro.api.modules.auth.service.UsuarioService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;

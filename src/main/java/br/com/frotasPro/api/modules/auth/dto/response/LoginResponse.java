@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.controller.response;
+package br.com.frotasPro.api.modules.auth.dto.response;
 
 public record LoginResponse(
         String accessToken,

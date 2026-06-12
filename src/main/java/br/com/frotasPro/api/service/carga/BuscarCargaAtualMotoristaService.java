@@ -8,7 +8,7 @@ import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
-import br.com.frotasPro.api.service.usuario.UsuarioAutenticadoService;
+import br.com.frotasPro.api.modules.auth.service.UsuarioAutenticadoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

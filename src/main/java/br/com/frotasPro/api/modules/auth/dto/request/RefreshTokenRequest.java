@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.controller.request;
+package br.com.frotasPro.api.modules.auth.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 

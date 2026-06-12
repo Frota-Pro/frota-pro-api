@@ -1,4 +1,4 @@
-package br.com.frotasPro.api.domain;
+package br.com.frotasPro.api.modules.auth.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

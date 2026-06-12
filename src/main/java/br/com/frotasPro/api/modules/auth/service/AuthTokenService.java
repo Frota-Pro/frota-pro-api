@@ -1,8 +1,8 @@
-package br.com.frotasPro.api.service.auth;
+package br.com.frotasPro.api.modules.auth.service;
 
-import br.com.frotasPro.api.domain.Acesso;
-import br.com.frotasPro.api.domain.Usuario;
-import br.com.frotasPro.api.service.usuario.BuscarUsuarioService;
+import br.com.frotasPro.api.modules.auth.domain.Acesso;
+import br.com.frotasPro.api.modules.auth.domain.Usuario;
+import br.com.frotasPro.api.modules.auth.service.BuscarUsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;

@@ -1,16 +1,16 @@
-package br.com.frotasPro.api.service.usuario;
+package br.com.frotasPro.api.modules.auth.service;
 
-import br.com.frotasPro.api.controller.request.UsuarioRequest;
-import br.com.frotasPro.api.controller.request.UsuarioSenhaSelfRequest;
-import br.com.frotasPro.api.controller.request.UsuarioSenhaUpdateRequest;
-import br.com.frotasPro.api.controller.request.UsuarioUpdateRequest;
-import br.com.frotasPro.api.controller.response.UsuarioResponse;
-import br.com.frotasPro.api.domain.Acesso;
+import br.com.frotasPro.api.modules.auth.dto.request.UsuarioRequest;
+import br.com.frotasPro.api.modules.auth.dto.request.UsuarioSenhaSelfRequest;
+import br.com.frotasPro.api.modules.auth.dto.request.UsuarioSenhaUpdateRequest;
+import br.com.frotasPro.api.modules.auth.dto.request.UsuarioUpdateRequest;
+import br.com.frotasPro.api.modules.auth.dto.response.UsuarioResponse;
+import br.com.frotasPro.api.modules.auth.domain.Acesso;
 import br.com.frotasPro.api.domain.Motorista;
-import br.com.frotasPro.api.domain.Usuario;
-import br.com.frotasPro.api.repository.AcessoRepository;
+import br.com.frotasPro.api.modules.auth.domain.Usuario;
+import br.com.frotasPro.api.modules.auth.repository.AcessoRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
-import br.com.frotasPro.api.repository.UsuarioRepository;
+import br.com.frotasPro.api.modules.auth.repository.UsuarioRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
