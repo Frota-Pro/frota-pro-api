@@ -1,10 +1,12 @@
 package br.com.frotasPro.api.service.carga;
 
-import br.com.frotasPro.api.domain.enums.StatusSincronizacao;
-import br.com.frotasPro.api.domain.integracao.CargaSyncJob;
-import br.com.frotasPro.api.integracao.kafka.CargaSyncRequestProducer;
-import br.com.frotasPro.api.repository.integracao.CargaSyncJobRepository;
-import br.com.frotasPro.api.service.notificacao.NotificacaoService;
+import br.com.frotasPro.api.modules.integracao.domain.CargaSyncJob;
+import br.com.frotasPro.api.modules.integracao.kafka.CargaSyncRequestProducer;
+import br.com.frotasPro.api.modules.integracao.repository.CargaSyncJobRepository;
+import br.com.frotasPro.api.modules.logistica.service.CargaSyncJobService;
+import br.com.frotasPro.api.modules.notificacao.service.NotificacaoService;
+import br.com.frotasPro.api.shared.enums.StatusSincronizacao;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;

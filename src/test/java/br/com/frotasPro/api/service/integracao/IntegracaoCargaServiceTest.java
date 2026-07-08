@@ -1,10 +1,13 @@
 package br.com.frotasPro.api.service.integracao;
 
-import br.com.frotasPro.api.domain.integracao.CargaSyncJob;
-import br.com.frotasPro.api.integracao.dto.CargaSyncRequestEvent;
-import br.com.frotasPro.api.integracao.kafka.CargaSyncRequestProducer;
-import br.com.frotasPro.api.repository.CargaRepository;
-import br.com.frotasPro.api.service.carga.CargaSyncJobService;
+import br.com.frotasPro.api.modules.integracao.domain.CargaSyncJob;
+import br.com.frotasPro.api.modules.integracao.dto.request.CargaSyncRequestEvent;
+import br.com.frotasPro.api.modules.integracao.kafka.CargaSyncRequestProducer;
+import br.com.frotasPro.api.modules.integracao.service.IntegracaoCargaService;
+import br.com.frotasPro.api.modules.integracao.service.IntegracaoWinThorConfigService;
+import br.com.frotasPro.api.modules.logistica.repository.CargaRepository;
+import br.com.frotasPro.api.modules.logistica.service.CargaSyncJobService;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,0 +1,58 @@
+package br.com.frotasPro.api.modules.relatorio.service;
+
+import br.com.frotasPro.api.modules.relatorio.dto.response.RelatorioHistoricoManutencaoResponse;
+import br.com.frotasPro.api.modules.frota.domain.Caminhao;
+import br.com.frotasPro.api.modules.manutencao.domain.Manutencao;
+import br.com.frotasPro.api.modules.frota.repository.CaminhaoRepository;
+import br.com.frotasPro.api.modules.manutencao.repository.ManutencaoRepository;
+import br.com.frotasPro.api.shared.validator.PeriodoValidator;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class RelatorioHistoricoManutencaoService {
+
+    private final CaminhaoRepository caminhaoRepository;
+    private final ManutencaoRepository manutencaoRepository;
+
+    public RelatorioHistoricoManutencaoResponse gerar(String codigoCaminhao, LocalDate inicio, LocalDate fim) {
+
+        PeriodoValidator.obrigatorio(inicio, fim, "periodo");
+
+        Caminhao caminhao = caminhaoRepository.findByCaminhaoPorCodigoOuPorCodigoExterno(codigoCaminhao)
+                .orElseThrow(() -> new IllegalArgumentException("Caminhão não encontrado: " + codigoCaminhao));
+
+        List<Manutencao> itens = manutencaoRepository.findByCaminhaoAndPeriodo(caminhao.getId(), inicio, fim);
+
+        List<RelatorioHistoricoManutencaoResponse.Linha> linhas = itens.stream()
+                .map(m -> RelatorioHistoricoManutencaoResponse.Linha.builder()
+                        .data(m.getDataFimManutencao() != null ? m.getDataFimManutencao() : m.getDataInicioManutencao())
+                        .descricao(m.getDescricao())
+                        .tipo(m.getTipoManutencao() == null ? null : m.getTipoManutencao().name())
+                        .valor(nvl(m.getValor()))
+                        .status(m.getStatusManutencao() == null ? null : m.getStatusManutencao().name())
+                        .build())
+                .collect(Collectors.toList());
+
+        BigDecimal total = itens.stream().map(Manutencao::getValor).map(this::nvl).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return RelatorioHistoricoManutencaoResponse.builder()
+                .codigoCaminhao(caminhao.getCodigo())
+                .placaCaminhao(caminhao.getPlaca())
+                .periodoInicio(inicio)
+                .periodoFim(fim)
+                .totalManutencao(total)
+                .linhas(linhas)
+                .build();
+    }
+
+    private BigDecimal nvl(BigDecimal v) {
+        return v == null ? BigDecimal.ZERO : v;
+    }
+}

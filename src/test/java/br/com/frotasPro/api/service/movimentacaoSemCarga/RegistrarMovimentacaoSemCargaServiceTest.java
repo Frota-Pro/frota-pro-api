@@ -1,16 +1,18 @@
 package br.com.frotasPro.api.service.movimentacaoSemCarga;
 
-import br.com.frotasPro.api.domain.Caminhao;
-import br.com.frotasPro.api.domain.Carga;
-import br.com.frotasPro.api.domain.MovimentacaoSemCarga;
-import br.com.frotasPro.api.repository.AbastecimentoRepository;
-import br.com.frotasPro.api.repository.MovimentacaoSemCargaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import br.com.frotasPro.api.modules.abastecimento.repository.AbastecimentoRepository;
+import br.com.frotasPro.api.modules.frota.domain.Caminhao;
+import br.com.frotasPro.api.modules.logistica.domain.Carga;
+import br.com.frotasPro.api.modules.logistica.domain.MovimentacaoSemCarga;
+import br.com.frotasPro.api.modules.logistica.repository.MovimentacaoSemCargaRepository;
+import br.com.frotasPro.api.modules.logistica.service.RegistrarMovimentacaoSemCargaService;
 
 import java.math.BigDecimal;
 import java.util.UUID;

@@ -1,0 +1,38 @@
+package br.com.frotasPro.api.modules.meta.service;
+
+import br.com.frotasPro.api.modules.meta.domain.Meta;
+import br.com.frotasPro.api.modules.meta.repository.MetaRepository;
+import br.com.frotasPro.api.shared.enums.StatusMeta;
+import br.com.frotasPro.api.shared.exception.BusinessException;
+import br.com.frotasPro.api.shared.exception.ObjectNotFound;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class DeletarMetaService {
+
+    private final MetaRepository metaRepository;
+
+    @Transactional
+    public void deletar(UUID id) {
+        Meta meta = metaRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFound("Meta não encontrada para o id: " + id));
+
+        boolean vinculada = meta.getCaminhao() != null || meta.getCategoria() != null || meta.getMotorista() != null;
+        boolean cancelada = meta.getStatusMeta() == StatusMeta.CANCELADA;
+
+        if (!cancelada) {
+            throw new BusinessException("Só é possível excluir meta com status CANCELADA.");
+        }
+
+        if (vinculada) {
+            throw new BusinessException("Não é possível excluir uma meta vinculada. Desvincule/cancele a meta antes de excluir.");
+        }
+
+        metaRepository.delete(meta);
+    }
+}
