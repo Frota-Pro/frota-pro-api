@@ -149,7 +149,12 @@ public class SincronizarCargaService {
                         : null
         );
 
-        carga.setStatusCarga(Status.SINCRONIZADA);
+        boolean cargaJaIniciada = carga.getStatusCarga() == Status.EM_ROTA
+                && (carga.getDtSaida() != null || carga.getKmInicial() != null);
+
+        if (carga.getStatusCarga() != Status.FINALIZADA && !cargaJaIniciada) {
+            carga.setStatusCarga(Status.SINCRONIZADA);
+        }
 
         int totalClientes = 0;
         int totalNotas = 0;
