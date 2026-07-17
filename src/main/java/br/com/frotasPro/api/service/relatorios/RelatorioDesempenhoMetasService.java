@@ -105,6 +105,8 @@ public class RelatorioDesempenhoMetasService {
             }
         }
 
+        linhas = excluirLinhasDeCategoriaSobrepostasPorCaminhao(linhas);
+
         linhas.sort(Comparator
                 .comparing(RelatorioDesempenhoMetasResponse.Linha::getAlvoTipo, Comparator.nullsLast(String::compareTo))
                 .thenComparing(l -> valorOrdenacao(l.getCaminhaoCodigo(), l.getMotoristaCodigo()))
@@ -189,6 +191,39 @@ public class RelatorioDesempenhoMetasService {
                 .status(metaProgressoService.statusDesempenho(realizado, atingida))
                 .periodoCalculoInicio(inicio)
                 .periodoCalculoFim(fim);
+    }
+
+    /**
+     * Quando um caminhão tem meta própria e também herda uma meta de categoria do
+     * mesmo tipo cobrindo o mesmo período, ele não pode ser avaliado duas vezes no
+     * relatório — a meta direta do caminhão prevalece, igual nas outras telas de meta.
+     */
+    private List<RelatorioDesempenhoMetasResponse.Linha> excluirLinhasDeCategoriaSobrepostasPorCaminhao(
+            List<RelatorioDesempenhoMetasResponse.Linha> linhas) {
+
+        List<RelatorioDesempenhoMetasResponse.Linha> diretas = linhas.stream()
+                .filter(l -> "CAMINHAO".equals(l.getOrigemMeta()))
+                .toList();
+
+        if (diretas.isEmpty()) {
+            return linhas;
+        }
+
+        return linhas.stream()
+                .filter(l -> !"CATEGORIA".equals(l.getOrigemMeta())
+                        || diretas.stream().noneMatch(direta -> mesmoCaminhaoTipoEPeriodo(direta, l)))
+                .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+    }
+
+    private boolean mesmoCaminhaoTipoEPeriodo(RelatorioDesempenhoMetasResponse.Linha a, RelatorioDesempenhoMetasResponse.Linha b) {
+        if (!java.util.Objects.equals(a.getCaminhaoCodigo(), b.getCaminhaoCodigo())) {
+            return false;
+        }
+        if (a.getTipoMeta() != b.getTipoMeta()) {
+            return false;
+        }
+        return !a.getPeriodoCalculoInicio().isAfter(b.getPeriodoCalculoFim())
+                && !b.getPeriodoCalculoInicio().isAfter(a.getPeriodoCalculoFim());
     }
 
     private List<Caminhao> caminhoesDaMetaCategoria(Meta meta) {
