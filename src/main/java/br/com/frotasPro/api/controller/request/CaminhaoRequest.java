@@ -59,6 +59,9 @@ public class CaminhaoRequest {
     @Size(max = 20, message = "Categoria inválida")
     private String categoria;
 
+    @Size(max = 50, message = "Motorista titular inválido")
+    private String motoristaTitular;
+
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate dtLicenciamento;
 }

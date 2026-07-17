@@ -4,10 +4,13 @@ import br.com.frotasPro.api.controller.request.CaminhaoRequest;
 import br.com.frotasPro.api.controller.response.CaminhaoResponse;
 import br.com.frotasPro.api.domain.Caminhao;
 import br.com.frotasPro.api.domain.CategoriaCaminhao;
+import br.com.frotasPro.api.domain.Motorista;
+import br.com.frotasPro.api.excption.BusinessException;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.mapper.CaminhaoMapper;
 import br.com.frotasPro.api.repository.CategoriaCaminhaoRepository;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
+import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.service.meta.MetaCategoriaCaminhaoVinculoService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,7 @@ public class AtualizarCaminhaoService {
 
     private final CaminhaoRepository caminhaoRepository;
     private final CategoriaCaminhaoRepository categoriaCaminhaoRepository;
+    private final MotoristaRepository motoristaRepository;
     private final MetaCategoriaCaminhaoVinculoService metaCategoriaCaminhaoVinculoService;
 
     @Transactional
@@ -68,6 +72,24 @@ public class AtualizarCaminhaoService {
             caminhao.setCategoria(categoria);
         } else {
             caminhao.setCategoria(null);
+        }
+
+        if (hasText(request.getMotoristaTitular())) {
+            Motorista motoristaTitular = motoristaRepository
+                    .findByCodigo(request.getMotoristaTitular().trim().toUpperCase())
+                    .orElseThrow(() -> new ObjectNotFound(
+                            "ERRO: Motorista titular não encontrado: " + request.getMotoristaTitular()));
+
+            caminhaoRepository.findByMotoristaTitularId(motoristaTitular.getId())
+                    .filter(outroCaminhao -> !outroCaminhao.getId().equals(caminhao.getId()))
+                    .ifPresent(outroCaminhao -> {
+                        throw new BusinessException(
+                                "Motorista já é titular do caminhão " + outroCaminhao.getCodigo());
+                    });
+
+            caminhao.setMotoristaTitular(motoristaTitular);
+        } else {
+            caminhao.setMotoristaTitular(null);
         }
     }
 }

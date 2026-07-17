@@ -31,6 +31,9 @@ public class CaminhaoResponse {
     private String categoriaCodigo;
     private String categoriaDescricao;
 
+    private String motoristaTitularCodigo;
+    private String motoristaTitularNome;
+
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate dtLicenciamento;
 

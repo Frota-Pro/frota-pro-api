@@ -34,6 +34,12 @@ public class CaminhaoMapper {
                     .categoriaDescricao(caminhao.getCategoria().getDescricao());
         }
 
+        if (caminhao.getMotoristaTitular() != null) {
+            builder
+                    .motoristaTitularCodigo(caminhao.getMotoristaTitular().getCodigo())
+                    .motoristaTitularNome(caminhao.getMotoristaTitular().getNome());
+        }
+
         return builder.build();
     }
 }

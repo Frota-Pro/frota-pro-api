@@ -6,6 +6,7 @@ import br.com.frotasPro.api.domain.*;
 import br.com.frotasPro.api.domain.enums.StatusMeta;
 import br.com.frotasPro.api.domain.enums.TipoMeta;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
+import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.MetaRepository;
 import br.com.frotasPro.api.utils.PeriodoValidator;
@@ -27,6 +28,7 @@ public class RelatorioMetaMensalMotoristaService {
     private final CargaRepository cargaRepository;
     private final AbastecimentoRepository abastecimentoRepository;
     private final MetaRepository metaRepository;
+    private final CaminhaoRepository caminhaoRepository;
 
     @Transactional(readOnly = true)
     public RelatorioMetaMensalMotoristaResponse gerar(
@@ -55,7 +57,14 @@ public class RelatorioMetaMensalMotoristaService {
         }
 
         Motorista motorista = cargas.get(0).getMotorista();
-        Caminhao caminhao = cargas.get(0).getCaminhao();
+
+        // O objetivo do mês é sempre o do caminhão titular do motorista, quando houver
+        // vínculo cadastrado — assim, se ele pegar carga em outro caminhão eventualmente,
+        // a meta de referência continua sendo a dele, não a do caminhão emprestado.
+        // Sem vínculo cadastrado, cai no comportamento anterior: caminhão da primeira
+        // carga do período.
+        Caminhao caminhao = caminhaoRepository.findByMotoristaTitularId(motorista.getId())
+                .orElseGet(cargas.get(0)::getCaminhao);
         CategoriaCaminhao categoriaCaminhao = caminhao != null ? caminhao.getCategoria() : null;
 
         BigDecimal objetivoMesTonelada = buscarMetaTonelada(motorista, caminhao, categoriaCaminhao);
@@ -183,7 +192,12 @@ public class RelatorioMetaMensalMotoristaService {
 
         Optional<Meta> metaOpt = Optional.empty();
 
-        if (caminhao != null) {
+        if (motorista != null) {
+            metaOpt = metaRepository.findFirstByTipoMetaAndMotoristaAndStatusMetaOrderByDataIncioDesc(
+                    TipoMeta.CONSUMO_COMBUSTIVEL, motorista, StatusMeta.EM_ANDAMENTO);
+        }
+
+        if (metaOpt.isEmpty() && caminhao != null) {
             metaOpt = metaRepository.findFirstByTipoMetaAndCaminhaoAndStatusMetaOrderByDataIncioDesc(
                     TipoMeta.CONSUMO_COMBUSTIVEL, caminhao, StatusMeta.EM_ANDAMENTO);
         }
@@ -191,11 +205,6 @@ public class RelatorioMetaMensalMotoristaService {
         if (metaOpt.isEmpty() && categoriaCaminhao != null) {
             metaOpt = metaRepository.findFirstByTipoMetaAndCategoriaAndStatusMetaOrderByDataIncioDesc(
                     TipoMeta.CONSUMO_COMBUSTIVEL, categoriaCaminhao, StatusMeta.EM_ANDAMENTO);
-        }
-
-        if (metaOpt.isEmpty() && motorista != null) {
-            metaOpt = metaRepository.findFirstByTipoMetaAndMotoristaAndStatusMetaOrderByDataIncioDesc(
-                    TipoMeta.CONSUMO_COMBUSTIVEL, motorista, StatusMeta.EM_ANDAMENTO);
         }
 
         return metaOpt.map(Meta::getValorMeta).orElse(null);

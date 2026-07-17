@@ -52,4 +52,6 @@ public interface CaminhaoRepository extends JpaRepository<Caminhao, UUID> {
     List<Caminhao> findByCodigoIn(List<String> codigos);
 
     List<Caminhao> findByCategoriaIdAndAtivoTrue(UUID categoriaId);
+
+    Optional<Caminhao> findByMotoristaTitularId(UUID motoristaTitularId);
 }
