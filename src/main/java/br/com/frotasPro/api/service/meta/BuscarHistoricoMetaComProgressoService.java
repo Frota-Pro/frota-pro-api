@@ -50,6 +50,7 @@ public class BuscarHistoricoMetaComProgressoService {
                 : null;
 
         List<Meta> metas = metaRepository.historicoMetas(caminhao, categoria, motorista, inicio, fim);
+        metas = excluirMetasDeCategoriaSobrepostasPorCaminhao(metas, caminhaoRef);
         return metas.stream()
                 .map(meta -> {
                     var valorRealizado = meta.getValorRealizado();
@@ -65,5 +66,37 @@ public class BuscarHistoricoMetaComProgressoService {
                     return MetaMapper.toResponse(meta, valorRealizado, percentual, metaAtingida, statusDesempenho);
                 })
                 .toList();
+    }
+
+    /**
+     * A query de histórico traz tanto a meta própria do caminhão quanto metas de
+     * categoria vinculadas a ele. Quando o caminhão já tem uma meta direta do mesmo
+     * tipo cobrindo o mesmo período, a meta de categoria não deve aparecer para ele —
+     * a meta do caminhão sempre tem prioridade (mesma regra do card de metas ativas).
+     */
+    private List<Meta> excluirMetasDeCategoriaSobrepostasPorCaminhao(List<Meta> metas, Caminhao caminhaoRef) {
+        if (caminhaoRef == null) {
+            return metas;
+        }
+
+        List<Meta> metasDiretasDoCaminhao = metas.stream()
+                .filter(m -> m.getCaminhao() != null && caminhaoRef.getId().equals(m.getCaminhao().getId()))
+                .toList();
+
+        if (metasDiretasDoCaminhao.isEmpty()) {
+            return metas;
+        }
+
+        return metas.stream()
+                .filter(meta -> meta.getCaminhao() != null
+                        || metasDiretasDoCaminhao.stream().noneMatch(direta -> mesmoTipoEPeriodoSobreposto(direta, meta)))
+                .toList();
+    }
+
+    private boolean mesmoTipoEPeriodoSobreposto(Meta a, Meta b) {
+        if (a.getTipoMeta() != b.getTipoMeta()) {
+            return false;
+        }
+        return !a.getDataIncio().isAfter(b.getDataFim()) && !b.getDataIncio().isAfter(a.getDataFim());
     }
 }
