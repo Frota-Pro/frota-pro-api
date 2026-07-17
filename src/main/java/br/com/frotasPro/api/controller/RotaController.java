@@ -1,6 +1,7 @@
 package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.RotaRequest;
+import br.com.frotasPro.api.controller.response.ClienteHistoricoRotaResponse;
 import br.com.frotasPro.api.controller.response.RotaResponse;
 import br.com.frotasPro.api.service.rota.*;
 import jakarta.validation.Valid;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/rota")
@@ -24,6 +26,7 @@ public class RotaController {
     private final CriarRotaService criarRotaService;
     private final AtualizarRotaService atualizarRotaService;
     private final DeletarRotaService deletarRotaService;
+    private final BuscarClientesHistoricoRotaService buscarClientesHistoricoRotaService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/{codigo}")
@@ -67,5 +70,12 @@ public class RotaController {
     public ResponseEntity<Void> deletar(@PathVariable String codigo) {
         deletarRotaService.deletar(codigo);
         return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @GetMapping("/{codigo}/clientes")
+    public ResponseEntity<List<ClienteHistoricoRotaResponse>> clientesHistorico(@PathVariable String codigo) {
+        List<ClienteHistoricoRotaResponse> clientes = buscarClientesHistoricoRotaService.buscar(codigo);
+        return ResponseEntity.ok(clientes);
     }
 }
