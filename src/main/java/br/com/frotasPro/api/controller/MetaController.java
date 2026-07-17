@@ -4,9 +4,11 @@ import br.com.frotasPro.api.controller.request.MetaRequest;
 import br.com.frotasPro.api.controller.response.MetaCategoriaDesempenhoResponse;
 import br.com.frotasPro.api.controller.response.MetaResponse;
 import br.com.frotasPro.api.controller.response.RelatorioDesempenhoMetasResponse;
+import br.com.frotasPro.api.controller.response.RelatorioMetaMensalMotoristaResponse;
 import br.com.frotasPro.api.controller.response.TipoMetaRegraResponse;
 import br.com.frotasPro.api.domain.enums.TipoMeta;
 import br.com.frotasPro.api.service.meta.*;
+import br.com.frotasPro.api.service.relatorios.BuscarMinhaMetaMensalService;
 import br.com.frotasPro.api.service.relatorios.RelatorioDesempenhoMetasService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -40,6 +42,7 @@ public class MetaController {
     private final BuscarHistoricoMetaComProgressoService buscarHistoricoMetaComProgressoService;
     private final BuscarDesempenhoMetaCategoriaService buscarDesempenhoMetaCategoriaService;
     private final RelatorioDesempenhoMetasService relatorioDesempenhoMetasService;
+    private final BuscarMinhaMetaMensalService buscarMinhaMetaMensalService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @PostMapping
@@ -188,6 +191,17 @@ public class MetaController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim) {
 
         return ResponseEntity.ok(buscarHistoricoMetaComProgressoService.historico(caminhao, categoria, motorista, inicio, fim));
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_MOTORISTA')")
+    @GetMapping("/minha-meta-mensal")
+    public ResponseEntity<RelatorioMetaMensalMotoristaResponse> minhaMetaMensal(
+            @RequestParam(value = "inicio", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam(value = "fim", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim
+    ) {
+        return ResponseEntity.ok(buscarMinhaMetaMensalService.buscar(inicio, fim));
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_CONSULTA')")
