@@ -22,8 +22,8 @@ public interface MovimentacaoSemCargaRepository extends JpaRepository<Movimentac
               or m.caminhao.codigo = :codigoCaminhao
               or m.caminhao.codigoExterno = :codigoCaminhao
               or lower(replace(coalesce(m.caminhao.placa, ''), '-', '')) = lower(replace(:codigoCaminhao, '-', '')))
-         and (:inicio is null or m.dataMovimentacao >= :inicio)
-         and (:fim is null or m.dataMovimentacao <= :fim)
+         and (cast(:inicio as date) is null or m.dataMovimentacao >= :inicio)
+         and (cast(:fim as date) is null or m.dataMovimentacao <= :fim)
        order by m.dataMovimentacao desc, m.criadoEm desc
        """)
     Page<MovimentacaoSemCarga> buscar(
@@ -64,8 +64,8 @@ public interface MovimentacaoSemCargaRepository extends JpaRepository<Movimentac
               or m.caminhao.codigo = :codigoCaminhao
               or m.caminhao.codigoExterno = :codigoCaminhao
               or lower(replace(coalesce(m.caminhao.placa, ''), '-', '')) = lower(replace(:codigoCaminhao, '-', '')))
-         and (:inicio is null or m.dataMovimentacao >= :inicio)
-         and (:fim is null or m.dataMovimentacao <= :fim)
+         and (cast(:inicio as date) is null or m.dataMovimentacao >= :inicio)
+         and (cast(:fim as date) is null or m.dataMovimentacao <= :fim)
        """)
     BigDecimal sumCusto(
             @Param("codigoCaminhao") String codigoCaminhao,
@@ -80,8 +80,8 @@ public interface MovimentacaoSemCargaRepository extends JpaRepository<Movimentac
               or m.caminhao.codigo = :codigoCaminhao
               or m.caminhao.codigoExterno = :codigoCaminhao
               or lower(replace(coalesce(m.caminhao.placa, ''), '-', '')) = lower(replace(:codigoCaminhao, '-', '')))
-         and (:inicio is null or m.dataMovimentacao >= :inicio)
-         and (:fim is null or m.dataMovimentacao <= :fim)
+         and (cast(:inicio as date) is null or m.dataMovimentacao >= :inicio)
+         and (cast(:fim as date) is null or m.dataMovimentacao <= :fim)
        """)
     Long sumKm(
             @Param("codigoCaminhao") String codigoCaminhao,

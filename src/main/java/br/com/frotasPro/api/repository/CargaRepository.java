@@ -182,8 +182,8 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
           or lower(c.numeroCarga) like concat('%', lower(cast(:q as string)), '%')
           or lower(c.numeroCargaExterno) like concat('%', lower(cast(:q as string)), '%')
    )
-   and (:inicio is null or c.dtSaida >= :inicio)
-   and (:fim is null or c.dtSaida <= :fim)
+   and (cast(:inicio as date) is null or c.dtSaida >= :inicio)
+   and (cast(:fim as date) is null or c.dtSaida <= :fim)
    """)
     Page<Carga> listarFiltrado(
             @Param("q") String q,
