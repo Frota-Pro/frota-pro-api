@@ -28,6 +28,7 @@ spring:
       max-request-size: 150MB
 
 server:
+  forward-headers-strategy: framework
   error:
     include-message: always
 
