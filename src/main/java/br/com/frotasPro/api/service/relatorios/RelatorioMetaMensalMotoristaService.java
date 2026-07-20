@@ -9,6 +9,7 @@ import br.com.frotasPro.api.repository.AbastecimentoRepository;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.MetaRepository;
+import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class RelatorioMetaMensalMotoristaService {
     private final AbastecimentoRepository abastecimentoRepository;
     private final MetaRepository metaRepository;
     private final CaminhaoRepository caminhaoRepository;
+    private final MotoristaRepository motoristaRepository;
 
     @Transactional(readOnly = true)
     public RelatorioMetaMensalMotoristaResponse gerar(
@@ -42,10 +44,24 @@ public class RelatorioMetaMensalMotoristaService {
                 .findByMotoristaCodigoAndPeriodo(codigoMotorista, inicio, fim);
 
         if (cargas.isEmpty()) {
+            // Motorista pode não ter nenhuma carga iniciada ainda no período (ex: carga
+            // só SINCRONIZADA, sem dtSaida), mas a meta do mês já existe e deve aparecer
+            // mesmo assim — só o realizado é que fica zerado.
+            Motorista motoristaSemCarga = motoristaRepository.findByCodigo(codigoMotorista).orElse(null);
+            Caminhao caminhaoSemCarga = motoristaSemCarga != null
+                    ? caminhaoRepository.findByMotoristaTitularId(motoristaSemCarga.getId()).orElse(null)
+                    : null;
+            CategoriaCaminhao categoriaSemCarga = caminhaoSemCarga != null ? caminhaoSemCarga.getCategoria() : null;
+
             return RelatorioMetaMensalMotoristaResponse.builder()
+                    .nomeMotorista(motoristaSemCarga != null ? motoristaSemCarga.getNome() : null)
                     .codigoMotorista(codigoMotorista)
+                    .placaCaminhao(caminhaoSemCarga != null ? caminhaoSemCarga.getPlaca() : null)
+                    .codigoCaminhao(caminhaoSemCarga != null ? caminhaoSemCarga.getCodigo() : null)
                     .periodoInicio(inicio)
                     .periodoFim(fim)
+                    .objetivoMesTonelada(buscarMetaTonelada(motoristaSemCarga, caminhaoSemCarga, categoriaSemCarga))
+                    .metaConsumoKmPorLitro(buscarMetaConsumoCombustivel(motoristaSemCarga, caminhaoSemCarga, categoriaSemCarga))
                     .linhas(new ArrayList<>())
                     .totalKmRodado(0L)
                     .totalTonelada(BigDecimal.ZERO)
