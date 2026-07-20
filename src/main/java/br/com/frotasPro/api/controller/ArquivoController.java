@@ -65,7 +65,7 @@ public class ArquivoController {
         return MediaType.APPLICATION_OCTET_STREAM;
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/{id}/preview")
     public ResponseEntity<Resource> preview(@PathVariable UUID id) {
         Arquivo arquivo = buscarArquivo(id);
@@ -79,7 +79,7 @@ public class ArquivoController {
                 .body(resource);
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/{id}/download")
     public ResponseEntity<Resource> download(@PathVariable UUID id) {
         Arquivo arquivo = buscarArquivo(id);

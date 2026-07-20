@@ -55,13 +55,14 @@ public class SalvarArquivoService {
             Files.createDirectories(pastaDestino);
 
             String nomeOriginal = multipartFile.getOriginalFilename();
-            String extensao = "";
-            if (nomeOriginal != null && nomeOriginal.contains(".")) {
-                extensao = nomeOriginal.substring(nomeOriginal.lastIndexOf("."));
-            }
+            String extensao = extrairExtensaoSegura(nomeOriginal);
 
             String nomeArmazenado = UUID.randomUUID() + extensao;
-            Path destino = pastaDestino.resolve(nomeArmazenado);
+            Path destino = pastaDestino.resolve(nomeArmazenado).normalize();
+
+            if (!destino.startsWith(root)) {
+                throw new BusinessException("Nome de arquivo inválido.");
+            }
 
             try (InputStream inputStream = multipartFile.getInputStream()) {
                 Files.copy(inputStream, destino, StandardCopyOption.REPLACE_EXISTING);
@@ -96,6 +97,28 @@ public class SalvarArquivoService {
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException("Algoritmo de hash não suportado.", e);
         }
+    }
+
+    private String extrairExtensaoSegura(String nomeOriginal) {
+        if (nomeOriginal == null) {
+            return "";
+        }
+
+        // Considera só o último segmento do nome enviado, ignorando qualquer
+        // diretório embutido (com "/" ou "\") que o cliente tenha mandado.
+        String nomeBase = nomeOriginal.replace('\\', '/');
+        int barraIdx = nomeBase.lastIndexOf('/');
+        if (barraIdx >= 0) {
+            nomeBase = nomeBase.substring(barraIdx + 1);
+        }
+
+        int pontoIdx = nomeBase.lastIndexOf('.');
+        if (pontoIdx < 0 || pontoIdx == nomeBase.length() - 1) {
+            return "";
+        }
+
+        String extensao = nomeBase.substring(pontoIdx).toLowerCase();
+        return extensao.matches("\\.[a-z0-9]{1,10}") ? extensao : "";
     }
 
     private String sanitizeFolderName(String value) {

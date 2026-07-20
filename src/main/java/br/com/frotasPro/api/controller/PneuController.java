@@ -18,6 +18,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
 
@@ -30,6 +31,7 @@ public class PneuController {
     private final PneuService service;
     private final RelatorioVidaUtilPneuService relatorioVidaUtilPneuService;
 
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping
     public ResponseEntity<Page<PneuResponse>> listar(
             @RequestParam(value = "q", required = false)
@@ -46,6 +48,7 @@ public class PneuController {
         return ResponseEntity.ok(service.listar(q, status, pageable));
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/{codigo}")
     public ResponseEntity<PneuResponse> buscar(
             @PathVariable
@@ -56,6 +59,7 @@ public class PneuController {
         return ResponseEntity.ok(service.buscarPorCodigo(codigo));
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @PostMapping
     @Caching(evict = {
             @CacheEvict(value = "pneu_listar", allEntries = true),
@@ -67,6 +71,7 @@ public class PneuController {
         return ResponseEntity.ok(service.criar(req));
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @PutMapping("/{codigo}")
     @Caching(evict = {
             @CacheEvict(value = "pneu_listar", allEntries = true),
@@ -84,6 +89,7 @@ public class PneuController {
         return ResponseEntity.ok(service.atualizar(codigo, req));
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @DeleteMapping("/{codigo}")
     @Caching(evict = {
             @CacheEvict(value = "pneu_listar", allEntries = true),
@@ -102,6 +108,7 @@ public class PneuController {
     }
 
     // VIDA ÚTIL
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/{codigo}/vida-util")
     public ResponseEntity<PneuVidaUtilResponse> vidaUtil(
             @PathVariable
@@ -112,6 +119,7 @@ public class PneuController {
         return ResponseEntity.ok(service.vidaUtil(codigo));
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/relatorios/vida-util")
     public ResponseEntity<RelatorioVidaUtilPneuResponse> relatorioVidaUtil(
             @RequestParam(value = "caminhao", required = false)
@@ -125,6 +133,7 @@ public class PneuController {
     }
 
     // EVENTOS
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @PostMapping("/{codigo}/movimentacoes")
     @Caching(evict = {
             @CacheEvict(value = "pneu_listar", allEntries = true),
@@ -143,6 +152,7 @@ public class PneuController {
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/{codigo}/movimentacoes")
     public ResponseEntity<Page<PneuMovimentacaoResponse>> listarMovimentacoes(
             @PathVariable

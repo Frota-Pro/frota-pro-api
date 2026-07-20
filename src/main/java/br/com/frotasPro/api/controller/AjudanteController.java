@@ -27,14 +27,14 @@ public class AjudanteController {
     private final AtualizarAjudanteService atualizarAjudanteService;
     private final DeletarAjudanteService deletarAjudanteService;
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_CONSULTA\',)")
+    @PreAuthorize("hasAnyAuthority(\'ROLE_CONSULTA\')")
     @GetMapping
     public ResponseEntity<Page<AjudanteResponse>> listar(Pageable pageable) {
         Page<AjudanteResponse> ajudantes = listarAjudanteService.listar(pageable);
         return ResponseEntity.ok(ajudantes);
     }
 
-    @PreAuthorize("hasAnyAuthority(\'ROLE_CONSULTA\',)")
+    @PreAuthorize("hasAnyAuthority(\'ROLE_CONSULTA\')")
     @GetMapping("/{codigo}")
     public ResponseEntity<AjudanteResponse> buscarPorCodigo(@PathVariable String codigo) {
         AjudanteResponse ajudante = buscarAjudanteService.buscarPorCodigo(codigo);

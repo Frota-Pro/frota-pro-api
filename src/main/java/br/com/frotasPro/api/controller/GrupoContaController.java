@@ -6,6 +6,7 @@ import br.com.frotasPro.api.service.grupoConta.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,32 +26,38 @@ public class GrupoContaController {
     private final AtualizarGrupoContaService atualizarService;
     private final DeletarGrupoContaService deletarService;
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @PostMapping
     public GrupoContaResponse criar(@Valid @RequestBody GrupoContaRequest request) {
         return criarService.criar(request);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @GetMapping
     public List<GrupoContaResponse> listar() {
         return listarService.listar();
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @GetMapping("/{id}")
     public GrupoContaResponse buscarPorId(@PathVariable UUID id) {
         return buscarPorIdService.buscarPorId(id);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @GetMapping("/codigo")
     public ResponseEntity<GrupoContaResponse> buscarGrupoContaPorCodigo(@RequestParam("codigo") String codigo){
         GrupoContaResponse grupoConta = buscarGrupoContaPorCodigoService.buscarPorCodigo(codigo);
         return ResponseEntity.ok(grupoConta);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @PutMapping("/{id}")
     public GrupoContaResponse atualizar(@PathVariable UUID id, @Valid @RequestBody GrupoContaRequest request) {
         return atualizarService.atualizar(id, request);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @DeleteMapping("/{id}")
     @ResponseStatus(NO_CONTENT)
     public void deletar(@PathVariable UUID id) {

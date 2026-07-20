@@ -6,6 +6,7 @@ import br.com.frotasPro.api.service.despesaParada.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,22 +23,26 @@ public class DespesaParadaController {
     private final AtualizarDespesaParadaService atualizarService;
     private final DespesaParadaDeleteService deleteService;
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public DespesaParadaResponse criar(@RequestBody @Valid DespesaParadaRequest request) {
         return criarService.criar(request);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/{id}")
     public DespesaParadaResponse buscarPorId(@PathVariable UUID id) {
         return buscarPorIdService.buscar(id);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @GetMapping
     public List<DespesaParadaResponse> listar() {
         return buscarTodosService.listar();
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @PutMapping("/{id}")
     public DespesaParadaResponse atualizar(
             @PathVariable UUID id,
@@ -46,6 +51,7 @@ public class DespesaParadaController {
         return atualizarService.atualizar(id, request);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletar(@PathVariable UUID id) {
