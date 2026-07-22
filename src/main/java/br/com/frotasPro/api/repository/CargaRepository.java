@@ -181,6 +181,8 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
    where (:q is null
           or lower(c.numeroCarga) like concat('%', lower(cast(:q as string)), '%')
           or lower(c.numeroCargaExterno) like concat('%', lower(cast(:q as string)), '%')
+          or lower(c.caminhao.placa) like concat('%', lower(cast(:q as string)), '%')
+          or lower(c.motorista.nome) like concat('%', lower(cast(:q as string)), '%')
    )
    and (cast(:inicio as date) is null or c.dtSaida >= :inicio)
    and (cast(:fim as date) is null or c.dtSaida <= :fim)
