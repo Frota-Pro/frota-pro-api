@@ -15,6 +15,8 @@ import java.time.LocalDate;
 public class DashboardCargaRecenteResponse {
 
     private String numeroCarga;
+    /** Número a ser exibido ao usuário: externo se a integração estiver ativa, senão interno. */
+    private String numeroCargaExibicao;
     private String origem;
     private String destino;
 

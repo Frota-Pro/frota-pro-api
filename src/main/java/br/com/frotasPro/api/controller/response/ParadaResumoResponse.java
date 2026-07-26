@@ -13,6 +13,8 @@ public class ParadaResumoResponse {
 
     private UUID id;
     private String numeroCarga;
+    /** Número a ser exibido ao usuário: externo se a integração estiver ativa, senão interno. */
+    private String numeroCargaExibicao;
     private TipoParada tipoParada;
     private LocalDateTime dtInicio;
     private LocalDateTime dtFim;

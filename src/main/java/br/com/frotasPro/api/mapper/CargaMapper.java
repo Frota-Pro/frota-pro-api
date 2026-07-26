@@ -124,4 +124,29 @@ public class CargaMapper {
                 .build();
     }
 
+    /**
+     * Decide qual número de carga deve ser exibido ao usuário: o externo
+     * (vindo da integração) tem precedência apenas quando a integração está
+     * ativa E aquela carga específica já tem um número externo sincronizado;
+     * caso contrário, sempre o número interno.
+     */
+    public static String resolverNumeroExibicao(String numeroCarga, String numeroCargaExterno, boolean integracaoAtiva) {
+        if (integracaoAtiva && numeroCargaExterno != null && !numeroCargaExterno.isBlank()) {
+            return numeroCargaExterno;
+        }
+        return numeroCarga;
+    }
+
+    public static void aplicarNumeroExibicao(CargaResponse response, Carga carga, boolean integracaoAtiva) {
+        response.setNumeroCargaExibicao(
+                resolverNumeroExibicao(carga.getNumeroCarga(), carga.getNumeroCargaExterno(), integracaoAtiva)
+        );
+    }
+
+    public static void aplicarNumeroExibicao(CargaMinResponse response, Carga carga, boolean integracaoAtiva) {
+        response.setNumeroCargaExibicao(
+                resolverNumeroExibicao(carga.getNumeroCarga(), carga.getNumeroCargaExterno(), integracaoAtiva)
+        );
+    }
+
 }

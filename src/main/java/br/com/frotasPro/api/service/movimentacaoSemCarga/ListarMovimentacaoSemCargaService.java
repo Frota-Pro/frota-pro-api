@@ -5,6 +5,7 @@ import br.com.frotasPro.api.controller.response.ResumoMovimentacaoSemCargaRespon
 import br.com.frotasPro.api.domain.MovimentacaoSemCarga;
 import br.com.frotasPro.api.mapper.MovimentacaoSemCargaMapper;
 import br.com.frotasPro.api.repository.MovimentacaoSemCargaRepository;
+import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.utils.PeriodoValidator;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
@@ -25,12 +26,14 @@ import java.util.Locale;
 public class ListarMovimentacaoSemCargaService {
 
     private final MovimentacaoSemCargaRepository repository;
+    private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
     @Transactional(readOnly = true)
     public Page<MovimentacaoSemCargaResponse> listar(String codigoCaminhao, LocalDate inicio, LocalDate fim, Pageable pageable) {
         PeriodoValidator.opcional(inicio, fim, "movimentação sem carga");
+        boolean integracaoAtiva = integracaoWinThorConfigService.isCargaIntegracaoAtiva();
         return repository.findAll(filtros(codigoCaminhao, inicio, fim), pageable)
-                .map(MovimentacaoSemCargaMapper::toResponse);
+                .map(m -> MovimentacaoSemCargaMapper.toResponse(m, integracaoAtiva));
     }
 
     @Transactional(readOnly = true)

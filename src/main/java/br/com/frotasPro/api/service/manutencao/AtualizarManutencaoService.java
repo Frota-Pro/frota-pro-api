@@ -14,6 +14,7 @@ import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
 import br.com.frotasPro.api.repository.OficinaRepository;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;
+import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ public class AtualizarManutencaoService {
     private final OficinaRepository oficinaRepository;
     private final ParadaCargaRepository paradaCargaRepository;
     private final NotificacaoService notificacaoService;
+    private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
     public ManutencaoResponse atualizar(String codigo, ManutencaoRequest request) {
 
@@ -110,6 +112,6 @@ public class AtualizarManutencaoService {
                 manutencao.getCodigo()
         );
 
-        return toResponse(manutencao);
+        return toResponse(manutencao, integracaoWinThorConfigService.isCargaIntegracaoAtiva());
     }
 }

@@ -9,6 +9,7 @@ import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.CargaTransferenciaRepository;
+import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ public class MarcarTransferenciaCargaService {
 
     private final CargaRepository cargaRepository;
     private final CargaTransferenciaRepository cargaTransferenciaRepository;
+    private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
     @Transactional
     public CargaResponse marcar(String numeroCargaOrigem, MarcarTransferenciaCargaRequest request) {
@@ -45,7 +47,10 @@ public class MarcarTransferenciaCargaService {
 
         cargaTransferenciaRepository.save(transferencia);
 
-        return CargaMapper.toResponse(cargaRepository.save(origem));
+        Carga origemSalva = cargaRepository.save(origem);
+        CargaResponse response = CargaMapper.toResponse(origemSalva);
+        CargaMapper.aplicarNumeroExibicao(response, origemSalva, integracaoWinThorConfigService.isCargaIntegracaoAtiva());
+        return response;
     }
 
     private Carga buscarDestino(MarcarTransferenciaCargaRequest request) {

@@ -7,10 +7,12 @@ import br.com.frotasPro.api.domain.Rota;
 import br.com.frotasPro.api.domain.enums.Status;
 import br.com.frotasPro.api.domain.enums.StatusManutencao;
 import br.com.frotasPro.api.domain.enums.StatusMeta;
+import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
 import br.com.frotasPro.api.repository.MetaRepository;
+import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,7 @@ public class BuscarDashboardResumoService {
     private final AbastecimentoRepository abastecimentoRepository;
     private final MetaRepository metaRepository;
     private final ManutencaoRepository manutencaoRepository;
+    private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
     @Transactional(readOnly = true)
     public DashboardResumoResponse executar() {
@@ -49,8 +52,9 @@ public class BuscarDashboardResumoService {
 
         List<Carga> recentes = cargaRepository.findTop5ByOrderByCriadoEmDesc();
 
+        boolean integracaoAtiva = integracaoWinThorConfigService.isCargaIntegracaoAtiva();
         List<DashboardCargaRecenteResponse> cargasRecentes = recentes.stream()
-                .map(this::toCargaRecente)
+                .map(c -> toCargaRecente(c, integracaoAtiva))
                 .toList();
 
         return DashboardResumoResponse.builder()
@@ -63,7 +67,7 @@ public class BuscarDashboardResumoService {
                 .build();
     }
 
-    private DashboardCargaRecenteResponse toCargaRecente(Carga c) {
+    private DashboardCargaRecenteResponse toCargaRecente(Carga c, boolean integracaoAtiva) {
         Rota r = c.getRota();
 
         String origem = "N/A";
@@ -80,6 +84,7 @@ public class BuscarDashboardResumoService {
 
         return DashboardCargaRecenteResponse.builder()
                 .numeroCarga(c.getNumeroCarga())
+                .numeroCargaExibicao(CargaMapper.resolverNumeroExibicao(c.getNumeroCarga(), c.getNumeroCargaExterno(), integracaoAtiva))
                 .origem(origem)
                 .destino(destino)
                 .valorTotal(c.getValorTotal())

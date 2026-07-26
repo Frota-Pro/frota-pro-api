@@ -8,6 +8,7 @@ import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
+import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.service.usuario.UsuarioAutenticadoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class BuscarCargaAtualMotoristaService {
     private final MotoristaRepository motoristaRepository;
     private final CargaRepository cargaRepository;
     private final UsuarioAutenticadoService usuarioAutenticadoService;
+    private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
     @Transactional(readOnly = true)
     public List<CargaResponse> buscar() {
@@ -41,8 +43,13 @@ public class BuscarCargaAtualMotoristaService {
             throw new ObjectNotFound("Nenhuma carga SINCRONIZADA ou EM_ROTA para este motorista");
         }
 
+        boolean integracaoAtiva = integracaoWinThorConfigService.isCargaIntegracaoAtiva();
         return cargas.stream()
-                .map(CargaMapper::toResponse)
+                .map(carga -> {
+                    CargaResponse response = CargaMapper.toResponse(carga);
+                    CargaMapper.aplicarNumeroExibicao(response, carga, integracaoAtiva);
+                    return response;
+                })
                 .toList();
     }
 }

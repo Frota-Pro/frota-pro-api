@@ -8,8 +8,10 @@ import br.com.frotasPro.api.domain.enums.EventoNotificacao;
 import br.com.frotasPro.api.domain.enums.Status;
 import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.excption.ObjectNotFound;
+import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.AjudanteRepository;
 import br.com.frotasPro.api.repository.CargaRepository;
+import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.service.movimentacaoSemCarga.RegistrarMovimentacaoSemCargaService;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ public class IniciarCargaService {
     private final AjudanteRepository ajudanteRepository;
     private final NotificacaoService notificacaoService;
     private final RegistrarMovimentacaoSemCargaService registrarMovimentacaoSemCargaService;
+    private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
     @Transactional
     public String iniciarCarga(String numCarga, Integer kmInicial, List<String> ajudanteCodigos) {
@@ -73,14 +76,17 @@ public class IniciarCargaService {
 
         cargaRepository.save(carga);
 
+        String numeroCargaExibicao = CargaMapper.resolverNumeroExibicao(
+                carga.getNumeroCarga(), carga.getNumeroCargaExterno(), integracaoWinThorConfigService.isCargaIntegracaoAtiva());
+
         notificacaoService.notificar(
                 EventoNotificacao.CARGA_INICIADA,
                 TipoNotificacao.SUCESSO,
                 "Carga iniciada",
-                "Carga " + carga.getNumeroCarga() + " iniciada com KM inicial " + kmInicial + ".",
+                "Carga " + numeroCargaExibicao + " iniciada com KM inicial " + kmInicial + ".",
                 "CARGA",
                 carga.getId(),
-                carga.getNumeroCarga()
+                numeroCargaExibicao
         );
 
         return "Carga iniciada! Boa viagem 🚚";

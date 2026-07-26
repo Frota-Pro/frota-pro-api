@@ -2,14 +2,17 @@ package br.com.frotasPro.api.service.relatorios;
 
 import br.com.frotasPro.api.controller.response.RelatorioDespesaCategoriaPeriodoResponse;
 import br.com.frotasPro.api.domain.Abastecimento;
+import br.com.frotasPro.api.domain.Carga;
 import br.com.frotasPro.api.domain.DespesaParada;
 import br.com.frotasPro.api.domain.Manutencao;
 import br.com.frotasPro.api.domain.MovimentacaoSemCarga;
 import br.com.frotasPro.api.domain.enums.TipoDespesa;
+import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
 import br.com.frotasPro.api.repository.DespesaParadaRepository;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
 import br.com.frotasPro.api.repository.MovimentacaoSemCargaRepository;
+import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.utils.PeriodoValidator;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
@@ -35,9 +38,12 @@ public class RelatorioDespesaCategoriaPeriodoService {
     private final ManutencaoRepository manutencaoRepository;
     private final DespesaParadaRepository despesaParadaRepository;
     private final MovimentacaoSemCargaRepository movimentacaoSemCargaRepository;
+    private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
     public RelatorioDespesaCategoriaPeriodoResponse gerar(LocalDate inicio, LocalDate fim) {
         PeriodoValidator.obrigatorio(inicio, fim, "periodo");
+
+        boolean integracaoAtiva = integracaoWinThorConfigService.isCargaIntegracaoAtiva();
 
         LocalDateTime inicioDt = inicio.atStartOfDay();
         LocalDateTime fimDt = fim.atTime(LocalTime.MAX);
@@ -83,7 +89,9 @@ public class RelatorioDespesaCategoriaPeriodoService {
                 movimentacaoSemCargaRepository.findAll(movimentacaoFiltros(inicio, fim));
         for (MovimentacaoSemCarga m : movimentacoesSemCarga) {
             String referencia = m.getCaminhao().getPlaca() + " (" + m.getCaminhao().getCodigo() + ")";
-            String descricao = "Carga inicial " + m.getCargaInicio().getNumeroCarga()
+            String numeroCargaInicio = CargaMapper.resolverNumeroExibicao(
+                    m.getCargaInicio().getNumeroCarga(), m.getCargaInicio().getNumeroCargaExterno(), integracaoAtiva);
+            String descricao = "Carga inicial " + numeroCargaInicio
                     + " | " + m.getKmRodado() + " km sem carga"
                     + " | odômetro " + m.getKmOrigem() + " -> " + m.getKmDestino();
 
@@ -106,8 +114,10 @@ public class RelatorioDespesaCategoriaPeriodoService {
             }
 
             String categoriaPrincipal = TipoDespesa.PNEU.equals(d.getTipoDespesa()) ? CATEGORIA_FROTA : CATEGORIA_PESSOAL;
-            String referencia = d.getParadaCarga().getCarga().getNumeroCarga() + " | " +
-                    d.getParadaCarga().getCarga().getMotorista().getNome();
+            Carga cargaDespesa = d.getParadaCarga().getCarga();
+            String referencia = CargaMapper.resolverNumeroExibicao(
+                    cargaDespesa.getNumeroCarga(), cargaDespesa.getNumeroCargaExterno(), integracaoAtiva)
+                    + " | " + cargaDespesa.getMotorista().getNome();
 
             linhas.add(RelatorioDespesaCategoriaPeriodoResponse.Linha.builder()
                     .data(d.getDataHora().toLocalDate())

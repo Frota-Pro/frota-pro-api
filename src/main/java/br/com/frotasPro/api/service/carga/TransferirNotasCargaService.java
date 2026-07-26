@@ -1,6 +1,7 @@
 package br.com.frotasPro.api.service.carga;
 
 import br.com.frotasPro.api.controller.request.TransferirNotasCargaRequest;
+import br.com.frotasPro.api.controller.response.CargaResponse;
 import br.com.frotasPro.api.controller.response.TransferirNotasCargaResponse;
 import br.com.frotasPro.api.domain.Carga;
 import br.com.frotasPro.api.domain.CargaNota;
@@ -11,6 +12,7 @@ import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.CargaTransferenciaRepository;
+import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,7 @@ public class TransferirNotasCargaService {
 
     private final CargaRepository cargaRepository;
     private final CargaTransferenciaRepository cargaTransferenciaRepository;
+    private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
     @Transactional
     public TransferirNotasCargaResponse transferir(String numeroCargaOrigem, TransferirNotasCargaRequest request) {
@@ -83,10 +86,16 @@ public class TransferirNotasCargaService {
         Carga origemSalva = cargaRepository.save(origem);
         Carga destinoSalva = cargaRepository.save(destino);
 
+        boolean integracaoAtiva = integracaoWinThorConfigService.isCargaIntegracaoAtiva();
+        CargaResponse origemResponse = CargaMapper.toResponse(origemSalva);
+        CargaMapper.aplicarNumeroExibicao(origemResponse, origemSalva, integracaoAtiva);
+        CargaResponse destinoResponse = CargaMapper.toResponse(destinoSalva);
+        CargaMapper.aplicarNumeroExibicao(destinoResponse, destinoSalva, integracaoAtiva);
+
         return TransferirNotasCargaResponse.builder()
                 .totalNotasTransferidas(notasSolicitadas.size())
-                .cargaOrigem(CargaMapper.toResponse(origemSalva))
-                .cargaDestino(CargaMapper.toResponse(destinoSalva))
+                .cargaOrigem(origemResponse)
+                .cargaDestino(destinoResponse)
                 .build();
     }
 

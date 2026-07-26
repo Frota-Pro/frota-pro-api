@@ -23,6 +23,8 @@ public class CargaMinResponse {
 
     private String numeroCarga;
     private String numeroCargaExterno;
+    /** Número a ser exibido ao usuário: externo se a integração estiver ativa, senão interno. */
+    private String numeroCargaExibicao;
     private LocalDate dtSaida;
     private LocalDate dtChegada;
     @JsonSerialize(using = BigDecimalSemZerosSerializer.class)

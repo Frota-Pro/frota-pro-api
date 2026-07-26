@@ -4,6 +4,7 @@ import br.com.frotasPro.api.controller.response.ManutencaoResponse;
 import br.com.frotasPro.api.domain.Manutencao;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
+import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -16,12 +17,13 @@ import static br.com.frotasPro.api.mapper.ManutencaoMapper.toResponse;
 public class BuscarManutencaoPorCodigoService {
 
     private final ManutencaoRepository manutencaoRepository;
+    private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
     @Transactional(readOnly = true)
     @Cacheable("manutencao_buscar_codigo")
     public ManutencaoResponse buscar(String codigo) {
         Manutencao manutencao = manutencaoRepository.findByCodigo(codigo)
                 .orElseThrow(() -> new ObjectNotFound("Manutenção não encontrada"));
-        return toResponse(manutencao);
+        return toResponse(manutencao, integracaoWinThorConfigService.isCargaIntegracaoAtiva());
     }
 }

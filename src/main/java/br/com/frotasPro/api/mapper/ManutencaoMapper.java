@@ -14,7 +14,7 @@ public class ManutencaoMapper {
     private ManutencaoMapper() {
     }
 
-    public static ManutencaoResponse toResponse(Manutencao entity) {
+    public static ManutencaoResponse toResponse(Manutencao entity, boolean integracaoAtiva) {
         if (entity == null) {
             return null;
         }
@@ -39,6 +39,9 @@ public class ManutencaoMapper {
             parada = new ParadaResumoResponse();
             parada.setId(p.getId());
             parada.setNumeroCarga(p.getCarga() != null ? p.getCarga().getNumeroCarga() : null);
+            parada.setNumeroCargaExibicao(p.getCarga() != null
+                    ? CargaMapper.resolverNumeroExibicao(p.getCarga().getNumeroCarga(), p.getCarga().getNumeroCargaExterno(), integracaoAtiva)
+                    : null);
             parada.setTipoParada(p.getTipoParada());
             parada.setDtInicio(p.getDtInicio());
             parada.setDtFim(p.getDtFim());

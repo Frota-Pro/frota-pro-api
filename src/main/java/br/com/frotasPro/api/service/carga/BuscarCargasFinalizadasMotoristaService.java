@@ -7,6 +7,7 @@ import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
+import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.service.usuario.UsuarioAutenticadoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,7 @@ public class BuscarCargasFinalizadasMotoristaService {
     private final MotoristaRepository motoristaRepository;
     private final CargaRepository cargaRepository;
     private final UsuarioAutenticadoService usuarioAutenticadoService;
+    private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
     @Transactional(readOnly = true)
     public Page<CargaResponse> buscar(Pageable pageable) {
@@ -33,12 +35,17 @@ public class BuscarCargasFinalizadasMotoristaService {
                 .orElseThrow(() -> new ObjectNotFound(
                         "Nenhum motorista vinculado ao usuário logado"));
 
+        boolean integracaoAtiva = integracaoWinThorConfigService.isCargaIntegracaoAtiva();
         return cargaRepository
                 .findByMotoristaIdAndStatusCargaOrderByDtChegadaDesc(
                         motorista.getId(),
                         Status.FINALIZADA,
                         pageable
                 )
-                .map(CargaMapper::toResponse);
+                .map(carga -> {
+                    CargaResponse response = CargaMapper.toResponse(carga);
+                    CargaMapper.aplicarNumeroExibicao(response, carga, integracaoAtiva);
+                    return response;
+                });
     }
 }

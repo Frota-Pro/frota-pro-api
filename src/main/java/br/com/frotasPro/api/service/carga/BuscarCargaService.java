@@ -5,6 +5,7 @@ import br.com.frotasPro.api.domain.Carga;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.CargaRepository;
+import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
@@ -21,6 +22,13 @@ import java.time.LocalDateTime;
 public class BuscarCargaService {
 
     private final CargaRepository cargaRepository;
+    private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
+
+    private CargaResponse toResponseComExibicao(Carga carga, boolean integracaoAtiva) {
+        CargaResponse response = CargaMapper.toResponse(carga);
+        CargaMapper.aplicarNumeroExibicao(response, carga, integracaoAtiva);
+        return response;
+    }
 
     @Transactional(readOnly = true)
     @Cacheable("carga_buscar_numero")
@@ -30,7 +38,7 @@ public class BuscarCargaService {
                         "Carga não encontrada para o código: " + NumeroCarga
                 ));
 
-        return CargaMapper.toResponse(carga);
+        return toResponseComExibicao(carga, integracaoWinThorConfigService.isCargaIntegracaoAtiva());
     }
 
     @Transactional(readOnly = true)
@@ -41,13 +49,14 @@ public class BuscarCargaService {
                         "Carga não encontrada para o código externo: " + codigoExterno
                 ));
 
-        return CargaMapper.toResponse(carga);
+        return toResponseComExibicao(carga, integracaoWinThorConfigService.isCargaIntegracaoAtiva());
     }
 
     @Transactional(readOnly = true)
     public Page<CargaResponse> porDataSaida(LocalDate dataSaida, Pageable pageable) {
+        boolean integracaoAtiva = integracaoWinThorConfigService.isCargaIntegracaoAtiva();
         return cargaRepository.findByDtSaida(dataSaida, pageable)
-                .map(CargaMapper::toResponse);
+                .map(carga -> toResponseComExibicao(carga, integracaoAtiva));
     }
 
     @Transactional(readOnly = true)
@@ -57,8 +66,9 @@ public class BuscarCargaService {
 
         PeriodoValidator.obrigatorio(inicio, fim, "dtSaida");
 
+        boolean integracaoAtiva = integracaoWinThorConfigService.isCargaIntegracaoAtiva();
         return cargaRepository.findByDtSaidaBetween(inicio, fim, pageable)
-                .map(CargaMapper::toResponse);
+                .map(carga -> toResponseComExibicao(carga, integracaoAtiva));
     }
 
     @Transactional(readOnly = true)
@@ -68,8 +78,9 @@ public class BuscarCargaService {
 
         PeriodoValidator.obrigatorio(inicio, fim, "criadoEm");
 
+        boolean integracaoAtiva = integracaoWinThorConfigService.isCargaIntegracaoAtiva();
         return cargaRepository.findByCriadoEmBetween(inicio, fim, pageable)
-                .map(CargaMapper::toResponse);
+                .map(carga -> toResponseComExibicao(carga, integracaoAtiva));
     }
 
     @Transactional(readOnly = true)
@@ -80,10 +91,11 @@ public class BuscarCargaService {
         }
 
         String valor = codigo.trim();
+        boolean integracaoAtiva = integracaoWinThorConfigService.isCargaIntegracaoAtiva();
 
         return cargaRepository
                 .findByMotoristaCodigoOuCodigoExterno(valor, pageable)
-                .map(CargaMapper::toResponse);
+                .map(carga -> toResponseComExibicao(carga, integracaoAtiva));
     }
 
     @Transactional(readOnly = true)
@@ -94,10 +106,11 @@ public class BuscarCargaService {
         }
 
         String valor = codigo.trim();
+        boolean integracaoAtiva = integracaoWinThorConfigService.isCargaIntegracaoAtiva();
 
         return cargaRepository
                 .findByCaminhaoCodigoOuCodigoExterno(valor, pageable)
-                .map(CargaMapper::toResponse);
+                .map(carga -> toResponseComExibicao(carga, integracaoAtiva));
     }
 
 }

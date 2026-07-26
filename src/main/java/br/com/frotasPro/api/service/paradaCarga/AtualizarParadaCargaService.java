@@ -14,7 +14,9 @@ import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.domain.enums.TipoParada;
 import br.com.frotasPro.api.excption.BusinessException;
 import br.com.frotasPro.api.excption.ObjectNotFound;
+import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;
+import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import br.com.frotasPro.api.util.AtualizarMetaConsumoCombustivelService;
 import br.com.frotasPro.api.util.CalcularMediaKmLitroService;
@@ -37,6 +39,7 @@ public class AtualizarParadaCargaService {
     private final AtualizarMetaConsumoCombustivelService atualizarMetaConsumoCombustivelService;
     private final CalcularMediaKmLitroService calcularMediaKmLitroService;
     private final NotificacaoService notificacaoService;
+    private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
     @Transactional
     public ParadaCargaResponse atualizar(UUID id, ParadaCargaRequest request) {
@@ -179,21 +182,26 @@ public class AtualizarParadaCargaService {
             parada.getDespesaParadas().add(despesaManutencao);
         }
 
+        boolean integracaoAtiva = integracaoWinThorConfigService.isCargaIntegracaoAtiva();
+        String numeroCargaExibicao = carga != null
+                ? CargaMapper.resolverNumeroExibicao(carga.getNumeroCarga(), carga.getNumeroCargaExterno(), integracaoAtiva)
+                : null;
+
         notificacaoService.notificar(
                 EventoNotificacao.PARADA_ATUALIZADA,
                 TipoNotificacao.INFO,
                 "Parada atualizada",
                 "Parada " + parada.getId() + " da carga "
-                        + (carga != null ? carga.getNumeroCarga() : "N/A")
+                        + (numeroCargaExibicao != null ? numeroCargaExibicao : "N/A")
                         + " foi atualizada.",
                 "PARADA_CARGA",
                 parada.getId(),
-                carga != null ? carga.getNumeroCarga() : null
+                numeroCargaExibicao
         );
 
         atualizarMetasConsumoSeTiverAbastecimento(parada);
 
-        return toResponse(parada);
+        return toResponse(parada, integracaoAtiva);
     }
 
     private void atualizarMetasConsumoSeTiverAbastecimento(ParadaCarga parada) {

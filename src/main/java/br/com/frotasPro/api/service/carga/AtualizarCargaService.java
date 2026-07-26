@@ -6,6 +6,7 @@ import br.com.frotasPro.api.domain.*;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.*;
+import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ public class AtualizarCargaService {
     private final CaminhaoRepository caminhaoRepository;
     private final RotaRepository rotaRepository;
     private final AjudanteRepository ajudanteRepository;
+    private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
     @Transactional
     public CargaResponse atualizar(String numeroCarga, CargaRequest request) {
@@ -51,6 +53,8 @@ public class AtualizarCargaService {
 
         carga = cargaRepository.save(carga);
 
-        return CargaMapper.toResponse(carga);
+        CargaResponse response = CargaMapper.toResponse(carga);
+        CargaMapper.aplicarNumeroExibicao(response, carga, integracaoWinThorConfigService.isCargaIntegracaoAtiva());
+        return response;
     }
 }

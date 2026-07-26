@@ -7,8 +7,10 @@ import br.com.frotasPro.api.domain.enums.EventoNotificacao;
 import br.com.frotasPro.api.domain.enums.Status;
 import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.excption.ObjectNotFound;
+import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
+import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import br.com.frotasPro.api.util.AtualizarMetaCargaTransportadaService;
 import br.com.frotasPro.api.util.AtualizarMetaQuilometragemService;
@@ -28,6 +30,7 @@ public class FinalizarCargaService {
     private final AtualizarMetaToneladaService atualizarMetaToneladaService;
     private final AtualizarMetaCargaTransportadaService atualizarMetaCargaTransportadaService;
     private final NotificacaoService notificacaoService;
+    private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
 
     @Transactional
@@ -93,14 +96,17 @@ public class FinalizarCargaService {
 
         cargaRepository.save(carga);
 
+        String numeroCargaExibicao = CargaMapper.resolverNumeroExibicao(
+                carga.getNumeroCarga(), carga.getNumeroCargaExterno(), integracaoWinThorConfigService.isCargaIntegracaoAtiva());
+
         notificacaoService.notificar(
                 EventoNotificacao.CARGA_FINALIZADA,
                 TipoNotificacao.SUCESSO,
                 "Carga finalizada",
-                "Carga " + carga.getNumeroCarga() + " finalizada com KM final " + kmFinal + ".",
+                "Carga " + numeroCargaExibicao + " finalizada com KM final " + kmFinal + ".",
                 "CARGA",
                 carga.getId(),
-                carga.getNumeroCarga()
+                numeroCargaExibicao
         );
 
         return "Carga finalizada com sucesso! 🚚💨";

@@ -5,10 +5,17 @@ import br.com.frotasPro.api.domain.MovimentacaoSemCarga;
 
 public class MovimentacaoSemCargaMapper {
 
-    public static MovimentacaoSemCargaResponse toResponse(MovimentacaoSemCarga movimentacao) {
+    public static MovimentacaoSemCargaResponse toResponse(MovimentacaoSemCarga movimentacao, boolean integracaoAtiva) {
         if (movimentacao == null) {
             return null;
         }
+
+        String numeroCargaInicioExibicao = movimentacao.getCargaInicio() != null
+                ? CargaMapper.resolverNumeroExibicao(
+                        movimentacao.getCargaInicio().getNumeroCarga(),
+                        movimentacao.getCargaInicio().getNumeroCargaExterno(),
+                        integracaoAtiva)
+                : null;
 
         return MovimentacaoSemCargaResponse.builder()
                 .id(movimentacao.getId())
@@ -16,6 +23,7 @@ public class MovimentacaoSemCargaMapper {
                 .codigoCaminhao(movimentacao.getCaminhao() != null ? movimentacao.getCaminhao().getCodigo() : null)
                 .placaCaminhao(movimentacao.getCaminhao() != null ? movimentacao.getCaminhao().getPlaca() : null)
                 .numeroCargaInicio(movimentacao.getCargaInicio() != null ? movimentacao.getCargaInicio().getNumeroCarga() : null)
+                .numeroCargaInicioExibicao(numeroCargaInicioExibicao)
                 .kmOrigem(movimentacao.getKmOrigem())
                 .kmDestino(movimentacao.getKmDestino())
                 .kmRodado(movimentacao.getKmRodado())

@@ -5,6 +5,7 @@ import br.com.frotasPro.api.controller.integracao.dto.IntegracaoWinThorConfigUpd
 import br.com.frotasPro.api.domain.integracao.IntegracaoWinThorConfig;
 import br.com.frotasPro.api.repository.integracao.IntegracaoWinThorConfigRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,9 +20,24 @@ public class IntegracaoWinThorConfigService {
 
     private final IntegracaoWinThorConfigRepository repository;
 
+    @Value("${frotapro.empresa-sync-id}")
+    private UUID empresaIdPadrao;
+
     @Transactional(readOnly = true)
     public IntegracaoWinThorConfig getOrDefault(UUID empresaId) {
         return repository.findByEmpresaId(empresaId).orElse(null);
+    }
+
+    /**
+     * Indica se a integração com o WinThor está ativa e sincronizando cargas
+     * para a empresa padrão do sistema. Usado para decidir se o número
+     * externo de uma carga deve ter precedência sobre o número interno na
+     * exibição ao usuário.
+     */
+    @Transactional(readOnly = true)
+    public boolean isCargaIntegracaoAtiva() {
+        IntegracaoWinThorConfig cfg = getOrDefault(empresaIdPadrao);
+        return cfg != null && cfg.isAtivo() && cfg.isSyncCargas();
     }
 
     @Transactional

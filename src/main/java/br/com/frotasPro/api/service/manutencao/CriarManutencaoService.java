@@ -9,6 +9,7 @@ import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.domain.enums.TipoMovimentacaoPneu;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.*;
+import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import br.com.frotasPro.api.service.pneu.PneuService;
 import lombok.AllArgsConstructor;
@@ -35,6 +36,7 @@ public class CriarManutencaoService {
     // ✅ novo
     private final PneuService pneuService;
     private final NotificacaoService notificacaoService;
+    private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
     @Transactional
     public ManutencaoResponse criar(ManutencaoRequest request) {
@@ -181,7 +183,7 @@ public class CriarManutencaoService {
         );
 
 
-        return toResponse(manutencao);
+        return toResponse(manutencao, integracaoWinThorConfigService.isCargaIntegracaoAtiva());
     }
 
     private TipoMovimentacaoPneu mapearTipoMov(String tipoTrocaName) {

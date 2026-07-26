@@ -4,9 +4,11 @@ import br.com.frotasPro.api.controller.response.RelatorioCargaCompletaResponse;
 import br.com.frotasPro.api.domain.Carga;
 import br.com.frotasPro.api.domain.CargaNota;
 import br.com.frotasPro.api.domain.ParadaCarga;
+import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.DespesaParadaRepository;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;
+import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,7 @@ public class RelatorioCargaCompletaService {
     private final CargaRepository cargaRepository;
     private final ParadaCargaRepository paradaCargaRepository;
     private final DespesaParadaRepository despesaParadaRepository;
+    private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
     public RelatorioCargaCompletaResponse gerar(String numeroCarga) {
 
@@ -63,9 +66,16 @@ public class RelatorioCargaCompletaService {
         linhas.sort(Comparator.comparing(RelatorioCargaCompletaResponse.Linha::getTipo)
                 .thenComparing(RelatorioCargaCompletaResponse.Linha::getData, Comparator.nullsLast(Comparator.naturalOrder())));
 
+        boolean integracaoAtiva = integracaoWinThorConfigService.isCargaIntegracaoAtiva();
+        String numeroPrincipal = CargaMapper.resolverNumeroExibicao(
+                carga.getNumeroCarga(), carga.getNumeroCargaExterno(), integracaoAtiva);
+        String numeroSecundario = numeroPrincipal.equals(carga.getNumeroCarga())
+                ? carga.getNumeroCargaExterno()
+                : carga.getNumeroCarga();
+
         return RelatorioCargaCompletaResponse.builder()
-                .numeroCarga(carga.getNumeroCarga())
-                .codigoCarga(carga.getNumeroCargaExterno())
+                .numeroCarga(numeroPrincipal)
+                .codigoCarga(numeroSecundario)
                 .statusCarga(carga.getStatusCarga() == null ? null : carga.getStatusCarga().name())
                 .motorista(carga.getMotorista() == null ? "-" : (carga.getMotorista().getNome() + " (" + carga.getMotorista().getCodigo() + ")"))
                 .caminhao(carga.getCaminhao() == null ? "-" : (carga.getCaminhao().getPlaca() + " (" + carga.getCaminhao().getCodigo() + ")"))

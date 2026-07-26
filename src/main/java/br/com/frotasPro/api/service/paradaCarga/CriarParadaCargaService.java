@@ -12,10 +12,12 @@ import br.com.frotasPro.api.domain.enums.TipoParada;
 import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.excption.BusinessException;
 import br.com.frotasPro.api.excption.ObjectNotFound;
+import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.EixoRepository;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;
 import br.com.frotasPro.api.repository.PneuRepository;
+import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import br.com.frotasPro.api.service.pneu.PneuService;
 import br.com.frotasPro.api.util.AtualizarMetaConsumoCombustivelService;
@@ -45,6 +47,7 @@ public class CriarParadaCargaService {
     // ✅ novo (para registrar eventos do pneu)
     private final PneuService pneuService;
     private final NotificacaoService notificacaoService;
+    private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
     @Transactional
     public ParadaCargaResponse criar(ParadaCargaRequest request) {
@@ -262,18 +265,23 @@ public class CriarParadaCargaService {
             });
         }
 
+        boolean integracaoAtiva = integracaoWinThorConfigService.isCargaIntegracaoAtiva();
+        String numeroCargaExibicao = CargaMapper.resolverNumeroExibicao(
+                carga.getNumeroCarga(), carga.getNumeroCargaExterno(), integracaoAtiva
+        );
+
         notificacaoService.notificar(
                 EventoNotificacao.PARADA_CRIADA,
                 TipoNotificacao.INFO,
                 "Nova parada registrada",
-                "Parada " + parada.getId() + " criada para a carga " + carga.getNumeroCarga()
+                "Parada " + parada.getId() + " criada para a carga " + numeroCargaExibicao
                         + " (" + parada.getTipoParada() + ").",
                 "PARADA_CARGA",
                 parada.getId(),
-                carga.getNumeroCarga()
+                numeroCargaExibicao
         );
 
-        return toResponse(parada);
+        return toResponse(parada, integracaoAtiva);
     }
 
     private BigDecimal toBigDecimal(Integer v) {

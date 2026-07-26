@@ -5,11 +5,13 @@ import br.com.frotasPro.api.controller.response.RelatorioMetaMensalMotoristaResp
 import br.com.frotasPro.api.domain.*;
 import br.com.frotasPro.api.domain.enums.StatusMeta;
 import br.com.frotasPro.api.domain.enums.TipoMeta;
+import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.MetaRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
+import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,7 @@ public class RelatorioMetaMensalMotoristaService {
     private final MetaRepository metaRepository;
     private final CaminhaoRepository caminhaoRepository;
     private final MotoristaRepository motoristaRepository;
+    private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
     @Transactional(readOnly = true)
     public RelatorioMetaMensalMotoristaResponse gerar(
@@ -92,6 +95,7 @@ public class RelatorioMetaMensalMotoristaService {
         long totalKmRodado = 0L;
         BigDecimal totalLitros = BigDecimal.ZERO;
         BigDecimal totalValorAbastecimento = BigDecimal.ZERO;
+        boolean integracaoAtiva = integracaoWinThorConfigService.isCargaIntegracaoAtiva();
 
         for (Carga carga : cargas) {
 
@@ -116,7 +120,7 @@ public class RelatorioMetaMensalMotoristaService {
             LinhaRelatorioMetaMensalMotoristaResponse linha =
                     LinhaRelatorioMetaMensalMotoristaResponse.builder()
                             .data(carga.getDtSaida())
-                            .lote(carga.getNumeroCarga())
+                            .lote(CargaMapper.resolverNumeroExibicao(carga.getNumeroCarga(), carga.getNumeroCargaExterno(), integracaoAtiva))
                             .cidade(carga.getRota().getCidadeInicio())
                             .valorCarga(carga.getValorTotal())
                             .tonelagem(carga.getPesoCarga())

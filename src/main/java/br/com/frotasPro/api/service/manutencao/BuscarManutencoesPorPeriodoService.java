@@ -3,6 +3,7 @@ package br.com.frotasPro.api.service.manutencao;
 import br.com.frotasPro.api.controller.response.ManutencaoResponse;
 import br.com.frotasPro.api.mapper.ManutencaoMapper;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
+import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.utils.PeriodoValidator;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 public class BuscarManutencoesPorPeriodoService {
 
     private final ManutencaoRepository manutencaoRepository;
+    private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
     public Page<ManutencaoResponse> buscar(
             LocalDate inicio,
@@ -25,7 +27,8 @@ public class BuscarManutencoesPorPeriodoService {
 
         PeriodoValidator.obrigatorio(inicio, fim, "dataInicioManutencao");
 
+        boolean integracaoAtiva = integracaoWinThorConfigService.isCargaIntegracaoAtiva();
         return manutencaoRepository.findByDataInicioManutencaoBetween(inicio, fim, pageable)
-                .map(ManutencaoMapper::toResponse);
+                .map(m -> ManutencaoMapper.toResponse(m, integracaoAtiva));
     }
 }

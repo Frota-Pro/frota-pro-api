@@ -27,13 +27,15 @@ public class ParadaCargaMapper {
                 .build();
     }
 
-    public static ParadaCargaResponse toResponse(ParadaCarga entity) {
+    public static ParadaCargaResponse toResponse(ParadaCarga entity, boolean integracaoAtiva) {
         ParadaCargaResponse r = new ParadaCargaResponse();
         r.setId(entity.getId());
 
-        String codigo = entity.getCarga().getNumeroCargaExterno() != null
-                ? entity.getCarga().getNumeroCargaExterno()
-                : entity.getCarga().getNumeroCarga();
+        String codigo = CargaMapper.resolverNumeroExibicao(
+                entity.getCarga().getNumeroCarga(),
+                entity.getCarga().getNumeroCargaExterno(),
+                integracaoAtiva
+        );
 
         r.setCodigocarga(codigo);
         r.setTipoParada(entity.getTipoParada().getDescricao());

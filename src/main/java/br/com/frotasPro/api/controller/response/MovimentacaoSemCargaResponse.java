@@ -22,6 +22,8 @@ public class MovimentacaoSemCargaResponse {
     private String codigoCaminhao;
     private String placaCaminhao;
     private String numeroCargaInicio;
+    /** Número a ser exibido ao usuário: externo se a integração estiver ativa, senão interno. */
+    private String numeroCargaInicioExibicao;
     private Integer kmOrigem;
     private Integer kmDestino;
     private Integer kmRodado;

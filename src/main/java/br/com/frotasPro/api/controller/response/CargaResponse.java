@@ -24,6 +24,8 @@ public class CargaResponse {
     private UUID id;
     private String numeroCarga;
     private String numeroCargaExterno;
+    /** Número a ser exibido ao usuário: externo se a integração estiver ativa, senão interno. */
+    private String numeroCargaExibicao;
 
     private LocalDate dtSaida;
     private LocalDate dtPrevista;

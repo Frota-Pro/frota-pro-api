@@ -6,6 +6,7 @@ import br.com.frotasPro.api.domain.*;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.*;
+import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class CriarCargaService {
     private final CaminhaoRepository caminhaoRepository;
     private final RotaRepository rotaRepository;
     private final AjudanteRepository ajudanteRepository;
+    private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -56,6 +58,8 @@ public class CriarCargaService {
         entityManager.flush();
         entityManager.refresh(carga);
 
-        return CargaMapper.toResponse(carga);
+        CargaResponse response = CargaMapper.toResponse(carga);
+        CargaMapper.aplicarNumeroExibicao(response, carga, integracaoWinThorConfigService.isCargaIntegracaoAtiva());
+        return response;
     }
 }

@@ -6,7 +6,9 @@ import br.com.frotasPro.api.domain.enums.EventoNotificacao;
 import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.excption.BusinessException;
 import br.com.frotasPro.api.excption.ObjectNotFound;
+import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;
+import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ public class DeletarParadaCargaService {
 
     private final ParadaCargaRepository paradaRepository;
     private final NotificacaoService notificacaoService;
+    private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
     @Transactional
     public void deletar(UUID id) {
@@ -35,16 +38,20 @@ public class DeletarParadaCargaService {
 
         paradaRepository.delete(parada);
 
+        String numeroCargaExibicao = carga != null
+                ? CargaMapper.resolverNumeroExibicao(carga.getNumeroCarga(), carga.getNumeroCargaExterno(), integracaoWinThorConfigService.isCargaIntegracaoAtiva())
+                : null;
+
         notificacaoService.notificar(
                 EventoNotificacao.PARADA_APAGADA,
                 TipoNotificacao.ALERTA,
                 "Parada removida",
                 "Parada " + parada.getId() + " da carga "
-                        + (carga != null ? carga.getNumeroCarga() : "N/A")
+                        + (numeroCargaExibicao != null ? numeroCargaExibicao : "N/A")
                         + " foi excluída.",
                 "PARADA_CARGA",
                 parada.getId(),
-                carga != null ? carga.getNumeroCarga() : null
+                numeroCargaExibicao
         );
     }
 }
