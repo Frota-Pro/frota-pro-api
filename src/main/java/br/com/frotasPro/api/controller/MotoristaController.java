@@ -2,9 +2,11 @@ package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.MotoristaRequest;
 import br.com.frotasPro.api.controller.response.DocumentoMotoristaResponse;
+import br.com.frotasPro.api.controller.response.MotoristaDispositivoAppResponse;
 import br.com.frotasPro.api.controller.response.MotoristaResponse;
 import br.com.frotasPro.api.controller.response.RelatorioMetaMensalMotoristaResponse;
 import br.com.frotasPro.api.domain.enums.TipoDocumentoMotorista;
+import br.com.frotasPro.api.service.dispositivo.ListarDispositivosAppMotoristasService;
 import br.com.frotasPro.api.service.motorista.*;
 import br.com.frotasPro.api.service.relatorios.RelatorioMetaMensalMotoristaService;
 import jakarta.validation.Valid;
@@ -39,6 +41,7 @@ public class MotoristaController {
     private final RelatorioMetaMensalMotoristaService relatorioMetaMensalMotoristaService;
     private final ListarDocumentoMotoristaService listarDocumentoMotoristaService;
     private final RegistrarDocumentoMotoristaService registrarDocumentoMotoristaService;
+    private final ListarDispositivosAppMotoristasService listarDispositivosAppMotoristasService;
 
     @PreAuthorize("hasAnyAuthority(\'ROLE_CONSULTA\')")
     @GetMapping("/{codigo}")
@@ -104,6 +107,16 @@ public class MotoristaController {
     public ResponseEntity<Void> deletar(@PathVariable String codigo) {
         deletarMotoristaService.deletar(codigo);
         return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @GetMapping("/dispositivo-app")
+    public ResponseEntity<Page<MotoristaDispositivoAppResponse>> listarDispositivosApp(
+            @RequestParam(required = false) String q,
+            Pageable pageable
+    ) {
+        Page<MotoristaDispositivoAppResponse> resultado = listarDispositivosAppMotoristasService.listar(q, pageable);
+        return ResponseEntity.ok(resultado);
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")

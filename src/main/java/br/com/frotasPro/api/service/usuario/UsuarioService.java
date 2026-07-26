@@ -1,5 +1,6 @@
 package br.com.frotasPro.api.service.usuario;
 
+import br.com.frotasPro.api.controller.request.DispositivoAppRequest;
 import br.com.frotasPro.api.controller.request.UsuarioRequest;
 import br.com.frotasPro.api.controller.request.UsuarioSenhaSelfRequest;
 import br.com.frotasPro.api.controller.request.UsuarioSenhaUpdateRequest;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.text.Normalizer;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -146,6 +148,14 @@ public class UsuarioService {
         usuario.setSenha(passwordEncoder.encode(request.getNovaSenha()));
         usuarioRepository.save(usuario);
         log.info("security_event=password_changed_self login={} user_id={}", usuario.getLogin(), usuario.getId());
+    }
+
+    public void reportarDispositivoApp(DispositivoAppRequest request) {
+        Usuario usuario = usuarioAutenticadoService.getUsuario();
+        usuario.setDispositivoAppVersao(request.versao().trim());
+        usuario.setDispositivoAppPlataforma(request.plataforma());
+        usuario.setDispositivoAppReportadoEm(LocalDateTime.now());
+        usuarioRepository.save(usuario);
     }
 
     public List<String> criarUsuariosPelosMotoristas(List<String> codigos) {

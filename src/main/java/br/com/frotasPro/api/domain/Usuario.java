@@ -1,11 +1,13 @@
 package br.com.frotasPro.api.domain;
 
+import br.com.frotasPro.api.domain.enums.TipoPlataformaDispositivo;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -44,6 +46,16 @@ public class Usuario extends AuditoriaBase{
             joinColumns = @JoinColumn(name = "usuario_id"),
             inverseJoinColumns = @JoinColumn(name = "acesso_id"))
     private List<Acesso> acesso= new ArrayList<>();
+
+    @Column(name = "dispositivo_app_versao", length = 30)
+    private String dispositivoAppVersao;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "dispositivo_app_plataforma", length = 20)
+    private TipoPlataformaDispositivo dispositivoAppPlataforma;
+
+    @Column(name = "dispositivo_app_reportado_em")
+    private LocalDateTime dispositivoAppReportadoEm;
 
     public void adicionarAcesso(Acesso acesso){
         this.acesso.add(acesso);

@@ -56,4 +56,18 @@ public interface MotoristaRepository extends JpaRepository<Motorista, UUID> {
           )
     """)
     Page<Motorista> search(@Param("ativo") Boolean ativo, @Param("q") String q, Pageable pageable);
+
+    @Query("""
+        select m
+        from Motorista m
+        join fetch m.usuario u
+        where (
+            :q is null or :q = '' or
+            lower(m.codigo) like lower(concat('%', :q, '%')) or
+            lower(coalesce(m.codigoExterno, '')) like lower(concat('%', :q, '%')) or
+            lower(coalesce(m.nome, '')) like lower(concat('%', :q, '%'))
+          )
+        order by m.nome asc
+    """)
+    Page<Motorista> buscarComUsuarioVinculado(@Param("q") String q, Pageable pageable);
 }

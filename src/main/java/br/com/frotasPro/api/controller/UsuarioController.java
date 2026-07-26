@@ -1,5 +1,6 @@
 package br.com.frotasPro.api.controller;
 
+import br.com.frotasPro.api.controller.request.DispositivoAppRequest;
 import br.com.frotasPro.api.controller.request.UsuarioRequest;
 import br.com.frotasPro.api.controller.request.UsuarioSenhaSelfRequest;
 import br.com.frotasPro.api.controller.request.UsuarioSenhaUpdateRequest;
@@ -100,6 +101,13 @@ public class UsuarioController {
     })
     public ResponseEntity<Void> atualizarMinhaSenha(@Valid @RequestBody UsuarioSenhaSelfRequest request) {
         usuarioService.atualizarMinhaSenha(request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PatchMapping("/me/dispositivo-app")
+    public ResponseEntity<Void> reportarDispositivoApp(@Valid @RequestBody DispositivoAppRequest request) {
+        usuarioService.reportarDispositivoApp(request);
         return ResponseEntity.noContent().build();
     }
 
