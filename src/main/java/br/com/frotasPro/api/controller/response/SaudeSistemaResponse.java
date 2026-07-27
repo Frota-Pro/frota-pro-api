@@ -41,4 +41,7 @@ public class SaudeSistemaResponse {
 
     @Builder.Default
     private List<MotoristaAtrasoResponse> rankingAtrasoMotoristas = List.of();
+
+    // Métricas do Spring Actuator (saúde/JVM/infra)
+    private MetricasAtuadorResponse metricasAtuador;
 }

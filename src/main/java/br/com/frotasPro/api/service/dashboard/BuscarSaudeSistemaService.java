@@ -1,5 +1,6 @@
 package br.com.frotasPro.api.service.dashboard;
 
+import br.com.frotasPro.api.controller.response.MetricasAtuadorResponse;
 import br.com.frotasPro.api.controller.response.MotoristaAcessoResponse;
 import br.com.frotasPro.api.controller.response.MotoristaAtrasoResponse;
 import br.com.frotasPro.api.controller.response.SaudeSistemaResponse;
@@ -33,6 +34,7 @@ public class BuscarSaudeSistemaService {
 
     private final MotoristaRepository motoristaRepository;
     private final CargaRepository cargaRepository;
+    private final BuscarMetricasAtuadorService buscarMetricasAtuadorService;
 
     @Transactional(readOnly = true)
     public SaudeSistemaResponse buscar(LocalDate inicio, LocalDate fim) {
@@ -47,6 +49,7 @@ public class BuscarSaudeSistemaService {
 
         preencherAdocaoApp(builder);
         preencherAtrasos(builder, periodoInicio, periodoFim);
+        builder.metricasAtuador(buscarMetricasAtuadorService.buscar());
 
         return builder.build();
     }
