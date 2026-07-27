@@ -56,6 +56,12 @@ frotapro:
   integracao:
     integradora-base-url: http://localhost:8081
     timeout-ms: 2000
+    nfe:
+      timeout-ms: 8000
+
+  resend:
+    api-key: ${RESEND_API_KEY:}
+    remetente: ${RESEND_FROM_EMAIL:}
 
   logs:
     api-file: logs/frotapro.log
