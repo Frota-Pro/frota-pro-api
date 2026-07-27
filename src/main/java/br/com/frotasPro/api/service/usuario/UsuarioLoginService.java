@@ -3,6 +3,7 @@ package br.com.frotasPro.api.service.usuario;
 import br.com.frotasPro.api.controller.request.LoginRequest;
 import br.com.frotasPro.api.controller.response.LoginResponse;
 import br.com.frotasPro.api.domain.Usuario;
+import br.com.frotasPro.api.repository.UsuarioRepository;
 import br.com.frotasPro.api.service.auth.AuthTokenService;
 import br.com.frotasPro.api.service.auth.LoginProtectionService;
 import br.com.frotasPro.api.service.auth.TokenPair;
@@ -22,6 +23,7 @@ public class UsuarioLoginService {
     private final PasswordEncoder passwordEncoder;
     private final AuthTokenService authTokenService;
     private final LoginProtectionService loginProtectionService;
+    private final UsuarioRepository usuarioRepository;
 
     public LoginResponse login(LoginRequest request, String clientIp) {
         String loginNormalizado = normalizeLogin(request.getLogin());
@@ -47,6 +49,9 @@ public class UsuarioLoginService {
         TokenPair tokenPair = authTokenService.generateTokenPair(usuario);
         loginProtectionService.registerSuccess(ip, loginNormalizado);
         log.info("security_event=login_success login={} ip={}", loginNormalizado, ip);
+
+        usuario.registrarLogin();
+        usuarioRepository.save(usuario);
 
         return new LoginResponse(
                 tokenPair.accessToken(),

@@ -58,6 +58,17 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
             @Param("codmotorista") String codmotorista,
             @Param("status") List<Status> status);
 
+    @Query("""
+           select c
+           from Carga c
+           join fetch c.motorista m
+           where c.statusCarga = br.com.frotasPro.api.domain.enums.Status.FINALIZADA
+             and c.dtChegada between :inicio and :fim
+           """)
+    List<Carga> buscarFinalizadasComMotoristaNoPeriodo(
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim);
+
     Page<Carga> findByMotoristaIdAndStatusCargaOrderByDtChegadaDesc(
             UUID motoristaId,
             Status statusCarga,

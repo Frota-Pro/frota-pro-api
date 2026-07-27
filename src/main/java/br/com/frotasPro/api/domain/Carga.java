@@ -118,6 +118,12 @@ public class Carga extends AuditoriaBase {
         return Math.max(dias, 0);
     }
 
+    public long calcularAtrasoInicio() {
+        if (dtPrevista == null || dtSaida == null) return 0;
+        long dias = ChronoUnit.DAYS.between(dtPrevista, dtSaida);
+        return Math.max(dias, 0);
+    }
+
     public Integer calcularKmTotal() {
         if (kmInicial == null || kmFinal == null) return 0;
         int total = kmFinal - kmInicial;

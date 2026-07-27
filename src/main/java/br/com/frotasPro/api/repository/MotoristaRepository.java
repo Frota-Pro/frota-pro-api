@@ -70,4 +70,13 @@ public interface MotoristaRepository extends JpaRepository<Motorista, UUID> {
         order by m.nome asc
     """)
     Page<Motorista> buscarComUsuarioVinculado(@Param("q") String q, Pageable pageable);
+
+    @Query("""
+        select m
+        from Motorista m
+        join fetch m.usuario u
+        where m.ativo = true
+        order by m.nome asc
+    """)
+    List<Motorista> listarAtivosComUsuarioVinculado();
 }

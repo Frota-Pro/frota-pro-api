@@ -57,6 +57,17 @@ public class Usuario extends AuditoriaBase{
     @Column(name = "dispositivo_app_reportado_em")
     private LocalDateTime dispositivoAppReportadoEm;
 
+    @Column(name = "ultimo_login_em")
+    private LocalDateTime ultimoLoginEm;
+
+    @Column(name = "total_logins", nullable = false)
+    private long totalLogins = 0;
+
+    public void registrarLogin() {
+        this.ultimoLoginEm = LocalDateTime.now();
+        this.totalLogins++;
+    }
+
     public void adicionarAcesso(Acesso acesso){
         this.acesso.add(acesso);
     }
