@@ -1,0 +1,38 @@
+name: Build and Deploy API (Teste)
+
+on:
+  push:
+    branches: [ "develop" ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: [self-hosted, vps10364]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Build JAR
+        run: mvn -B clean package -DskipTests
+
+      - name: Login Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
+
+      - name: Build image
+        run: docker build -t arthenyo/frotapro-api:test .
+
+      - name: Push image
+        run: docker push arthenyo/frotapro-api:test
+
+      - name: Deploy no ambiente de teste
+        run: |
+          cd /opt/apps/frotapro-test
+          docker compose --env-file /opt/env/frotapro-test/.env.test pull frotapro-api
+          docker compose --env-file /opt/env/frotapro-test/.env.test up -d --no-deps --remove-orphans frotapro-api
+          docker compose logs --tail=100 frotapro-api
