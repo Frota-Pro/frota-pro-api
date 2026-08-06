@@ -3,6 +3,7 @@ package br.com.frotasPro.api.scheduler;
 import br.com.frotasPro.api.domain.integracao.IntegracaoWinThorConfig;
 import br.com.frotasPro.api.service.integracao.IntegracaoCargaService;
 import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
+import br.com.frotasPro.api.util.FusoHorarioUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,7 +34,7 @@ public class CargaScheduled {
         // Compatibilidade: sem configuração, mantém comportamento anterior.
         Integer intervaloMin = cfg != null ? cfg.getIntervaloMin() : null;
         if (intervaloMin == null) {
-            if (deveRodarNoCronLegado(LocalDateTime.now())) {
+            if (deveRodarNoCronLegado(FusoHorarioUtils.agoraBrasil())) {
                 log.debug("Scheduler: execução no cron legado.");
                 sincronizarCargas();
             }
@@ -45,7 +46,7 @@ public class CargaScheduled {
             return;
         }
 
-        LocalDateTime agora = LocalDateTime.now();
+        LocalDateTime agora = FusoHorarioUtils.agoraBrasil();
         if (ultimoDisparoAutomatico != null) {
             long minutos = Duration.between(ultimoDisparoAutomatico, agora).toMinutes();
             if (minutos < intervaloMin) {
@@ -69,7 +70,7 @@ public class CargaScheduled {
             return;
         }
 
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = FusoHorarioUtils.hojeBrasil();
         UUID jobId = integracaoCargaService.solicitarSincronizacao(
                 empresaIdPadrao,
                 hoje,

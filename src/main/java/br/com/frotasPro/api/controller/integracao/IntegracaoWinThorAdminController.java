@@ -4,6 +4,7 @@ import br.com.frotasPro.api.controller.integracao.dto.*;
 import br.com.frotasPro.api.domain.enums.StatusSincronizacao;
 import br.com.frotasPro.api.service.integracao.*;
 import br.com.frotasPro.api.service.integracao.IntegracaoWinThorMonitorService.TipoJob;
+import br.com.frotasPro.api.util.FusoHorarioUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -122,7 +123,7 @@ public class IntegracaoWinThorAdminController {
             @RequestParam(value = "solicitadoPor", defaultValue = "sistema") String solicitadoPor
     ) {
         if (dataInicial == null && dataFinal == null) {
-            dataInicial = data != null ? data : LocalDate.now();
+            dataInicial = data != null ? data : FusoHorarioUtils.hojeBrasil();
             dataFinal = dataInicial;
         } else {
             if (dataInicial == null) dataInicial = dataFinal;

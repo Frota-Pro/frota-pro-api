@@ -4,6 +4,7 @@ import br.com.frotasPro.api.integracao.dto.CargaSyncRequestEvent;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.integracao.kafka.CargaSyncRequestProducer;
 import br.com.frotasPro.api.service.carga.CargaSyncJobService;
+import br.com.frotasPro.api.util.FusoHorarioUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +38,7 @@ public class IntegracaoCargaService {
             String solicitadoPor
     ) {
 
-        LocalDate inicio = dataInicial != null ? dataInicial : LocalDate.now();
+        LocalDate inicio = dataInicial != null ? dataInicial : FusoHorarioUtils.hojeBrasil();
         LocalDate fim = dataFinal != null ? dataFinal : inicio;
         List<Integer> codigosCaminhoesResolvidos = resolverCodigosCaminhoes(empresaId, codigosCaminhoes);
         List<Integer> codigosMotoristasResolvidos = resolverCodigosMotoristas(empresaId, codigosMotoristas);
