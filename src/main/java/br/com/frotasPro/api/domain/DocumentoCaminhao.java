@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -37,4 +38,8 @@ public class DocumentoCaminhao extends AuditoriaBase {
 
     @Column(length = 255)
     private String observacao;
+
+    /** Marca quando o alerta de vencimento já foi disparado — evita repetir o aviso todo dia. */
+    @Column(name = "notificado_vencimento_em")
+    private LocalDateTime notificadoVencimentoEm;
 }

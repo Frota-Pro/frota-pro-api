@@ -27,6 +27,8 @@ public class AtualizarMotoristaService {
         motorista.setDataNascimento(request.getDataNascimento());
         motorista.setCnh(request.getCnh());
         motorista.setValidadeCnh(request.getValidadeCnh());
+        // Validade mudou: reabre a janela de alerta de vencimento.
+        motorista.setCnhNotificadoVencimentoEm(null);
 
         if (request.getCodigoExterno() != null && !request.getCodigoExterno().trim().isEmpty()) {
             motorista.setCodigoExterno(request.getCodigoExterno().trim());

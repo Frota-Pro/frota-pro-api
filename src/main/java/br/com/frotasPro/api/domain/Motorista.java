@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -53,6 +54,10 @@ public class Motorista extends AuditoriaBase{
 
     @Column(name = "validade_cnh")
     private LocalDate validadeCnh;
+
+    /** Marca quando o alerta de CNH vencendo já foi disparado — evita repetir o aviso todo dia. */
+    @Column(name = "cnh_notificado_vencimento_em")
+    private LocalDateTime cnhNotificadoVencimentoEm;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
