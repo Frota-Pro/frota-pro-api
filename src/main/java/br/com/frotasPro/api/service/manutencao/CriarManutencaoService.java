@@ -5,6 +5,8 @@ import br.com.frotasPro.api.controller.request.PneuMovimentacaoRequest;
 import br.com.frotasPro.api.controller.response.ManutencaoResponse;
 import br.com.frotasPro.api.domain.*;
 import br.com.frotasPro.api.domain.enums.EventoNotificacao;
+import br.com.frotasPro.api.domain.enums.StatusAprovacaoManutencao;
+import br.com.frotasPro.api.domain.enums.StatusManutencao;
 import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.domain.enums.TipoMovimentacaoPneu;
 import br.com.frotasPro.api.excption.ObjectNotFound;
@@ -32,6 +34,7 @@ public class CriarManutencaoService {
     private final EixoRepository eixoRepository;
     private final PneuRepository pneuRepository;
     private final ParadaCargaRepository paradaCargaRepository;
+    private final PlanoManutencaoPreventivaRepository planoManutencaoPreventivaRepository;
 
     // ✅ novo
     private final PneuService pneuService;
@@ -57,18 +60,35 @@ public class CriarManutencaoService {
                     .orElseThrow(() -> new ObjectNotFound("Parada não encontrada"));
         }
 
+        PlanoManutencaoPreventiva planoPreventivo = null;
+        if (request.getPlanoManutencaoPreventivaId() != null) {
+            planoPreventivo = planoManutencaoPreventivaRepository.findById(request.getPlanoManutencaoPreventivaId())
+                    .orElseThrow(() -> new ObjectNotFound("Plano de manutenção preventiva não encontrado"));
+        }
+
+        // O fluxo de aprovação só entra em jogo quando existe um valor orçado a aprovar;
+        // sem orçamento, segue como antes (aprovado automaticamente, sem gate nenhum).
+        StatusAprovacaoManutencao statusAprovacaoInicial = request.getValorOrcado() != null
+                ? StatusAprovacaoManutencao.PENDENTE
+                : StatusAprovacaoManutencao.APROVADO;
+        ManutencaoStatusHelper.validarAprovacaoParaAvancar(statusAprovacaoInicial, request.getStatusManutencao());
+
         Manutencao manutencao = Manutencao.builder()
                 .descricao(request.getDescricao())
                 .dataInicioManutencao(request.getDataInicioManutencao())
-                .dataFimManutencao(request.getDataFimManutencao())
+                .dataFimManutencao(ManutencaoStatusHelper.resolverDataFim(request.getStatusManutencao(), request.getDataFimManutencao()))
                 .tipoManutencao(request.getTipoManutencao())
                 .itensTrocados(request.getItensTrocados())
                 .observacoes(request.getObservacoes())
                 .valor(request.getValor())
+                .valorOrcado(request.getValorOrcado())
                 .statusManutencao(request.getStatusManutencao())
+                .statusAprovacao(statusAprovacaoInicial)
                 .caminhao(caminhao)
                 .oficina(oficina)
                 .paradaCarga(parada)
+                .kmOdometro(request.getKmOdometro())
+                .planoManutencaoPreventiva(planoPreventivo)
                 .build();
 
         // =========================
@@ -137,6 +157,8 @@ public class CriarManutencaoService {
         // ✅ salva primeiro pra garantir manutencao.id
         manutencaoRepository.save(manutencao);
 
+        atualizarPlanoPreventivoSeConcluida(manutencao);
+
         // =========================
         // Registra movimentações do pneu (vida útil)
         // =========================
@@ -182,8 +204,38 @@ public class CriarManutencaoService {
                 manutencao.getCodigo()
         );
 
+        if (statusAprovacaoInicial == StatusAprovacaoManutencao.PENDENTE) {
+            notificacaoService.notificar(
+                    EventoNotificacao.MANUTENCAO_ORCAMENTO_PENDENTE,
+                    TipoNotificacao.ALERTA,
+                    "Orçamento aguardando aprovação",
+                    "A manutenção " + manutencao.getCodigo() + " do caminhão "
+                            + (caminhao != null ? caminhao.getCodigo() : "N/A")
+                            + " está aguardando aprovação de orçamento.",
+                    "MANUTENCAO",
+                    manutencao.getId(),
+                    manutencao.getCodigo()
+            );
+        }
 
         return toResponse(manutencao, integracaoWinThorConfigService.isCargaIntegracaoAtiva());
+    }
+
+    /** Se a manutenção cumpre um plano preventivo e já nasce concluída, atualiza a linha de base do plano. */
+    private void atualizarPlanoPreventivoSeConcluida(Manutencao manutencao) {
+        PlanoManutencaoPreventiva plano = manutencao.getPlanoManutencaoPreventiva();
+        if (plano == null || manutencao.getStatusManutencao() != StatusManutencao.CONCLUIDA) {
+            return;
+        }
+
+        if (manutencao.getKmOdometro() != null) {
+            plano.setUltimoKmExecutado(manutencao.getKmOdometro());
+        }
+        if (manutencao.getDataFimManutencao() != null) {
+            plano.setUltimaDataExecutada(manutencao.getDataFimManutencao());
+        }
+        plano.setNotificadoVencimentoEm(null);
+        planoManutencaoPreventivaRepository.save(plano);
     }
 
     private TipoMovimentacaoPneu mapearTipoMov(String tipoTrocaName) {

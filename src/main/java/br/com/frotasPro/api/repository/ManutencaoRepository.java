@@ -187,4 +187,16 @@ public interface ManutencaoRepository extends JpaRepository<Manutencao, UUID> {
             @Param("inicio") LocalDate inicio,
             @Param("fim") LocalDate fim
     );
+
+    @Query("""
+        select m
+        from Manutencao m
+        where m.statusManutencao in :statusEmAberto
+          and m.notificadoDemoraEm is null
+          and m.dataInicioManutencao <= :limite
+    """)
+    List<Manutencao> buscarEstagnadasNaoNotificadas(
+            @Param("statusEmAberto") List<StatusManutencao> statusEmAberto,
+            @Param("limite") LocalDate limite
+    );
 }
