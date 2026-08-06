@@ -2,6 +2,7 @@ package br.com.frotasPro.api.repository;
 
 import br.com.frotasPro.api.domain.Abastecimento;
 import br.com.frotasPro.api.domain.enums.FormaPagamento;
+import br.com.frotasPro.api.domain.enums.Status;
 import br.com.frotasPro.api.domain.enums.TipoCombustivel;
 import br.com.frotasPro.api.projections.AbastecimentoGastoPorCombustivel;
 import br.com.frotasPro.api.projections.AbastecimentoResumoCaminhao;
@@ -12,6 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -343,4 +345,40 @@ and (cast(:fim as timestamp) is null or a.dt_abastecimento <= cast(:fim as times
        order by a.dtAbastecimento
        """)
     List<Abastecimento> findByCargaId(@Param("cargaId") UUID cargaId);
+
+    // Litros abastecidos DURANTE cargas finalizadas cujo início (dtSaida) caiu
+    // no período — não filtra pela data do abastecimento em si, porque um
+    // abastecimento pode acontecer já no mês seguinte ao início da carga
+    // (a carga é que decide o período, não o abastecimento isolado).
+    @Query("""
+       select coalesce(sum(a.qtLitros), 0)
+       from Abastecimento a
+       join a.paradaCarga p
+       join p.carga c
+       where c.caminhao.codigo = :codigo
+         and c.statusCarga = :status
+         and c.dtSaida between :inicio and :fim
+       """)
+    BigDecimal sumLitrosVinculadosACargaPorCaminhaoNoPeriodo(
+            @Param("codigo") String codigo,
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim,
+            @Param("status") Status status
+    );
+
+    @Query("""
+       select coalesce(sum(a.qtLitros), 0)
+       from Abastecimento a
+       join a.paradaCarga p
+       join p.carga c
+       where c.motorista.codigo = :codigo
+         and c.statusCarga = :status
+         and c.dtSaida between :inicio and :fim
+       """)
+    BigDecimal sumLitrosVinculadosACargaPorMotoristaNoPeriodo(
+            @Param("codigo") String codigo,
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim,
+            @Param("status") Status status
+    );
 }

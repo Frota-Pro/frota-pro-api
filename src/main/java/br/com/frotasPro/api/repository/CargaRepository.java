@@ -95,7 +95,7 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
        from Carga c
        where c.caminhao.codigo = :codigo
          and c.statusCarga = :status
-         and c.dtChegada between :inicio and :fim
+         and c.dtSaida between :inicio and :fim
          and c.kmFinal is not null
          and c.kmInicial is not null
        """)
@@ -111,7 +111,7 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
        from Carga c
        where c.motorista.codigo = :codigo
          and c.statusCarga = :status
-         and c.dtChegada between :inicio and :fim
+         and c.dtSaida between :inicio and :fim
          and c.kmFinal is not null
          and c.kmInicial is not null
        """)
@@ -127,7 +127,7 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
        from Carga c
        where c.caminhao.codigo = :codigo
          and c.statusCarga = :status
-         and c.dtChegada between :inicio and :fim
+         and c.dtSaida between :inicio and :fim
        """)
     BigDecimal sumPesoPorCaminhaoNoPeriodo(
             @Param("codigo") String codigo,
@@ -141,7 +141,7 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
        from Carga c
        where c.motorista.codigo = :codigo
          and c.statusCarga = :status
-         and c.dtChegada between :inicio and :fim
+         and c.dtSaida between :inicio and :fim
        """)
     BigDecimal sumPesoPorMotoristaNoPeriodo(
             @Param("codigo") String codigo,
@@ -155,7 +155,7 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
        from Carga c
        where c.caminhao.codigo = :codigo
          and c.statusCarga = :status
-         and c.dtChegada between :inicio and :fim
+         and c.dtSaida between :inicio and :fim
        """)
     Long countCargasPorCaminhaoNoPeriodo(
             @Param("codigo") String codigo,
@@ -169,7 +169,7 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
        from Carga c
        where c.motorista.codigo = :codigo
          and c.statusCarga = :status
-         and c.dtChegada between :inicio and :fim
+         and c.dtSaida between :inicio and :fim
        """)
     Long countCargasPorMotoristaNoPeriodo(
             @Param("codigo") String codigo,

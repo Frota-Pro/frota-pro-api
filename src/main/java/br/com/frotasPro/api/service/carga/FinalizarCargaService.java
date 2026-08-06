@@ -13,6 +13,7 @@ import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import br.com.frotasPro.api.util.AtualizarMetaCargaTransportadaService;
+import br.com.frotasPro.api.util.AtualizarMetaConsumoCombustivelService;
 import br.com.frotasPro.api.util.AtualizarMetaQuilometragemService;
 import br.com.frotasPro.api.util.AtualizarMetaToneladaService;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class FinalizarCargaService {
     private final AtualizarMetaQuilometragemService atualizarMetaQuilometragemService;
     private final AtualizarMetaToneladaService atualizarMetaToneladaService;
     private final AtualizarMetaCargaTransportadaService atualizarMetaCargaTransportadaService;
+    private final AtualizarMetaConsumoCombustivelService atualizarMetaConsumoCombustivelService;
     private final NotificacaoService notificacaoService;
     private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
@@ -71,28 +73,38 @@ public class FinalizarCargaService {
         carga.setKmFinal(kmFinal);
         carga.setStatusCarga(Status.FINALIZADA);
 
+        // Conta pela data de INÍCIO da carga (dtSaida), não pela de chegada:
+        // uma carga que começou no fim de um mês e só termina no mês
+        // seguinte deve continuar pertencendo à meta do mês em que ela foi
+        // de fato despachada, mesmo que essa meta já tenha sido fechada
+        // (renovação automática) antes da carga ser finalizada.
+        LocalDate dataReferenciaMeta = carga.getDtSaida();
+
         atualizarMetaQuilometragemService.registrarQuilometragem(
                 carga.getCaminhao().getCodigo(),
                 carga.getMotorista() != null ? carga.getMotorista().getCodigo() : null,
                 carga.getKmInicial(),
                 kmFinal,
-                carga.getDtChegada()
+                dataReferenciaMeta
         );
 
         atualizarMetaToneladaService.registrarTonelada(
                 carga.getCaminhao().getCodigo(),
                 carga.getMotorista() != null ? carga.getMotorista().getCodigo() : null,
                 carga.getPesoCarga(),
-                carga.getDtChegada()
+                dataReferenciaMeta
         );
 
         atualizarMetaCargaTransportadaService.registrarCarga(
                 carga.getCaminhao().getCodigo(),
                 carga.getMotorista() != null ? carga.getMotorista().getCodigo() : null,
-                carga.getDtChegada()
+                dataReferenciaMeta
         );
 
-
+        // Km/l: soma o km/litros dessa carga na meta de consumo do caminhão/
+        // motorista (recalculada do zero a partir de todas as cargas finalizadas
+        // no período — ver MetaProgressoService).
+        atualizarMetaConsumoCombustivelService.atualizar(caminhao, motorista, dataReferenciaMeta);
 
         cargaRepository.save(carga);
 

@@ -20,7 +20,6 @@ import br.com.frotasPro.api.repository.PneuRepository;
 import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import br.com.frotasPro.api.service.pneu.PneuService;
-import br.com.frotasPro.api.util.AtualizarMetaConsumoCombustivelService;
 import br.com.frotasPro.api.util.CalcularMediaKmLitroService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,7 +39,6 @@ public class CriarParadaCargaService {
     private final ParadaCargaRepository repository;
     private final CargaRepository cargaRepository;
     private final CalcularMediaKmLitroService calcularMediaKmLitroService;
-    private final AtualizarMetaConsumoCombustivelService atualizarMetaConsumoCombustivelService;
     private final EixoRepository eixoRepository;
     private final PneuRepository pneuRepository;
 
@@ -225,7 +223,7 @@ public class CriarParadaCargaService {
 
         // ✅ salva tudo primeiro (garante IDs)
         repository.save(parada);
-        atualizarMetasConsumoSeTiverAbastecimento(parada);
+        // A meta de consumo (km/l) não é mais atualizada aqui — ver FinalizarCargaService.
 
         // ✅ Agora registra eventos dos pneus (movimentações) vinculando na parada/manutenção
         if (request.getManutencao() != null && request.getManutencao().getTrocasPneu() != null
@@ -287,19 +285,6 @@ public class CriarParadaCargaService {
     private BigDecimal toBigDecimal(Integer v) {
         if (v == null) return null;
         return BigDecimal.valueOf(v.longValue());
-    }
-
-    private void atualizarMetasConsumoSeTiverAbastecimento(ParadaCarga parada) {
-        if (parada.getAbastecimentos() == null || parada.getAbastecimentos().isEmpty()) {
-            return;
-        }
-
-        Abastecimento abastecimento = parada.getAbastecimentos().get(0);
-        atualizarMetaConsumoCombustivelService.atualizar(
-                abastecimento.getCaminhao(),
-                abastecimento.getMotorista(),
-                abastecimento.getDtAbastecimento() != null ? abastecimento.getDtAbastecimento().toLocalDate() : null
-        );
     }
 
     private TipoMovimentacaoPneu mapearTipoMov(String tipoTrocaName) {

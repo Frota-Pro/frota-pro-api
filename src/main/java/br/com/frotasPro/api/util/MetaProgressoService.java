@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -46,19 +45,28 @@ public class MetaProgressoService {
 
         TipoMeta tipo = meta.getTipoMeta();
         if (tipo == TipoMeta.CONSUMO_COMBUSTIVEL) {
-            LocalDateTime dtInicio = inicio.atStartOfDay();
-            LocalDateTime dtFim = fim.atTime(23, 59, 59);
-            if (motorista != null) {
-                BigDecimal media = abastecimentoRepository
-                        .mediaKmLitroPonderadaPorMotoristaEPeriodo(motorista.getId(), dtInicio, dtFim);
-                return media != null ? media : BigDecimal.ZERO;
-            }
+            // Média geral do período: soma do km rodado de todas as cargas
+            // finalizadas cujo início caiu no período, dividido pela soma dos
+            // litros abastecidos durante essas mesmas cargas — igual ao que
+            // já é mostrado no relatório de meta mensal do motorista. Não é
+            // mais a média entre abastecimentos avulsos (que ignorava de
+            // qual carga cada um fazia parte).
+            Long kmRodado = null;
+            BigDecimal litros = null;
             if (caminhao != null) {
-                BigDecimal media = abastecimentoRepository
-                        .mediaKmLitroPonderadaPorCaminhaoEPeriodo(caminhao.getId(), dtInicio, dtFim);
-                return media != null ? media : BigDecimal.ZERO;
+                kmRodado = cargaRepository.sumKmRodadoPorCaminhaoNoPeriodo(caminhao.getCodigo(), inicio, fim, Status.FINALIZADA);
+                litros = abastecimentoRepository.sumLitrosVinculadosACargaPorCaminhaoNoPeriodo(caminhao.getCodigo(), inicio, fim, Status.FINALIZADA);
+            } else if (motorista != null) {
+                kmRodado = cargaRepository.sumKmRodadoPorMotoristaNoPeriodo(motorista.getCodigo(), inicio, fim, Status.FINALIZADA);
+                litros = abastecimentoRepository.sumLitrosVinculadosACargaPorMotoristaNoPeriodo(motorista.getCodigo(), inicio, fim, Status.FINALIZADA);
+            } else {
+                return meta.getValorRealizado();
             }
-            return meta.getValorRealizado();
+
+            if (litros == null || litros.compareTo(BigDecimal.ZERO) <= 0) {
+                return BigDecimal.ZERO;
+            }
+            return BigDecimal.valueOf(kmRodado != null ? kmRodado : 0L).divide(litros, 2, RoundingMode.HALF_UP);
         }
 
         if (tipo == TipoMeta.QUILOMETRAGEM) {

@@ -12,7 +12,6 @@ import br.com.frotasPro.api.repository.AbastecimentoRepository;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
-import br.com.frotasPro.api.util.AtualizarMetaConsumoCombustivelService;
 import br.com.frotasPro.api.util.CalcularMediaKmLitroService;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,6 @@ public class CriarAbastecimentoService {
     private final CaminhaoRepository caminhaoRepository;
     private final MotoristaRepository motoristaRepository;
     private final CalcularMediaKmLitroService calcularMediaKmLitroService;
-    private final AtualizarMetaConsumoCombustivelService atualizarMetaConsumoCombustivelService;
     private final NotificacaoService notificacaoService;
 
     public AbastecimentoResponse criar(AbastecimentoRequest request) {
@@ -73,11 +71,9 @@ public class CriarAbastecimentoService {
         a.setMediaKmLitro(media != null ? media : request.getMediaKmLitro());
 
         repository.save(a);
-        atualizarMetaConsumoCombustivelService.atualizar(
-                a.getCaminhao(),
-                a.getMotorista(),
-                a.getDtAbastecimento() != null ? a.getDtAbastecimento().toLocalDate() : null
-        );
+        // A meta de consumo (km/l) não é mais atualizada aqui — ela é
+        // recalculada quando a carga vinculada a esse abastecimento é
+        // finalizada (ver FinalizarCargaService), não no momento do abastecimento.
 
         String codigoRef = a.getCodigo() != null ? a.getCodigo() : "ID-" + a.getId();
         notificacaoService.notificar(

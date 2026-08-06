@@ -3,7 +3,6 @@ package br.com.frotasPro.api.util;
 import br.com.frotasPro.api.domain.Caminhao;
 import br.com.frotasPro.api.domain.Meta;
 import br.com.frotasPro.api.domain.Motorista;
-import br.com.frotasPro.api.domain.enums.StatusMeta;
 import br.com.frotasPro.api.domain.enums.TipoMeta;
 import br.com.frotasPro.api.repository.MetaRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +16,13 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Recalcula a meta de consumo (km/l) de um caminhão/motorista. Chamado ao
+ * FINALIZAR uma carga (junto com as outras metas), usando a data de início
+ * da carga (dtSaida) como referência — não mais no momento do abastecimento.
+ * O valor em si (km total das cargas do período ÷ litros das cargas do
+ * período) é recalculado do zero por MetaProgressoService a cada chamada.
+ */
 @Service
 @RequiredArgsConstructor
 public class AtualizarMetaConsumoCombustivelService {
@@ -40,9 +46,8 @@ public class AtualizarMetaConsumoCombustivelService {
         UUID caminhaoId = caminhao != null ? caminhao.getId() : null;
         UUID motoristaId = motorista != null ? motorista.getId() : null;
 
-        List<Meta> metas = metaRepository.buscarMetasAtivasConsumoPorAbastecimento(
+        List<Meta> metas = metaRepository.buscarMetasAtivasConsumoPorCaminhaoOuMotorista(
                 TipoMeta.CONSUMO_COMBUSTIVEL,
-                List.of(StatusMeta.EM_ANDAMENTO, StatusMeta.NAO_INICIADA),
                 dataReferencia,
                 caminhaoId,
                 motoristaId
