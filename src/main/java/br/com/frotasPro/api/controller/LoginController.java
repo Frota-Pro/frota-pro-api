@@ -35,7 +35,8 @@ public class LoginController {
                 tokenPair.accessToken(),
                 tokenPair.accessExpiresIn(),
                 tokenPair.refreshToken(),
-                tokenPair.refreshExpiresIn()
+                tokenPair.refreshExpiresIn(),
+                tokenPair.mustChangePassword()
         );
     }
 

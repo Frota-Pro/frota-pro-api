@@ -17,4 +17,5 @@ public class AuthMeResponse {
     private String nome;
     private String login;
     private Set<String> authorities;
+    private boolean mustChangePassword;
 }

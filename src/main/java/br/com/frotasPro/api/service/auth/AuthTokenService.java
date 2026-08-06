@@ -86,6 +86,7 @@ public class AuthTokenService {
                 .claim("login", usuario.getLogin())
                 .claim("id", usuario.getId())
                 .claim("scope", acessos)
+                .claim("mustChangePassword", usuario.isSenhaTemporaria())
                 .build();
 
         String refreshJti = UUID.randomUUID().toString();
@@ -103,7 +104,7 @@ public class AuthTokenService {
         String accessToken = jwtEncoder.encode(JwtEncoderParameters.from(accessClaims)).getTokenValue();
         String refreshToken = jwtEncoder.encode(JwtEncoderParameters.from(refreshClaims)).getTokenValue();
 
-        return new TokenPair(accessToken, accessTokenSeconds, refreshToken, refreshTokenSeconds);
+        return new TokenPair(accessToken, accessTokenSeconds, refreshToken, refreshTokenSeconds, usuario.isSenhaTemporaria());
     }
 
     private Jwt decode(String token) {

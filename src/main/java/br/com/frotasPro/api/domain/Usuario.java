@@ -41,6 +41,10 @@ public class Usuario extends AuditoriaBase{
     @Column(nullable = false)
     private boolean ativo = true;
 
+    /** Senha ainda é a padrão (ou foi resetada por um admin) — obriga a troca antes de liberar o resto da API. */
+    @Column(name = "senha_temporaria", nullable = false)
+    private boolean senhaTemporaria = false;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "tb_usuario_acesso",
             joinColumns = @JoinColumn(name = "usuario_id"),

@@ -35,6 +35,8 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 @Slf4j
 public class UsuarioService {
 
+    private static final String SENHA_PADRAO = "padrao123";
+
     private final UsuarioRepository usuarioRepository;
     private final AcessoRepository acessoRepository;
     private final PasswordEncoder passwordEncoder;
@@ -134,6 +136,8 @@ public class UsuarioService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
         String actor = getCurrentActorOrSystem();
         usuario.setSenha(passwordEncoder.encode(request.getNovaSenha()));
+        // Senha definida por um admin é sempre tratada como temporária: o usuário é obrigado a trocá-la no próximo login.
+        usuario.setSenhaTemporaria(true);
         usuarioRepository.save(usuario);
         log.info("security_event=password_changed actor={} target_login={} target_id={}", actor, usuario.getLogin(), usuario.getId());
     }
@@ -145,7 +149,12 @@ public class UsuarioService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Senha atual inválida");
         }
 
+        if (SENHA_PADRAO.equals(request.getNovaSenha())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Escolha uma senha diferente da senha padrão.");
+        }
+
         usuario.setSenha(passwordEncoder.encode(request.getNovaSenha()));
+        usuario.setSenhaTemporaria(false);
         usuarioRepository.save(usuario);
         log.info("security_event=password_changed_self login={} user_id={}", usuario.getLogin(), usuario.getId());
     }
@@ -184,7 +193,8 @@ public class UsuarioService {
                 Usuario usuario = new Usuario();
                 usuario.setNome(motorista.getNome());
                 usuario.setLogin(gerarLoginUnico(motorista.getNome()));
-                usuario.setSenha(passwordEncoder.encode("padrao123"));
+                usuario.setSenha(passwordEncoder.encode(SENHA_PADRAO));
+                usuario.setSenhaTemporaria(true);
                 usuario.setAtivo(true);
 
                 usuario.adicionarAcesso(acessoPadrao);
