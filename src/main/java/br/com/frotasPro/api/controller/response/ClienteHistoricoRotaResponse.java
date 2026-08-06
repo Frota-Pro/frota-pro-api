@@ -14,6 +14,7 @@ import java.time.LocalDate;
 public class ClienteHistoricoRotaResponse {
 
     private String cliente;
+    private String cidade;
     private Long quantidadeCargas;
     private LocalDate ultimaCargaEm;
 }

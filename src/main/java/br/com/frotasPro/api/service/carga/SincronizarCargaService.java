@@ -176,12 +176,17 @@ public class SincronizarCargaService {
                     String key = notaKey(clienteStr, notaStr);
                     notasDesejadas.add(key);
 
-                    if (!notasExistentes.containsKey(key)) {
+                    CargaNota existente = notasExistentes.get(key);
+                    if (existente == null) {
                         CargaNota cn = new CargaNota();
                         cn.setCarga(carga);
                         cn.setCliente(clienteStr);
                         cn.setNota(notaStr);
+                        cn.setCidade(cli.getCidade());
                         carga.getNotas().add(cn);
+                    } else if (existente.getCidade() == null && cli.getCidade() != null) {
+                        // backfill: nota sincronizada antes do campo cidade existir
+                        existente.setCidade(cli.getCidade());
                     }
                     totalNotas++;
                 }
