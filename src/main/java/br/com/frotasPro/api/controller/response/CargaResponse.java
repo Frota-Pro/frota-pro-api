@@ -73,4 +73,11 @@ public class CargaResponse {
 
     /** Observação informada pelo motorista durante/ao final da carga */
     private String observacaoMotorista;
+
+    /**
+     * true quando o motorista desta carga foi corrigido manualmente (carga
+     * faturada pra um motorista no WinThor, mas outro que realmente saiu
+     * com ela) — o próximo sync do WinThor não sobrescreve.
+     */
+    private boolean motoristaDefinidoManualmente;
 }

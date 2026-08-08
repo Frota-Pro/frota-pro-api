@@ -112,15 +112,20 @@ public class SincronizarCargaService {
             carga.setNotas(new ArrayList<>());
         }
 
-        var motoristaOpt = motoristaRepository
-                .findByCodigoExterno(String.valueOf(dto.getCodMotorista()));
+        // Se o motorista já foi trocado manualmente (TransferirMotoristaCargaService),
+        // não deixa o sync do WinThor sobrescrever — o MDF-e/minuta não refletem
+        // a troca real, então o dado de lá sempre estaria desatualizado aqui.
+        if (!carga.isMotoristaDefinidoManualmente()) {
+            var motoristaOpt = motoristaRepository
+                    .findByCodigoExterno(String.valueOf(dto.getCodMotorista()));
 
-        if (motoristaOpt.isEmpty()) {
-            log.warn("Motorista WinThor {} não encontrado. Ignorando MDF-e {}",
-                    dto.getCodMotorista(), dto.getNumMdfe());
-            return;
+            if (motoristaOpt.isEmpty()) {
+                log.warn("Motorista WinThor {} não encontrado. Ignorando MDF-e {}",
+                        dto.getCodMotorista(), dto.getNumMdfe());
+                return;
+            }
+            carga.setMotorista(motoristaOpt.get());
         }
-        carga.setMotorista(motoristaOpt.get());
 
         var caminhaoOpt = caminhaoRepository
                 .findByCodigoExterno(String.valueOf(dto.getCodVeiculo()));

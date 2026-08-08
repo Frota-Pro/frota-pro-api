@@ -3,7 +3,7 @@ package br.com.frotasPro.api.controller;
 import br.com.frotasPro.api.controller.request.AtualizarObservacaoMotoristaRequest;
 import br.com.frotasPro.api.controller.request.AtualizarOrdemEntregaRequest;
 import br.com.frotasPro.api.controller.request.CargaRequest;
-import br.com.frotasPro.api.controller.request.MarcarTransferenciaCargaRequest;
+import br.com.frotasPro.api.controller.request.TransferirMotoristaCargaRequest;
 import br.com.frotasPro.api.controller.request.TransferirNotasCargaRequest;
 import br.com.frotasPro.api.controller.response.CargaMinResponse;
 import br.com.frotasPro.api.controller.response.CargaResponse;
@@ -43,7 +43,7 @@ public class CargaController {
     private final AtualizarOrdemEntregaService atualizarOrdemEntregaService;
     private final AtualizarObservacaoMotoristaService atualizarObservacaoMotoristaService;
     private final TransferirNotasCargaService transferirNotasCargaService;
-    private final MarcarTransferenciaCargaService marcarTransferenciaCargaService;
+    private final TransferirMotoristaCargaService transferirMotoristaCargaService;
 
     // ========= BUSCA ÚNICA =========
 
@@ -275,7 +275,7 @@ public class CargaController {
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
-    @PatchMapping("/{numeroCarga}/marcar-transferencia")
+    @PatchMapping("/{numeroCarga}/transferir-motorista")
     @Caching(evict = {
             @CacheEvict(value = "carga_buscar_numero", allEntries = true),
             @CacheEvict(value = "carga_buscar_codigo_externo", allEntries = true),
@@ -287,11 +287,11 @@ public class CargaController {
             @CacheEvict(value = "carga_caminhao", allEntries = true),
             @CacheEvict(value = "carga_minha_atual", allEntries = true)
     })
-    public ResponseEntity<CargaResponse> marcarTransferencia(
+    public ResponseEntity<CargaResponse> transferirMotorista(
             @PathVariable String numeroCarga,
-            @Valid @RequestBody(required = false) MarcarTransferenciaCargaRequest request
+            @Valid @RequestBody TransferirMotoristaCargaRequest request
     ) {
-        CargaResponse response = marcarTransferenciaCargaService.marcar(numeroCarga, request);
+        CargaResponse response = transferirMotoristaCargaService.transferir(numeroCarga, request);
         return ResponseEntity.ok(response);
     }
 

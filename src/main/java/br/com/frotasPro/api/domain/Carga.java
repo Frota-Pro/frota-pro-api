@@ -73,6 +73,13 @@ public class Carga extends AuditoriaBase {
     @Column(name = "status_transferencia", nullable = false, length = 30)
     private StatusTransferenciaCarga statusTransferencia = StatusTransferenciaCarga.SEM_TRANSFERENCIA;
 
+    // A carga foi faturada pra um motorista no WinThor, mas outro foi quem
+    // realmente saiu com ela (MDF-e/minuta não mudam pra refletir isso).
+    // Enquanto true, o sync do WinThor não sobrescreve o motorista desta
+    // carga com o que vier de lá.
+    @Column(name = "motorista_definido_manualmente", nullable = false)
+    private boolean motoristaDefinidoManualmente = false;
+
     @OneToMany(mappedBy = "carga", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CargaNota> notas = new ArrayList<>();
 
