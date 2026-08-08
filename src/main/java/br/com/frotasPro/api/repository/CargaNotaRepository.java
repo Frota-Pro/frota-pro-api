@@ -4,6 +4,8 @@ import br.com.frotasPro.api.domain.CargaNota;
 import br.com.frotasPro.api.domain.CargaNotaId;
 import br.com.frotasPro.api.projections.CidadeResumoProjection;
 import br.com.frotasPro.api.projections.ClienteHistoricoRotaProjection;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -37,7 +39,7 @@ public interface CargaNotaRepository extends JpaRepository<CargaNota, CargaNotaI
 
     // Cidade do cliente, independente da rota que a carga usou (a mesma cidade
     // pode ter sido atendida por rotas diferentes ao longo do tempo).
-    @Query("""
+    @Query(value = """
         select cn.cidade as cidade,
                count(distinct cn.cliente) as quantidadeClientes,
                count(distinct cn.carga.id) as quantidadeCargas
@@ -45,8 +47,13 @@ public interface CargaNotaRepository extends JpaRepository<CargaNota, CargaNotaI
         where cn.cidade is not null
         group by cn.cidade
         order by cn.cidade asc
+        """,
+        countQuery = """
+        select count(distinct cn.cidade)
+        from CargaNota cn
+        where cn.cidade is not null
         """)
-    List<CidadeResumoProjection> listarCidades();
+    Page<CidadeResumoProjection> listarCidades(Pageable pageable);
 
     @Query("""
         select cn.cliente as cliente,

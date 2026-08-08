@@ -4,10 +4,10 @@ import br.com.frotasPro.api.controller.response.CidadeResumoResponse;
 import br.com.frotasPro.api.projections.CidadeResumoProjection;
 import br.com.frotasPro.api.repository.CargaNotaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 /**
  * Lista as cidades que o sistema já "conhece", derivadas do histórico de
@@ -22,15 +22,13 @@ public class ListarCidadesService {
     private final CargaNotaRepository cargaNotaRepository;
 
     @Transactional(readOnly = true)
-    public List<CidadeResumoResponse> listar() {
-        List<CidadeResumoProjection> cidades = cargaNotaRepository.listarCidades();
+    public Page<CidadeResumoResponse> listar(Pageable pageable) {
+        Page<CidadeResumoProjection> cidades = cargaNotaRepository.listarCidades(pageable);
 
-        return cidades.stream()
-                .map(p -> CidadeResumoResponse.builder()
-                        .cidade(p.getCidade())
-                        .quantidadeClientes(p.getQuantidadeClientes())
-                        .quantidadeCargas(p.getQuantidadeCargas())
-                        .build())
-                .toList();
+        return cidades.map(p -> CidadeResumoResponse.builder()
+                .cidade(p.getCidade())
+                .quantidadeClientes(p.getQuantidadeClientes())
+                .quantidadeCargas(p.getQuantidadeCargas())
+                .build());
     }
 }

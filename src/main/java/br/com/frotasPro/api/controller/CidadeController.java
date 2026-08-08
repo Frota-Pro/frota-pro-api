@@ -5,6 +5,8 @@ import br.com.frotasPro.api.controller.response.ClienteHistoricoRotaResponse;
 import br.com.frotasPro.api.service.cidade.BuscarClientesPorCidadeService;
 import br.com.frotasPro.api.service.cidade.ListarCidadesService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,8 +33,8 @@ public class CidadeController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping
-    public ResponseEntity<List<CidadeResumoResponse>> listar() {
-        return ResponseEntity.ok(listarCidadesService.listar());
+    public ResponseEntity<Page<CidadeResumoResponse>> listar(Pageable pageable) {
+        return ResponseEntity.ok(listarCidadesService.listar(pageable));
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
