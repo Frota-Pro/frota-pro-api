@@ -4,6 +4,7 @@ import br.com.frotasPro.api.domain.Caminhao;
 import br.com.frotasPro.api.domain.DocumentoCaminhao;
 import br.com.frotasPro.api.domain.Manutencao;
 import br.com.frotasPro.api.domain.Motorista;
+import br.com.frotasPro.api.domain.ParametroSistema;
 import br.com.frotasPro.api.domain.PlanoManutencaoPreventiva;
 import br.com.frotasPro.api.domain.enums.EventoNotificacao;
 import br.com.frotasPro.api.domain.enums.StatusManutencao;
@@ -12,6 +13,7 @@ import br.com.frotasPro.api.repository.DocumentoCaminhaoRepository;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.repository.PlanoManutencaoPreventivaRepository;
+import br.com.frotasPro.api.service.parametrosistema.ParametroSistemaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,9 +36,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotificarVencimentosService {
 
-    private static final int DIAS_ANTECEDENCIA = 5;
-    private static final int KM_ANTECEDENCIA = 500;
-    private static final int DIAS_MANUTENCAO_ESTAGNADA = 7;
     private static final List<StatusManutencao> STATUS_EM_ABERTO = List.of(StatusManutencao.AGENDADA, StatusManutencao.EM_ANDAMENTO);
     private static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -45,11 +44,12 @@ public class NotificarVencimentosService {
     private final PlanoManutencaoPreventivaRepository planoManutencaoPreventivaRepository;
     private final ManutencaoRepository manutencaoRepository;
     private final NotificacaoService notificacaoService;
+    private final ParametroSistemaService parametroSistemaService;
 
     @Transactional
     public void notificarCnhVencendo() {
         LocalDate hoje = LocalDate.now();
-        LocalDate limite = hoje.plusDays(DIAS_ANTECEDENCIA);
+        LocalDate limite = hoje.plusDays(parametroSistemaService.buscarOuPadrao().getDiasAntecedenciaVencimentoDocumento());
 
         List<Motorista> motoristas = motoristaRepository.buscarComCnhVencendoNaoNotificada(hoje, limite);
         if (motoristas.isEmpty()) {
@@ -77,7 +77,7 @@ public class NotificarVencimentosService {
     @Transactional
     public void notificarDocumentosCaminhaoVencendo() {
         LocalDate hoje = LocalDate.now();
-        LocalDate limite = hoje.plusDays(DIAS_ANTECEDENCIA);
+        LocalDate limite = hoje.plusDays(parametroSistemaService.buscarOuPadrao().getDiasAntecedenciaVencimentoDocumento());
 
         List<DocumentoCaminhao> documentos = documentoCaminhaoRepository.buscarComVencimentoProximoNaoNotificado(hoje, limite);
         if (documentos.isEmpty()) {
@@ -112,10 +112,11 @@ public class NotificarVencimentosService {
             return;
         }
 
+        ParametroSistema parametro = parametroSistemaService.buscarOuPadrao();
         List<PlanoManutencaoPreventiva> vencendo = new ArrayList<>();
 
         for (PlanoManutencaoPreventiva plano : candidatos) {
-            if (estaVencendo(plano, hoje)) {
+            if (estaVencendo(plano, hoje, parametro)) {
                 vencendo.add(plano);
             }
         }
@@ -147,7 +148,8 @@ public class NotificarVencimentosService {
 
     @Transactional
     public void notificarManutencoesEstagnadas() {
-        LocalDate limite = LocalDate.now().minusDays(DIAS_MANUTENCAO_ESTAGNADA);
+        int diasManutencaoEstagnada = parametroSistemaService.buscarOuPadrao().getDiasManutencaoEstagnada();
+        LocalDate limite = LocalDate.now().minusDays(diasManutencaoEstagnada);
 
         List<Manutencao> manutencoes = manutencaoRepository.buscarEstagnadasNaoNotificadas(STATUS_EM_ABERTO, limite);
         if (manutencoes.isEmpty()) {
@@ -163,7 +165,7 @@ public class NotificarVencimentosService {
                     "Manutenção parada há muito tempo",
                     "A manutenção " + manutencao.getCodigo() + " do caminhão " + codigoCaminhao
                             + " está em aberto desde " + manutencao.getDataInicioManutencao().format(FORMATO_DATA)
-                            + " (mais de " + DIAS_MANUTENCAO_ESTAGNADA + " dias) sem ser concluída.",
+                            + " (mais de " + diasManutencaoEstagnada + " dias) sem ser concluída.",
                     "MANUTENCAO",
                     manutencao.getId(),
                     manutencao.getCodigo()
@@ -175,18 +177,18 @@ public class NotificarVencimentosService {
         log.info("Alertas de manutenção estagnada enviados para {} manutenção(ões).", manutencoes.size());
     }
 
-    private boolean estaVencendo(PlanoManutencaoPreventiva plano, LocalDate hoje) {
+    private boolean estaVencendo(PlanoManutencaoPreventiva plano, LocalDate hoje, ParametroSistema parametro) {
         Caminhao caminhao = plano.getCaminhao();
         Integer odometroAtual = caminhao != null ? caminhao.getOdometroUltimaCarga() : null;
 
         boolean vencendoPorKm = plano.getIntervaloKm() != null
                 && plano.getUltimoKmExecutado() != null
                 && odometroAtual != null
-                && odometroAtual >= (plano.getUltimoKmExecutado() + plano.getIntervaloKm() - KM_ANTECEDENCIA);
+                && odometroAtual >= (plano.getUltimoKmExecutado() + plano.getIntervaloKm() - parametro.getKmAntecedenciaTrocaPneu());
 
         boolean vencendoPorData = plano.getIntervaloDias() != null
                 && plano.getUltimaDataExecutada() != null
-                && !hoje.isBefore(plano.getUltimaDataExecutada().plusDays(plano.getIntervaloDias()).minusDays(DIAS_ANTECEDENCIA));
+                && !hoje.isBefore(plano.getUltimaDataExecutada().plusDays(plano.getIntervaloDias()).minusDays(parametro.getDiasAntecedenciaVencimentoDocumento()));
 
         return vencendoPorKm || vencendoPorData;
     }

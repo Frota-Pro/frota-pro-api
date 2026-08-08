@@ -5,6 +5,7 @@ import br.com.frotasPro.api.domain.enums.EventoNotificacao;
 import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.repository.MultaRepository;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
+import br.com.frotasPro.api.service.parametrosistema.ParametroSistemaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,16 +27,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotificarPrazosMultaService {
 
-    private static final int DIAS_ANTECEDENCIA = 5;
     private static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final MultaRepository multaRepository;
     private final NotificacaoService notificacaoService;
+    private final ParametroSistemaService parametroSistemaService;
 
     @Transactional
     public void processar() {
         LocalDate hoje = LocalDate.now();
-        LocalDate limite = hoje.plusDays(DIAS_ANTECEDENCIA);
+        LocalDate limite = hoje.plusDays(parametroSistemaService.buscarOuPadrao().getDiasAntecedenciaPrazoMulta());
 
         List<Multa> multas = multaRepository.buscarComPrazoProximoNaoNotificado(hoje, limite);
         if (multas.isEmpty()) {
