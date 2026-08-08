@@ -3,6 +3,7 @@ package br.com.frotasPro.api.service.carga;
 import br.com.frotasPro.api.domain.Carga;
 import br.com.frotasPro.api.domain.CargaNota;
 import br.com.frotasPro.api.domain.Rota;
+import br.com.frotasPro.api.domain.RoteirizacaoCidade;
 import br.com.frotasPro.api.domain.enums.Status;
 import br.com.frotasPro.api.domain.enums.StatusTransferenciaCarga;
 import br.com.frotasPro.api.integracao.dto.CargaSyncResponseEvent;
@@ -14,6 +15,7 @@ import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.CargaTransferenciaRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.repository.RotaRepository;
+import br.com.frotasPro.api.repository.RoteirizacaoCidadeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -25,8 +27,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,6 +46,7 @@ public class SincronizarCargaService {
     private final RotaRepository rotaRepository;
     private final CargaNotaRepository cargaNotaRepository;
     private final CargaTransferenciaRepository cargaTransferenciaRepository;
+    private final RoteirizacaoCidadeRepository roteirizacaoCidadeRepository;
 
     @Caching(evict = {
             @CacheEvict(value = "carga_listar", allEntries = true),
@@ -196,6 +202,8 @@ public class SincronizarCargaService {
         // Remove apenas o que não existe mais, evita "delete + reinsert" no mesmo contexto.
         carga.getNotas().removeIf(n -> !notasDesejadas.contains(notaKey(n.getCliente(), n.getNota())));
 
+        aplicarOrdemEntregaPorCidade(carga);
+
         // Flush ajuda a detectar conflitos cedo e reduz surpresa no commit do listener.
         cargaRepository.saveAndFlush(carga);
         concluirTransferenciaPendenteSeNecessario(carga);
@@ -208,6 +216,71 @@ public class SincronizarCargaService {
 
     private static String notaKey(String cliente, String nota) {
         return cliente + "||" + nota;
+    }
+
+    /**
+     * Aplica a ordem de entrega parametrizada por cidade (RoteirizacaoCidade)
+     * aos clientes desta carga que ainda não têm posição definida — nunca
+     * reordena quem já está posicionado (preserva ajuste manual feito pelo
+     * motorista/despachante). Só olha a cidade principal da carga
+     * (rota.cidadeInicio); clientes de outras cidades (praça secundária)
+     * entram na ordem original do WinThor, no fim da lista.
+     *
+     * Clientes novos cuja cidade principal não tem roteirização definida
+     * (ou que não estão na lista parametrizada dela) ficam marcados em
+     * clientesNaoRoteirizados — fica registrado nesta carga mesmo que a
+     * cidade seja roteirizada depois, só a próxima carga sai correta.
+     */
+    private void aplicarOrdemEntregaPorCidade(Carga carga) {
+        List<String> clientesAtuais = carga.getNotas().stream()
+                .map(CargaNota::getCliente)
+                .distinct()
+                .toList();
+
+        List<String> ordemAtual = new ArrayList<>(carga.getOrdemEntregaClientes());
+        ordemAtual.retainAll(clientesAtuais);
+
+        Set<String> jaPosicionados = new HashSet<>(ordemAtual);
+        List<String> novos = clientesAtuais.stream()
+                .filter(c -> !jaPosicionados.contains(c))
+                .toList();
+
+        Set<String> naoRoteirizados = new LinkedHashSet<>(carga.getClientesNaoRoteirizados());
+        naoRoteirizados.retainAll(clientesAtuais);
+
+        if (!novos.isEmpty()) {
+            String cidadePrincipal = carga.getRota() != null ? carga.getRota().getCidadeInicio() : null;
+
+            Map<String, String> cidadePorCliente = new HashMap<>();
+            for (CargaNota n : carga.getNotas()) {
+                cidadePorCliente.putIfAbsent(n.getCliente(), n.getCidade());
+            }
+
+            List<String> ordemParametrizada = cidadePrincipal != null
+                    ? roteirizacaoCidadeRepository.findByCidade(cidadePrincipal)
+                        .map(RoteirizacaoCidade::getClientesOrdenados)
+                        .orElseGet(List::of)
+                    : List.of();
+
+            List<String> novosOrdenados = new ArrayList<>(novos);
+            novosOrdenados.sort(Comparator.comparingInt(c -> {
+                int idx = ordemParametrizada.indexOf(c);
+                return idx >= 0 ? idx : Integer.MAX_VALUE;
+            }));
+
+            for (String c : novos) {
+                boolean mesmaCidadePrincipal = cidadePrincipal != null
+                        && cidadePrincipal.equals(cidadePorCliente.get(c));
+                if (mesmaCidadePrincipal && !ordemParametrizada.contains(c)) {
+                    naoRoteirizados.add(c);
+                }
+            }
+
+            ordemAtual.addAll(novosOrdenados);
+        }
+
+        carga.setOrdemEntregaClientes(ordemAtual);
+        carga.setClientesNaoRoteirizados(new ArrayList<>(naoRoteirizados));
     }
 
     private void concluirTransferenciaPendenteSeNecessario(Carga carga) {

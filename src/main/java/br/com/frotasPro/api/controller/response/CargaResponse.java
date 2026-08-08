@@ -64,6 +64,13 @@ public class CargaResponse {
     /** Ordem definida para entrega (lista ordenada de clientes) */
     private List<String> ordemEntregaClientes;
 
+    /**
+     * Clientes desta carga que entraram sem posição parametrizada na
+     * roteirização da cidade deles — o app mobile usa isso pra avisar o
+     * motorista que a ordem daquele(s) cliente(s) não é confiável ainda.
+     */
+    private List<String> clientesNaoRoteirizados;
+
     /** Observação informada pelo motorista durante/ao final da carga */
     private String observacaoMotorista;
 }

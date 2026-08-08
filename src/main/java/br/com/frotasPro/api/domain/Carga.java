@@ -109,6 +109,18 @@ public class Carga extends AuditoriaBase {
     @Column(name = "cliente", length = 200, nullable = false)
     private List<String> ordemEntregaClientes = new ArrayList<>();
 
+    // Clientes desta carga que entraram sem posição parametrizada na
+    // roteirização da cidade deles (RoteirizacaoCidade) no momento do sync.
+    // Fica registrado nesta carga mesmo que a cidade seja roteirizada
+    // depois — só a próxima carga sai com a ordem correta automaticamente.
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+            name = "tb_carga_cliente_nao_roteirizado",
+            joinColumns = @JoinColumn(name = "carga_id")
+    )
+    @Column(name = "cliente", length = 200, nullable = false)
+    private List<String> clientesNaoRoteirizados = new ArrayList<>();
+
     @OneToMany(mappedBy = "carga", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ParadaCarga> paradas = new ArrayList<>();
 

@@ -104,6 +104,7 @@ public class CargaMapper {
                                 .toList()
                 )
                 .ordemEntregaClientes(new ArrayList<>(carga.getOrdemEntregaClientes()))
+                .clientesNaoRoteirizados(new ArrayList<>(carga.getClientesNaoRoteirizados()))
                 .observacaoMotorista(carga.getObservacaoMotorista())
                 .build();
     }
