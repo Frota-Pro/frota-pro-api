@@ -7,6 +7,8 @@ import br.com.frotasPro.api.integracao.dto.CaminhaoWinThorDto;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +21,18 @@ public class SincronizarCaminhaoService {
 
     private final CaminhaoRepository caminhaoRepository;
 
+    // Mesmo motivo do SincronizarMotoristaService: o fluxo de sync não passa
+    // pelo controller, então nunca invalidava esses caches — só não dava pra
+    // notar até alguém abrir a tela de Caminhões (populando o cache vazio)
+    // antes de sincronizar.
+    @Caching(evict = {
+            @CacheEvict(value = "caminhao_listar", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_codigo", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_placa", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_codigo_externo", allEntries = true),
+            @CacheEvict(value = "caminhao_documentos", allEntries = true),
+            @CacheEvict(value = "caminhao_detalhes", allEntries = true)
+    })
     @Transactional
     public void sincronizar(CaminhaoSyncResponseEvent event) {
 
