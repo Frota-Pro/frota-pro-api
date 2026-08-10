@@ -12,5 +12,6 @@ import java.util.List;
 public class ClienteCargaResponse {
 
     private String cliente;
+    private String cidade;
     private List<String> notas;
 }

@@ -31,4 +31,16 @@ public class CargaWinThorDto {
 
     private Integer totalClientes;
     private List<ClienteCargaWinThorDto> clientes;
+
+    /**
+     * Códigos de devolução (CODDEVOL) encontrados pra notas desse carregamento
+     * no WinThor. Vazio = nenhuma devolução associada.
+     */
+    private List<String> codigosDevolucao;
+
+    /**
+     * true se esse carregamento perdeu pedido(s) transferido(s) pra outro
+     * carregamento no WinThor (PCLOGTRANSFNFCARREG).
+     */
+    private Boolean temTransferencia;
 }

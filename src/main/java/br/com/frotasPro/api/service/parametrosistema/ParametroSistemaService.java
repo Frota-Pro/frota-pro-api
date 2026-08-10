@@ -44,6 +44,9 @@ public class ParametroSistemaService {
         parametro.setKmAntecedenciaTrocaPneu(request.getKmAntecedenciaTrocaPneu());
         parametro.setDiasManutencaoEstagnada(request.getDiasManutencaoEstagnada());
         parametro.setDiasAntecedenciaPrazoMulta(request.getDiasAntecedenciaPrazoMulta());
+        parametro.setValidarMotivoAlteracaoPesoValorCarga(request.getValidarMotivoAlteracaoPesoValorCarga());
+        parametro.setCodigosDevolucaoPermitidos(request.getCodigosDevolucaoPermitidos());
+        parametro.setPermitirAtualizacaoPorTransferencia(request.getPermitirAtualizacaoPorTransferencia());
 
         return toResponse(repository.save(parametro));
     }
@@ -62,6 +65,9 @@ public class ParametroSistemaService {
                 .kmAntecedenciaTrocaPneu(parametro.getKmAntecedenciaTrocaPneu())
                 .diasManutencaoEstagnada(parametro.getDiasManutencaoEstagnada())
                 .diasAntecedenciaPrazoMulta(parametro.getDiasAntecedenciaPrazoMulta())
+                .validarMotivoAlteracaoPesoValorCarga(parametro.isValidarMotivoAlteracaoPesoValorCarga())
+                .codigosDevolucaoPermitidos(parametro.getCodigosDevolucaoPermitidos())
+                .permitirAtualizacaoPorTransferencia(parametro.isPermitirAtualizacaoPorTransferencia())
                 .build();
     }
 }

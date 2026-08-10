@@ -15,4 +15,8 @@ public class ParametroSistemaResponse {
     private int kmAntecedenciaTrocaPneu;
     private int diasManutencaoEstagnada;
     private int diasAntecedenciaPrazoMulta;
+
+    private boolean validarMotivoAlteracaoPesoValorCarga;
+    private String codigosDevolucaoPermitidos;
+    private boolean permitirAtualizacaoPorTransferencia;
 }

@@ -2,6 +2,7 @@ package br.com.frotasPro.api.service.carga;
 
 import br.com.frotasPro.api.domain.Carga;
 import br.com.frotasPro.api.domain.CargaNota;
+import br.com.frotasPro.api.domain.ParametroSistema;
 import br.com.frotasPro.api.domain.Rota;
 import br.com.frotasPro.api.domain.RoteirizacaoCidade;
 import br.com.frotasPro.api.domain.enums.Status;
@@ -16,6 +17,7 @@ import br.com.frotasPro.api.repository.CargaTransferenciaRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.repository.RotaRepository;
 import br.com.frotasPro.api.repository.RoteirizacaoCidadeRepository;
+import br.com.frotasPro.api.service.parametrosistema.ParametroSistemaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -27,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,6 +37,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -47,6 +51,7 @@ public class SincronizarCargaService {
     private final CargaNotaRepository cargaNotaRepository;
     private final CargaTransferenciaRepository cargaTransferenciaRepository;
     private final RoteirizacaoCidadeRepository roteirizacaoCidadeRepository;
+    private final ParametroSistemaService parametroSistemaService;
 
     @Caching(evict = {
             @CacheEvict(value = "carga_listar", allEntries = true),
@@ -150,15 +155,7 @@ public class SincronizarCargaService {
             carga.setDtFaturamento(dto.getDtSaida().toLocalDate());
         }
 
-        carga.setPesoCarga(dto.getPesoTotalKg() != null
-                ? BigDecimal.valueOf(dto.getPesoTotalKg())
-                : null);
-
-        carga.setValorTotal(
-                dto.getValorTotal() != null && dto.getValorTotal().compareTo(BigDecimal.ZERO) > 0
-                        ? dto.getValorTotal()
-                        : null
-        );
+        atualizarPesoEValor(carga, dto);
 
         boolean cargaJaIniciada = carga.getStatusCarga() == Status.EM_ROTA
                 && (carga.getDtSaida() != null || carga.getKmInicial() != null);
@@ -221,6 +218,101 @@ public class SincronizarCargaService {
 
     private static String notaKey(String cliente, String nota) {
         return cliente + "||" + nota;
+    }
+
+    /**
+     * Atualiza peso/valor da carga a partir do WinThor. Se
+     * ParametroSistema.validarMotivoAlteracaoPesoValorCarga estiver desligado (padrão),
+     * sobrescreve sempre — comportamento de antes. Ligado, uma DIMINUIÇÃO de peso ou
+     * valor só é aplicada se houver motivo reconhecido no WinThor (devolução com código
+     * permitido, ou transferência de pedido pra outro carregamento, se habilitada).
+     * Aumentos nunca são bloqueados.
+     */
+    private void atualizarPesoEValor(Carga carga, CargaWinThorDto dto) {
+        BigDecimal pesoNovo = dto.getPesoTotalKg() != null
+                ? BigDecimal.valueOf(dto.getPesoTotalKg())
+                : null;
+        BigDecimal valorNovo = dto.getValorTotal() != null && dto.getValorTotal().compareTo(BigDecimal.ZERO) > 0
+                ? dto.getValorTotal()
+                : null;
+
+        // Sempre registrado, informativo — independe do gate estar ligado ou não.
+        // É o que aparece na tela (badge de devolução/transferência da carga).
+        carga.setCodigosDevolucaoEncontrados(
+                dto.getCodigosDevolucao() != null && !dto.getCodigosDevolucao().isEmpty()
+                        ? String.join(",", dto.getCodigosDevolucao())
+                        : null
+        );
+        carga.setTeveTransferencia(Boolean.TRUE.equals(dto.getTemTransferencia()));
+
+        ParametroSistema parametro = parametroSistemaService.buscarOuPadrao();
+
+        if (!parametro.isValidarMotivoAlteracaoPesoValorCarga()) {
+            carga.setPesoCarga(pesoNovo);
+            carga.setValorTotal(valorNovo);
+            carga.setDiminuicaoPesoValorBloqueada(false);
+            return;
+        }
+
+        boolean motivoValido = motivoAlteracaoValido(dto, parametro);
+        boolean pesoBloqueado = false;
+        boolean valorBloqueado = false;
+
+        if (isDiminuicao(carga.getPesoCarga(), pesoNovo)) {
+            if (motivoValido) {
+                carga.setPesoCarga(pesoNovo);
+            } else {
+                pesoBloqueado = true;
+                log.info("Diminuição de peso ignorada (sem motivo reconhecido no WinThor). numCar={} pesoAtual={} pesoWinThor={}",
+                        dto.getNumCar(), carga.getPesoCarga(), pesoNovo);
+            }
+        } else {
+            carga.setPesoCarga(pesoNovo);
+        }
+
+        if (isDiminuicao(carga.getValorTotal(), valorNovo)) {
+            if (motivoValido) {
+                carga.setValorTotal(valorNovo);
+            } else {
+                valorBloqueado = true;
+                log.info("Diminuição de valor ignorada (sem motivo reconhecido no WinThor). numCar={} valorAtual={} valorWinThor={}",
+                        dto.getNumCar(), carga.getValorTotal(), valorNovo);
+            }
+        } else {
+            carga.setValorTotal(valorNovo);
+        }
+
+        carga.setDiminuicaoPesoValorBloqueada(pesoBloqueado || valorBloqueado);
+    }
+
+    private boolean isDiminuicao(BigDecimal atual, BigDecimal novo) {
+        BigDecimal atualOuZero = atual != null ? atual : BigDecimal.ZERO;
+        BigDecimal novoOuZero = novo != null ? novo : BigDecimal.ZERO;
+        return novoOuZero.compareTo(atualOuZero) < 0;
+    }
+
+    private boolean motivoAlteracaoValido(CargaWinThorDto dto, ParametroSistema parametro) {
+        if (motivoDevolucaoValido(dto, parametro)) {
+            return true;
+        }
+        return parametro.isPermitirAtualizacaoPorTransferencia() && Boolean.TRUE.equals(dto.getTemTransferencia());
+    }
+
+    private boolean motivoDevolucaoValido(CargaWinThorDto dto, ParametroSistema parametro) {
+        String codigosPermitidos = parametro.getCodigosDevolucaoPermitidos();
+        if (codigosPermitidos == null || codigosPermitidos.isBlank()) {
+            return false;
+        }
+        if (dto.getCodigosDevolucao() == null || dto.getCodigosDevolucao().isEmpty()) {
+            return false;
+        }
+
+        Set<String> permitidos = Arrays.stream(codigosPermitidos.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isBlank())
+                .collect(Collectors.toSet());
+
+        return dto.getCodigosDevolucao().stream().anyMatch(permitidos::contains);
     }
 
     /**

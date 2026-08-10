@@ -80,6 +80,32 @@ public class Carga extends AuditoriaBase {
     @Column(name = "motorista_definido_manualmente", nullable = false)
     private boolean motoristaDefinidoManualmente = false;
 
+    /**
+     * Códigos de devolução (CODDEVOL) encontrados no WinThor no último sync
+     * desta carga, separados por vírgula (ex.: "53,56"). Null/vazio = não foi
+     * encontrada nenhuma devolução associada. Só informativo — não decide
+     * sozinho se peso/valor foram atualizados (ver diminuicaoPesoValorBloqueada).
+     */
+    @Column(name = "codigos_devolucao_encontrados", length = 500)
+    private String codigosDevolucaoEncontrados;
+
+    /**
+     * true se o último sync encontrou, no WinThor, uma transferência de
+     * pedido desta carga pra outro carregamento (PCLOGTRANSFNFCARREG).
+     */
+    @Column(name = "teve_transferencia", nullable = false)
+    private boolean teveTransferencia = false;
+
+    /**
+     * true se, no último sync, uma diminuição de peso e/ou valor que veio do
+     * WinThor foi IGNORADA por falta de motivo reconhecido (parâmetro de
+     * validação ligado, sem devolução com código permitido nem transferência
+     * autorizada). Ajuda a enxergar rápido quais cargas ficaram "presas" no
+     * valor antigo.
+     */
+    @Column(name = "diminuicao_peso_valor_bloqueada", nullable = false)
+    private boolean diminuicaoPesoValorBloqueada = false;
+
     @OneToMany(mappedBy = "carga", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CargaNota> notas = new ArrayList<>();
 
