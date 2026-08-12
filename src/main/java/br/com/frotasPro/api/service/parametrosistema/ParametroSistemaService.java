@@ -47,6 +47,8 @@ public class ParametroSistemaService {
         parametro.setValidarMotivoAlteracaoPesoValorCarga(request.getValidarMotivoAlteracaoPesoValorCarga());
         parametro.setCodigosDevolucaoPermitidos(request.getCodigosDevolucaoPermitidos());
         parametro.setPermitirAtualizacaoPorTransferencia(request.getPermitirAtualizacaoPorTransferencia());
+        parametro.setValidarTempoMinimoCarga(request.getValidarTempoMinimoCarga());
+        parametro.setTempoMinimoEntregaPadraoMinutos(request.getTempoMinimoEntregaPadraoMinutos());
 
         return toResponse(repository.save(parametro));
     }
@@ -68,6 +70,8 @@ public class ParametroSistemaService {
                 .validarMotivoAlteracaoPesoValorCarga(parametro.isValidarMotivoAlteracaoPesoValorCarga())
                 .codigosDevolucaoPermitidos(parametro.getCodigosDevolucaoPermitidos())
                 .permitirAtualizacaoPorTransferencia(parametro.isPermitirAtualizacaoPorTransferencia())
+                .validarTempoMinimoCarga(parametro.isValidarTempoMinimoCarga())
+                .tempoMinimoEntregaPadraoMinutos(parametro.getTempoMinimoEntregaPadraoMinutos())
                 .build();
     }
 }

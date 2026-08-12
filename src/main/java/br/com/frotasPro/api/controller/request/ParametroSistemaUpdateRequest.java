@@ -34,4 +34,11 @@ public class ParametroSistemaUpdateRequest {
 
     @NotNull(message = "Informe se transferência de pedido autoriza a atualização")
     private Boolean permitirAtualizacaoPorTransferencia;
+
+    @NotNull(message = "Informe se a validação de tempo mínimo de entrega está ativa")
+    private Boolean validarTempoMinimoCarga;
+
+    @NotNull(message = "Tempo mínimo padrão de entrega é obrigatório")
+    @Min(value = 0, message = "Tempo mínimo padrão deve ser >= 0")
+    private Integer tempoMinimoEntregaPadraoMinutos;
 }

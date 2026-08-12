@@ -43,4 +43,13 @@ public class RoteirizacaoCidade extends AuditoriaBase {
     @OrderColumn(name = "ordem")
     @Column(name = "cliente", length = 200, nullable = false)
     private List<String> clientesOrdenados = new ArrayList<>();
+
+    /**
+     * Tempo mínimo esperado (em minutos) entre iniciar e finalizar uma carga
+     * cuja rota principal é esta cidade — usado pelo gate de "carga
+     * finalizada rápido demais" (ParametroSistema.validarTempoMinimoCarga).
+     * Null = usa o padrão global (ParametroSistema.tempoMinimoEntregaPadraoMinutos).
+     */
+    @Column(name = "tempo_minimo_entrega_minutos")
+    private Integer tempoMinimoEntregaMinutos;
 }

@@ -34,6 +34,7 @@ public class SalvarRoteirizacaoCidadeService {
 
         roteirizacao.getClientesOrdenados().clear();
         roteirizacao.getClientesOrdenados().addAll(ordenados);
+        roteirizacao.setTempoMinimoEntregaMinutos(request.getTempoMinimoEntregaMinutos());
 
         roteirizacaoCidadeRepository.save(roteirizacao);
 

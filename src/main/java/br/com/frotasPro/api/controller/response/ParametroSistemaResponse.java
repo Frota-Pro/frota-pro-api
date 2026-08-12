@@ -19,4 +19,7 @@ public class ParametroSistemaResponse {
     private boolean validarMotivoAlteracaoPesoValorCarga;
     private String codigosDevolucaoPermitidos;
     private boolean permitirAtualizacaoPorTransferencia;
+
+    private boolean validarTempoMinimoCarga;
+    private int tempoMinimoEntregaPadraoMinutos;
 }

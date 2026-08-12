@@ -74,4 +74,22 @@ public class ParametroSistema extends AuditoriaBase {
      */
     @Column(name = "permitir_atualizacao_por_transferencia", nullable = false)
     private boolean permitirAtualizacaoPorTransferencia = true;
+
+    /**
+     * Se true, bloqueia finalizar uma carga antes do tempo mínimo esperado
+     * desde o início (ver tempoMinimoEntregaPadraoMinutos e
+     * RoteirizacaoCidade.tempoMinimoEntregaMinutos). Sem isso (false,
+     * padrão), continua permitindo finalizar a qualquer momento.
+     */
+    @Column(name = "validar_tempo_minimo_carga", nullable = false)
+    private boolean validarTempoMinimoCarga = false;
+
+    /**
+     * Tempo mínimo padrão (em minutos) entre iniciar e finalizar uma carga,
+     * usado quando a cidade da rota não tem um valor específico configurado
+     * em RoteirizacaoCidade.tempoMinimoEntregaMinutos. Só é consultado
+     * quando validarTempoMinimoCarga = true.
+     */
+    @Column(name = "tempo_minimo_entrega_padrao_minutos", nullable = false)
+    private int tempoMinimoEntregaPadraoMinutos = 30;
 }

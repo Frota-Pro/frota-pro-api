@@ -21,4 +21,7 @@ public class RoteirizacaoCidadeResponse {
     // Clientes já vistos em cargas dessa cidade mas que ainda não entraram
     // na ordem — o que falta parametrizar.
     private List<String> clientesSemPosicao;
+
+    /** Null = sem override — usa o padrão global de Parâmetros do Sistema. */
+    private Integer tempoMinimoEntregaMinutos;
 }

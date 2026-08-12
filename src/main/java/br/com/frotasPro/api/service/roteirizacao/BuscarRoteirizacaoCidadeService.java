@@ -25,10 +25,16 @@ public class BuscarRoteirizacaoCidadeService {
     public RoteirizacaoCidadeResponse buscar(String cidade) {
         String cidadeTrim = cidade.trim();
 
-        List<String> ordenados = roteirizacaoCidadeRepository.findByCidade(cidadeTrim)
+        var roteirizacao = roteirizacaoCidadeRepository.findByCidade(cidadeTrim);
+
+        List<String> ordenados = roteirizacao
                 .map(RoteirizacaoCidade::getClientesOrdenados)
                 .map(ArrayList::new)
                 .orElseGet(ArrayList::new);
+
+        Integer tempoMinimoEntregaMinutos = roteirizacao
+                .map(RoteirizacaoCidade::getTempoMinimoEntregaMinutos)
+                .orElse(null);
 
         Set<String> jaOrdenados = new LinkedHashSet<>(ordenados);
 
@@ -41,6 +47,7 @@ public class BuscarRoteirizacaoCidadeService {
                 .cidade(cidadeTrim)
                 .clientesOrdenados(ordenados)
                 .clientesSemPosicao(semPosicao)
+                .tempoMinimoEntregaMinutos(tempoMinimoEntregaMinutos)
                 .build();
     }
 }
