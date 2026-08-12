@@ -125,6 +125,8 @@ public class CargaMapper {
                 )
                 .teveTransferencia(carga.isTeveTransferencia())
                 .diminuicaoPesoValorBloqueada(carga.isDiminuicaoPesoValorBloqueada())
+                .naoEncontradaNoWinThor(carga.isNaoEncontradaNoWinThor())
+                .dataVerificacaoWinThor(carga.getDataVerificacaoWinThor())
                 .build();
     }
 
@@ -151,6 +153,7 @@ public class CargaMapper {
                 )
                 .teveTransferencia(carga.isTeveTransferencia())
                 .diminuicaoPesoValorBloqueada(carga.isDiminuicaoPesoValorBloqueada())
+                .naoEncontradaNoWinThor(carga.isNaoEncontradaNoWinThor())
                 .build();
     }
 

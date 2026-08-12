@@ -7,8 +7,10 @@ import br.com.frotasPro.api.controller.request.TransferirMotoristaCargaRequest;
 import br.com.frotasPro.api.controller.request.TransferirNotasCargaRequest;
 import br.com.frotasPro.api.controller.response.CargaMinResponse;
 import br.com.frotasPro.api.controller.response.CargaResponse;
+import br.com.frotasPro.api.controller.response.RelatorioCargasSumidasWinThorResponse;
 import br.com.frotasPro.api.controller.response.TransferirNotasCargaResponse;
 import br.com.frotasPro.api.service.carga.*;
+import br.com.frotasPro.api.service.relatorios.RelatorioCargasSumidasWinThorService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -44,6 +46,31 @@ public class CargaController {
     private final AtualizarObservacaoMotoristaService atualizarObservacaoMotoristaService;
     private final TransferirNotasCargaService transferirNotasCargaService;
     private final TransferirMotoristaCargaService transferirMotoristaCargaService;
+    private final VerificarCargasSumidasWinThorService verificarCargasSumidasWinThorService;
+    private final RelatorioCargasSumidasWinThorService relatorioCargasSumidasWinThorService;
+
+    // ========= RECONCILIAÇÃO WINTHOR =========
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PostMapping("/verificar-winthor")
+    public ResponseEntity<Void> verificarCargasSumidasWinThor() {
+        verificarCargasSumidasWinThorService.verificar();
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @GetMapping("/relatorio-sumidas")
+    public ResponseEntity<RelatorioCargasSumidasWinThorResponse> relatorioCargasSumidas(
+            @RequestParam(value = "inicio", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam(value = "fim", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim,
+            @RequestParam(value = "motorista", required = false) String codigoMotorista,
+            @RequestParam(value = "caminhao", required = false) String codigoCaminhao
+    ) {
+        return ResponseEntity.ok(
+                relatorioCargasSumidasWinThorService.gerar(inicio, fim, codigoMotorista, codigoCaminhao));
+    }
 
     // ========= BUSCA ÚNICA =========
 
@@ -199,7 +226,16 @@ public class CargaController {
             @CacheEvict(value = "caminhao_buscar_codigo", allEntries = true),
             @CacheEvict(value = "caminhao_buscar_placa", allEntries = true),
             @CacheEvict(value = "caminhao_buscar_codigo_externo", allEntries = true),
-            @CacheEvict(value = "caminhao_detalhes", allEntries = true)
+            @CacheEvict(value = "caminhao_detalhes", allEntries = true),
+            // Finalizar carga também atualiza progresso de meta (km, tonelada,
+            // carga transportada, consumo) via AtualizarMeta*Service — sem isso,
+            // as telas de Meta continuavam mostrando o progresso de antes da carga
+            // ser finalizada até alguma outra ação (criar/editar meta) evitar o cache.
+            @CacheEvict(value = "meta_buscar_id", allEntries = true),
+            @CacheEvict(value = "meta_listar", allEntries = true),
+            @CacheEvict(value = "meta_ativas_caminhao", allEntries = true),
+            @CacheEvict(value = "meta_historico", allEntries = true),
+            @CacheEvict(value = "meta_historico_caminhao", allEntries = true)
     })
     public ResponseEntity<String> finalizarCarga(
             @RequestParam("carga") String numeroCarga,

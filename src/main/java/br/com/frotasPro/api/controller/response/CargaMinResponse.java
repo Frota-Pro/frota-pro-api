@@ -49,4 +49,7 @@ public class CargaMinResponse {
      * WinThor foi ignorada por falta de motivo reconhecido.
      */
     private boolean diminuicaoPesoValorBloqueada;
+
+    /** true se a última verificação de reconciliação não encontrou mais essa carga no WinThor. */
+    private boolean naoEncontradaNoWinThor;
 }

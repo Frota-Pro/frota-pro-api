@@ -21,6 +21,15 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
 
     Optional<Carga> findByNumeroCargaExterno(String numeroCargaExterno);
 
+    /**
+     * Cargas ainda não iniciadas mas já sincronizadas do WinThor — universo
+     * verificado pela reconciliação (VerificarCargasSumidasWinThorService).
+     */
+    List<Carga> findByStatusCargaAndNumeroCargaExternoIsNotNull(Status statusCarga);
+
+    /** Base do relatório de cargas sumidas do WinThor — filtros extras aplicados em memória (lista pequena). */
+    List<Carga> findByNaoEncontradaNoWinThorTrueOrderByDataVerificacaoWinThorDesc();
+
     Page<Carga> findByDtSaida(LocalDate dtSaida, Pageable pageable);
 
     Page<Carga> findByDtSaidaBetween(LocalDate dataInicio,
@@ -47,11 +56,15 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
        """)
     Page<Carga> findByCaminhaoCodigoOuCodigoExterno(String codigo, Pageable pageable);
 
+    // naoEncontradaNoWinThor = false: uma carga sumida do WinThor não tem
+    // carregamento de verdade pra buscar, então não aparece pro motorista
+    // escolher — só fica visível pro escritório na tela de Cargas.
     @Query("""
            select c
            from Carga c
            where c.motorista.codigo = :codmotorista
              and c.statusCarga in :status
+             and c.naoEncontradaNoWinThor = false
            order by c.dtSaida desc
            """)
     List<Carga> buscarCargaAtualDoMotorista(

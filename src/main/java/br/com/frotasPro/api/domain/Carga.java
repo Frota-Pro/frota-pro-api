@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +51,19 @@ public class Carga extends AuditoriaBase {
 
     @Column(name = "data_chegada")
     private LocalDate dtChegada;
+
+    /**
+     * Igual dtSaida/dtChegada, mas com hora certa (aqueles dois só guardam a
+     * data, por compatibilidade com o resto do sistema — relatórios, metas,
+     * etc). Usado só pelo gate de tempo mínimo de entrega
+     * (ParametroSistema.validarTempoMinimoCarga), que precisa saber quantos
+     * minutos realmente se passaram entre iniciar e finalizar.
+     */
+    @Column(name = "data_hora_saida")
+    private LocalDateTime dtHoraSaida;
+
+    @Column(name = "data_hora_chegada")
+    private LocalDateTime dtHoraChegada;
 
     @Column(name = "peso_carga", precision = 15, scale = 3)
     private BigDecimal pesoCarga;
@@ -105,6 +119,21 @@ public class Carga extends AuditoriaBase {
      */
     @Column(name = "diminuicao_peso_valor_bloqueada", nullable = false)
     private boolean diminuicaoPesoValorBloqueada = false;
+
+    /**
+     * true se a verificação periódica de reconciliação não encontrou mais
+     * essa carga no WinThor (sem nenhuma nota fiscal vinculada ao numcar) —
+     * sinal de que o carregamento foi apagado/desvinculado lá depois de já
+     * ter sido sincronizado pro FrotaPRO. Só é checado pra cargas ainda não
+     * iniciadas (SINCRONIZADA); se ela reaparecer numa verificação seguinte,
+     * a flag é limpa. Não bloqueia nada sozinha — só avisa (VerificarCargasSumidasWinThorService).
+     */
+    @Column(name = "nao_encontrada_no_winthor", nullable = false)
+    private boolean naoEncontradaNoWinThor = false;
+
+    /** Quando a verificação de reconciliação rodou pela última vez pra essa carga. */
+    @Column(name = "data_verificacao_winthor")
+    private LocalDateTime dataVerificacaoWinThor;
 
     @OneToMany(mappedBy = "carga", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CargaNota> notas = new ArrayList<>();

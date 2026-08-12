@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport name="Relatório - Cargas Sumidas do WinThor" language="java"
+              whenNoDataType="AllSectionsNoDetail"
+              pageWidth="842" pageHeight="595" orientation="Landscape"
+              columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+
+    <parameter name="logoPath" class="java.lang.Object"/>
+
+    <parameter name="periodoDescricao" class="java.lang.String"/>
+    <parameter name="totalCargas" class="java.lang.Long"/>
+
+    <field name="numeroCarga" class="java.lang.String"/>
+    <field name="numeroCargaExterno" class="java.lang.String"/>
+    <field name="statusCarga" class="java.lang.String"/>
+    <field name="dtSaida" class="java.time.LocalDate"/>
+    <field name="pesoCarga" class="java.math.BigDecimal"/>
+    <field name="valorTotal" class="java.math.BigDecimal"/>
+    <field name="nomeMotorista" class="java.lang.String"/>
+    <field name="placaCaminhao" class="java.lang.String"/>
+    <field name="codigoRota" class="java.lang.String"/>
+    <field name="dataVerificacaoWinThor" class="java.time.LocalDateTime"/>
+
+    <title height="118">
+        <element kind="image" x="10" y="5" width="120" height="50">
+            <expression><![CDATA[$P{logoPath}]]></expression>
+        </element>
+
+        <element kind="staticText" x="140" y="6" width="560" height="20" fontSize="14" bold="true">
+            <text><![CDATA[RELATÓRIO DE CARGAS SUMIDAS DO WINTHOR]]></text>
+        </element>
+
+        <element kind="textField" x="140" y="30" width="560" height="16">
+            <expression><![CDATA[$P{periodoDescricao}]]></expression>
+        </element>
+
+        <element kind="textField" x="640" y="12" width="162" height="16" hTextAlign="Right">
+            <expression><![CDATA["Total: " + $P{totalCargas}]]></expression>
+        </element>
+
+        <element kind="staticText" mode="Opaque" x="0" y="64" width="802" height="22" forecolor="#FFFFFF" backcolor="#B91C1C" bold="true" hTextAlign="Center" vTextAlign="Middle">
+            <text><![CDATA[CARGAS SINCRONIZADAS NÃO ENCONTRADAS NA ÚLTIMA VERIFICAÇÃO NO WINTHOR]]></text>
+        </element>
+        <element kind="textField" mode="Opaque" x="0" y="86" width="802" height="22" forecolor="#111827" backcolor="#E5E7EB" hTextAlign="Center" vTextAlign="Middle">
+            <expression><![CDATA["Revisão manual recomendada — carga pode ter sido excluída ou cancelada no WinThor após o sync"]]></expression>
+        </element>
+    </title>
+
+    <columnHeader height="24">
+        <element kind="staticText" mode="Opaque" x="0" y="3" width="60" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" fontSize="8" hTextAlign="Center">
+            <text><![CDATA[CARGA]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="60" y="3" width="50" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" fontSize="8" hTextAlign="Center">
+            <text><![CDATA[EXTERNO]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="110" y="3" width="70" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" fontSize="8" hTextAlign="Center">
+            <text><![CDATA[STATUS]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="180" y="3" width="55" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" fontSize="8" hTextAlign="Center">
+            <text><![CDATA[SAÍDA]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="235" y="3" width="195" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" fontSize="8" hTextAlign="Center">
+            <text><![CDATA[MOTORISTA]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="430" y="3" width="62" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" fontSize="8" hTextAlign="Center">
+            <text><![CDATA[CAMINHÃO]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="492" y="3" width="65" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" fontSize="8" hTextAlign="Center">
+            <text><![CDATA[ROTA]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="557" y="3" width="50" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" fontSize="8" hTextAlign="Center">
+            <text><![CDATA[PESO]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="607" y="3" width="80" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" fontSize="8" hTextAlign="Center">
+            <text><![CDATA[VALOR]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="687" y="3" width="115" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" fontSize="8" hTextAlign="Center">
+            <text><![CDATA[VERIFICADO EM]]></text>
+        </element>
+    </columnHeader>
+
+    <detail>
+        <band height="18">
+            <element kind="textField" x="0" y="1" width="60" height="15" fontSize="8" hTextAlign="Center">
+                <expression><![CDATA[$F{numeroCarga}]]></expression>
+            </element>
+            <element kind="textField" x="60" y="1" width="50" height="15" fontSize="8" hTextAlign="Center" blankWhenNull="true">
+                <expression><![CDATA[$F{numeroCargaExterno}]]></expression>
+            </element>
+            <element kind="textField" x="110" y="1" width="70" height="15" fontSize="8" hTextAlign="Center">
+                <expression><![CDATA[$F{statusCarga}]]></expression>
+            </element>
+            <element kind="textField" x="180" y="1" width="55" height="15" fontSize="8" hTextAlign="Center">
+                <expression><![CDATA[$F{dtSaida} == null ? "" : $F{dtSaida}.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"))]]></expression>
+            </element>
+            <element kind="textField" x="235" y="1" width="195" height="15" fontSize="8" blankWhenNull="true">
+                <expression><![CDATA[$F{nomeMotorista}]]></expression>
+            </element>
+            <element kind="textField" x="430" y="1" width="62" height="15" fontSize="8" hTextAlign="Center" blankWhenNull="true">
+                <expression><![CDATA[$F{placaCaminhao}]]></expression>
+            </element>
+            <element kind="textField" x="492" y="1" width="65" height="15" fontSize="8" hTextAlign="Center" blankWhenNull="true">
+                <expression><![CDATA[$F{codigoRota}]]></expression>
+            </element>
+            <element kind="textField" x="557" y="1" width="50" height="15" fontSize="8" pattern="#,##0.000" hTextAlign="Right" blankWhenNull="true">
+                <expression><![CDATA[$F{pesoCarga}]]></expression>
+            </element>
+            <element kind="textField" x="607" y="1" width="80" height="15" fontSize="8" pattern="'R$ ' #,##0.00" hTextAlign="Right" blankWhenNull="true">
+                <expression><![CDATA[$F{valorTotal}]]></expression>
+            </element>
+            <element kind="textField" x="687" y="1" width="115" height="15" fontSize="8" hTextAlign="Center">
+                <expression><![CDATA[$F{dataVerificacaoWinThor} == null ? "" : $F{dataVerificacaoWinThor}.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))]]></expression>
+            </element>
+        </band>
+    </detail>
+
+    <noData height="40">
+        <element kind="staticText" x="0" y="10" width="802" height="20" hTextAlign="Center" bold="true">
+            <text><![CDATA[Nenhuma carga sumida do WinThor encontrada para os filtros informados.]]></text>
+        </element>
+    </noData>
+
+    <pageFooter height="24">
+        <element kind="textField" x="0" y="6" width="300" height="15">
+            <expression><![CDATA["Emitido em: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())]]></expression>
+        </element>
+        <element kind="textField" x="700" y="6" width="102" height="15" hTextAlign="Right">
+            <expression><![CDATA["Página " + $V{PAGE_NUMBER}]]></expression>
+        </element>
+    </pageFooter>
+
+</jasperReport>

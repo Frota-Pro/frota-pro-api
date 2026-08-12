@@ -13,6 +13,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -96,4 +97,9 @@ public class CargaResponse {
      * código permitido, ou transferência autorizada).
      */
     private boolean diminuicaoPesoValorBloqueada;
+
+    /** true se a última verificação de reconciliação não encontrou mais essa carga no WinThor. */
+    private boolean naoEncontradaNoWinThor;
+
+    private LocalDateTime dataVerificacaoWinThor;
 }
