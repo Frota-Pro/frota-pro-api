@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.domain;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import br.com.frotasPro.api.domain.enums.TipoPlataformaDispositivo;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -68,7 +70,7 @@ public class Usuario extends AuditoriaBase{
     private long totalLogins = 0;
 
     public void registrarLogin() {
-        this.ultimoLoginEm = LocalDateTime.now();
+        this.ultimoLoginEm = FusoHorarioUtils.agoraBrasil();
         this.totalLogins++;
     }
 

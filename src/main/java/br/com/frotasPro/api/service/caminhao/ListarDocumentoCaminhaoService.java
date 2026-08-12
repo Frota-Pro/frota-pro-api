@@ -9,6 +9,7 @@ import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.DocumentoCaminhaoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,11 @@ public class ListarDocumentoCaminhaoService {
     private final CaminhaoRepository caminhaoRepository;
     private final DocumentoCaminhaoRepository documentoCaminhaoRepository;
 
+    // Faltava esse @Cacheable — mesma situação de BuscarCaminhaoDetalheService:
+    // "caminhao_documentos" já era evitado em todo write path, mas nada
+    // populava esse cache. Mesmo padrão de ListarDocumentoMotoristaService
+    // (motorista_documentos), que já funciona.
+    @Cacheable("caminhao_documentos")
     @Transactional(readOnly = true)
     public Page<DocumentoCaminhaoResponse> listarPorCaminhao(String codigo, Pageable pageable) {
 

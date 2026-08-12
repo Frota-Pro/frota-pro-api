@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.service.meta;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import br.com.frotasPro.api.domain.Caminhao;
 import br.com.frotasPro.api.domain.Meta;
 import br.com.frotasPro.api.domain.enums.EventoNotificacao;
@@ -11,6 +13,8 @@ import br.com.frotasPro.api.repository.NotificacaoRepository;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import br.com.frotasPro.api.util.MetaProgressoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,9 +35,21 @@ public class ProcessarMetasDiariasService {
     private final NotificacaoService notificacaoService;
     private final NotificacaoRepository notificacaoRepository;
 
+    // Job diário (1h da manhã) — não passa por controller, então nunca
+    // invalidava esses caches: fecha/renova metas automaticamente todo dia,
+    // mas a tela de Metas continuava mostrando o status de ontem (ou não
+    // mostrava a meta recém-renovada) até alguém editar uma meta manualmente
+    // pelo controller. Mesmo bug já corrigido antes pro sync de motorista/caminhão.
+    @Caching(evict = {
+            @CacheEvict(value = "meta_buscar_id", allEntries = true),
+            @CacheEvict(value = "meta_listar", allEntries = true),
+            @CacheEvict(value = "meta_ativas_caminhao", allEntries = true),
+            @CacheEvict(value = "meta_historico", allEntries = true),
+            @CacheEvict(value = "meta_historico_caminhao", allEntries = true)
+    })
     @Transactional
     public void processar() {
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = FusoHorarioUtils.hojeBrasil();
 
         atualizarStatusAutomatico(hoje);
         notificarMetasVencendoForaDaMeta(hoje);

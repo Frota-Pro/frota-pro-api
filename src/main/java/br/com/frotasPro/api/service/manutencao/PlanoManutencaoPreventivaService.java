@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.service.manutencao;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import br.com.frotasPro.api.controller.request.PlanoManutencaoPreventivaRequest;
 import br.com.frotasPro.api.controller.response.PlanoManutencaoPreventivaResponse;
 import br.com.frotasPro.api.domain.Caminhao;
@@ -39,7 +41,7 @@ public class PlanoManutencaoPreventivaService {
         // A contagem começa a partir de agora: odômetro/data atuais do caminhão
         // servem de linha de base até a primeira manutenção vinculada ser concluída.
         plano.setUltimoKmExecutado(caminhao.getOdometroUltimaCarga());
-        plano.setUltimaDataExecutada(LocalDate.now());
+        plano.setUltimaDataExecutada(FusoHorarioUtils.hojeBrasil());
 
         return toResponse(repository.save(plano));
     }

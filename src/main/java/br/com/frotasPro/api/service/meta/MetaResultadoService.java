@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.service.meta;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import br.com.frotasPro.api.domain.Caminhao;
 import br.com.frotasPro.api.domain.Meta;
 import br.com.frotasPro.api.domain.MetaResultado;
@@ -43,7 +45,7 @@ public class MetaResultadoService {
                 .periodoFim(periodoFim)
                 .percentual(percentual)
                 .metaAtingida(Boolean.TRUE.equals(metaAtingida))
-                .calculadoEm(LocalDateTime.now())
+                .calculadoEm(FusoHorarioUtils.agoraBrasil())
                 .build();
 
         repository.save(resultado);

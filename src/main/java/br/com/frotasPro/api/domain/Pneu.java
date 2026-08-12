@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.domain;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import br.com.frotasPro.api.domain.enums.StatusPneu;
 import jakarta.persistence.*;
 import lombok.*;
@@ -57,11 +59,11 @@ public class Pneu {
         if (status == null) status = StatusPneu.ESTOQUE;
         if (kmMetaAtual == null) kmMetaAtual = BigDecimal.ZERO;
         if (kmTotalAcumulado == null) kmTotalAcumulado = BigDecimal.ZERO;
-        if (criadoEm == null) criadoEm = LocalDateTime.now();
+        if (criadoEm == null) criadoEm = FusoHorarioUtils.agoraBrasil();
     }
 
     @PreUpdate
     public void preUpdate() {
-        atualizadoEm = LocalDateTime.now();
+        atualizadoEm = FusoHorarioUtils.agoraBrasil();
     }
 }

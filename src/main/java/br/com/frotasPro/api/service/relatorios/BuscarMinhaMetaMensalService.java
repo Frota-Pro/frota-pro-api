@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.service.relatorios;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import br.com.frotasPro.api.controller.response.RelatorioMetaMensalMotoristaResponse;
 import br.com.frotasPro.api.domain.Motorista;
 import br.com.frotasPro.api.excption.ObjectNotFound;
@@ -26,7 +28,7 @@ public class BuscarMinhaMetaMensalService {
                 .findByUsuarioId(usuarioAutenticadoService.getUsuarioIdLogado())
                 .orElseThrow(() -> new ObjectNotFound("Nenhum motorista vinculado ao usuário logado"));
 
-        LocalDate periodoInicio = inicio != null ? inicio : LocalDate.now().withDayOfMonth(1);
+        LocalDate periodoInicio = inicio != null ? inicio : FusoHorarioUtils.hojeBrasil().withDayOfMonth(1);
         LocalDate periodoFim = fim != null ? fim : periodoInicio.withDayOfMonth(periodoInicio.lengthOfMonth());
 
         return relatorioMetaMensalMotoristaService.gerar(motorista.getCodigo(), periodoInicio, periodoFim);

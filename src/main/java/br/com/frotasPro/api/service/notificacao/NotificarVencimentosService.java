@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.service.notificacao;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import br.com.frotasPro.api.domain.Caminhao;
 import br.com.frotasPro.api.domain.DocumentoCaminhao;
 import br.com.frotasPro.api.domain.Manutencao;
@@ -48,7 +50,7 @@ public class NotificarVencimentosService {
 
     @Transactional
     public void notificarCnhVencendo() {
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = FusoHorarioUtils.hojeBrasil();
         LocalDate limite = hoje.plusDays(parametroSistemaService.buscarOuPadrao().getDiasAntecedenciaVencimentoDocumento());
 
         List<Motorista> motoristas = motoristaRepository.buscarComCnhVencendoNaoNotificada(hoje, limite);
@@ -67,7 +69,7 @@ public class NotificarVencimentosService {
                     motorista.getId(),
                     motorista.getCodigo()
             );
-            motorista.setCnhNotificadoVencimentoEm(LocalDateTime.now());
+            motorista.setCnhNotificadoVencimentoEm(FusoHorarioUtils.agoraBrasil());
         }
 
         motoristaRepository.saveAll(motoristas);
@@ -76,7 +78,7 @@ public class NotificarVencimentosService {
 
     @Transactional
     public void notificarDocumentosCaminhaoVencendo() {
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = FusoHorarioUtils.hojeBrasil();
         LocalDate limite = hoje.plusDays(parametroSistemaService.buscarOuPadrao().getDiasAntecedenciaVencimentoDocumento());
 
         List<DocumentoCaminhao> documentos = documentoCaminhaoRepository.buscarComVencimentoProximoNaoNotificado(hoje, limite);
@@ -97,7 +99,7 @@ public class NotificarVencimentosService {
                     documento.getId(),
                     codigoCaminhao
             );
-            documento.setNotificadoVencimentoEm(LocalDateTime.now());
+            documento.setNotificadoVencimentoEm(FusoHorarioUtils.agoraBrasil());
         }
 
         documentoCaminhaoRepository.saveAll(documentos);
@@ -106,7 +108,7 @@ public class NotificarVencimentosService {
 
     @Transactional
     public void notificarManutencoesPreventivasVencendo() {
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = FusoHorarioUtils.hojeBrasil();
         List<PlanoManutencaoPreventiva> candidatos = planoManutencaoPreventivaRepository.findByAtivoTrueAndNotificadoVencimentoEmIsNull();
         if (candidatos.isEmpty()) {
             return;
@@ -139,7 +141,7 @@ public class NotificarVencimentosService {
                     plano.getId(),
                     codigoCaminhao
             );
-            plano.setNotificadoVencimentoEm(LocalDateTime.now());
+            plano.setNotificadoVencimentoEm(FusoHorarioUtils.agoraBrasil());
         }
 
         planoManutencaoPreventivaRepository.saveAll(vencendo);
@@ -149,7 +151,7 @@ public class NotificarVencimentosService {
     @Transactional
     public void notificarManutencoesEstagnadas() {
         int diasManutencaoEstagnada = parametroSistemaService.buscarOuPadrao().getDiasManutencaoEstagnada();
-        LocalDate limite = LocalDate.now().minusDays(diasManutencaoEstagnada);
+        LocalDate limite = FusoHorarioUtils.hojeBrasil().minusDays(diasManutencaoEstagnada);
 
         List<Manutencao> manutencoes = manutencaoRepository.buscarEstagnadasNaoNotificadas(STATUS_EM_ABERTO, limite);
         if (manutencoes.isEmpty()) {
@@ -170,7 +172,7 @@ public class NotificarVencimentosService {
                     manutencao.getId(),
                     manutencao.getCodigo()
             );
-            manutencao.setNotificadoDemoraEm(LocalDateTime.now());
+            manutencao.setNotificadoDemoraEm(FusoHorarioUtils.agoraBrasil());
         }
 
         manutencaoRepository.saveAll(manutencoes);

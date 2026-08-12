@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.service.dashboard;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import br.com.frotasPro.api.controller.response.MetricasAtuadorResponse;
 import br.com.frotasPro.api.controller.response.MotoristaAcessoResponse;
 import br.com.frotasPro.api.controller.response.MotoristaAtrasoResponse;
@@ -38,7 +40,7 @@ public class BuscarSaudeSistemaService {
 
     @Transactional(readOnly = true)
     public SaudeSistemaResponse buscar(LocalDate inicio, LocalDate fim) {
-        LocalDate periodoInicio = inicio != null ? inicio : LocalDate.now().withDayOfMonth(1);
+        LocalDate periodoInicio = inicio != null ? inicio : FusoHorarioUtils.hojeBrasil().withDayOfMonth(1);
         LocalDate periodoFim = fim != null
                 ? fim
                 : periodoInicio.withDayOfMonth(periodoInicio.lengthOfMonth());
@@ -56,7 +58,7 @@ public class BuscarSaudeSistemaService {
 
     private void preencherAdocaoApp(SaudeSistemaResponse.SaudeSistemaResponseBuilder builder) {
         List<Motorista> motoristas = motoristaRepository.listarAtivosComUsuarioVinculado();
-        LocalDateTime agora = LocalDateTime.now();
+        LocalDateTime agora = FusoHorarioUtils.agoraBrasil();
 
         List<MotoristaAcessoResponse> linhas = new ArrayList<>();
         int ativos7 = 0;

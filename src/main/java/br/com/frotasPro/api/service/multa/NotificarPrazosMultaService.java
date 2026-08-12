@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.service.multa;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import br.com.frotasPro.api.domain.Multa;
 import br.com.frotasPro.api.domain.enums.EventoNotificacao;
 import br.com.frotasPro.api.domain.enums.TipoNotificacao;
@@ -35,7 +37,7 @@ public class NotificarPrazosMultaService {
 
     @Transactional
     public void processar() {
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = FusoHorarioUtils.hojeBrasil();
         LocalDate limite = hoje.plusDays(parametroSistemaService.buscarOuPadrao().getDiasAntecedenciaPrazoMulta());
 
         List<Multa> multas = multaRepository.buscarComPrazoProximoNaoNotificado(hoje, limite);
@@ -45,7 +47,7 @@ public class NotificarPrazosMultaService {
 
         for (Multa multa : multas) {
             notificarPrazo(multa, hoje, limite);
-            multa.setNotificadoPrazoEm(LocalDateTime.now());
+            multa.setNotificadoPrazoEm(FusoHorarioUtils.agoraBrasil());
         }
 
         multaRepository.saveAll(multas);

@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.service.dashboard;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import br.com.frotasPro.api.controller.response.DashboardMetasResponse;
 import br.com.frotasPro.api.domain.CategoriaCaminhao;
 import br.com.frotasPro.api.domain.MetaResultado;
@@ -27,7 +29,7 @@ public class BuscarDashboardMetasService {
 
     @Transactional(readOnly = true)
     public DashboardMetasResponse executar() {
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = FusoHorarioUtils.hojeBrasil();
         long metasAtivas = metaRepository.countByStatusMetaAndDataIncioLessThanEqualAndDataFimGreaterThanEqual(
                 StatusMeta.EM_ANDAMENTO,
                 hoje,

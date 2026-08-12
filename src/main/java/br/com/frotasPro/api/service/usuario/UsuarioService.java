@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.service.usuario;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import br.com.frotasPro.api.controller.request.DispositivoAppRequest;
 import br.com.frotasPro.api.controller.request.UsuarioRequest;
 import br.com.frotasPro.api.controller.request.UsuarioSenhaSelfRequest;
@@ -163,7 +165,7 @@ public class UsuarioService {
         Usuario usuario = usuarioAutenticadoService.getUsuario();
         usuario.setDispositivoAppVersao(request.versao().trim());
         usuario.setDispositivoAppPlataforma(request.plataforma());
-        usuario.setDispositivoAppReportadoEm(LocalDateTime.now());
+        usuario.setDispositivoAppReportadoEm(FusoHorarioUtils.agoraBrasil());
         usuarioRepository.save(usuario);
     }
 

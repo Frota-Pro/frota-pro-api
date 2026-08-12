@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.service.manutencao;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import br.com.frotasPro.api.domain.enums.StatusAprovacaoManutencao;
 import br.com.frotasPro.api.domain.enums.StatusManutencao;
 import br.com.frotasPro.api.excption.BusinessException;
@@ -33,7 +35,7 @@ public final class ManutencaoStatusHelper {
 
     public static LocalDate resolverDataFim(StatusManutencao novoStatus, LocalDate dataFimInformada) {
         if (novoStatus == StatusManutencao.CONCLUIDA && dataFimInformada == null) {
-            return LocalDate.now();
+            return FusoHorarioUtils.hojeBrasil();
         }
         return dataFimInformada;
     }

@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.service.carga;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import br.com.frotasPro.api.domain.Carga;
 import br.com.frotasPro.api.domain.CargaNota;
 import br.com.frotasPro.api.domain.ParametroSistema;
@@ -396,7 +398,7 @@ public class SincronizarCargaService {
 
         for (var transferencia : transferencias) {
             transferencia.setStatus(StatusTransferenciaCarga.CONCLUIDA);
-            transferencia.setConcluidoEm(LocalDateTime.now());
+            transferencia.setConcluidoEm(FusoHorarioUtils.agoraBrasil());
         }
 
         cargaTransferenciaRepository.saveAll(transferencias);

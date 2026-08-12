@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.service.paradaCarga;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import br.com.frotasPro.api.controller.request.ParadaCargaRequest;
 import br.com.frotasPro.api.controller.response.ParadaCargaResponse;
 import br.com.frotasPro.api.domain.Abastecimento;
@@ -104,7 +106,7 @@ public class AtualizarParadaCargaService {
             abastecimento.setCaminhao(carga.getCaminhao());
             abastecimento.setMotorista(carga.getMotorista());
             abastecimento.setDtAbastecimento(
-                    request.getDtInicio() != null ? request.getDtInicio() : LocalDateTime.now()
+                    request.getDtInicio() != null ? request.getDtInicio() : FusoHorarioUtils.agoraBrasil()
             );
             abastecimento.setKmOdometro(request.getKmOdometro());
             abastecimento.setQtLitros(abReq.getQtLitros());

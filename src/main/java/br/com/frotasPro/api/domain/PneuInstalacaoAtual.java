@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.domain;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -44,6 +46,6 @@ public class PneuInstalacaoAtual {
     @PrePersist
     public void prePersist() {
         if (id == null) id = UUID.randomUUID();
-        if (dataInstalacao == null) dataInstalacao = LocalDateTime.now();
+        if (dataInstalacao == null) dataInstalacao = FusoHorarioUtils.agoraBrasil();
     }
 }

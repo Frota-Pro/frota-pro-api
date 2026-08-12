@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.service.movimentacaoSemCarga;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import br.com.frotasPro.api.domain.Caminhao;
 import br.com.frotasPro.api.domain.Carga;
 import br.com.frotasPro.api.domain.MovimentacaoSemCarga;
@@ -38,7 +40,7 @@ public class RegistrarMovimentacaoSemCargaService {
         MovimentacaoSemCarga movimentacao = new MovimentacaoSemCarga();
         movimentacao.setCaminhao(caminhao);
         movimentacao.setCargaInicio(carga);
-        movimentacao.setDataMovimentacao(LocalDate.now());
+        movimentacao.setDataMovimentacao(FusoHorarioUtils.hojeBrasil());
         movimentacao.setKmOrigem(kmOrigem);
         movimentacao.setKmDestino(kmInicial);
         movimentacao.setKmRodado(kmRodado);

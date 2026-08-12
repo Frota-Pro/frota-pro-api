@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.service.notificacao;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import br.com.frotasPro.api.controller.response.NotificacaoResponse;
 import br.com.frotasPro.api.domain.Notificacao;
 import br.com.frotasPro.api.domain.NotificacaoUsuario;
@@ -119,7 +121,7 @@ public class NotificacaoService {
                 .orElseThrow(() -> new ObjectNotFound("Notificação não encontrada para o usuário"));
 
         if (notificacaoUsuario.getLidaEm() == null) {
-            notificacaoUsuario.setLidaEm(LocalDateTime.now());
+            notificacaoUsuario.setLidaEm(FusoHorarioUtils.agoraBrasil());
             notificacaoUsuarioRepository.save(notificacaoUsuario);
         }
     }
@@ -134,7 +136,7 @@ public class NotificacaoService {
             return 0;
         }
 
-        LocalDateTime agora = LocalDateTime.now();
+        LocalDateTime agora = FusoHorarioUtils.agoraBrasil();
         List<NotificacaoUsuario> pendentes = page.getContent();
         pendentes.forEach(nu -> nu.setLidaEm(agora));
         notificacaoUsuarioRepository.saveAll(pendentes);
