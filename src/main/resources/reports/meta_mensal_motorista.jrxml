@@ -2,6 +2,7 @@
 <!-- JRXML ajustado para uso com JRBeanCollectionDataSource (API) -->
 <jasperReport name="Relatório – Meta mensal do motorista"
               language="java"
+              whenNoDataType="AllSectionsNoDetail"
               pageWidth="842"
               pageHeight="595"
               orientation="Landscape"
@@ -101,7 +102,7 @@
 
         <element kind="textField"
                  uuid="00000000-0000-0000-0000-000000000205"
-                 x="640" y="12" width="180" height="16"
+                 x="460" y="12" width="340" height="16"
                  blankWhenNull="true"
                  hTextAlign="Right" vTextAlign="Middle">
             <expression><![CDATA[
@@ -112,17 +113,17 @@
 
         <element kind="textField"
                  uuid="00000000-0000-0000-0000-000000000206"
-                 x="640" y="30" width="180" height="16"
+                 x="460" y="30" width="340" height="16"
                  blankWhenNull="true"
                  hTextAlign="Right" vTextAlign="Middle">
             <expression><![CDATA[
-"Meta tonelada: " + ($P{objetivoMesTonelada} == null ? "-" : $P{objetivoMesTonelada})
+"Meta tonelada: " + ($P{objetivoMesTonelada} == null ? "-" : $P{objetivoMesTonelada}.toString())
             ]]></expression>
         </element>
 
         <element kind="textField"
                  uuid="00000000-0000-0000-0000-000000000207"
-                 x="640" y="48" width="180" height="16"
+                 x="460" y="48" width="340" height="16"
                  blankWhenNull="true"
                  hTextAlign="Right" vTextAlign="Middle">
             <expression><![CDATA[
@@ -141,7 +142,8 @@
                  mode="Opaque"
                  x="0" y="100" width="258" height="22"
                  forecolor="#1E3A8A" backcolor="#DBEAFE"
-                 bold="true" hTextAlign="Center" vTextAlign="Middle">
+                 bold="true" pattern="#,##0.000" hTextAlign="Center" vTextAlign="Middle"
+                 blankWhenNull="true">
             <expression><![CDATA[$P{objetivoMesTonelada}]]></expression>
         </element>
 
@@ -156,7 +158,8 @@
                  mode="Opaque"
                  x="272" y="100" width="258" height="22"
                  forecolor="#134E4A" backcolor="#CCFBF1"
-                 bold="true" pattern="#,##0.00" hTextAlign="Center" vTextAlign="Middle">
+                 bold="true" pattern="#,##0.00" hTextAlign="Center" vTextAlign="Middle"
+                 blankWhenNull="true">
             <expression><![CDATA[$P{mediaGeralKmPorLitro}]]></expression>
         </element>
 
@@ -171,7 +174,8 @@
                  mode="Opaque"
                  x="544" y="100" width="258" height="22"
                  forecolor="#7C2D12" backcolor="#FFEDD5"
-                 bold="true" pattern="#,##0.00" hTextAlign="Center" vTextAlign="Middle">
+                 bold="true" pattern="#,##0.00" hTextAlign="Center" vTextAlign="Middle"
+                 blankWhenNull="true">
             <expression><![CDATA[$P{realizadoToneladaPercentual}]]></expression>
         </element>
 
