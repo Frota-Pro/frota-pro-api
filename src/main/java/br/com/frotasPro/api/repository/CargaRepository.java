@@ -311,4 +311,13 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
             @Param("status") Status status
     );
 
+    /** Base da página de Analytics — cargas finalizadas no período, pra série de tendência semanal. */
+    List<Carga> findByStatusCargaAndDtChegadaBetween(Status statusCarga, LocalDate inicio, LocalDate fim);
+
+    /** Analytics por motorista — cargas finalizadas de um motorista específico no período. */
+    List<Carga> findByMotorista_CodigoAndStatusCargaAndDtChegadaBetween(String codigoMotorista, Status statusCarga, LocalDate inicio, LocalDate fim);
+
+    /** Analytics por caminhão — cargas finalizadas de um caminhão específico no período. */
+    List<Carga> findByCaminhao_CodigoAndStatusCargaAndDtChegadaBetween(String codigoCaminhao, Status statusCarga, LocalDate inicio, LocalDate fim);
+
 }

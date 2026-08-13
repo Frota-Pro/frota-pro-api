@@ -43,6 +43,9 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, UU
             Pageable pageable
     );
 
+    /** Base da página de Analytics — todos os abastecimentos do período, pra série de tendência semanal. */
+    List<Abastecimento> findAllByDtAbastecimentoBetween(LocalDateTime inicio, LocalDateTime fim);
+
     Page<Abastecimento> findByTipoCombustivelAndDtAbastecimentoBetween(
             TipoCombustivel tipoCombustivel,
             LocalDateTime inicio,
@@ -381,4 +384,30 @@ and (cast(:fim as timestamp) is null or a.dt_abastecimento <= cast(:fim as times
             @Param("fim") LocalDate fim,
             @Param("status") Status status
     );
+
+    boolean existsByPostoAbastecimento_Id(UUID id);
+
+    /** Analytics por motorista/caminhão — abastecimentos de um específico no período. */
+    List<Abastecimento> findAllByMotorista_CodigoAndDtAbastecimentoBetween(String codigoMotorista, LocalDateTime inicio, LocalDateTime fim);
+
+    List<Abastecimento> findAllByCaminhao_CodigoAndDtAbastecimentoBetween(String codigoCaminhao, LocalDateTime inicio, LocalDateTime fim);
+
+    /** Analytics de abastecimento — total por posto (cadastrado ou texto livre) no período. */
+    @Query("""
+       select coalesce(pa.nome, a.posto, 'Não informado') as posto,
+              sum(a.qtLitros) as totalLitros,
+              sum(a.valorTotal) as totalValor
+       from Abastecimento a
+       left join a.postoAbastecimento pa
+       where a.dtAbastecimento between :inicio and :fim
+       group by coalesce(pa.nome, a.posto, 'Não informado')
+       order by sum(a.valorTotal) desc
+       """)
+    List<ResumoPostoRow> resumoPorPostoNoPeriodo(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
+
+    interface ResumoPostoRow {
+        String getPosto();
+        BigDecimal getTotalLitros();
+        BigDecimal getTotalValor();
+    }
 }
