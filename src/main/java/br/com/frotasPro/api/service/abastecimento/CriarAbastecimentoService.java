@@ -28,6 +28,7 @@ public class CriarAbastecimentoService {
     private final MotoristaRepository motoristaRepository;
     private final CalcularMediaKmLitroService calcularMediaKmLitroService;
     private final NotificacaoService notificacaoService;
+    private final ResolverPostoAbastecimentoService resolverPostoAbastecimentoService;
 
     public AbastecimentoResponse criar(AbastecimentoRequest request) {
 
@@ -56,6 +57,7 @@ public class CriarAbastecimentoService {
 
         a.setTipoCombustivel(request.getTipoCombustivel());
         a.setFormaPagamento(request.getFormaPagamento());
+        a.setPostoAbastecimento(resolverPostoAbastecimentoService.resolver(request.getPosto(), request.getPostoAbastecimento()));
         a.setPosto(request.getPosto());
         a.setCidade(request.getCidade());
         a.setUf(request.getUf());

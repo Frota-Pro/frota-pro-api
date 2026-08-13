@@ -57,6 +57,14 @@ public class ControllerExceptionHandler {
         return ResponseEntity.status(status).body(err);
     }
 
+    // ex: exclusão bloqueada por haver registros vinculados (categoria/posto/etc. em uso)
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<CustomException> illegalState(IllegalStateException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
+        CustomException err = new CustomException(Instant.now(), status.value(), e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
     // validação de @RequestParam / @PathVariable quando usar @Validated + constraints
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<CustomException> constraintViolation(ConstraintViolationException e, HttpServletRequest request) {

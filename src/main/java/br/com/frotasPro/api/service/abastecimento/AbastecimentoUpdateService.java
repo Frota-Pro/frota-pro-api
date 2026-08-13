@@ -31,6 +31,7 @@ public class AbastecimentoUpdateService {
     private final ParadaCargaRepository paradaRepository;
     private final CalcularMediaKmLitroService calcularMediaKmLitroService;
     private final NotificacaoService notificacaoService;
+    private final ResolverPostoAbastecimentoService resolverPostoAbastecimentoService;
 
     public AbastecimentoResponse atualizar(String codigo, AbastecimentoRequest request) {
 
@@ -63,6 +64,7 @@ public class AbastecimentoUpdateService {
 
         abastecimento.setTipoCombustivel(request.getTipoCombustivel());
         abastecimento.setFormaPagamento(request.getFormaPagamento());
+        abastecimento.setPostoAbastecimento(resolverPostoAbastecimentoService.resolver(request.getPosto(), request.getPostoAbastecimento()));
         abastecimento.setPosto(request.getPosto());
         abastecimento.setCidade(request.getCidade());
         abastecimento.setUf(request.getUf());

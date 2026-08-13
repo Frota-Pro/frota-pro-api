@@ -19,6 +19,7 @@ import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.EixoRepository;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;
 import br.com.frotasPro.api.repository.PneuRepository;
+import br.com.frotasPro.api.service.abastecimento.ResolverPostoAbastecimentoService;
 import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import br.com.frotasPro.api.service.pneu.PneuService;
@@ -48,6 +49,7 @@ public class CriarParadaCargaService {
     private final PneuService pneuService;
     private final NotificacaoService notificacaoService;
     private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
+    private final ResolverPostoAbastecimentoService resolverPostoAbastecimentoService;
 
     @Transactional
     public ParadaCargaResponse criar(ParadaCargaRequest request) {
@@ -112,6 +114,7 @@ public class CriarParadaCargaService {
             abastecimento.setValorTotal(valorTotal);
             abastecimento.setTipoCombustivel(abReq.getTipoCombustivel());
             abastecimento.setFormaPagamento(abReq.getFormaPagamento());
+            abastecimento.setPostoAbastecimento(resolverPostoAbastecimentoService.resolver(abReq.getPosto(), abReq.getPostoAbastecimento()));
             abastecimento.setPosto(abReq.getPosto());
             abastecimento.setCidade(abReq.getCidade());
             abastecimento.setUf(abReq.getUf());
@@ -128,12 +131,16 @@ public class CriarParadaCargaService {
 
             parada.getAbastecimentos().add(abastecimento);
 
+            String nomePosto = abastecimento.getPostoAbastecimento() != null
+                    ? abastecimento.getPostoAbastecimento().getNome()
+                    : abReq.getPosto();
+
             DespesaParada despesa = DespesaParada.builder()
                     .paradaCarga(parada)
                     .tipoDespesa(TipoDespesa.COMBUSTIVEL)
                     .dataHora(request.getDtInicio())
                     .valor(valorTotal)
-                    .descricao("Abastecimento - " + (abReq.getPosto() != null ? abReq.getPosto() : ""))
+                    .descricao("Abastecimento - " + (nomePosto != null ? nomePosto : ""))
                     .cidade(abReq.getCidade())
                     .uf(abReq.getUf())
                     .build();

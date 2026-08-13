@@ -56,6 +56,10 @@ public class AbastecimentoRequest {
     @Size(max = 120, message = "Posto deve ter no máximo 120 caracteres")
     private String posto;
 
+    /** Código do posto cadastrado (alternativa a "posto" — informe um ou outro). */
+    @Size(max = 20, message = "Posto cadastrado inválido")
+    private String postoAbastecimento;
+
     @Size(max = 120, message = "Cidade deve ter no máximo 120 caracteres")
     private String cidade;
 
