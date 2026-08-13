@@ -88,6 +88,30 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
             Pageable pageable
     );
 
+    /** Histórico de cargas finalizadas do motorista (app mobile), com busca livre e filtro de período por dtChegada. */
+    @Query("""
+       select c
+       from Carga c
+       where c.motorista.id = :motoristaId
+         and c.statusCarga = :status
+         and (:q is null
+              or lower(c.numeroCarga) like concat('%', lower(cast(:q as string)), '%')
+              or lower(c.numeroCargaExterno) like concat('%', lower(cast(:q as string)), '%')
+              or lower(c.caminhao.placa) like concat('%', lower(cast(:q as string)), '%')
+         )
+         and (cast(:inicio as date) is null or c.dtChegada >= :inicio)
+         and (cast(:fim as date) is null or c.dtChegada <= :fim)
+       order by c.dtChegada desc
+       """)
+    Page<Carga> findFinalizadasPorMotoristaFiltrado(
+            @Param("motoristaId") UUID motoristaId,
+            @Param("status") Status status,
+            @Param("q") String q,
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim,
+            Pageable pageable
+    );
+
     @Query("""
             select c
             from Carga c

@@ -174,8 +174,13 @@ public class CargaController {
 
     @PreAuthorize("hasAuthority('ROLE_MOTORISTA')")
     @GetMapping("/minhas-cargas-finalizadas")
-    public ResponseEntity<Page<CargaResponse>> minhasCargasFinalizadas(Pageable pageable) {
-        Page<CargaResponse> response = buscarCargasFinalizadasMotoristaService.buscar(pageable);
+    public ResponseEntity<Page<CargaResponse>> minhasCargasFinalizadas(
+            @RequestParam(value = "q", required = false) String q,
+            @RequestParam(value = "dtInicio", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dtInicio,
+            @RequestParam(value = "dtFim", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dtFim,
+            Pageable pageable
+    ) {
+        Page<CargaResponse> response = buscarCargasFinalizadasMotoristaService.buscar(pageable, q, dtInicio, dtFim);
         return ResponseEntity.ok(response);
     }
 
