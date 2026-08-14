@@ -14,7 +14,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Service
@@ -27,7 +29,7 @@ public class BuscarCargasFinalizadasMotoristaService {
     private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
     @Transactional(readOnly = true)
-    public Page<CargaResponse> buscar(Pageable pageable) {
+    public Page<CargaResponse> buscar(Pageable pageable, String q, LocalDate inicio, LocalDate fim) {
 
         UUID usuarioIdLogado = usuarioAutenticadoService.getUsuarioIdLogado();
 
@@ -36,10 +38,15 @@ public class BuscarCargasFinalizadasMotoristaService {
                         "Nenhum motorista vinculado ao usuário logado"));
 
         boolean integracaoAtiva = integracaoWinThorConfigService.isCargaIntegracaoAtiva();
+        String qTratado = StringUtils.hasText(q) ? q.trim() : null;
+
         return cargaRepository
-                .findByMotoristaIdAndStatusCargaOrderByDtChegadaDesc(
+                .findFinalizadasPorMotoristaFiltrado(
                         motorista.getId(),
                         Status.FINALIZADA,
+                        qTratado,
+                        inicio,
+                        fim,
                         pageable
                 )
                 .map(carga -> {

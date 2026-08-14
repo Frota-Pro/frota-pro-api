@@ -13,6 +13,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -64,6 +65,41 @@ public class CargaResponse {
     /** Ordem definida para entrega (lista ordenada de clientes) */
     private List<String> ordemEntregaClientes;
 
+    /**
+     * Clientes desta carga que entraram sem posição parametrizada na
+     * roteirização da cidade deles — o app mobile usa isso pra avisar o
+     * motorista que a ordem daquele(s) cliente(s) não é confiável ainda.
+     */
+    private List<String> clientesNaoRoteirizados;
+
     /** Observação informada pelo motorista durante/ao final da carga */
     private String observacaoMotorista;
+
+    /**
+     * true quando o motorista desta carga foi corrigido manualmente (carga
+     * faturada pra um motorista no WinThor, mas outro que realmente saiu
+     * com ela) — o próximo sync do WinThor não sobrescreve.
+     */
+    private boolean motoristaDefinidoManualmente;
+
+    /**
+     * Códigos de devolução (CODDEVOL) encontrados no último sync com o
+     * WinThor pra esta carga. Null = não foi encontrada nenhuma devolução.
+     */
+    private List<String> codigosDevolucaoEncontrados;
+
+    /** true se o último sync encontrou transferência de pedido desta carga pra outro carregamento. */
+    private boolean teveTransferencia;
+
+    /**
+     * true se, no último sync, uma diminuição de peso e/ou valor vinda do
+     * WinThor foi ignorada por falta de motivo reconhecido (devolução com
+     * código permitido, ou transferência autorizada).
+     */
+    private boolean diminuicaoPesoValorBloqueada;
+
+    /** true se a última verificação de reconciliação não encontrou mais essa carga no WinThor. */
+    private boolean naoEncontradaNoWinThor;
+
+    private LocalDateTime dataVerificacaoWinThor;
 }

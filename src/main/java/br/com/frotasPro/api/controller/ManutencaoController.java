@@ -1,5 +1,6 @@
 package br.com.frotasPro.api.controller;
 
+import br.com.frotasPro.api.controller.request.AprovarManutencaoRequest;
 import br.com.frotasPro.api.controller.request.ManutencaoRequest;
 import br.com.frotasPro.api.controller.response.DocumentoManutencaoResponse;
 import br.com.frotasPro.api.controller.response.ManutencaoResponse;
@@ -45,6 +46,7 @@ public class ManutencaoController {
 
     private final RegistrarDocumentoManutencaoService registrarDocumentoManutencaoService;
     private final ListarDocumentoManutencaoService listarDocumentoManutencaoService;
+    private final AprovarManutencaoService aprovarManutencaoService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @PostMapping
@@ -103,6 +105,19 @@ public class ManutencaoController {
             @Valid @RequestBody ManutencaoRequest request
     ) {
         return ResponseEntity.ok(atualizarManutencaoService.atualizar(codigo, request));
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PatchMapping("/{codigo}/aprovacao")
+    @Caching(evict = {
+            @CacheEvict(value = "manutencao_buscar_codigo", allEntries = true),
+            @CacheEvict(value = "manutencao_listar", allEntries = true)
+    })
+    public ResponseEntity<ManutencaoResponse> aprovar(
+            @PathVariable String codigo,
+            @Valid @RequestBody AprovarManutencaoRequest request
+    ) {
+        return ResponseEntity.ok(aprovarManutencaoService.aprovar(codigo, request));
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")

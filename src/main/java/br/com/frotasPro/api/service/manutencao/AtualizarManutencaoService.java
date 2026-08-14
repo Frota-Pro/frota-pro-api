@@ -7,13 +7,17 @@ import br.com.frotasPro.api.domain.Manutencao;
 import br.com.frotasPro.api.domain.ManutencaoItem;
 import br.com.frotasPro.api.domain.Oficina;
 import br.com.frotasPro.api.domain.ParadaCarga;
+import br.com.frotasPro.api.domain.PlanoManutencaoPreventiva;
 import br.com.frotasPro.api.domain.enums.EventoNotificacao;
+import br.com.frotasPro.api.domain.enums.StatusAprovacaoManutencao;
+import br.com.frotasPro.api.domain.enums.StatusManutencao;
 import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
 import br.com.frotasPro.api.repository.OficinaRepository;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;
+import br.com.frotasPro.api.repository.PlanoManutencaoPreventivaRepository;
 import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import lombok.AllArgsConstructor;
@@ -33,6 +37,7 @@ public class AtualizarManutencaoService {
     private final CaminhaoRepository caminhaoRepository;
     private final OficinaRepository oficinaRepository;
     private final ParadaCargaRepository paradaCargaRepository;
+    private final PlanoManutencaoPreventivaRepository planoManutencaoPreventivaRepository;
     private final NotificacaoService notificacaoService;
     private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
@@ -57,17 +62,34 @@ public class AtualizarManutencaoService {
                     .orElseThrow(() -> new ObjectNotFound("Parada não encontrada"));
         }
 
+        PlanoManutencaoPreventiva planoPreventivo = null;
+        if (request.getPlanoManutencaoPreventivaId() != null) {
+            planoPreventivo = planoManutencaoPreventivaRepository.findById(request.getPlanoManutencaoPreventivaId())
+                    .orElseThrow(() -> new ObjectNotFound("Plano de manutenção preventiva não encontrado"));
+        }
+
+        ManutencaoStatusHelper.validarTransicao(manutencao.getStatusManutencao(), request.getStatusManutencao());
+
+        StatusAprovacaoManutencao novoStatusAprovacao = ManutencaoStatusHelper.resolverStatusAprovacaoAoEditar(
+                manutencao.getStatusAprovacao(), manutencao.getValorOrcado(), request.getValorOrcado());
+        ManutencaoStatusHelper.validarAprovacaoParaAvancar(novoStatusAprovacao, request.getStatusManutencao());
+
         manutencao.setDescricao(request.getDescricao());
         manutencao.setDataInicioManutencao(request.getDataInicioManutencao());
-        manutencao.setDataFimManutencao(request.getDataFimManutencao());
+        manutencao.setDataFimManutencao(
+                ManutencaoStatusHelper.resolverDataFim(request.getStatusManutencao(), request.getDataFimManutencao()));
         manutencao.setTipoManutencao(request.getTipoManutencao());
         manutencao.setItensTrocados(request.getItensTrocados());
         manutencao.setObservacoes(request.getObservacoes());
         manutencao.setValor(request.getValor());
+        manutencao.setValorOrcado(request.getValorOrcado());
         manutencao.setStatusManutencao(request.getStatusManutencao());
+        manutencao.setStatusAprovacao(novoStatusAprovacao);
         manutencao.setCaminhao(caminhao);
         manutencao.setOficina(oficina);
         manutencao.setParadaCarga(parada);
+        manutencao.setKmOdometro(request.getKmOdometro());
+        manutencao.setPlanoManutencaoPreventiva(planoPreventivo);
 
         // Itens detalhados: substitui a lista (orphanRemoval = true)
         if (request.getItens() != null) {
@@ -101,6 +123,7 @@ public class AtualizarManutencaoService {
         }
 
         manutencaoRepository.save(manutencao);
+        atualizarPlanoPreventivoSeConcluida(manutencao);
 
         notificacaoService.notificar(
                 EventoNotificacao.MANUTENCAO_ATUALIZADA,
@@ -113,5 +136,22 @@ public class AtualizarManutencaoService {
         );
 
         return toResponse(manutencao, integracaoWinThorConfigService.isCargaIntegracaoAtiva());
+    }
+
+    /** Se a manutenção cumpre um plano preventivo e foi concluída, atualiza a linha de base do plano. */
+    private void atualizarPlanoPreventivoSeConcluida(Manutencao manutencao) {
+        PlanoManutencaoPreventiva plano = manutencao.getPlanoManutencaoPreventiva();
+        if (plano == null || manutencao.getStatusManutencao() != StatusManutencao.CONCLUIDA) {
+            return;
+        }
+
+        if (manutencao.getKmOdometro() != null) {
+            plano.setUltimoKmExecutado(manutencao.getKmOdometro());
+        }
+        if (manutencao.getDataFimManutencao() != null) {
+            plano.setUltimaDataExecutada(manutencao.getDataFimManutencao());
+        }
+        plano.setNotificadoVencimentoEm(null);
+        planoManutencaoPreventivaRepository.save(plano);
     }
 }

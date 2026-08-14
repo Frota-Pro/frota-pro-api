@@ -86,7 +86,10 @@ public class ManutencaoMapper {
                 .itens(itens)
                 .observacoes(entity.getObservacoes())
                 .valor(entity.getValor())
+                .valorOrcado(entity.getValorOrcado())
                 .statusManutencao(entity.getStatusManutencao())
+                .statusAprovacao(entity.getStatusAprovacao())
+                .observacaoAprovacao(entity.getObservacaoAprovacao())
 
                 .codigoCaminhao(caminhaoCodigo)
                 .caminhao(caminhaoDescricao)
@@ -94,6 +97,9 @@ public class ManutencaoMapper {
                 .oficina(oficinaNome)
                 .parada(parada)
                 .trocasPneu(trocas)
+                .kmOdometro(entity.getKmOdometro())
+                .planoManutencaoPreventivaId(entity.getPlanoManutencaoPreventiva() != null ? entity.getPlanoManutencaoPreventiva().getId() : null)
+                .planoManutencaoPreventivaDescricao(entity.getPlanoManutencaoPreventiva() != null ? entity.getPlanoManutencaoPreventiva().getDescricao() : null)
                 .build();
     }
 }

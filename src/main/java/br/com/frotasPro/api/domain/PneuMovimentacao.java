@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.domain;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import br.com.frotasPro.api.domain.enums.TipoMovimentacaoPneu;
 import jakarta.persistence.*;
 import lombok.*;
@@ -52,7 +54,7 @@ public class PneuMovimentacao {
     @PrePersist
     public void prePersist() {
         if (id == null) id = UUID.randomUUID();
-        if (dataEvento == null) dataEvento = LocalDateTime.now();
-        if (criadoEm == null) criadoEm = LocalDateTime.now();
+        if (dataEvento == null) dataEvento = FusoHorarioUtils.agoraBrasil();
+        if (criadoEm == null) criadoEm = FusoHorarioUtils.agoraBrasil();
     }
 }

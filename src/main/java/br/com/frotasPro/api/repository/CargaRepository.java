@@ -21,6 +21,15 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
 
     Optional<Carga> findByNumeroCargaExterno(String numeroCargaExterno);
 
+    /**
+     * Cargas ainda não iniciadas mas já sincronizadas do WinThor — universo
+     * verificado pela reconciliação (VerificarCargasSumidasWinThorService).
+     */
+    List<Carga> findByStatusCargaAndNumeroCargaExternoIsNotNull(Status statusCarga);
+
+    /** Base do relatório de cargas sumidas do WinThor — filtros extras aplicados em memória (lista pequena). */
+    List<Carga> findByNaoEncontradaNoWinThorTrueOrderByDataVerificacaoWinThorDesc();
+
     Page<Carga> findByDtSaida(LocalDate dtSaida, Pageable pageable);
 
     Page<Carga> findByDtSaidaBetween(LocalDate dataInicio,
@@ -47,11 +56,15 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
        """)
     Page<Carga> findByCaminhaoCodigoOuCodigoExterno(String codigo, Pageable pageable);
 
+    // naoEncontradaNoWinThor = false: uma carga sumida do WinThor não tem
+    // carregamento de verdade pra buscar, então não aparece pro motorista
+    // escolher — só fica visível pro escritório na tela de Cargas.
     @Query("""
            select c
            from Carga c
            where c.motorista.codigo = :codmotorista
              and c.statusCarga in :status
+             and c.naoEncontradaNoWinThor = false
            order by c.dtSaida desc
            """)
     List<Carga> buscarCargaAtualDoMotorista(
@@ -75,6 +88,30 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
             Pageable pageable
     );
 
+    /** Histórico de cargas finalizadas do motorista (app mobile), com busca livre e filtro de período por dtChegada. */
+    @Query("""
+       select c
+       from Carga c
+       where c.motorista.id = :motoristaId
+         and c.statusCarga = :status
+         and (:q is null
+              or lower(c.numeroCarga) like concat('%', lower(cast(:q as string)), '%')
+              or lower(c.numeroCargaExterno) like concat('%', lower(cast(:q as string)), '%')
+              or lower(c.caminhao.placa) like concat('%', lower(cast(:q as string)), '%')
+         )
+         and (cast(:inicio as date) is null or c.dtChegada >= :inicio)
+         and (cast(:fim as date) is null or c.dtChegada <= :fim)
+       order by c.dtChegada desc
+       """)
+    Page<Carga> findFinalizadasPorMotoristaFiltrado(
+            @Param("motoristaId") UUID motoristaId,
+            @Param("status") Status status,
+            @Param("q") String q,
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim,
+            Pageable pageable
+    );
+
     @Query("""
             select c
             from Carga c
@@ -95,7 +132,7 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
        from Carga c
        where c.caminhao.codigo = :codigo
          and c.statusCarga = :status
-         and c.dtChegada between :inicio and :fim
+         and c.dtSaida between :inicio and :fim
          and c.kmFinal is not null
          and c.kmInicial is not null
        """)
@@ -111,7 +148,7 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
        from Carga c
        where c.motorista.codigo = :codigo
          and c.statusCarga = :status
-         and c.dtChegada between :inicio and :fim
+         and c.dtSaida between :inicio and :fim
          and c.kmFinal is not null
          and c.kmInicial is not null
        """)
@@ -127,7 +164,7 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
        from Carga c
        where c.caminhao.codigo = :codigo
          and c.statusCarga = :status
-         and c.dtChegada between :inicio and :fim
+         and c.dtSaida between :inicio and :fim
        """)
     BigDecimal sumPesoPorCaminhaoNoPeriodo(
             @Param("codigo") String codigo,
@@ -141,7 +178,7 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
        from Carga c
        where c.motorista.codigo = :codigo
          and c.statusCarga = :status
-         and c.dtChegada between :inicio and :fim
+         and c.dtSaida between :inicio and :fim
        """)
     BigDecimal sumPesoPorMotoristaNoPeriodo(
             @Param("codigo") String codigo,
@@ -155,7 +192,7 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
        from Carga c
        where c.caminhao.codigo = :codigo
          and c.statusCarga = :status
-         and c.dtChegada between :inicio and :fim
+         and c.dtSaida between :inicio and :fim
        """)
     Long countCargasPorCaminhaoNoPeriodo(
             @Param("codigo") String codigo,
@@ -169,7 +206,7 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
        from Carga c
        where c.motorista.codigo = :codigo
          and c.statusCarga = :status
-         and c.dtChegada between :inicio and :fim
+         and c.dtSaida between :inicio and :fim
        """)
     Long countCargasPorMotoristaNoPeriodo(
             @Param("codigo") String codigo,
@@ -297,5 +334,14 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
             @Param("fim") java.time.LocalDate fim,
             @Param("status") Status status
     );
+
+    /** Base da página de Analytics — cargas finalizadas no período, pra série de tendência semanal. */
+    List<Carga> findByStatusCargaAndDtChegadaBetween(Status statusCarga, LocalDate inicio, LocalDate fim);
+
+    /** Analytics por motorista — cargas finalizadas de um motorista específico no período. */
+    List<Carga> findByMotorista_CodigoAndStatusCargaAndDtChegadaBetween(String codigoMotorista, Status statusCarga, LocalDate inicio, LocalDate fim);
+
+    /** Analytics por caminhão — cargas finalizadas de um caminhão específico no período. */
+    List<Carga> findByCaminhao_CodigoAndStatusCargaAndDtChegadaBetween(String codigoCaminhao, Status statusCarga, LocalDate inicio, LocalDate fim);
 
 }

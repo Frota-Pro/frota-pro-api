@@ -1,5 +1,6 @@
 package br.com.frotasPro.api.controller.response;
 
+import br.com.frotasPro.api.domain.enums.StatusAprovacaoManutencao;
 import br.com.frotasPro.api.domain.enums.StatusManutencao;
 import br.com.frotasPro.api.domain.enums.TipoManutencao;
 import lombok.*;
@@ -28,7 +29,10 @@ public class ManutencaoResponse {
 
     private String observacoes;
     private BigDecimal valor;
+    private BigDecimal valorOrcado;
     private StatusManutencao statusManutencao;
+    private StatusAprovacaoManutencao statusAprovacao;
+    private String observacaoAprovacao;
 
     private String codigoCaminhao;
     private String caminhao;
@@ -38,4 +42,8 @@ public class ManutencaoResponse {
 
     private ParadaResumoResponse parada;
     private List<TrocaPneuManutencaoResponse> trocasPneu;
+
+    private Integer kmOdometro;
+    private UUID planoManutencaoPreventivaId;
+    private String planoManutencaoPreventivaDescricao;
 }

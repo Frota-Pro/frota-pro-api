@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.service.meta;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import br.com.frotasPro.api.controller.request.MetaRequest;
 import br.com.frotasPro.api.controller.response.MetaResponse;
 import br.com.frotasPro.api.domain.Caminhao;
@@ -168,7 +170,7 @@ public class AtualizarMetaService {
     }
 
     private StatusMeta statusPorPeriodo(java.time.LocalDate inicio, java.time.LocalDate fim) {
-        java.time.LocalDate hoje = java.time.LocalDate.now();
+        java.time.LocalDate hoje = FusoHorarioUtils.hojeBrasil();
         if (hoje.isBefore(inicio)) {
             return StatusMeta.NAO_INICIADA;
         }

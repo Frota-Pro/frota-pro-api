@@ -178,13 +178,18 @@ public interface MetaRepository extends JpaRepository <Meta, UUID>{
             @Param("id") UUID id
     );
 
+    // Status não entra no filtro (fora CANCELADA): o range de data já decide
+    // sozinho a qual período a carga pertence. Se filtrássemos por
+    // EM_ANDAMENTO, uma carga que começou dentro do período de uma meta que
+    // já virou CONCLUIDA (fechada pelo scheduler antes da carga ser
+    // finalizada) nunca seria contabilizada em lugar nenhum.
     @Query("""
        select m
        from Meta m
        left join m.caminhao c
        left join m.motorista mot
        where m.tipoMeta = :tipoMeta
-         and m.statusMeta = :status
+         and m.statusMeta <> br.com.frotasPro.api.domain.enums.StatusMeta.CANCELADA
          and m.dataIncio <= :data and m.dataFim >= :data
          and (
               (:caminhaoCodigo is not null and c.codigo = :caminhaoCodigo)
@@ -193,19 +198,20 @@ public interface MetaRepository extends JpaRepository <Meta, UUID>{
        """)
     List<Meta> buscarMetasAtivasPorAlvoEData(
             @Param("tipoMeta") TipoMeta tipoMeta,
-            @Param("status") StatusMeta status,
             @Param("data") LocalDate data,
             @Param("caminhaoCodigo") String caminhaoCodigo,
             @Param("motoristaCodigo") String motoristaCodigo
     );
 
+    // Mesmo motivo do buscarMetasAtivasPorAlvoEData: status não filtra (fora
+    // CANCELADA), só o range de data decide a qual período a carga pertence.
     @Query("""
        select distinct m
        from Meta m
        left join m.caminhao cam
        left join m.motorista mot
        where m.tipoMeta = :tipoMeta
-         and m.statusMeta in :status
+         and m.statusMeta <> br.com.frotasPro.api.domain.enums.StatusMeta.CANCELADA
          and m.dataIncio <= :data
          and m.dataFim >= :data
          and (
@@ -213,9 +219,8 @@ public interface MetaRepository extends JpaRepository <Meta, UUID>{
               or (:motoristaId is not null and mot.id = :motoristaId)
          )
        """)
-    List<Meta> buscarMetasAtivasConsumoPorAbastecimento(
+    List<Meta> buscarMetasAtivasConsumoPorCaminhaoOuMotorista(
             @Param("tipoMeta") TipoMeta tipoMeta,
-            @Param("status") List<StatusMeta> status,
             @Param("data") LocalDate data,
             @Param("caminhaoId") UUID caminhaoId,
             @Param("motoristaId") UUID motoristaId

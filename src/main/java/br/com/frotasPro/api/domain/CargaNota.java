@@ -23,4 +23,11 @@ public class CargaNota {
     @Id
     @Column(name = "nota", nullable = false, length = 30)
     private String nota;
+
+    // Cidade do cliente (praça no WinThor). Não faz parte da chave — é só um
+    // atributo descritivo do cliente, usado pra agrupar o histórico de
+    // clientes de uma rota por cidade. Pode ser nulo (cliente sem praça
+    // cadastrada no WinThor, ou nota sincronizada antes desse campo existir).
+    @Column(name = "cidade", length = 150)
+    private String cidade;
 }

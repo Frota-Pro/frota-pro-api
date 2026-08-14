@@ -37,6 +37,7 @@ public class AuthController {
                 .nome(usuario.getNome())
                 .login(usuario.getLogin())
                 .authorities(authorities)
+                .mustChangePassword(usuario.isSenhaTemporaria())
                 .build();
 
         return ResponseEntity.ok(resp);

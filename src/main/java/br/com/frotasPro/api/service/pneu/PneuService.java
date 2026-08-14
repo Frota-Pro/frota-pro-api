@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.service.pneu;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import br.com.frotasPro.api.controller.request.PneuMovimentacaoRequest;
 import br.com.frotasPro.api.controller.request.PneuRequest;
 import br.com.frotasPro.api.controller.response.PneuMovimentacaoResponse;
@@ -210,7 +212,7 @@ public class PneuService {
                 inst.setLado(req.lado);
                 inst.setPosicao(req.posicao);
                 inst.setKmInstalacao(req.kmInstalacao);
-                inst.setDataInstalacao(java.time.LocalDateTime.now());
+                inst.setDataInstalacao(FusoHorarioUtils.agoraBrasil());
 
                 instalacaoRepository.save(inst);
                 pneu.setStatus(StatusPneu.EM_USO);
@@ -266,7 +268,7 @@ public class PneuService {
 
             case DESCARTE -> {
                 pneu.setStatus(StatusPneu.DESCARTADO);
-                pneu.setDtDescarte(java.time.LocalDate.now());
+                pneu.setDtDescarte(FusoHorarioUtils.hojeBrasil());
                 instalacaoRepository.deleteByPneu_Codigo(codigoPneu);
             }
 

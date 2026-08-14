@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.service.dashboard;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import br.com.frotasPro.api.controller.response.DashboardCargaRecenteResponse;
 import br.com.frotasPro.api.controller.response.DashboardResumoResponse;
 import br.com.frotasPro.api.domain.Carga;
@@ -35,12 +37,12 @@ public class BuscarDashboardResumoService {
     @Transactional(readOnly = true)
     public DashboardResumoResponse executar() {
 
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = FusoHorarioUtils.hojeBrasil();
 
         long cargasAtivas = cargaRepository.countByStatusCarga(Status.EM_ROTA);
         long finalizadasHoje = cargaRepository.countByStatusCargaAndDtChegada(Status.FINALIZADA, hoje);
 
-        LocalDateTime inicioMes = LocalDate.now().withDayOfMonth(1).atStartOfDay();
+        LocalDateTime inicioMes = FusoHorarioUtils.hojeBrasil().withDayOfMonth(1).atStartOfDay();
         BigDecimal litrosMes = abastecimentoRepository.sumLitrosFrom(inicioMes);
         if (litrosMes == null) litrosMes = BigDecimal.ZERO;
 

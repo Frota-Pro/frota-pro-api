@@ -33,6 +33,7 @@ public class RelatorioPdfController {
     private final RelatorioMetasMotoristasService metasMotoristasService;
     private final RelatorioMetaCategoriaService metaCategoriaService;
     private final RelatorioDesempenhoMetasService desempenhoMetasService;
+    private final RelatorioCargasSumidasWinThorService cargasSumidasWinThorService;
 
     private static final String LOGO_CLASSPATH = "reports/logo.png";
 
@@ -420,5 +421,42 @@ public class RelatorioPdfController {
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "inline; filename=\"vida-util-pneu.pdf\"")
                 .body(pdf);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @GetMapping("/carga/sumidas-winthor")
+    public ResponseEntity<byte[]> cargasSumidasWinThorPdf(
+            @RequestParam(value = "inicio", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam(value = "fim", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim,
+            @RequestParam(value = "motorista", required = false) String motorista,
+            @RequestParam(value = "caminhao", required = false) String caminhao
+    ) {
+        RelatorioCargasSumidasWinThorResponse rel = cargasSumidasWinThorService.gerar(inicio, fim, motorista, caminhao);
+
+        Map<String, Object> p = new HashMap<>();
+        p.put("periodoDescricao", descricaoPeriodoSumidas(inicio, fim));
+        p.put("totalCargas", rel.getTotal());
+        aplicarLogo(p);
+
+        byte[] pdf = jasperPdfService.gerarPdfFromJasper(
+                "reports/cargas_sumidas_winthor.jasper",
+                p,
+                rel.getLinhas()
+        );
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=\"cargas-sumidas-winthor.pdf\"")
+                .body(pdf);
+    }
+
+    private String descricaoPeriodoSumidas(LocalDate inicio, LocalDate fim) {
+        if (inicio == null && fim == null) {
+            return "Período: todas as verificações";
+        }
+        String de = inicio != null ? inicio.toString() : "início";
+        String ate = fim != null ? fim.toString() : "hoje";
+        return "Período: " + de + " até " + ate;
     }
 }

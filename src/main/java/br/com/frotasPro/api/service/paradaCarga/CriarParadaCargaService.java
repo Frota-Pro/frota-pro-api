@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.service.paradaCarga;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import br.com.frotasPro.api.controller.request.ParadaCargaRequest;
 import br.com.frotasPro.api.controller.request.PneuMovimentacaoRequest;
 import br.com.frotasPro.api.controller.response.ParadaCargaResponse;
@@ -17,10 +19,10 @@ import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.EixoRepository;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;
 import br.com.frotasPro.api.repository.PneuRepository;
+import br.com.frotasPro.api.service.abastecimento.ResolverPostoAbastecimentoService;
 import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import br.com.frotasPro.api.service.pneu.PneuService;
-import br.com.frotasPro.api.util.AtualizarMetaConsumoCombustivelService;
 import br.com.frotasPro.api.util.CalcularMediaKmLitroService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,7 +42,6 @@ public class CriarParadaCargaService {
     private final ParadaCargaRepository repository;
     private final CargaRepository cargaRepository;
     private final CalcularMediaKmLitroService calcularMediaKmLitroService;
-    private final AtualizarMetaConsumoCombustivelService atualizarMetaConsumoCombustivelService;
     private final EixoRepository eixoRepository;
     private final PneuRepository pneuRepository;
 
@@ -48,6 +49,7 @@ public class CriarParadaCargaService {
     private final PneuService pneuService;
     private final NotificacaoService notificacaoService;
     private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
+    private final ResolverPostoAbastecimentoService resolverPostoAbastecimentoService;
 
     @Transactional
     public ParadaCargaResponse criar(ParadaCargaRequest request) {
@@ -104,7 +106,7 @@ public class CriarParadaCargaService {
             abastecimento.setCaminhao(carga.getCaminhao());
             abastecimento.setMotorista(carga.getMotorista());
             abastecimento.setDtAbastecimento(
-                    request.getDtInicio() != null ? request.getDtInicio() : LocalDateTime.now()
+                    request.getDtInicio() != null ? request.getDtInicio() : FusoHorarioUtils.agoraBrasil()
             );
             abastecimento.setKmOdometro(request.getKmOdometro());
             abastecimento.setQtLitros(abReq.getQtLitros());
@@ -112,6 +114,7 @@ public class CriarParadaCargaService {
             abastecimento.setValorTotal(valorTotal);
             abastecimento.setTipoCombustivel(abReq.getTipoCombustivel());
             abastecimento.setFormaPagamento(abReq.getFormaPagamento());
+            abastecimento.setPostoAbastecimento(resolverPostoAbastecimentoService.resolver(abReq.getPosto(), abReq.getPostoAbastecimento()));
             abastecimento.setPosto(abReq.getPosto());
             abastecimento.setCidade(abReq.getCidade());
             abastecimento.setUf(abReq.getUf());
@@ -128,12 +131,16 @@ public class CriarParadaCargaService {
 
             parada.getAbastecimentos().add(abastecimento);
 
+            String nomePosto = abastecimento.getPostoAbastecimento() != null
+                    ? abastecimento.getPostoAbastecimento().getNome()
+                    : abReq.getPosto();
+
             DespesaParada despesa = DespesaParada.builder()
                     .paradaCarga(parada)
                     .tipoDespesa(TipoDespesa.COMBUSTIVEL)
                     .dataHora(request.getDtInicio())
                     .valor(valorTotal)
-                    .descricao("Abastecimento - " + (abReq.getPosto() != null ? abReq.getPosto() : ""))
+                    .descricao("Abastecimento - " + (nomePosto != null ? nomePosto : ""))
                     .cidade(abReq.getCidade())
                     .uf(abReq.getUf())
                     .build();
@@ -225,7 +232,7 @@ public class CriarParadaCargaService {
 
         // ✅ salva tudo primeiro (garante IDs)
         repository.save(parada);
-        atualizarMetasConsumoSeTiverAbastecimento(parada);
+        // A meta de consumo (km/l) não é mais atualizada aqui — ver FinalizarCargaService.
 
         // ✅ Agora registra eventos dos pneus (movimentações) vinculando na parada/manutenção
         if (request.getManutencao() != null && request.getManutencao().getTrocasPneu() != null
@@ -287,19 +294,6 @@ public class CriarParadaCargaService {
     private BigDecimal toBigDecimal(Integer v) {
         if (v == null) return null;
         return BigDecimal.valueOf(v.longValue());
-    }
-
-    private void atualizarMetasConsumoSeTiverAbastecimento(ParadaCarga parada) {
-        if (parada.getAbastecimentos() == null || parada.getAbastecimentos().isEmpty()) {
-            return;
-        }
-
-        Abastecimento abastecimento = parada.getAbastecimentos().get(0);
-        atualizarMetaConsumoCombustivelService.atualizar(
-                abastecimento.getCaminhao(),
-                abastecimento.getMotorista(),
-                abastecimento.getDtAbastecimento() != null ? abastecimento.getDtAbastecimento().toLocalDate() : null
-        );
     }
 
     private TipoMovimentacaoPneu mapearTipoMov(String tipoTrocaName) {

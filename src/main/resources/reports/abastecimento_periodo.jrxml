@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport name="Relatório - Abastecimento por Período" language="java"
+              whenNoDataType="AllSectionsNoDetail"
               pageWidth="842" pageHeight="595" orientation="Landscape"
               columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
 

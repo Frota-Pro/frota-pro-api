@@ -15,5 +15,6 @@ public class ClienteCargaWinThorDto {
 
     private Integer codCli;
     private String nomeCli;
+    private String cidade;
     private List<Long> notas;
 }

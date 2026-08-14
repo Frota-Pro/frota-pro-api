@@ -4,6 +4,7 @@ public record LoginResponse(
         String accessToken,
         Long expiresIn,
         String refreshToken,
-        Long refreshExpiresIn
+        Long refreshExpiresIn,
+        boolean mustChangePassword
 ) {
 }

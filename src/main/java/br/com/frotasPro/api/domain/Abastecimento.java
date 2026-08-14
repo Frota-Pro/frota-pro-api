@@ -45,6 +45,12 @@ public class Abastecimento extends AuditoriaBase{
     @JoinColumn(name = "motorista_id")
     private Motorista motorista;
 
+    // Posto cadastrado (com contrato) — alternativa ao campo "posto" (texto livre)
+    // logo abaixo, usado quando o motorista abastece num posto fora da lista.
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "posto_abastecimento_id")
+    private PostoAbastecimento postoAbastecimento;
+
     @Column(name = "dt_abastecimento", nullable = false)
     private LocalDateTime dtAbastecimento;
 

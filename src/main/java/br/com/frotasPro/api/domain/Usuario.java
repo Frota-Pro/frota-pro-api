@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.domain;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import br.com.frotasPro.api.domain.enums.TipoPlataformaDispositivo;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -41,6 +43,10 @@ public class Usuario extends AuditoriaBase{
     @Column(nullable = false)
     private boolean ativo = true;
 
+    /** Senha ainda é a padrão (ou foi resetada por um admin) — obriga a troca antes de liberar o resto da API. */
+    @Column(name = "senha_temporaria", nullable = false)
+    private boolean senhaTemporaria = false;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "tb_usuario_acesso",
             joinColumns = @JoinColumn(name = "usuario_id"),
@@ -64,7 +70,7 @@ public class Usuario extends AuditoriaBase{
     private long totalLogins = 0;
 
     public void registrarLogin() {
-        this.ultimoLoginEm = LocalDateTime.now();
+        this.ultimoLoginEm = FusoHorarioUtils.agoraBrasil();
         this.totalLogins++;
     }
 

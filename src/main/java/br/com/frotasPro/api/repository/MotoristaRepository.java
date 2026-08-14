@@ -7,11 +7,23 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface MotoristaRepository extends JpaRepository<Motorista, UUID> {
+
+    @Query("""
+        select m
+        from Motorista m
+        where m.ativo = true
+          and m.validadeCnh is not null
+          and m.cnhNotificadoVencimentoEm is null
+          and m.validadeCnh >= :hoje
+          and m.validadeCnh <= :limite
+    """)
+    List<Motorista> buscarComCnhVencendoNaoNotificada(@Param("hoje") LocalDate hoje, @Param("limite") LocalDate limite);
 
     Page<Motorista> findByAtivoTrue(Pageable pageable);
 

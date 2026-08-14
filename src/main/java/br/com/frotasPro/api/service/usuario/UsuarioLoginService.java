@@ -19,6 +19,8 @@ import org.springframework.web.server.ResponseStatusException;
 @Slf4j
 public class UsuarioLoginService {
 
+    private static final String SENHA_PADRAO = "padrao123";
+
     private final BuscarUsuarioService buscarUsuarioService;
     private final PasswordEncoder passwordEncoder;
     private final AuthTokenService authTokenService;
@@ -46,6 +48,13 @@ public class UsuarioLoginService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenciais inválidas");
         }
 
+        // Detecta contas antigas que nunca trocaram a senha padrão (ex: admin
+        // e motoristas criados em massa) e passa a exigir a troca daqui pra frente.
+        if (SENHA_PADRAO.equals(request.getSenha()) && !usuario.isSenhaTemporaria()) {
+            usuario.setSenhaTemporaria(true);
+            log.warn("security_event=senha_padrao_detectada login={}", loginNormalizado);
+        }
+
         TokenPair tokenPair = authTokenService.generateTokenPair(usuario);
         loginProtectionService.registerSuccess(ip, loginNormalizado);
         log.info("security_event=login_success login={} ip={}", loginNormalizado, ip);
@@ -57,7 +66,8 @@ public class UsuarioLoginService {
                 tokenPair.accessToken(),
                 tokenPair.accessExpiresIn(),
                 tokenPair.refreshToken(),
-                tokenPair.refreshExpiresIn()
+                tokenPair.refreshExpiresIn(),
+                tokenPair.mustChangePassword()
         );
     }
 

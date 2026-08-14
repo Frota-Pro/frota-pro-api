@@ -6,6 +6,7 @@ import br.com.frotasPro.api.domain.enums.Status;
 import br.com.frotasPro.api.excption.BusinessException;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.CargaRepository;
+import br.com.frotasPro.api.service.configuracaoempresa.ConfiguracaoEmpresaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,7 @@ public class NotaFiscalService {
     private final CargaRepository cargaRepository;
     private final NotaFiscalWinThorClient client;
     private final ResendEmailService resendEmailService;
+    private final ConfiguracaoEmpresaService configuracaoEmpresaService;
 
     public List<NotaFiscalResumoResponse> listar(String numeroCarga, String cliente) {
         Carga carga = buscarCargaDisponivel(numeroCarga);
@@ -40,7 +42,7 @@ public class NotaFiscalService {
 
     public byte[] buscarPdf(String numeroCarga, Long numeroNota) {
         Carga carga = buscarCargaDisponivel(numeroCarga);
-        return client.buscarPdf(numeroCargaExterno(carga), numeroNota);
+        return client.buscarPdf(numeroCargaExterno(carga), numeroNota, configuracaoEmpresaService.buscarLogoBytes());
     }
 
     public void enviarPorEmail(String numeroCarga, Long numeroNota, String destinatario) {
@@ -48,7 +50,7 @@ public class NotaFiscalService {
         Integer numeroCargaExterno = numeroCargaExterno(carga);
 
         String xml = client.buscarXml(numeroCargaExterno, numeroNota);
-        byte[] pdf = client.buscarPdf(numeroCargaExterno, numeroNota);
+        byte[] pdf = client.buscarPdf(numeroCargaExterno, numeroNota, configuracaoEmpresaService.buscarLogoBytes());
 
         resendEmailService.enviarNotaFiscal(destinatario, numeroNota, xml, pdf);
     }

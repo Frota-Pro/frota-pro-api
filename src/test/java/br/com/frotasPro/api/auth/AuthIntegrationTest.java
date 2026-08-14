@@ -76,7 +76,7 @@ class AuthIntegrationTest {
     @Test
     void loginValidoDeveRetornar200EParDeTokens() throws Exception {
         when(usuarioLoginService.login(ArgumentMatchers.any(LoginRequest.class), ArgumentMatchers.anyString()))
-                .thenReturn(new LoginResponse("access", 900L, "refresh", 604800L));
+                .thenReturn(new LoginResponse("access", 900L, "refresh", 604800L, false));
 
         mockMvc.perform(post("/login")
                         .contentType(MediaType.APPLICATION_JSON)

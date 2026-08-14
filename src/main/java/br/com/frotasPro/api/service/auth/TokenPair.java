@@ -4,6 +4,7 @@ public record TokenPair(
         String accessToken,
         long accessExpiresIn,
         String refreshToken,
-        long refreshExpiresIn
+        long refreshExpiresIn,
+        boolean mustChangePassword
 ) {
 }

@@ -3,6 +3,7 @@ package br.com.frotasPro.api.controller.integracao;
 import br.com.frotasPro.api.service.integracao.IntegracaoCargaService;
 import br.com.frotasPro.api.service.integracao.IntegracaoCaminhaoService;
 import br.com.frotasPro.api.service.integracao.IntegracaoMotoristaService;
+import br.com.frotasPro.api.util.FusoHorarioUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -64,7 +65,7 @@ public class IntegracaoWinThorController {
             @RequestParam(value = "solicitadoPor", defaultValue = "sistema") String solicitadoPor
     ) {
 
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = FusoHorarioUtils.hojeBrasil();
 
         if (dataInicial == null && dataFinal == null) {
             dataInicial = data != null ? data : hoje;

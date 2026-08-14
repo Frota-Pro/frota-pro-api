@@ -6,6 +6,7 @@ import br.com.frotasPro.api.domain.enums.TipoManutencao;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -44,6 +45,9 @@ public class ManutencaoRequest {
     @DecimalMin(value = "0.00", message = "Valor deve ser >= 0")
     private BigDecimal valor;
 
+    @DecimalMin(value = "0.00", message = "Valor orçado deve ser >= 0")
+    private BigDecimal valorOrcado;
+
     /**
      * Vínculo opcional com uma parada de carga.
      */
@@ -65,4 +69,11 @@ public class ManutencaoRequest {
     private String oficina;
 
     private List<@Valid TrocaPneuManutencaoRequest> trocasPneu;
+
+    /** Odômetro do caminhão no momento do serviço (opcional, mas necessário pra manutenção preventiva por KM). */
+    @Min(value = 0, message = "KM do odômetro não pode ser negativo")
+    private Integer kmOdometro;
+
+    /** Opcional: vincula esta manutenção a um plano de manutenção preventiva. */
+    private UUID planoManutencaoPreventivaId;
 }

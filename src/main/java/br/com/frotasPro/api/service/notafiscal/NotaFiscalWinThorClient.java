@@ -17,7 +17,9 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
+import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Fala com o endpoint interno de nota fiscal da frota-pro-integradora.
@@ -62,9 +64,14 @@ public class NotaFiscalWinThorClient {
         return executar(() -> restTemplate.getForObject(url, String.class));
     }
 
-    public byte[] buscarPdf(Integer numeroCargaExterno, Long numeroNota) {
+    public byte[] buscarPdf(Integer numeroCargaExterno, Long numeroNota, byte[] logoBytes) {
         String url = baseUrl() + "/winthor/cargas/" + numeroCargaExterno + "/notas/" + numeroNota + "/pdf";
-        ResponseEntity<byte[]> resposta = executar(() -> restTemplate.getForEntity(url, byte[].class));
+
+        Map<String, String> body = (logoBytes != null && logoBytes.length > 0)
+                ? Map.of("logoBase64", Base64.getEncoder().encodeToString(logoBytes))
+                : Map.of();
+
+        ResponseEntity<byte[]> resposta = executar(() -> restTemplate.postForEntity(url, body, byte[].class));
         return resposta != null ? resposta.getBody() : null;
     }
 

@@ -36,6 +36,8 @@ public class AbastecimentoResponse {
     private String formaPagamento;
 
     private String posto;
+    private String postoAbastecimentoCodigo;
+    private String postoAbastecimentoNome;
     private String cidade;
     private String uf;
 

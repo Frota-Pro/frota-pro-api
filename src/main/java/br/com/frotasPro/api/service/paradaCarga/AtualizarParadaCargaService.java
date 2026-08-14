@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.service.paradaCarga;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import br.com.frotasPro.api.controller.request.ParadaCargaRequest;
 import br.com.frotasPro.api.controller.response.ParadaCargaResponse;
 import br.com.frotasPro.api.domain.Abastecimento;
@@ -18,7 +20,6 @@ import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;
 import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
-import br.com.frotasPro.api.util.AtualizarMetaConsumoCombustivelService;
 import br.com.frotasPro.api.util.CalcularMediaKmLitroService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,6 @@ import static br.com.frotasPro.api.mapper.ParadaCargaMapper.toResponse;
 public class AtualizarParadaCargaService {
 
     private final ParadaCargaRepository paradaRepository;
-    private final AtualizarMetaConsumoCombustivelService atualizarMetaConsumoCombustivelService;
     private final CalcularMediaKmLitroService calcularMediaKmLitroService;
     private final NotificacaoService notificacaoService;
     private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
@@ -106,7 +106,7 @@ public class AtualizarParadaCargaService {
             abastecimento.setCaminhao(carga.getCaminhao());
             abastecimento.setMotorista(carga.getMotorista());
             abastecimento.setDtAbastecimento(
-                    request.getDtInicio() != null ? request.getDtInicio() : LocalDateTime.now()
+                    request.getDtInicio() != null ? request.getDtInicio() : FusoHorarioUtils.agoraBrasil()
             );
             abastecimento.setKmOdometro(request.getKmOdometro());
             abastecimento.setQtLitros(abReq.getQtLitros());
@@ -199,22 +199,9 @@ public class AtualizarParadaCargaService {
                 numeroCargaExibicao
         );
 
-        atualizarMetasConsumoSeTiverAbastecimento(parada);
+        // A meta de consumo (km/l) não é mais atualizada aqui — ver FinalizarCargaService.
 
         return toResponse(parada, integracaoAtiva);
-    }
-
-    private void atualizarMetasConsumoSeTiverAbastecimento(ParadaCarga parada) {
-        if (parada.getAbastecimentos() == null || parada.getAbastecimentos().isEmpty()) {
-            return;
-        }
-
-        Abastecimento abastecimento = parada.getAbastecimentos().get(0);
-        atualizarMetaConsumoCombustivelService.atualizar(
-                abastecimento.getCaminhao(),
-                abastecimento.getMotorista(),
-                abastecimento.getDtAbastecimento() != null ? abastecimento.getDtAbastecimento().toLocalDate() : null
-        );
     }
 
     private TipoDespesa mapearTipoDespesa(TipoParada tipoParada) {

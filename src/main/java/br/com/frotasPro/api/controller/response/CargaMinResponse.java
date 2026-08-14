@@ -37,4 +37,19 @@ public class CargaMinResponse {
     private StatusTransferenciaCarga statusTransferencia;
     private String nomeMotorista;
     private String placaCaminhao;
+
+    /** Códigos de devolução (CODDEVOL) encontrados no último sync com o WinThor pra esta carga. */
+    private List<String> codigosDevolucaoEncontrados;
+
+    /** true se o último sync encontrou transferência de pedido desta carga pra outro carregamento. */
+    private boolean teveTransferencia;
+
+    /**
+     * true se, no último sync, uma diminuição de peso e/ou valor vinda do
+     * WinThor foi ignorada por falta de motivo reconhecido.
+     */
+    private boolean diminuicaoPesoValorBloqueada;
+
+    /** true se a última verificação de reconciliação não encontrou mais essa carga no WinThor. */
+    private boolean naoEncontradaNoWinThor;
 }

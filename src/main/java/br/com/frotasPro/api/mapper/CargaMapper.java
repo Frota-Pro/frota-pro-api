@@ -7,7 +7,9 @@ import br.com.frotasPro.api.controller.response.ClienteCargaResponse;
 import br.com.frotasPro.api.domain.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import static java.util.stream.Collectors.*;
 
@@ -74,17 +76,23 @@ public class CargaMapper {
                 .diasAtraso(carga.calcularAtraso())
                 .clientes(
                         carga.getNotas().stream()
-                                .collect(
-                                        groupingBy(
-                                                CargaNota::getCliente,
-                                                mapping(CargaNota::getNota, toList())
-                                        )
-                                )
+                                .collect(groupingBy(CargaNota::getCliente))
                                 .entrySet()
                                 .stream()
                                 .map(entry -> ClienteCargaResponse.builder()
                                         .cliente(entry.getKey())
-                                        .notas(entry.getValue())
+                                        .cidade(
+                                                entry.getValue().stream()
+                                                        .map(CargaNota::getCidade)
+                                                        .filter(Objects::nonNull)
+                                                        .findFirst()
+                                                        .orElse(null)
+                                        )
+                                        .notas(
+                                                entry.getValue().stream()
+                                                        .map(CargaNota::getNota)
+                                                        .toList()
+                                        )
                                         .build()
                                 )
                                 .toList()
@@ -104,7 +112,21 @@ public class CargaMapper {
                                 .toList()
                 )
                 .ordemEntregaClientes(new ArrayList<>(carga.getOrdemEntregaClientes()))
+                .clientesNaoRoteirizados(new ArrayList<>(carga.getClientesNaoRoteirizados()))
                 .observacaoMotorista(carga.getObservacaoMotorista())
+                .motoristaDefinidoManualmente(carga.isMotoristaDefinidoManualmente())
+                .codigosDevolucaoEncontrados(
+                        carga.getCodigosDevolucaoEncontrados() != null && !carga.getCodigosDevolucaoEncontrados().isBlank()
+                                ? Arrays.stream(carga.getCodigosDevolucaoEncontrados().split(","))
+                                        .map(String::trim)
+                                        .filter(s -> !s.isBlank())
+                                        .toList()
+                                : List.of()
+                )
+                .teveTransferencia(carga.isTeveTransferencia())
+                .diminuicaoPesoValorBloqueada(carga.isDiminuicaoPesoValorBloqueada())
+                .naoEncontradaNoWinThor(carga.isNaoEncontradaNoWinThor())
+                .dataVerificacaoWinThor(carga.getDataVerificacaoWinThor())
                 .build();
     }
 
@@ -121,6 +143,17 @@ public class CargaMapper {
                 .statusTransferencia(carga.getStatusTransferencia())
                 .nomeMotorista(carga.getMotorista().getNome())
                 .placaCaminhao(carga.getCaminhao().getPlaca())
+                .codigosDevolucaoEncontrados(
+                        carga.getCodigosDevolucaoEncontrados() != null && !carga.getCodigosDevolucaoEncontrados().isBlank()
+                                ? Arrays.stream(carga.getCodigosDevolucaoEncontrados().split(","))
+                                        .map(String::trim)
+                                        .filter(s -> !s.isBlank())
+                                        .toList()
+                                : List.of()
+                )
+                .teveTransferencia(carga.isTeveTransferencia())
+                .diminuicaoPesoValorBloqueada(carga.isDiminuicaoPesoValorBloqueada())
+                .naoEncontradaNoWinThor(carga.isNaoEncontradaNoWinThor())
                 .build();
     }
 

@@ -14,6 +14,7 @@ import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.service.movimentacaoSemCarga.RegistrarMovimentacaoSemCargaService;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
+import br.com.frotasPro.api.util.FusoHorarioUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,7 +71,8 @@ public class IniciarCargaService {
         registrarMovimentacaoSemCargaService.registrarSeHouver(carga, kmInicial);
         caminhao.setStatus(Status.EM_ROTA);
 
-        carga.setDtSaida(LocalDate.now());
+        carga.setDtSaida(FusoHorarioUtils.hojeBrasil());
+        carga.setDtHoraSaida(FusoHorarioUtils.agoraBrasil());
         carga.setKmInicial(kmInicial);
         carga.setStatusCarga(Status.EM_ROTA);
 

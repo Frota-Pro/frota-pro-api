@@ -34,6 +34,7 @@ public class BuscarClientesHistoricoRotaService {
         return historico.stream()
                 .map(p -> ClienteHistoricoRotaResponse.builder()
                         .cliente(p.getCliente())
+                        .cidade(p.getCidade())
                         .quantidadeCargas(p.getQuantidadeCargas())
                         .ultimaCargaEm(p.getUltimaCargaEm())
                         .build())

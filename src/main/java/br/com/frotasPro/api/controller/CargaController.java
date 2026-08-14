@@ -3,12 +3,14 @@ package br.com.frotasPro.api.controller;
 import br.com.frotasPro.api.controller.request.AtualizarObservacaoMotoristaRequest;
 import br.com.frotasPro.api.controller.request.AtualizarOrdemEntregaRequest;
 import br.com.frotasPro.api.controller.request.CargaRequest;
-import br.com.frotasPro.api.controller.request.MarcarTransferenciaCargaRequest;
+import br.com.frotasPro.api.controller.request.TransferirMotoristaCargaRequest;
 import br.com.frotasPro.api.controller.request.TransferirNotasCargaRequest;
 import br.com.frotasPro.api.controller.response.CargaMinResponse;
 import br.com.frotasPro.api.controller.response.CargaResponse;
+import br.com.frotasPro.api.controller.response.RelatorioCargasSumidasWinThorResponse;
 import br.com.frotasPro.api.controller.response.TransferirNotasCargaResponse;
 import br.com.frotasPro.api.service.carga.*;
+import br.com.frotasPro.api.service.relatorios.RelatorioCargasSumidasWinThorService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -43,7 +45,32 @@ public class CargaController {
     private final AtualizarOrdemEntregaService atualizarOrdemEntregaService;
     private final AtualizarObservacaoMotoristaService atualizarObservacaoMotoristaService;
     private final TransferirNotasCargaService transferirNotasCargaService;
-    private final MarcarTransferenciaCargaService marcarTransferenciaCargaService;
+    private final TransferirMotoristaCargaService transferirMotoristaCargaService;
+    private final VerificarCargasSumidasWinThorService verificarCargasSumidasWinThorService;
+    private final RelatorioCargasSumidasWinThorService relatorioCargasSumidasWinThorService;
+
+    // ========= RECONCILIAÇÃO WINTHOR =========
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PostMapping("/verificar-winthor")
+    public ResponseEntity<Void> verificarCargasSumidasWinThor() {
+        verificarCargasSumidasWinThorService.verificar();
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @GetMapping("/relatorio-sumidas")
+    public ResponseEntity<RelatorioCargasSumidasWinThorResponse> relatorioCargasSumidas(
+            @RequestParam(value = "inicio", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam(value = "fim", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim,
+            @RequestParam(value = "motorista", required = false) String codigoMotorista,
+            @RequestParam(value = "caminhao", required = false) String codigoCaminhao
+    ) {
+        return ResponseEntity.ok(
+                relatorioCargasSumidasWinThorService.gerar(inicio, fim, codigoMotorista, codigoCaminhao));
+    }
 
     // ========= BUSCA ÚNICA =========
 
@@ -147,8 +174,13 @@ public class CargaController {
 
     @PreAuthorize("hasAuthority('ROLE_MOTORISTA')")
     @GetMapping("/minhas-cargas-finalizadas")
-    public ResponseEntity<Page<CargaResponse>> minhasCargasFinalizadas(Pageable pageable) {
-        Page<CargaResponse> response = buscarCargasFinalizadasMotoristaService.buscar(pageable);
+    public ResponseEntity<Page<CargaResponse>> minhasCargasFinalizadas(
+            @RequestParam(value = "q", required = false) String q,
+            @RequestParam(value = "dtInicio", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dtInicio,
+            @RequestParam(value = "dtFim", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dtFim,
+            Pageable pageable
+    ) {
+        Page<CargaResponse> response = buscarCargasFinalizadasMotoristaService.buscar(pageable, q, dtInicio, dtFim);
         return ResponseEntity.ok(response);
     }
 
@@ -199,7 +231,16 @@ public class CargaController {
             @CacheEvict(value = "caminhao_buscar_codigo", allEntries = true),
             @CacheEvict(value = "caminhao_buscar_placa", allEntries = true),
             @CacheEvict(value = "caminhao_buscar_codigo_externo", allEntries = true),
-            @CacheEvict(value = "caminhao_detalhes", allEntries = true)
+            @CacheEvict(value = "caminhao_detalhes", allEntries = true),
+            // Finalizar carga também atualiza progresso de meta (km, tonelada,
+            // carga transportada, consumo) via AtualizarMeta*Service — sem isso,
+            // as telas de Meta continuavam mostrando o progresso de antes da carga
+            // ser finalizada até alguma outra ação (criar/editar meta) evitar o cache.
+            @CacheEvict(value = "meta_buscar_id", allEntries = true),
+            @CacheEvict(value = "meta_listar", allEntries = true),
+            @CacheEvict(value = "meta_ativas_caminhao", allEntries = true),
+            @CacheEvict(value = "meta_historico", allEntries = true),
+            @CacheEvict(value = "meta_historico_caminhao", allEntries = true)
     })
     public ResponseEntity<String> finalizarCarga(
             @RequestParam("carga") String numeroCarga,
@@ -275,7 +316,7 @@ public class CargaController {
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
-    @PatchMapping("/{numeroCarga}/marcar-transferencia")
+    @PatchMapping("/{numeroCarga}/transferir-motorista")
     @Caching(evict = {
             @CacheEvict(value = "carga_buscar_numero", allEntries = true),
             @CacheEvict(value = "carga_buscar_codigo_externo", allEntries = true),
@@ -287,11 +328,11 @@ public class CargaController {
             @CacheEvict(value = "carga_caminhao", allEntries = true),
             @CacheEvict(value = "carga_minha_atual", allEntries = true)
     })
-    public ResponseEntity<CargaResponse> marcarTransferencia(
+    public ResponseEntity<CargaResponse> transferirMotorista(
             @PathVariable String numeroCarga,
-            @Valid @RequestBody(required = false) MarcarTransferenciaCargaRequest request
+            @Valid @RequestBody TransferirMotoristaCargaRequest request
     ) {
-        CargaResponse response = marcarTransferenciaCargaService.marcar(numeroCarga, request);
+        CargaResponse response = transferirMotoristaCargaService.transferir(numeroCarga, request);
         return ResponseEntity.ok(response);
     }
 

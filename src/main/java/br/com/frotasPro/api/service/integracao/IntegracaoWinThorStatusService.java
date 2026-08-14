@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.service.integracao;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import br.com.frotasPro.api.controller.integracao.dto.IntegracaoWinThorStatusResponse;
 import br.com.frotasPro.api.domain.enums.EventoNotificacao;
 import br.com.frotasPro.api.domain.enums.TipoNotificacao;
@@ -91,7 +93,7 @@ public class IntegracaoWinThorStatusService {
     }
 
     private void processarNotificacaoStatusIntegradora(boolean integradoraOk, String oracleStatus, long latenciaMs) {
-        LocalDateTime agora = LocalDateTime.now();
+        LocalDateTime agora = FusoHorarioUtils.agoraBrasil();
 
         if (!integradoraOk) {
             boolean deveNotificar = !integradoraEmFalha

@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.service.caminhao;
 
+import br.com.frotasPro.api.util.FusoHorarioUtils;
+
 import br.com.frotasPro.api.controller.response.CaminhaoDetalheResponse;
 import br.com.frotasPro.api.controller.response.CaminhaoResponse;
 import br.com.frotasPro.api.controller.response.MetaResponse;
@@ -14,6 +16,7 @@ import br.com.frotasPro.api.repository.ManutencaoRepository;
 import br.com.frotasPro.api.repository.MovimentacaoSemCargaRepository;
 import br.com.frotasPro.api.service.meta.BuscarMetaAtivaComProgressoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +36,11 @@ public class BuscarCaminhaoDetalheService {
     private final MovimentacaoSemCargaRepository movimentacaoSemCargaRepository;
     private final BuscarMetaAtivaComProgressoService buscarMetaAtivaComProgressoService;
 
+    // Faltava esse @Cacheable — todo write path (controller e sync do WinThor)
+    // já evita "caminhao_detalhes" religiosamente, mas nada aqui produzia o
+    // cache; a eviction era um no-op silencioso e esse endpoint (6+ queries,
+    // algumas com SUM) nunca foi cacheado de fato.
+    @Cacheable("caminhao_detalhes")
     @Transactional(readOnly = true)
     public CaminhaoDetalheResponse detalhes(String codigo) {
 
@@ -57,7 +65,7 @@ public class BuscarCaminhaoDetalheService {
 
         List<MetaResponse> metasAtivas;
         try {
-            metasAtivas = buscarMetaAtivaComProgressoService.buscar(codigo, LocalDate.now());
+            metasAtivas = buscarMetaAtivaComProgressoService.buscar(codigo, FusoHorarioUtils.hojeBrasil());
         } catch (ObjectNotFound e) {
             metasAtivas = Collections.emptyList();
         }

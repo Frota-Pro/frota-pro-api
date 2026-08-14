@@ -48,6 +48,16 @@ public class AbastecimentoMapper {
                         : null)
 
                 .posto(a.getPosto())
+                .postoAbastecimentoCodigo(
+                        a.getPostoAbastecimento() != null
+                                ? a.getPostoAbastecimento().getCodigo()
+                                : null
+                )
+                .postoAbastecimentoNome(
+                        a.getPostoAbastecimento() != null
+                                ? a.getPostoAbastecimento().getNome()
+                                : null
+                )
                 .cidade(a.getCidade())
                 .uf(a.getUf())
                 .numNotaOuCupom(a.getNumNotaOuCupom())
