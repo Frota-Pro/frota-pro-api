@@ -1,6 +1,7 @@
 package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.response.DevolucaoResponse;
+import br.com.frotasPro.api.controller.response.ResumoDescontoCargaResponse;
 import br.com.frotasPro.api.controller.response.TransferenciaResponse;
 import br.com.frotasPro.api.service.notafiscal.DevolucaoTransferenciaService;
 import lombok.RequiredArgsConstructor;
@@ -35,5 +36,11 @@ public class DevolucaoTransferenciaController {
     @GetMapping("/transferencias")
     public ResponseEntity<List<TransferenciaResponse>> transferencias(@PathVariable String numeroCarga) {
         return ResponseEntity.ok(service.buscarTransferencias(numeroCarga));
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_MOTORISTA')")
+    @GetMapping("/desconto-resumo")
+    public ResponseEntity<ResumoDescontoCargaResponse> descontoResumo(@PathVariable String numeroCarga) {
+        return ResponseEntity.ok(service.buscarResumoDesconto(numeroCarga));
     }
 }
