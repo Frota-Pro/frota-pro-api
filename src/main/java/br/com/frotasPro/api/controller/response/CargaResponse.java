@@ -43,6 +43,13 @@ public class CargaResponse {
     private Integer kmFinal;
     private Integer kmTotal;
 
+    /**
+     * Km final da última carga finalizada deste mesmo caminhão (antes desta),
+     * pra servir de referência ao motorista na hora de iniciar — null se o
+     * caminhão nunca finalizou nenhuma carga com km registrado.
+     */
+    private Integer ultimoKmFinalCaminhao;
+
     private long diasAtraso;
 
     private List<ClienteCargaResponse> clientes;

@@ -88,6 +88,15 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
             Pageable pageable
     );
 
+    /**
+     * Km final da carga mais recente já finalizada desse caminhão — usado no
+     * app do motorista como referência pra saber o km atual do caminhão antes
+     * de iniciar uma carga nova. Ordenado pelo próprio km (não pela data): o
+     * odômetro só sobe, então o maior kmFinal é sempre o mais atual, mesmo se
+     * a data de chegada de duas cargas coincidir.
+     */
+    Optional<Carga> findFirstByCaminhao_CodigoAndKmFinalIsNotNullOrderByKmFinalDesc(String codigoCaminhao);
+
     /** Histórico de cargas finalizadas do motorista (app mobile), com busca livre e filtro de período por dtChegada. */
     @Query("""
        select c

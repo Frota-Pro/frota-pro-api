@@ -48,8 +48,20 @@ public class BuscarCargaAtualMotoristaService {
                 .map(carga -> {
                     CargaResponse response = CargaMapper.toResponse(carga);
                     CargaMapper.aplicarNumeroExibicao(response, carga, integracaoAtiva);
+                    response.setUltimoKmFinalCaminhao(buscarUltimoKmFinalCaminhao(carga));
                     return response;
                 })
                 .toList();
+    }
+
+    /** Km final da última carga já finalizada desse caminhão — referência pro motorista ao iniciar uma carga nova. */
+    private Integer buscarUltimoKmFinalCaminhao(Carga carga) {
+        if (carga.getCaminhao() == null) {
+            return null;
+        }
+        return cargaRepository
+                .findFirstByCaminhao_CodigoAndKmFinalIsNotNullOrderByKmFinalDesc(carga.getCaminhao().getCodigo())
+                .map(Carga::getKmFinal)
+                .orElse(null);
     }
 }
