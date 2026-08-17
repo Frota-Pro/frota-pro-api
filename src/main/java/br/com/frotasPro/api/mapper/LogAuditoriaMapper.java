@@ -2,6 +2,7 @@ package br.com.frotasPro.api.mapper;
 
 import br.com.frotasPro.api.controller.response.LogAuditoriaResponse;
 import br.com.frotasPro.api.domain.LogAuditoria;
+import br.com.frotasPro.api.util.AuditoriaSnapshotSerializer;
 
 public class LogAuditoriaMapper {
 
@@ -23,6 +24,8 @@ public class LogAuditoriaMapper {
                 .endpoint(log.getEndpoint())
                 .statusHttp(log.getStatusHttp())
                 .ip(log.getIp())
+                .dadosAntes(AuditoriaSnapshotSerializer.desserializar(log.getDadosAntes()))
+                .dadosDepois(AuditoriaSnapshotSerializer.desserializar(log.getDadosDepois()))
                 .build();
     }
 }

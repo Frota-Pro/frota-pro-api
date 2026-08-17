@@ -33,6 +33,22 @@ public class RegistrarLogAuditoriaService {
             Integer statusHttp,
             String ip
     ) {
+        registrar(usuarioLogin, usuarioNome, acao, entidade, descricao, metodoHttp, endpoint, statusHttp, ip, null, null);
+    }
+
+    public void registrar(
+            String usuarioLogin,
+            String usuarioNome,
+            AcaoAuditoria acao,
+            String entidade,
+            String descricao,
+            String metodoHttp,
+            String endpoint,
+            Integer statusHttp,
+            String ip,
+            String dadosAntes,
+            String dadosDepois
+    ) {
         try {
             LogAuditoria log = LogAuditoria.builder()
                     .dataHora(LocalDateTime.now())
@@ -45,6 +61,8 @@ public class RegistrarLogAuditoriaService {
                     .endpoint(truncar(endpoint, 255))
                     .statusHttp(statusHttp)
                     .ip(ip)
+                    .dadosAntes(dadosAntes)
+                    .dadosDepois(dadosDepois)
                     .build();
             repository.save(log);
         } catch (Exception e) {

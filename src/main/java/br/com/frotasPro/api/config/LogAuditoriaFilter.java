@@ -1,6 +1,7 @@
 package br.com.frotasPro.api.config;
 
 import br.com.frotasPro.api.domain.enums.AcaoAuditoria;
+import br.com.frotasPro.api.service.auditoria.AuditoriaEntidadeContexto;
 import br.com.frotasPro.api.service.auditoria.RegistrarLogAuditoriaService;
 import br.com.frotasPro.api.util.AuditoriaDescricaoResolver;
 import jakarta.servlet.FilterChain;
@@ -17,11 +18,15 @@ import java.io.IOException;
 import java.util.Set;
 
 /**
- * Alimenta a trilha de auditoria automaticamente pra toda requisição que
- * altera dados (POST/PUT/PATCH/DELETE), sem precisar instrumentar cada
- * service na mão — cobre qualquer controller novo "de graça". Login/logout
- * são registrados à parte (em {@code UsuarioLoginService}/{@code AuthTokenService})
- * porque acontecem antes de existir um JWT autenticado nessa requisição.
+ * Rede de segurança da trilha de auditoria: cobre qualquer requisição que
+ * altera dados (POST/PUT/PATCH/DELETE) cuja entidade NÃO passou pela
+ * auditoria detalhada de {@code AuditoriaBase} (ex: entidades que ainda não
+ * estendem ela) — sem isso, uma entidade fora desse esquema ficaria sem
+ * nenhum registro. Quando a auditoria de entidade já rodou pra essa
+ * requisição (sinalizado via {@link AuditoriaEntidadeContexto}), esse filtro
+ * não faz nada, pra não duplicar. Login/logout são registrados à parte (em
+ * {@code UsuarioLoginService}/{@code AuthTokenService}) porque acontecem
+ * antes de existir um JWT autenticado nessa requisição.
  */
 @Component
 public class LogAuditoriaFilter extends OncePerRequestFilter {
@@ -47,9 +52,16 @@ public class LogAuditoriaFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-        filterChain.doFilter(request, response);
+        try {
+            filterChain.doFilter(request, response);
+            registrarSeNecessario(request, response);
+        } finally {
+            AuditoriaEntidadeContexto.limpar();
+        }
+    }
 
-        if (!deveAuditar(request)) {
+    private void registrarSeNecessario(HttpServletRequest request, HttpServletResponse response) {
+        if (!deveAuditar(request) || AuditoriaEntidadeContexto.foiAuditado()) {
             return;
         }
 

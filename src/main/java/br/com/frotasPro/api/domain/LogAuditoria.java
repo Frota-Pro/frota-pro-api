@@ -70,4 +70,12 @@ public class LogAuditoria {
 
     @Column(length = 45)
     private String ip;
+
+    /** Snapshot (JSON) dos campos simples da entidade antes da mudança — null em CRIACAO. */
+    @Column(name = "dados_antes", columnDefinition = "text")
+    private String dadosAntes;
+
+    /** Snapshot (JSON) dos campos simples da entidade depois da mudança — null em EXCLUSAO. */
+    @Column(name = "dados_depois", columnDefinition = "text")
+    private String dadosDepois;
 }

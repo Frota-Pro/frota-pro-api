@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 @Getter
@@ -25,4 +26,6 @@ public class LogAuditoriaResponse {
     private String endpoint;
     private Integer statusHttp;
     private String ip;
+    private Map<String, Object> dadosAntes;
+    private Map<String, Object> dadosDepois;
 }
