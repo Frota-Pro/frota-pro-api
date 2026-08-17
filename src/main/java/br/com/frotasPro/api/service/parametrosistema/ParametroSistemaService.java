@@ -49,6 +49,7 @@ public class ParametroSistemaService {
         parametro.setPermitirAtualizacaoPorTransferencia(request.getPermitirAtualizacaoPorTransferencia());
         parametro.setValidarTempoMinimoCarga(request.getValidarTempoMinimoCarga());
         parametro.setTempoMinimoEntregaPadraoMinutos(request.getTempoMinimoEntregaPadraoMinutos());
+        parametro.setDiasRetencaoAuditoria(request.getDiasRetencaoAuditoria());
 
         return toResponse(repository.save(parametro));
     }
@@ -72,6 +73,7 @@ public class ParametroSistemaService {
                 .permitirAtualizacaoPorTransferencia(parametro.isPermitirAtualizacaoPorTransferencia())
                 .validarTempoMinimoCarga(parametro.isValidarTempoMinimoCarga())
                 .tempoMinimoEntregaPadraoMinutos(parametro.getTempoMinimoEntregaPadraoMinutos())
+                .diasRetencaoAuditoria(parametro.getDiasRetencaoAuditoria())
                 .build();
     }
 }

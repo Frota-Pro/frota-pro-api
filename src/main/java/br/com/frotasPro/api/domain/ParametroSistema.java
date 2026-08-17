@@ -92,4 +92,13 @@ public class ParametroSistema extends AuditoriaBase {
      */
     @Column(name = "tempo_minimo_entrega_padrao_minutos", nullable = false)
     private int tempoMinimoEntregaPadraoMinutos = 30;
+
+    /**
+     * Dias que um registro fica em tb_log_auditoria antes de ser apagado
+     * automaticamente (job diário, ver AuditoriaScheduler) — sem isso a
+     * tabela cresce sem limite, já que toda ação de escrita do sistema
+     * (e login/logout) gera uma linha.
+     */
+    @Column(name = "dias_retencao_auditoria", nullable = false)
+    private int diasRetencaoAuditoria = 180;
 }

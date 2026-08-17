@@ -4,8 +4,10 @@ import br.com.frotasPro.api.domain.LogAuditoria;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -25,4 +27,10 @@ public interface LogAuditoriaRepository extends JpaRepository<LogAuditoria, UUID
             @Param("usuarioLogin") String usuarioLogin,
             Pageable pageable
     );
+
+    /** Delete em lote (sem carregar entidade por entidade) — usado pelo expurgo automático. */
+    @Modifying
+    @Transactional
+    @Query("delete from LogAuditoria l where l.dataHora < :corte")
+    int deletarAnterioresA(@Param("corte") LocalDateTime corte);
 }

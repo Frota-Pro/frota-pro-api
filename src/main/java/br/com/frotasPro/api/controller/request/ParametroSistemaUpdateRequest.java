@@ -41,4 +41,8 @@ public class ParametroSistemaUpdateRequest {
     @NotNull(message = "Tempo mínimo padrão de entrega é obrigatório")
     @Min(value = 0, message = "Tempo mínimo padrão deve ser >= 0")
     private Integer tempoMinimoEntregaPadraoMinutos;
+
+    @NotNull(message = "Dias de retenção da auditoria é obrigatório")
+    @Min(value = 30, message = "Dias de retenção da auditoria deve ser >= 30")
+    private Integer diasRetencaoAuditoria;
 }
