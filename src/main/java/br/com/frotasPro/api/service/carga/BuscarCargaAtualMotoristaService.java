@@ -11,7 +11,6 @@ import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.service.usuario.UsuarioAutenticadoService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,13 +54,14 @@ public class BuscarCargaAtualMotoristaService {
                 .toList();
     }
 
-    /** Km final da última carga já finalizada desse caminhão (por data), referência pro motorista ao iniciar uma carga nova. */
+    /**
+     * Km atual conhecido do caminhão — mesmo campo (Caminhao.odometroUltimaCarga)
+     * que o resto do sistema já usa como fonte de km "de verdade" (plano de
+     * manutenção preventiva, movimentação sem carga, avisos de vencimento).
+     * Atualizado só em FinalizarCargaService a cada carga finalizada, então é
+     * sempre o valor mais recente — não o maior já visto.
+     */
     private Integer buscarUltimoKmFinalCaminhao(Carga carga) {
-        if (carga.getCaminhao() == null) {
-            return null;
-        }
-        List<Carga> ultimas = cargaRepository.buscarUltimasFinalizadasPorCaminhao(
-                carga.getCaminhao().getCodigo(), PageRequest.of(0, 1));
-        return ultimas.isEmpty() ? null : ultimas.get(0).getKmFinal();
+        return carga.getCaminhao() != null ? carga.getCaminhao().getOdometroUltimaCarga() : null;
     }
 }

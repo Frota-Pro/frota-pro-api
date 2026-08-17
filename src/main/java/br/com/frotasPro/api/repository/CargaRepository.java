@@ -88,23 +88,6 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
             Pageable pageable
     );
 
-    /**
-     * A(s) carga(s) mais recentemente finalizada(s) desse caminhão, por data/
-     * hora de chegada — usado no app do motorista como referência do km atual
-     * do caminhão antes de iniciar uma carga nova. De propósito NÃO ordena
-     * pelo maior kmFinal: um km digitado errado (ex.: um dígito a mais) numa
-     * carga antiga ficaria "grudado" pra sempre como referência, mesmo depois
-     * de cargas mais novas e corretas. Ordenando por data, um valor errado se
-     * autocorrige assim que a carga seguinte for finalizada.
-     */
-    @Query("""
-       select c from Carga c
-       where c.caminhao.codigo = :codigoCaminhao
-         and c.kmFinal is not null
-       order by c.dtHoraChegada desc nulls last, c.dtChegada desc
-       """)
-    List<Carga> buscarUltimasFinalizadasPorCaminhao(@Param("codigoCaminhao") String codigoCaminhao, Pageable pageable);
-
     /** Histórico de cargas finalizadas do motorista (app mobile), com busca livre e filtro de período por dtChegada. */
     @Query("""
        select c
