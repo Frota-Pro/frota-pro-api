@@ -49,7 +49,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             CorsConfigurationSource corsConfigurationSource,
-            MustChangePasswordFilter mustChangePasswordFilter
+            MustChangePasswordFilter mustChangePasswordFilter,
+            LogAuditoriaFilter logAuditoriaFilter
     ) throws Exception {
         AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authorizationRegistry = http
                 .authorizeHttpRequests();
@@ -82,6 +83,7 @@ public class SecurityConfig {
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
                 )
                 .addFilterAfter(mustChangePasswordFilter, BearerTokenAuthenticationFilter.class)
+                .addFilterAfter(logAuditoriaFilter, MustChangePasswordFilter.class)
                 .build();
     }
 

@@ -2,6 +2,8 @@ package br.com.frotasPro.api.service.auth;
 
 import br.com.frotasPro.api.domain.Acesso;
 import br.com.frotasPro.api.domain.Usuario;
+import br.com.frotasPro.api.domain.enums.AcaoAuditoria;
+import br.com.frotasPro.api.service.auditoria.RegistrarLogAuditoriaService;
 import br.com.frotasPro.api.service.usuario.BuscarUsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +35,7 @@ public class AuthTokenService {
     private final JwtDecoder jwtDecoder;
     private final StringRedisTemplate stringRedisTemplate;
     private final BuscarUsuarioService buscarUsuarioService;
+    private final RegistrarLogAuditoriaService registrarLogAuditoriaService;
 
     @Value("${frotapro.security.jwt.access-token-seconds:900}")
     private long accessTokenSeconds;
@@ -68,6 +71,10 @@ public class AuthTokenService {
         validateTokenType(decoded, TOKEN_TYPE_REFRESH);
         validateNotRevoked(decoded);
         revoke(decoded);
+
+        registrarLogAuditoriaService.registrar(
+                decoded.getClaimAsString("login"), decoded.getSubject(), AcaoAuditoria.LOGOUT,
+                null, "Logout", "POST", "/login/logout", 204, null);
     }
 
     private TokenPair generateTokenPair(Usuario usuario, List<String> acessos) {
