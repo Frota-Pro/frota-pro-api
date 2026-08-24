@@ -241,14 +241,15 @@ or coalesce(a.numero_nota_cupom, '') ilike ('%' || cast(:q as text) || '%')
 )
 and (
 cast(:caminhao as text) is null
-or c.codigo = cast(:caminhao as text)
-or c.codigo_externo = cast(:caminhao as text)
-or c.placa = cast(:caminhao as text)
+or c.codigo ilike ('%' || cast(:caminhao as text) || '%')
+or coalesce(c.codigo_externo, '') ilike ('%' || cast(:caminhao as text) || '%')
+or coalesce(c.placa, '') ilike ('%' || cast(:caminhao as text) || '%')
 )
 and (
 cast(:motorista as text) is null
-or m.codigo = cast(:motorista as text)
-or m.codigo_externo = cast(:motorista as text)
+or coalesce(m.codigo, '') ilike ('%' || cast(:motorista as text) || '%')
+or coalesce(m.codigo_externo, '') ilike ('%' || cast(:motorista as text) || '%')
+or coalesce(m.nome, '') ilike ('%' || cast(:motorista as text) || '%')
 )
 and (cast(:tipo as text) is null or a.tipo_combustivel = cast(:tipo as text))
 and (cast(:forma as text) is null or a.forma_pagamento = cast(:forma as text))
@@ -282,14 +283,15 @@ or coalesce(a.numero_nota_cupom, '') ilike ('%' || cast(:q as text) || '%')
 )
 and (
 cast(:caminhao as text) is null
-or c.codigo = cast(:caminhao as text)
-or c.codigo_externo = cast(:caminhao as text)
-or c.placa = cast(:caminhao as text)
+or c.codigo ilike ('%' || cast(:caminhao as text) || '%')
+or coalesce(c.codigo_externo, '') ilike ('%' || cast(:caminhao as text) || '%')
+or coalesce(c.placa, '') ilike ('%' || cast(:caminhao as text) || '%')
 )
 and (
 cast(:motorista as text) is null
-or m.codigo = cast(:motorista as text)
-or m.codigo_externo = cast(:motorista as text)
+or coalesce(m.codigo, '') ilike ('%' || cast(:motorista as text) || '%')
+or coalesce(m.codigo_externo, '') ilike ('%' || cast(:motorista as text) || '%')
+or coalesce(m.nome, '') ilike ('%' || cast(:motorista as text) || '%')
 )
 and (cast(:tipo as text) is null or a.tipo_combustivel = cast(:tipo as text))
 and (cast(:forma as text) is null or a.forma_pagamento = cast(:forma as text))
@@ -409,5 +411,74 @@ and (cast(:fim as timestamp) is null or a.dt_abastecimento <= cast(:fim as times
         String getPosto();
         BigDecimal getTotalLitros();
         BigDecimal getTotalValor();
+    }
+
+    /**
+     * Agregado da tela de Abastecimentos — usa EXATAMENTE o mesmo filtro de
+     * {@link #filtrarNative}, mas soma tudo que bate com o filtro (todas as
+     * páginas), não só a página carregada. Os cards da tela (litros, gasto
+     * total, preço médio, consumo médio) dependem disso pra não ficarem
+     * errados quando a lista tem mais de uma página.
+     */
+    @Query(
+            value = """
+select
+  coalesce(sum(a.qt_litros), 0) as totalLitros,
+  coalesce(sum(a.valor_total), 0) as totalValor,
+  coalesce(sum(case when a.media_km_litro is not null and a.qt_litros is not null then a.media_km_litro * a.qt_litros else 0 end), 0) as somaMediaPonderada,
+  coalesce(sum(case when a.media_km_litro is not null and a.qt_litros is not null then a.qt_litros else 0 end), 0) as somaLitrosParaMedia,
+  count(1) as totalRegistros
+from tb_abastecimento a
+join tb_caminhao c on c.id = a.caminhao_id
+left join tb_motorista m on m.id = a.motorista_id
+where (
+cast(:q as text) is null
+or a.codigo ilike ('%' || cast(:q as text) || '%')
+or c.codigo ilike ('%' || cast(:q as text) || '%')
+or coalesce(c.codigo_externo, '') ilike ('%' || cast(:q as text) || '%')
+or coalesce(c.placa, '') ilike ('%' || cast(:q as text) || '%')
+or coalesce(m.codigo, '') ilike ('%' || cast(:q as text) || '%')
+or coalesce(m.codigo_externo, '') ilike ('%' || cast(:q as text) || '%')
+or coalesce(m.nome, '') ilike ('%' || cast(:q as text) || '%')
+or coalesce(a.posto, '') ilike ('%' || cast(:q as text) || '%')
+or coalesce(a.cidade, '') ilike ('%' || cast(:q as text) || '%')
+or coalesce(a.uf, '') ilike ('%' || cast(:q as text) || '%')
+or coalesce(a.numero_nota_cupom, '') ilike ('%' || cast(:q as text) || '%')
+)
+and (
+cast(:caminhao as text) is null
+or c.codigo ilike ('%' || cast(:caminhao as text) || '%')
+or coalesce(c.codigo_externo, '') ilike ('%' || cast(:caminhao as text) || '%')
+or coalesce(c.placa, '') ilike ('%' || cast(:caminhao as text) || '%')
+)
+and (
+cast(:motorista as text) is null
+or coalesce(m.codigo, '') ilike ('%' || cast(:motorista as text) || '%')
+or coalesce(m.codigo_externo, '') ilike ('%' || cast(:motorista as text) || '%')
+or coalesce(m.nome, '') ilike ('%' || cast(:motorista as text) || '%')
+)
+and (cast(:tipo as text) is null or a.tipo_combustivel = cast(:tipo as text))
+and (cast(:forma as text) is null or a.forma_pagamento = cast(:forma as text))
+and (cast(:inicio as timestamp) is null or a.dt_abastecimento >= cast(:inicio as timestamp))
+and (cast(:fim as timestamp) is null or a.dt_abastecimento <= cast(:fim as timestamp))
+""",
+            nativeQuery = true
+    )
+    ResumoFiltroRow resumoFiltradoNative(
+            @Param("q") String q,
+            @Param("caminhao") String caminhao,
+            @Param("motorista") String motorista,
+            @Param("tipo") String tipo,
+            @Param("forma") String forma,
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fim") LocalDateTime fim
+    );
+
+    interface ResumoFiltroRow {
+        BigDecimal getTotalLitros();
+        BigDecimal getTotalValor();
+        BigDecimal getSomaMediaPonderada();
+        BigDecimal getSomaLitrosParaMedia();
+        long getTotalRegistros();
     }
 }

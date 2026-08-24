@@ -4,6 +4,7 @@ import br.com.frotasPro.api.controller.request.AbastecimentoRequest;
 import br.com.frotasPro.api.controller.response.AbastecimentoGastoPorCombustivelResponse;
 import br.com.frotasPro.api.controller.response.AbastecimentoResponse;
 import br.com.frotasPro.api.controller.response.AbastecimentoResumoCaminhaoResponse;
+import br.com.frotasPro.api.controller.response.AbastecimentoResumoFiltroResponse;
 import br.com.frotasPro.api.domain.enums.FormaPagamento;
 import br.com.frotasPro.api.domain.enums.TipoCombustivel;
 import br.com.frotasPro.api.service.abastecimento.*;
@@ -39,6 +40,7 @@ public class AbastecimentoController {
     private final DeletarAbastecimentoService deletarService;
     private final RelatorioAbastecimentoService relatorioService;
     private final ResumoAbastecimentoPorCaminhaoService resumoPorCaminhaoService;
+    private final ResumoAbastecimentoFiltradoService resumoAbastecimentoFiltradoService;
     private final BuscarAbastecimentosPorCaminhaoService buscarAbastecimentosPorCaminhaoService;
     private final BuscarAbastecimentosFiltradoService buscarAbastecimentosFiltradoService;
 
@@ -71,6 +73,30 @@ public class AbastecimentoController {
     ) {
         return ResponseEntity.ok(
                 buscarAbastecimentosFiltradoService.buscar(q, caminhao, motorista, tipo, forma, inicio, fim, pageable)
+        );
+    }
+
+    /**
+     * Totais (litros, gasto, preço médio, consumo médio) pra alimentar os
+     * cards da tela — soma TODOS os registros que batem com o filtro, não só
+     * a página carregada pelo /filtrar. Mesmos parâmetros de filtro dos dois
+     * endpoints, propositalmente.
+     */
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA','ROLE_ADMIN','ROLE_GERENTE_LOGISTICA','ROLE_OPERADOR_LOGISTICA')")
+    @GetMapping("/resumo-filtrado")
+    public ResponseEntity<AbastecimentoResumoFiltroResponse> resumoFiltrado(
+            @RequestParam(value = "q", required = false) String q,
+            @RequestParam(value = "caminhao", required = false) String caminhao,
+            @RequestParam(value = "motorista", required = false) String motorista,
+            @RequestParam(value = "tipo", required = false) TipoCombustivel tipo,
+            @RequestParam(value = "forma", required = false) FormaPagamento forma,
+            @RequestParam(value = "inicio", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
+            @RequestParam(value = "fim", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim
+    ) {
+        return ResponseEntity.ok(
+                resumoAbastecimentoFiltradoService.resumir(q, caminhao, motorista, tipo, forma, inicio, fim)
         );
     }
 
