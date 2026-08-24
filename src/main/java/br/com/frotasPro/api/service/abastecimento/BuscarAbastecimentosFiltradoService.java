@@ -30,7 +30,11 @@ public class BuscarAbastecimentosFiltradoService {
             LocalDateTime fim,
             Pageable pageable
     ) {
-        PeriodoValidator.opcional(inicio, fim, "dtAbastecimento");
+        // Deixa preencher só "De" ou só "Até" — abre o lado que faltou antes
+        // de validar, pra não obrigar as duas datas quando a intenção do
+        // usuário é óbvia ("desde tal dia" / "até tal dia").
+        var periodo = PeriodoParcialUtils.abrirLadoAusente(inicio, fim);
+        PeriodoValidator.opcional(periodo.inicio(), periodo.fim(), "dtAbastecimento");
 
         String qN = norm(q);
         String caminhaoN = norm(caminhao);
@@ -45,8 +49,8 @@ public class BuscarAbastecimentosFiltradoService {
                         motoristaN,
                         tipo != null ? tipo.name() : null,
                         forma != null ? forma.name() : null,
-                        inicio,
-                        fim,
+                        periodo.inicio(),
+                        periodo.fim(),
                         pageableNoSort
                 )
                 .map(AbastecimentoMapper::toResponse);

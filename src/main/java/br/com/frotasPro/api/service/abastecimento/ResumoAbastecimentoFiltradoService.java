@@ -33,7 +33,9 @@ public class ResumoAbastecimentoFiltradoService {
             LocalDateTime inicio,
             LocalDateTime fim
     ) {
-        PeriodoValidator.opcional(inicio, fim, "dtAbastecimento");
+        // Deixa preencher só "De" ou só "Até" — mesma regra do /filtrar, ver PeriodoParcialUtils.
+        var periodo = PeriodoParcialUtils.abrirLadoAusente(inicio, fim);
+        PeriodoValidator.opcional(periodo.inicio(), periodo.fim(), "dtAbastecimento");
 
         var row = repository.resumoFiltradoNative(
                 norm(q),
@@ -41,8 +43,8 @@ public class ResumoAbastecimentoFiltradoService {
                 norm(motorista),
                 tipo != null ? tipo.name() : null,
                 forma != null ? forma.name() : null,
-                inicio,
-                fim
+                periodo.inicio(),
+                periodo.fim()
         );
 
         BigDecimal totalLitros = row.getTotalLitros() != null ? row.getTotalLitros() : BigDecimal.ZERO;
