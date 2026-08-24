@@ -8,6 +8,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -42,7 +43,11 @@ public class LogAuditoriaFilter extends OncePerRequestFilter {
 
     private final RegistrarLogAuditoriaService registrarService;
 
-    public LogAuditoriaFilter(RegistrarLogAuditoriaService registrarService) {
+    // @Lazy: em testes de fatia (@WebMvcTest), o contexto restrito não carrega
+    // @Service — sem isso, a simples presença desse filtro (um @Component,
+    // que o Spring detecta mesmo sem ninguém referenciar) quebraria qualquer
+    // slice test nem que ele nunca chegue a usar esse filtro de verdade.
+    public LogAuditoriaFilter(@Lazy RegistrarLogAuditoriaService registrarService) {
         this.registrarService = registrarService;
     }
 
