@@ -1,6 +1,7 @@
 package br.com.frotasPro.api.mapper;
 
 import br.com.frotasPro.api.controller.request.ParadaCargaRequest;
+import br.com.frotasPro.api.controller.response.AbastecimentoResponse;
 import br.com.frotasPro.api.controller.response.DespesaParadaResponse;
 import br.com.frotasPro.api.controller.response.ManutencaoResponse;
 import br.com.frotasPro.api.controller.response.ParadaCargaResponse;
@@ -58,6 +59,10 @@ public class ParadaCargaMapper {
         if (entity.getManutencoes() != null && !entity.getManutencoes().isEmpty()) {
             Manutencao primeira = entity.getManutencoes().get(0);
             r.setManutencao(toManutencaoResponse(primeira));
+        }
+
+        if (entity.getAbastecimentos() != null && !entity.getAbastecimentos().isEmpty()) {
+            r.setAbastecimento(AbastecimentoMapper.toResponse(entity.getAbastecimentos().get(0)));
         }
 
         return r;
