@@ -48,8 +48,20 @@ public class BuscarCargaAtualMotoristaService {
                 .map(carga -> {
                     CargaResponse response = CargaMapper.toResponse(carga);
                     CargaMapper.aplicarNumeroExibicao(response, carga, integracaoAtiva);
+                    response.setUltimoKmFinalCaminhao(buscarUltimoKmFinalCaminhao(carga));
                     return response;
                 })
                 .toList();
+    }
+
+    /**
+     * Km atual conhecido do caminhão — mesmo campo (Caminhao.odometroUltimaCarga)
+     * que o resto do sistema já usa como fonte de km "de verdade" (plano de
+     * manutenção preventiva, movimentação sem carga, avisos de vencimento).
+     * Atualizado só em FinalizarCargaService a cada carga finalizada, então é
+     * sempre o valor mais recente — não o maior já visto.
+     */
+    private Integer buscarUltimoKmFinalCaminhao(Carga carga) {
+        return carga.getCaminhao() != null ? carga.getCaminhao().getOdometroUltimaCarga() : null;
     }
 }

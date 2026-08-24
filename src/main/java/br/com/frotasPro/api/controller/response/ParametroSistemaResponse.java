@@ -22,4 +22,6 @@ public class ParametroSistemaResponse {
 
     private boolean validarTempoMinimoCarga;
     private int tempoMinimoEntregaPadraoMinutos;
+
+    private int diasRetencaoAuditoria;
 }
