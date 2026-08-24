@@ -74,7 +74,7 @@ public class ParadaCargaController {
         return ResponseEntity.ok(page);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_CONSULTA')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_CONSULTA', 'ROLE_MOTORISTA')")
     @GetMapping("/carga/{numeroCarga}/abastecimentos")
     public ResponseEntity<Page<ParadaCargaResponse>> listarAbastecimentosPorCarga(
             @PathVariable String numeroCarga,

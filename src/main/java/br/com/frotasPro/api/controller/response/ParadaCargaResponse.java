@@ -25,4 +25,7 @@ public class ParadaCargaResponse {
 
     private List<DespesaParadaResponse> despesaParadas;
     private ManutencaoResponse manutencao;
+
+    /** Detalhe do abastecimento (litros, valor, posto, combustível...) quando tipoParada = ABASTECIMENTO. */
+    private AbastecimentoResponse abastecimento;
 }
