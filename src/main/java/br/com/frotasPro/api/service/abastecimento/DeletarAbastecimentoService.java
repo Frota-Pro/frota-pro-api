@@ -5,7 +5,9 @@ import br.com.frotasPro.api.domain.enums.EventoNotificacao;
 import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.excption.BusinessException;
 import br.com.frotasPro.api.excption.ObjectNotFound;
+import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
+import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ public class DeletarAbastecimentoService {
 
     private final AbastecimentoRepository repository;
     private final NotificacaoService notificacaoService;
+    private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
     @Transactional
     public void deletar(String codigo) {
@@ -24,7 +27,19 @@ public class DeletarAbastecimentoService {
                 .orElseThrow(() -> new ObjectNotFound("Abastecimento não encontrado para o código: " + codigo));
 
         if (entity.getParadaCarga() != null) {
-            throw new BusinessException("Não é possível excluir um abastecimento vinculado a uma parada.");
+            var carga = entity.getParadaCarga().getCarga();
+            String numeroExibicao = carga != null
+                    ? CargaMapper.resolverNumeroExibicao(
+                            carga.getNumeroCarga(),
+                            carga.getNumeroCargaExterno(),
+                            integracaoWinThorConfigService.isCargaIntegracaoAtiva())
+                    : null;
+
+            throw new BusinessException(
+                    "Não é possível excluir por aqui: esse abastecimento está vinculado a uma parada"
+                            + (numeroExibicao != null ? " da carga " + numeroExibicao : "")
+                            + ". Para removê-lo, edite ou exclua a parada dentro dessa carga."
+            );
         }
 
         String codigoRef = entity.getCodigo() != null ? entity.getCodigo() : "ID-" + entity.getId();
