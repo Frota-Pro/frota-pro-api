@@ -36,7 +36,11 @@ public class PneuService {
     private final CaminhaoRepository caminhaoRepository;
 
     @Transactional(readOnly = true)
-    public Page<PneuResponse> listar(String q, String status, Pageable pageable) {
+    public Page<PneuResponse> listar(String q, String status, String caminhao, Pageable pageable) {
+
+        if (caminhao != null && !caminhao.isBlank()) {
+            return pneuRepository.findByCaminhaoAtualMatch(caminhao.trim(), pageable).map(this::toResponse);
+        }
 
         if (status != null && !status.isBlank()) {
             var st = StatusPneu.valueOf(status);
@@ -133,9 +137,26 @@ public class PneuService {
             kmInst = inst.getKmInstalacao();
             dataInst = inst.getDataInstalacao();
 
-            // sem odômetro atual do caminhão, usamos o último kmEvento registrado
-            BigDecimal kmAtual = ultimoKmEventoDoPneu(codigo).orElse(inst.getKmInstalacao());
-            kmRodadoAtual = kmAtual.subtract(inst.getKmInstalacao());
+            // km_instalacao é opcional no cadastro (pode vir null de uma instalação
+            // antiga ou de um cadastro incompleto) — sem essa guarda, o subtract
+            // abaixo derrubava a tela com NPE em vez de só mostrar "rodado" zerado.
+            BigDecimal kmInstalacaoSeguro = kmInst != null ? kmInst : BigDecimal.ZERO;
+
+            // "Rodado" precisa de um km atual mais recente que o da instalação.
+            // Antes, sem nenhum evento de km registrado pra esse pneu (o usuário
+            // nunca clicou em "Atualizar KM" na tela dele), caía direto no
+            // km_instalacao — ou seja, "rodado" sempre dava 0, mesmo com o
+            // caminhão já tendo rodado bastante depois da troca. Agora cai pro
+            // odômetro mais recente do próprio caminhão onde o pneu está
+            // instalado antes de desistir e usar o km de instalação.
+            BigDecimal kmAtual = ultimoKmEventoDoPneu(codigo)
+                    .or(() -> caminhaoRepository.findById(inst.getCaminhaoId())
+                            .map(Caminhao::getOdometroUltimaCarga)
+                            .filter(km -> km != null)
+                            .map(BigDecimal::valueOf))
+                    .orElse(kmInstalacaoSeguro);
+
+            kmRodadoAtual = kmAtual.subtract(kmInstalacaoSeguro);
             if (kmRodadoAtual.compareTo(BigDecimal.ZERO) < 0) kmRodadoAtual = BigDecimal.ZERO;
 
             kmRestante = p.getKmMetaAtual().subtract(kmRodadoAtual);
@@ -229,8 +250,11 @@ public class PneuService {
                     throw new IllegalArgumentException("kmEvento é obrigatório em ATUALIZACAO_KM");
                 }
 
-                BigDecimal ultimoKm = ultimoKmEventoDoPneu(codigoPneu).orElse(inst.getKmInstalacao());
-                if (req.kmEvento.compareTo(inst.getKmInstalacao()) < 0
+                // km_instalacao é opcional no cadastro — sem essa guarda, um pneu
+                // instalado sem esse campo preenchido derrubava esse endpoint com NPE.
+                BigDecimal kmInstalacaoSeguro = inst.getKmInstalacao() != null ? inst.getKmInstalacao() : BigDecimal.ZERO;
+                BigDecimal ultimoKm = ultimoKmEventoDoPneu(codigoPneu).orElse(kmInstalacaoSeguro);
+                if (req.kmEvento.compareTo(kmInstalacaoSeguro) < 0
                         || req.kmEvento.compareTo(ultimoKm) < 0) {
                     throw new IllegalArgumentException("kmEvento não pode ser menor que a última leitura do pneu");
                 }

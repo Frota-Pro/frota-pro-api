@@ -29,6 +29,7 @@ public class CriarAbastecimentoService {
     private final CalcularMediaKmLitroService calcularMediaKmLitroService;
     private final NotificacaoService notificacaoService;
     private final ResolverPostoAbastecimentoService resolverPostoAbastecimentoService;
+    private final DetectarAnomaliaAbastecimentoService detectarAnomaliaAbastecimentoService;
 
     public AbastecimentoResponse criar(AbastecimentoRequest request) {
 
@@ -71,6 +72,8 @@ public class CriarAbastecimentoService {
         );
 
         a.setMediaKmLitro(media != null ? media : request.getMediaKmLitro());
+
+        detectarAnomaliaAbastecimentoService.avaliar(a);
 
         repository.save(a);
         // A meta de consumo (km/l) não é mais atualizada aqui — ela é

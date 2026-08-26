@@ -481,4 +481,43 @@ and (cast(:fim as timestamp) is null or a.dt_abastecimento <= cast(:fim as times
         BigDecimal getSomaLitrosParaMedia();
         long getTotalRegistros();
     }
+
+    /**
+     * Preço médio/L recente (mesmo posto + tipo de combustível, últimos N dias
+     * antes desse abastecimento) — base pra {@code DetectarAnomaliaAbastecimentoService}.
+     * Casa por posto cadastrado quando o abastecimento tem um vinculado; senão
+     * casa pelo texto livre do campo "posto" (mesmo abastecimento nunca conta
+     * na própria média, via :excluirId).
+     */
+    @Query(
+            value = """
+select
+  avg(a.valor_litro) as mediaPreco,
+  count(1) as amostras
+from tb_abastecimento a
+where a.tipo_combustivel = cast(:tipoCombustivel as text)
+  and a.valor_litro is not null
+  and a.dt_abastecimento >= cast(:desde as timestamp)
+  and a.dt_abastecimento < cast(:ate as timestamp)
+  and (cast(:excluirId as uuid) is null or a.id <> cast(:excluirId as uuid))
+  and (
+    (cast(:postoAbastecimentoId as uuid) is not null and a.posto_abastecimento_id = cast(:postoAbastecimentoId as uuid))
+    or (cast(:postoAbastecimentoId as uuid) is null and cast(:posto as text) is not null and lower(coalesce(a.posto, '')) = lower(cast(:posto as text)))
+  )
+""",
+            nativeQuery = true
+    )
+    ReferenciaPrecoRow referenciaPrecoPostoCombustivel(
+            @Param("tipoCombustivel") String tipoCombustivel,
+            @Param("desde") LocalDateTime desde,
+            @Param("ate") LocalDateTime ate,
+            @Param("excluirId") UUID excluirId,
+            @Param("postoAbastecimentoId") UUID postoAbastecimentoId,
+            @Param("posto") String posto
+    );
+
+    interface ReferenciaPrecoRow {
+        BigDecimal getMediaPreco();
+        Long getAmostras();
+    }
 }

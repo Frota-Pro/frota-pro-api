@@ -15,6 +15,7 @@ import br.com.frotasPro.api.repository.DocumentoCaminhaoRepository;
 import br.com.frotasPro.api.repository.ManutencaoRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.repository.PlanoManutencaoPreventivaRepository;
+import br.com.frotasPro.api.service.manutencao.PlanoManutencaoPreventivaStatusService;
 import br.com.frotasPro.api.service.parametrosistema.ParametroSistemaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,7 @@ public class NotificarVencimentosService {
     private final ManutencaoRepository manutencaoRepository;
     private final NotificacaoService notificacaoService;
     private final ParametroSistemaService parametroSistemaService;
+    private final PlanoManutencaoPreventivaStatusService planoManutencaoPreventivaStatusService;
 
     @Transactional
     public void notificarCnhVencendo() {
@@ -118,7 +120,7 @@ public class NotificarVencimentosService {
         List<PlanoManutencaoPreventiva> vencendo = new ArrayList<>();
 
         for (PlanoManutencaoPreventiva plano : candidatos) {
-            if (estaVencendo(plano, hoje, parametro)) {
+            if (planoManutencaoPreventivaStatusService.estaVencendo(plano, hoje, parametro)) {
                 vencendo.add(plano);
             }
         }
@@ -179,19 +181,4 @@ public class NotificarVencimentosService {
         log.info("Alertas de manutenção estagnada enviados para {} manutenção(ões).", manutencoes.size());
     }
 
-    private boolean estaVencendo(PlanoManutencaoPreventiva plano, LocalDate hoje, ParametroSistema parametro) {
-        Caminhao caminhao = plano.getCaminhao();
-        Integer odometroAtual = caminhao != null ? caminhao.getOdometroUltimaCarga() : null;
-
-        boolean vencendoPorKm = plano.getIntervaloKm() != null
-                && plano.getUltimoKmExecutado() != null
-                && odometroAtual != null
-                && odometroAtual >= (plano.getUltimoKmExecutado() + plano.getIntervaloKm() - parametro.getKmAntecedenciaTrocaPneu());
-
-        boolean vencendoPorData = plano.getIntervaloDias() != null
-                && plano.getUltimaDataExecutada() != null
-                && !hoje.isBefore(plano.getUltimaDataExecutada().plusDays(plano.getIntervaloDias()).minusDays(parametro.getDiasAntecedenciaVencimentoDocumento()));
-
-        return vencendoPorKm || vencendoPorData;
-    }
 }

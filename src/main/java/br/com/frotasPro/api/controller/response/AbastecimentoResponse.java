@@ -42,4 +42,9 @@ public class AbastecimentoResponse {
     private String uf;
 
     private String numNotaOuCupom;
+
+    /** Alerta de possível fraude/erro — ver DetectarAnomaliaAbastecimentoService. */
+    private boolean precoAnomalo;
+    private BigDecimal precoMedioReferencia;
+    private BigDecimal precoAnomaloPercentual;
 }

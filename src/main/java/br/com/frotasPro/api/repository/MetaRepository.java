@@ -92,6 +92,8 @@ public interface MetaRepository extends JpaRepository <Meta, UUID>{
 
     List<Meta> findByStatusMetaNot(StatusMeta statusMeta);
 
+    List<Meta> findByStatusMeta(StatusMeta statusMeta);
+
     long countByStatusMetaAndDataIncioLessThanEqualAndDataFimGreaterThanEqual(
             StatusMeta statusMeta,
             LocalDate dataInicio,

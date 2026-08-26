@@ -32,9 +32,9 @@ public class ParametroSistema extends AuditoriaBase {
     @Column(name = "dias_antecedencia_vencimento_documento", nullable = false)
     private int diasAntecedenciaVencimentoDocumento = 5;
 
-    /** Km de folga antes do km previsto de troca do pneu (plano preventivo) pra avisar. */
-    @Column(name = "km_antecedencia_troca_pneu", nullable = false)
-    private int kmAntecedenciaTrocaPneu = 500;
+    /** Km de folga antes do km previsto de QUALQUER plano de manutenção preventiva rastreado por km pra avisar. */
+    @Column(name = "km_antecedencia_manutencao_preventiva", nullable = false)
+    private int kmAntecedenciaManutencaoPreventiva = 500;
 
     /** Dias que uma manutenção pode ficar agendada/em andamento sem concluir antes de avisar. */
     @Column(name = "dias_manutencao_estagnada", nullable = false)
@@ -101,4 +101,12 @@ public class ParametroSistema extends AuditoriaBase {
      */
     @Column(name = "dias_retencao_auditoria", nullable = false)
     private int diasRetencaoAuditoria = 180;
+
+    /**
+     * Quanto por cento acima da média recente do posto (mesmo combustível,
+     * últimos 90 dias) o preço/litro de um abastecimento precisa estar pra
+     * ser marcado como anômalo (ver DetectarAnomaliaAbastecimentoService).
+     */
+    @Column(name = "percentual_limite_anomalia_abastecimento", nullable = false)
+    private int percentualLimiteAnomaliaAbastecimento = 25;
 }

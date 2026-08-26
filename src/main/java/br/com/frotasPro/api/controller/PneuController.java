@@ -43,9 +43,12 @@ public class PneuController {
                     message = "Status inválido"
             )
             String status,
+            @RequestParam(value = "caminhao", required = false)
+            @Size(max = 50, message = "Código do caminhão inválido")
+            String caminhao,
             Pageable pageable
     ) {
-        return ResponseEntity.ok(service.listar(q, status, pageable));
+        return ResponseEntity.ok(service.listar(q, status, caminhao, pageable));
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")

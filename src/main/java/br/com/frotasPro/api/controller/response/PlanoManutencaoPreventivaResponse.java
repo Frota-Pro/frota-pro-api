@@ -33,4 +33,7 @@ public class PlanoManutencaoPreventivaResponse {
 
     private Integer proximoKm;
     private LocalDate proximaData;
+
+    /** EM_DIA, VENCENDO ou VENCIDO — ver PlanoManutencaoPreventivaStatusService. */
+    private String situacao;
 }
