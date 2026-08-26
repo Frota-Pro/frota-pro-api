@@ -1,13 +1,18 @@
 package br.com.frotasPro.api.service.dashboard;
 
 import br.com.frotasPro.api.util.FusoHorarioUtils;
+import br.com.frotasPro.api.util.MetaProgressoService;
 
 import br.com.frotasPro.api.controller.response.DashboardMetasResponse;
+import br.com.frotasPro.api.domain.Caminhao;
 import br.com.frotasPro.api.domain.CategoriaCaminhao;
+import br.com.frotasPro.api.domain.Meta;
 import br.com.frotasPro.api.domain.MetaResultado;
 import br.com.frotasPro.api.domain.enums.StatusMeta;
+import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.MetaRepository;
 import br.com.frotasPro.api.repository.MetaResultadoRepository;
+import br.com.frotasPro.api.service.meta.MetaResultadoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,10 +31,24 @@ public class BuscarDashboardMetasService {
 
     private final MetaRepository metaRepository;
     private final MetaResultadoRepository metaResultadoRepository;
+    private final CaminhaoRepository caminhaoRepository;
+    private final MetaProgressoService metaProgressoService;
+    private final MetaResultadoService metaResultadoService;
 
-    @Transactional(readOnly = true)
+    @Transactional
     public DashboardMetasResponse executar() {
         LocalDate hoje = FusoHorarioUtils.hojeBrasil();
+
+        // "Categorias com pior desempenho" e "Top caminhões dentro da meta"
+        // leem de tb_meta_resultado — mas até aqui essa tabela só era
+        // preenchida como efeito colateral de alguém abrir a tela de
+        // progresso de UM caminhão específico (BuscarMetaAtivaComProgressoService).
+        // Se ninguém tivesse aberto essa tela ainda, os dois cards do
+        // Dashboard ficavam vazios pra sempre, mesmo com metas ativas de
+        // verdade. Recalcula aqui na hora pra não depender de ninguém ter
+        // visitado outra tela antes.
+        recalcularResultadosMetasAtivas();
+
         long metasAtivas = metaRepository.countByStatusMetaAndDataIncioLessThanEqualAndDataFimGreaterThanEqual(
                 StatusMeta.EM_ANDAMENTO,
                 hoje,
@@ -78,6 +97,28 @@ public class BuscarDashboardMetasService {
                 .sorted(Comparator.comparing(DashboardMetasResponse.CategoriaResumo::getPercentualForaMeta).reversed())
                 .limit(5)
                 .toList();
+    }
+
+    private void recalcularResultadosMetasAtivas() {
+        for (Meta meta : metaRepository.findByStatusMeta(StatusMeta.EM_ANDAMENTO)) {
+            for (Caminhao caminhao : caminhoesAlvoDaMeta(meta)) {
+                BigDecimal valorRealizado = metaProgressoService.calcularValorRealizado(meta, caminhao, null);
+                BigDecimal percentual = metaProgressoService.calcularPercentual(valorRealizado, meta.getValorMeta());
+                Boolean atingida = metaProgressoService.metaAtingida(meta.getTipoMeta(), valorRealizado, meta.getValorMeta());
+                metaResultadoService.registrar(meta, caminhao, valorRealizado, percentual, atingida);
+            }
+        }
+    }
+
+    /** Meta ligada direto a um caminhão vale só pra ele; ligada a uma categoria vale pra todos os caminhões ativos dela. */
+    private List<Caminhao> caminhoesAlvoDaMeta(Meta meta) {
+        if (meta.getCaminhao() != null) {
+            return List.of(meta.getCaminhao());
+        }
+        if (meta.getCategoria() != null) {
+            return caminhaoRepository.findByCategoriaIdAndAtivoTrue(meta.getCategoria().getId());
+        }
+        return List.of();
     }
 
     private List<DashboardMetasResponse.CaminhaoResumo> topCaminhoesDentroMeta() {
