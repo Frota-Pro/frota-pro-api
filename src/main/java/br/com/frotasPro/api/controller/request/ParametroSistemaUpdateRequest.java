@@ -45,4 +45,8 @@ public class ParametroSistemaUpdateRequest {
     @NotNull(message = "Dias de retenção da auditoria é obrigatório")
     @Min(value = 30, message = "Dias de retenção da auditoria deve ser >= 30")
     private Integer diasRetencaoAuditoria;
+
+    @NotNull(message = "Percentual limite de anomalia de abastecimento é obrigatório")
+    @Min(value = 1, message = "Percentual limite de anomalia deve ser >= 1")
+    private Integer percentualLimiteAnomaliaAbastecimento;
 }

@@ -24,4 +24,6 @@ public class ParametroSistemaResponse {
     private int tempoMinimoEntregaPadraoMinutos;
 
     private int diasRetencaoAuditoria;
+
+    private int percentualLimiteAnomaliaAbastecimento;
 }

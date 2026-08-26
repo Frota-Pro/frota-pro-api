@@ -101,4 +101,12 @@ public class ParametroSistema extends AuditoriaBase {
      */
     @Column(name = "dias_retencao_auditoria", nullable = false)
     private int diasRetencaoAuditoria = 180;
+
+    /**
+     * Quanto por cento acima da média recente do posto (mesmo combustível,
+     * últimos 90 dias) o preço/litro de um abastecimento precisa estar pra
+     * ser marcado como anômalo (ver DetectarAnomaliaAbastecimentoService).
+     */
+    @Column(name = "percentual_limite_anomalia_abastecimento", nullable = false)
+    private int percentualLimiteAnomaliaAbastecimento = 25;
 }

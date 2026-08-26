@@ -50,6 +50,7 @@ public class ParametroSistemaService {
         parametro.setValidarTempoMinimoCarga(request.getValidarTempoMinimoCarga());
         parametro.setTempoMinimoEntregaPadraoMinutos(request.getTempoMinimoEntregaPadraoMinutos());
         parametro.setDiasRetencaoAuditoria(request.getDiasRetencaoAuditoria());
+        parametro.setPercentualLimiteAnomaliaAbastecimento(request.getPercentualLimiteAnomaliaAbastecimento());
 
         return toResponse(repository.save(parametro));
     }
@@ -74,6 +75,7 @@ public class ParametroSistemaService {
                 .validarTempoMinimoCarga(parametro.isValidarTempoMinimoCarga())
                 .tempoMinimoEntregaPadraoMinutos(parametro.getTempoMinimoEntregaPadraoMinutos())
                 .diasRetencaoAuditoria(parametro.getDiasRetencaoAuditoria())
+                .percentualLimiteAnomaliaAbastecimento(parametro.getPercentualLimiteAnomaliaAbastecimento())
                 .build();
     }
 }

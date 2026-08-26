@@ -5,8 +5,8 @@ import br.com.frotasPro.api.domain.enums.EventoNotificacao;
 import br.com.frotasPro.api.domain.enums.TipoNotificacao;
 import br.com.frotasPro.api.repository.AbastecimentoRepository;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
+import br.com.frotasPro.api.service.parametrosistema.ParametroSistemaService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -36,9 +36,7 @@ public class DetectarAnomaliaAbastecimentoService {
 
     private final AbastecimentoRepository repository;
     private final NotificacaoService notificacaoService;
-
-    @Value("${frotapro.abastecimento.anomalia.percentual-limite:25}")
-    private BigDecimal percentualLimite;
+    private final ParametroSistemaService parametroSistemaService;
 
     public void avaliar(Abastecimento a) {
         a.setPrecoAnomalo(false);
@@ -85,7 +83,8 @@ public class DetectarAnomaliaAbastecimentoService {
                 .divide(media, 4, RoundingMode.HALF_UP)
                 .multiply(BigDecimal.valueOf(100));
 
-        if (percentualAcima.compareTo(percentualLimite) <= 0) {
+        int percentualLimite = parametroSistemaService.buscarOuPadrao().getPercentualLimiteAnomaliaAbastecimento();
+        if (percentualAcima.compareTo(BigDecimal.valueOf(percentualLimite)) <= 0) {
             return;
         }
 
