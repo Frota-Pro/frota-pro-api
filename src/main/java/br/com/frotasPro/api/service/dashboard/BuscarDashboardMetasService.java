@@ -72,9 +72,16 @@ public class BuscarDashboardMetasService {
     }
 
     private List<DashboardMetasResponse.CategoriaResumo> categoriasPiorDesempenho(List<MetaResultado> resultados) {
+        // Agrupa pela categoria do CAMINHÃO (Caminhao.categoria), não da meta —
+        // a maioria das metas reais é por caminhão ou por motorista, não por
+        // categoria, então agrupar por meta.getCategoria() deixava de fora
+        // quase todo mundo e a categoria que sobrava aparecia com 0% (parecia
+        // "sem problema" mesmo com caminhões fora da meta de verdade em outras
+        // categorias). Toda categoria de caminhão que tiver algum resultado
+        // entra na conta, não só as com meta configurada diretamente nela.
         Map<CategoriaCaminhao, List<MetaResultado>> porCategoria = resultados.stream()
-                .filter(r -> r.getMeta().getCategoria() != null)
-                .collect(Collectors.groupingBy(r -> r.getMeta().getCategoria()));
+                .filter(r -> r.getCaminhao() != null && r.getCaminhao().getCategoria() != null)
+                .collect(Collectors.groupingBy(r -> r.getCaminhao().getCategoria()));
 
         return porCategoria.entrySet().stream()
                 .map(entry -> {
