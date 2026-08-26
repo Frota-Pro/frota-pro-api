@@ -9,6 +9,7 @@ import br.com.frotasPro.api.domain.CategoriaCaminhao;
 import br.com.frotasPro.api.domain.Meta;
 import br.com.frotasPro.api.domain.MetaResultado;
 import br.com.frotasPro.api.domain.enums.StatusMeta;
+import br.com.frotasPro.api.domain.enums.TipoMeta;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.MetaRepository;
 import br.com.frotasPro.api.repository.MetaResultadoRepository;
@@ -21,6 +22,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -60,16 +62,64 @@ public class BuscarDashboardMetasService {
                 hoje,
                 hoje.plusDays(7)
         );
-        long caminhoesFora = metaResultadoRepository.countCaminhoesForaMetaAtual();
-        List<MetaResultado> resultados = metaResultadoRepository.findResultadosAtuaisMetasEmAndamento();
+
+        // Uma meta de categoria e uma meta direta do mesmo tipo (ex.: Tonelada)
+        // podem coexistir pro mesmo caminhão, mas só a direta vale pra ele —
+        // mesma prioridade que a tela de progresso do caminhão já aplica.
+        // Sem isso, o caminhão aparecia "fora" por causa de uma meta de
+        // categoria que nem é mais a dele naquele tipo.
+        List<MetaResultado> resultados = aplicarPrioridadeDiretaSobreCategoria(
+                metaResultadoRepository.findResultadosAtuaisMetasEmAndamento()
+        );
 
         return DashboardMetasResponse.builder()
                 .metasAtivas(metasAtivas)
                 .metasVencendo(metasVencendo)
-                .caminhoesForaMeta(caminhoesFora)
+                .caminhoesForaMeta(contarCaminhoesForaMeta(resultados))
                 .categoriasPiorDesempenho(categoriasPiorDesempenho(resultados))
-                .topCaminhoesDentroMeta(topCaminhoesDentroMeta())
+                .topCaminhoesDentroMeta(topCaminhoesDentroMeta(resultados))
                 .build();
+    }
+
+    /**
+     * Se um caminhão tem, pro mesmo tipo de meta (ex.: Tonelada), um
+     * resultado vindo de uma meta DIRETA dele e outro vindo de uma meta de
+     * CATEGORIA, descarta o de categoria — a direta tem prioridade (mesma
+     * regra da tela de progresso do caminhão, ver BuscarMetaAtivaComProgressoService).
+     * Sem isso, os dois contavam ao mesmo tempo pro caminhão.
+     */
+    private List<MetaResultado> aplicarPrioridadeDiretaSobreCategoria(List<MetaResultado> resultados) {
+        Map<UUID, Map<TipoMeta, MetaResultado>> escolhidoPorCaminhaoETipo = new HashMap<>();
+
+        for (MetaResultado r : resultados) {
+            if (r.getCaminhao() == null) continue;
+
+            Map<TipoMeta, MetaResultado> porTipo = escolhidoPorCaminhaoETipo
+                    .computeIfAbsent(r.getCaminhao().getId(), k -> new HashMap<>());
+            TipoMeta tipo = r.getMeta().getTipoMeta();
+            MetaResultado existente = porTipo.get(tipo);
+
+            if (existente == null) {
+                porTipo.put(tipo, r);
+                continue;
+            }
+
+            boolean novaEhDireta = r.getMeta().getCaminhao() != null;
+            boolean existenteEhDireta = existente.getMeta().getCaminhao() != null;
+            if (novaEhDireta && !existenteEhDireta) {
+                porTipo.put(tipo, r);
+            }
+        }
+
+        return escolhidoPorCaminhaoETipo.values().stream()
+                .flatMap(porTipo -> porTipo.values().stream())
+                .toList();
+    }
+
+    private long contarCaminhoesForaMeta(List<MetaResultado> resultados) {
+        return agruparPorCaminhao(resultados).values().stream()
+                .filter(rs -> rs.stream().anyMatch(r -> !r.isMetaAtingida()))
+                .count();
     }
 
     private List<DashboardMetasResponse.CategoriaResumo> categoriasPiorDesempenho(List<MetaResultado> resultados) {
@@ -87,12 +137,10 @@ public class BuscarDashboardMetasService {
         return porCategoria.entrySet().stream()
                 .map(entry -> {
                     // Cada caminhão conta só uma vez na categoria, mesmo tendo
-                    // várias metas ativas ao mesmo tempo (ex.: uma por
-                    // categoria + uma direta dele) — "fora da meta" aqui é
-                    // "fora de pelo menos uma das metas dele", não "número de
-                    // checagens caminhão×meta que falharam".
-                    Map<UUID, List<MetaResultado>> porCaminhao = entry.getValue().stream()
-                            .collect(Collectors.groupingBy(r -> r.getCaminhao().getId()));
+                    // várias metas ativas de tipos diferentes ao mesmo tempo —
+                    // "fora da meta" aqui é "fora de pelo menos uma das metas
+                    // dele", não "número de checagens caminhão×meta que falharam".
+                    Map<UUID, List<MetaResultado>> porCaminhao = agruparPorCaminhao(entry.getValue());
 
                     long total = porCaminhao.size();
                     long fora = porCaminhao.values().stream()
@@ -117,6 +165,10 @@ public class BuscarDashboardMetasService {
                 .toList();
     }
 
+    private Map<UUID, List<MetaResultado>> agruparPorCaminhao(List<MetaResultado> resultados) {
+        return resultados.stream().collect(Collectors.groupingBy(r -> r.getCaminhao().getId()));
+    }
+
     private void recalcularResultadosMetasAtivas() {
         for (Meta meta : metaRepository.findByStatusMeta(StatusMeta.EM_ANDAMENTO)) {
             for (Caminhao caminhao : caminhoesAlvoDaMeta(meta)) {
@@ -139,8 +191,10 @@ public class BuscarDashboardMetasService {
         return List.of();
     }
 
-    private List<DashboardMetasResponse.CaminhaoResumo> topCaminhoesDentroMeta() {
-        return metaResultadoRepository.findTopResultadosDentroMeta().stream()
+    private List<DashboardMetasResponse.CaminhaoResumo> topCaminhoesDentroMeta(List<MetaResultado> resultados) {
+        return resultados.stream()
+                .filter(MetaResultado::isMetaAtingida)
+                .sorted(Comparator.comparing(MetaResultado::getPercentual, Comparator.nullsLast(Comparator.naturalOrder())).reversed())
                 .limit(5)
                 .map(resultado -> DashboardMetasResponse.CaminhaoResumo.builder()
                         .caminhaoCodigo(resultado.getCaminhao().getCodigo())
