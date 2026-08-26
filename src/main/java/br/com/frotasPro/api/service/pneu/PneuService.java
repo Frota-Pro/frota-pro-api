@@ -36,7 +36,11 @@ public class PneuService {
     private final CaminhaoRepository caminhaoRepository;
 
     @Transactional(readOnly = true)
-    public Page<PneuResponse> listar(String q, String status, Pageable pageable) {
+    public Page<PneuResponse> listar(String q, String status, String caminhao, Pageable pageable) {
+
+        if (caminhao != null && !caminhao.isBlank()) {
+            return pneuRepository.findByCaminhaoAtualMatch(caminhao.trim(), pageable).map(this::toResponse);
+        }
 
         if (status != null && !status.isBlank()) {
             var st = StatusPneu.valueOf(status);
