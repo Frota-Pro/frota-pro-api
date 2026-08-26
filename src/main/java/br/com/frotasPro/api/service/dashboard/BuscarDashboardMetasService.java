@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -85,8 +86,18 @@ public class BuscarDashboardMetasService {
 
         return porCategoria.entrySet().stream()
                 .map(entry -> {
-                    long total = entry.getValue().size();
-                    long fora = entry.getValue().stream().filter(r -> !r.isMetaAtingida()).count();
+                    // Cada caminhão conta só uma vez na categoria, mesmo tendo
+                    // várias metas ativas ao mesmo tempo (ex.: uma por
+                    // categoria + uma direta dele) — "fora da meta" aqui é
+                    // "fora de pelo menos uma das metas dele", não "número de
+                    // checagens caminhão×meta que falharam".
+                    Map<UUID, List<MetaResultado>> porCaminhao = entry.getValue().stream()
+                            .collect(Collectors.groupingBy(r -> r.getCaminhao().getId()));
+
+                    long total = porCaminhao.size();
+                    long fora = porCaminhao.values().stream()
+                            .filter(rs -> rs.stream().anyMatch(r -> !r.isMetaAtingida()))
+                            .count();
                     BigDecimal percentualFora = total == 0
                             ? BigDecimal.ZERO
                             : BigDecimal.valueOf(fora)
