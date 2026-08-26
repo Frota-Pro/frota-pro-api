@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class ParametroSistemaResponse {
 
     private int diasAntecedenciaVencimentoDocumento;
-    private int kmAntecedenciaTrocaPneu;
+    private int kmAntecedenciaManutencaoPreventiva;
     private int diasManutencaoEstagnada;
     private int diasAntecedenciaPrazoMulta;
 

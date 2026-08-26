@@ -41,7 +41,7 @@ public class ParametroSistemaService {
         ParametroSistema parametro = ensureExists(empresaIdPadrao);
 
         parametro.setDiasAntecedenciaVencimentoDocumento(request.getDiasAntecedenciaVencimentoDocumento());
-        parametro.setKmAntecedenciaTrocaPneu(request.getKmAntecedenciaTrocaPneu());
+        parametro.setKmAntecedenciaManutencaoPreventiva(request.getKmAntecedenciaManutencaoPreventiva());
         parametro.setDiasManutencaoEstagnada(request.getDiasManutencaoEstagnada());
         parametro.setDiasAntecedenciaPrazoMulta(request.getDiasAntecedenciaPrazoMulta());
         parametro.setValidarMotivoAlteracaoPesoValorCarga(request.getValidarMotivoAlteracaoPesoValorCarga());
@@ -65,7 +65,7 @@ public class ParametroSistemaService {
     private ParametroSistemaResponse toResponse(ParametroSistema parametro) {
         return ParametroSistemaResponse.builder()
                 .diasAntecedenciaVencimentoDocumento(parametro.getDiasAntecedenciaVencimentoDocumento())
-                .kmAntecedenciaTrocaPneu(parametro.getKmAntecedenciaTrocaPneu())
+                .kmAntecedenciaManutencaoPreventiva(parametro.getKmAntecedenciaManutencaoPreventiva())
                 .diasManutencaoEstagnada(parametro.getDiasManutencaoEstagnada())
                 .diasAntecedenciaPrazoMulta(parametro.getDiasAntecedenciaPrazoMulta())
                 .validarMotivoAlteracaoPesoValorCarga(parametro.isValidarMotivoAlteracaoPesoValorCarga())

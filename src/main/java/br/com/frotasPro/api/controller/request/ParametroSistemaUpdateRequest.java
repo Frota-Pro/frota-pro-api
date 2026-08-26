@@ -14,9 +14,9 @@ public class ParametroSistemaUpdateRequest {
     @Min(value = 0, message = "Dias de antecedência deve ser >= 0")
     private Integer diasAntecedenciaVencimentoDocumento;
 
-    @NotNull(message = "Km de antecedência de troca de pneu é obrigatório")
+    @NotNull(message = "Km de antecedência de manutenção preventiva é obrigatório")
     @Min(value = 0, message = "Km de antecedência deve ser >= 0")
-    private Integer kmAntecedenciaTrocaPneu;
+    private Integer kmAntecedenciaManutencaoPreventiva;
 
     @NotNull(message = "Dias de manutenção estagnada é obrigatório")
     @Min(value = 0, message = "Dias de manutenção estagnada deve ser >= 0")

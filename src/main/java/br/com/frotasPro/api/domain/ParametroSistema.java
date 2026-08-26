@@ -32,9 +32,9 @@ public class ParametroSistema extends AuditoriaBase {
     @Column(name = "dias_antecedencia_vencimento_documento", nullable = false)
     private int diasAntecedenciaVencimentoDocumento = 5;
 
-    /** Km de folga antes do km previsto de troca do pneu (plano preventivo) pra avisar. */
-    @Column(name = "km_antecedencia_troca_pneu", nullable = false)
-    private int kmAntecedenciaTrocaPneu = 500;
+    /** Km de folga antes do km previsto de QUALQUER plano de manutenção preventiva rastreado por km pra avisar. */
+    @Column(name = "km_antecedencia_manutencao_preventiva", nullable = false)
+    private int kmAntecedenciaManutencaoPreventiva = 500;
 
     /** Dias que uma manutenção pode ficar agendada/em andamento sem concluir antes de avisar. */
     @Column(name = "dias_manutencao_estagnada", nullable = false)

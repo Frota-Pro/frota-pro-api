@@ -10,6 +10,8 @@ import br.com.frotasPro.api.excption.BusinessException;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.PlanoManutencaoPreventivaRepository;
+import br.com.frotasPro.api.service.parametrosistema.ParametroSistemaService;
+import br.com.frotasPro.api.util.FusoHorarioUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +27,8 @@ public class PlanoManutencaoPreventivaService {
 
     private final PlanoManutencaoPreventivaRepository repository;
     private final CaminhaoRepository caminhaoRepository;
+    private final ParametroSistemaService parametroSistemaService;
+    private final PlanoManutencaoPreventivaStatusService statusService;
 
     @Transactional
     public PlanoManutencaoPreventivaResponse criar(PlanoManutencaoPreventivaRequest request) {
@@ -52,12 +56,22 @@ public class PlanoManutencaoPreventivaService {
         PlanoManutencaoPreventiva plano = buscarEntidade(id);
         Caminhao caminhao = buscarCaminhao(request.getCaminhao());
 
+        // Muda o intervalo (ou o caminhão) muda quando o plano vence — se já
+        // tinha disparado o alerta pro intervalo antigo, reabre a janela em
+        // vez de deixar o plano "calado" até a próxima manutenção concluída.
+        boolean mudouCriterioDeVencimento = !java.util.Objects.equals(plano.getIntervaloKm(), request.getIntervaloKm())
+                || !java.util.Objects.equals(plano.getIntervaloDias(), request.getIntervaloDias())
+                || !java.util.Objects.equals(plano.getCaminhao().getId(), caminhao.getId());
+
         plano.setCaminhao(caminhao);
         plano.setDescricao(request.getDescricao().trim());
         plano.setIntervaloKm(request.getIntervaloKm());
         plano.setIntervaloDias(request.getIntervaloDias());
         if (request.getAtivo() != null) {
             plano.setAtivo(request.getAtivo());
+        }
+        if (mudouCriterioDeVencimento) {
+            plano.setNotificadoVencimentoEm(null);
         }
 
         return toResponse(repository.save(plano));
@@ -118,6 +132,10 @@ public class PlanoManutencaoPreventivaService {
                 ? plano.getUltimaDataExecutada().plusDays(plano.getIntervaloDias())
                 : null;
 
+        PlanoManutencaoPreventivaStatusService.Situacao situacao = statusService.calcularSituacao(
+                plano, FusoHorarioUtils.hojeBrasil(), parametroSistemaService.buscarOuPadrao()
+        );
+
         return PlanoManutencaoPreventivaResponse.builder()
                 .id(plano.getId())
                 .codigoCaminhao(caminhao != null ? caminhao.getCodigo() : null)
@@ -131,6 +149,7 @@ public class PlanoManutencaoPreventivaService {
                 .odometroAtualCaminhao(odometroAtual)
                 .proximoKm(proximoKm)
                 .proximaData(proximaData)
+                .situacao(situacao.name())
                 .build();
     }
 }
