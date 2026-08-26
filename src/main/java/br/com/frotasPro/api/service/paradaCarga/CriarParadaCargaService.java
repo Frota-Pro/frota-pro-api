@@ -19,6 +19,7 @@ import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.EixoRepository;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;
 import br.com.frotasPro.api.repository.PneuRepository;
+import br.com.frotasPro.api.service.abastecimento.DetectarAnomaliaAbastecimentoService;
 import br.com.frotasPro.api.service.abastecimento.ResolverPostoAbastecimentoService;
 import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
@@ -50,6 +51,7 @@ public class CriarParadaCargaService {
     private final NotificacaoService notificacaoService;
     private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
     private final ResolverPostoAbastecimentoService resolverPostoAbastecimentoService;
+    private final DetectarAnomaliaAbastecimentoService detectarAnomaliaAbastecimentoService;
 
     @Transactional
     public ParadaCargaResponse criar(ParadaCargaRequest request) {
@@ -128,6 +130,8 @@ public class CriarParadaCargaService {
             );
 
             abastecimento.setMediaKmLitro(media != null ? media : abReq.getMediaKmLitro());
+
+            detectarAnomaliaAbastecimentoService.avaliar(abastecimento);
 
             parada.getAbastecimentos().add(abastecimento);
 

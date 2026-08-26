@@ -88,4 +88,16 @@ public class Abastecimento extends AuditoriaBase{
 
     @Column(name = "media_km_litro", precision = 10, scale = 3)
     private BigDecimal mediaKmLitro;
+
+    // Detecção de anomalia de preço (possível fraude de cartão combustível) —
+    // ver DetectarAnomaliaAbastecimentoService. Calculado uma vez na criação/
+    // edição, igual mediaKmLitro acima.
+    @Column(name = "preco_anomalo", nullable = false)
+    private boolean precoAnomalo;
+
+    @Column(name = "preco_medio_referencia", precision = 10, scale = 3)
+    private BigDecimal precoMedioReferencia;
+
+    @Column(name = "preco_anomalo_percentual", precision = 6, scale = 1)
+    private BigDecimal precoAnomaloPercentual;
 }

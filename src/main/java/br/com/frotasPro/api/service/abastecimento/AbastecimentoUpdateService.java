@@ -32,6 +32,7 @@ public class AbastecimentoUpdateService {
     private final CalcularMediaKmLitroService calcularMediaKmLitroService;
     private final NotificacaoService notificacaoService;
     private final ResolverPostoAbastecimentoService resolverPostoAbastecimentoService;
+    private final DetectarAnomaliaAbastecimentoService detectarAnomaliaAbastecimentoService;
 
     public AbastecimentoResponse atualizar(String codigo, AbastecimentoRequest request) {
 
@@ -79,6 +80,8 @@ public class AbastecimentoUpdateService {
                 request.getQtLitros()
         );
         abastecimento.setMediaKmLitro(media != null ? media : request.getMediaKmLitro());
+
+        detectarAnomaliaAbastecimentoService.avaliar(abastecimento);
 
         abastecimento = repository.save(abastecimento);
         // A meta de consumo (km/l) é recalculada na finalização da carga, não

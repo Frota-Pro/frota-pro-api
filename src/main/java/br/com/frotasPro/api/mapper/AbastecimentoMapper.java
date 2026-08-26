@@ -61,6 +61,10 @@ public class AbastecimentoMapper {
                 .cidade(a.getCidade())
                 .uf(a.getUf())
                 .numNotaOuCupom(a.getNumNotaOuCupom())
+
+                .precoAnomalo(a.isPrecoAnomalo())
+                .precoMedioReferencia(a.getPrecoMedioReferencia())
+                .precoAnomaloPercentual(a.getPrecoAnomaloPercentual())
                 .build();
     }
 }

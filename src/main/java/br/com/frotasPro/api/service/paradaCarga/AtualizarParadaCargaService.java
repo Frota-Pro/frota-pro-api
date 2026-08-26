@@ -18,6 +18,7 @@ import br.com.frotasPro.api.excption.BusinessException;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.ParadaCargaRepository;
+import br.com.frotasPro.api.service.abastecimento.DetectarAnomaliaAbastecimentoService;
 import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import br.com.frotasPro.api.util.CalcularMediaKmLitroService;
@@ -40,6 +41,7 @@ public class AtualizarParadaCargaService {
     private final CalcularMediaKmLitroService calcularMediaKmLitroService;
     private final NotificacaoService notificacaoService;
     private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
+    private final DetectarAnomaliaAbastecimentoService detectarAnomaliaAbastecimentoService;
 
     @Transactional
     public ParadaCargaResponse atualizar(UUID id, ParadaCargaRequest request) {
@@ -126,6 +128,8 @@ public class AtualizarParadaCargaService {
                     abReq.getQtLitros()
             );
             abastecimento.setMediaKmLitro(media != null ? media : abReq.getMediaKmLitro());
+
+            detectarAnomaliaAbastecimentoService.avaliar(abastecimento);
 
             parada.getAbastecimentos().add(abastecimento);
 
