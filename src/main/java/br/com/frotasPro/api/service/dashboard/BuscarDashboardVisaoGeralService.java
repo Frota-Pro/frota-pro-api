@@ -62,7 +62,7 @@ public class BuscarDashboardVisaoGeralService {
                 .consumoMedioKmLMes(consumoMedioKmLMes(hoje))
                 .manutencoes(manutencoes(hoje))
                 .multas(multas(hoje))
-                .cargasPorStatus(cargasPorStatus())
+                .cargasPorStatus(cargasPorStatus(hoje))
                 .build();
     }
 
@@ -134,19 +134,23 @@ public class BuscarDashboardVisaoGeralService {
                 .build();
     }
 
-    private List<DashboardVisaoGeralResponse.CargaStatusResumo> cargasPorStatus() {
+    /** Cargas CRIADAS no mês corrente, agrupadas pelo status atual — não o histórico todo da empresa. */
+    private List<DashboardVisaoGeralResponse.CargaStatusResumo> cargasPorStatus(LocalDate hoje) {
+        LocalDateTime inicioMes = hoje.withDayOfMonth(1).atStartOfDay();
+        LocalDateTime fim = FusoHorarioUtils.agoraBrasil();
+
         return List.of(
-                cargaStatusResumo(Status.EM_ROTA, "Em rota"),
-                cargaStatusResumo(Status.SINCRONIZADA, "Sincronizada"),
-                cargaStatusResumo(Status.FINALIZADA, "Finalizada")
+                cargaStatusResumo(Status.EM_ROTA, "Em rota", inicioMes, fim),
+                cargaStatusResumo(Status.SINCRONIZADA, "Sincronizada", inicioMes, fim),
+                cargaStatusResumo(Status.FINALIZADA, "Finalizada", inicioMes, fim)
         );
     }
 
-    private DashboardVisaoGeralResponse.CargaStatusResumo cargaStatusResumo(Status status, String label) {
+    private DashboardVisaoGeralResponse.CargaStatusResumo cargaStatusResumo(Status status, String label, LocalDateTime inicioMes, LocalDateTime fim) {
         return DashboardVisaoGeralResponse.CargaStatusResumo.builder()
                 .status(status.name())
                 .statusLabel(label)
-                .total(cargaRepository.countByStatusCarga(status))
+                .total(cargaRepository.countByStatusCargaAndCriadoEmBetween(status, inicioMes, fim))
                 .build();
     }
 
