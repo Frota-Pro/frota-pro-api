@@ -35,6 +35,22 @@ public class RelatorioMetaMensalMotoristaService {
     private final MotoristaRepository motoristaRepository;
     private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
+    /**
+     * Códigos dos motoristas ativos, na mesma ordem que a tela de Motoristas usa
+     * (nome) — usado pelo controller pra gerar o relatório de cada um EM PARALELO
+     * (ver RelatorioPdfController.metaMensalTodosMotoristasPdf). Não dá pra
+     * paralelizar chamando gerar() daqui de dentro (auto-invocação: o
+     * @Transactional de gerar() não pega quando é a própria classe chamando),
+     * por isso o controller busca essa lista e chama gerar() ele mesmo, através
+     * do bean gerenciado pelo Spring.
+     */
+    @Transactional(readOnly = true)
+    public List<String> listarCodigosMotoristasAtivos() {
+        return motoristaRepository.findByAtivoTrueOrderByNomeAsc().stream()
+                .map(Motorista::getCodigo)
+                .toList();
+    }
+
     @Transactional(readOnly = true)
     public RelatorioMetaMensalMotoristaResponse gerar(
             String codigoMotorista,
