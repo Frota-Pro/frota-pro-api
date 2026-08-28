@@ -16,6 +16,9 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @RestController
 @RequestMapping("/relatorios/pdf")
@@ -38,6 +41,16 @@ public class RelatorioPdfController {
     private final RelatorioCargasSumidasWinThorService cargasSumidasWinThorService;
 
     private static final String LOGO_CLASSPATH = "reports/logo.png";
+
+    /**
+     * Gerar o relatório de cada motorista é ~1,5s (consultas de cargas/
+     * abastecimento + montagem do PDF) — sequencial, "todos os motoristas"
+     * demorava uns 25s pra 17 motoristas e só ia piorar conforme a frota
+     * cresce. Roda em paralelo, mas com um limite (4) pra não estourar o pool
+     * de conexão do banco (padrão de 10) se um dia isso rodar junto com outro
+     * relatório pesado.
+     */
+    private static final ExecutorService RELATORIO_EXECUTOR = Executors.newFixedThreadPool(4);
 
     private void aplicarLogo(Map<String, Object> p) {
         // JRXML usa $P{logoPath}
@@ -78,15 +91,23 @@ public class RelatorioPdfController {
             @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
             @RequestParam("fim")    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim
     ) {
-        List<RelatorioMetaMensalMotoristaResponse> relatorios = relatorioService.gerarTodos(inicio, fim);
+        List<String> codigos = relatorioService.listarCodigosMotoristasAtivos();
 
-        List<JasperPrint> prints = relatorios.stream()
-                .map(rel -> jasperPdfService.preencherRelatorio(
-                        "reports/meta_mensal_motorista.jasper",
-                        parametrosMetaMensal(rel),
-                        rel.getLinhas()
-                ))
+        // Cada gerar()/preencherRelatorio() é independente (só leitura, motorista
+        // por motorista) — dá pra rodar em paralelo com segurança. .join() mantém
+        // a ordem alfabética original mesmo terminando em ordens diferentes.
+        List<CompletableFuture<JasperPrint>> tarefas = codigos.stream()
+                .map(codigo -> CompletableFuture.supplyAsync(() -> {
+                    RelatorioMetaMensalMotoristaResponse rel = relatorioService.gerar(codigo, inicio, fim);
+                    return jasperPdfService.preencherRelatorio(
+                            "reports/meta_mensal_motorista.jasper",
+                            parametrosMetaMensal(rel),
+                            rel.getLinhas()
+                    );
+                }, RELATORIO_EXECUTOR))
                 .toList();
+
+        List<JasperPrint> prints = tarefas.stream().map(CompletableFuture::join).toList();
 
         byte[] pdf = jasperPdfService.gerarPdfConsolidado(prints);
 
