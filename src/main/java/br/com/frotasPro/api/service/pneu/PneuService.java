@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
@@ -184,6 +185,57 @@ public class PneuService {
                 .kmInstalacao(kmInst)
                 .dataInstalacao(dataInst)
                 .build();
+    }
+
+    /**
+     * Resumo pro Dashboard: quantos pneus EM_USO estão vencidos (100% da meta
+     * de km rodada), perto do fim (>=85%) e OK. Mesma conta de percentual de
+     * vida que {@link #vidaUtil(String)}, só que pra frota toda de uma vez —
+     * não devolve o detalhe de cada pneu, só as contagens.
+     */
+    @Transactional(readOnly = true)
+    public long[] contarAlertasVidaUtil() {
+        List<Pneu> pneusEmUso = pneuRepository.findByStatus(StatusPneu.EM_USO, Pageable.unpaged()).getContent();
+
+        long vencidos = 0;
+        long proximoFim = 0;
+        long ok = 0;
+
+        for (Pneu p : pneusEmUso) {
+            BigDecimal percentual = calcularPercentualVida(p);
+            if (percentual.compareTo(BigDecimal.ONE) >= 0) {
+                vencidos++;
+            } else if (percentual.compareTo(new BigDecimal("0.85")) >= 0) {
+                proximoFim++;
+            } else {
+                ok++;
+            }
+        }
+
+        return new long[]{vencidos, proximoFim, ok};
+    }
+
+    private BigDecimal calcularPercentualVida(Pneu p) {
+        var instOpt = instalacaoRepository.findByPneu_Codigo(p.getCodigo());
+        if (instOpt.isEmpty()) return BigDecimal.ZERO;
+
+        var inst = instOpt.get();
+        BigDecimal kmInstalacaoSeguro = inst.getKmInstalacao() != null ? inst.getKmInstalacao() : BigDecimal.ZERO;
+
+        BigDecimal kmAtual = ultimoKmEventoDoPneu(p.getCodigo())
+                .or(() -> caminhaoRepository.findById(inst.getCaminhaoId())
+                        .map(Caminhao::getOdometroUltimaCarga)
+                        .filter(km -> km != null)
+                        .map(BigDecimal::valueOf))
+                .orElse(kmInstalacaoSeguro);
+
+        BigDecimal kmRodadoAtual = kmAtual.subtract(kmInstalacaoSeguro);
+        if (kmRodadoAtual.compareTo(BigDecimal.ZERO) < 0) kmRodadoAtual = BigDecimal.ZERO;
+
+        if (p.getKmMetaAtual() == null || p.getKmMetaAtual().compareTo(BigDecimal.ZERO) <= 0) return BigDecimal.ZERO;
+
+        BigDecimal percentual = kmRodadoAtual.divide(p.getKmMetaAtual(), 6, RoundingMode.HALF_UP);
+        return percentual.compareTo(BigDecimal.ONE) > 0 ? BigDecimal.ONE : percentual;
     }
 
     private Optional<BigDecimal> ultimoKmEventoDoPneu(String codigo) {

@@ -199,4 +199,23 @@ public interface ManutencaoRepository extends JpaRepository<Manutencao, UUID> {
             @Param("statusEmAberto") List<StatusManutencao> statusEmAberto,
             @Param("limite") LocalDate limite
     );
+
+    /** Pro resumo do Dashboard — conta mesmo as já notificadas. */
+    @Query("""
+        select count(m)
+        from Manutencao m
+        where m.statusManutencao in :statusEmAberto
+          and m.dataInicioManutencao <= :limite
+    """)
+    long countEstagnadas(
+            @Param("statusEmAberto") List<StatusManutencao> statusEmAberto,
+            @Param("limite") LocalDate limite
+    );
+
+    @Query("""
+        select count(distinct m.caminhao.id)
+        from Manutencao m
+        where m.statusManutencao in :statusEmAberto
+    """)
+    long countCaminhoesDistintosComManutencaoEmAberto(@Param("statusEmAberto") List<StatusManutencao> statusEmAberto);
 }

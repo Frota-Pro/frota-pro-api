@@ -1,6 +1,7 @@
 package br.com.frotasPro.api.repository;
 
 import br.com.frotasPro.api.domain.Caminhao;
+import br.com.frotasPro.api.domain.enums.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -54,4 +55,8 @@ public interface CaminhaoRepository extends JpaRepository<Caminhao, UUID> {
     List<Caminhao> findByCategoriaIdAndAtivoTrue(UUID categoriaId);
 
     Optional<Caminhao> findByMotoristaTitularId(UUID motoristaTitularId);
+
+    long countByStatusAndAtivoTrue(Status status);
+
+    long countByAtivoTrue();
 }

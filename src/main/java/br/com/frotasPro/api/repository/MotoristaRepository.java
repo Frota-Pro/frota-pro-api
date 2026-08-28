@@ -25,6 +25,16 @@ public interface MotoristaRepository extends JpaRepository<Motorista, UUID> {
     """)
     List<Motorista> buscarComCnhVencendoNaoNotificada(@Param("hoje") LocalDate hoje, @Param("limite") LocalDate limite);
 
+    /** Pro resumo do Dashboard — conta mesmo as já notificadas, ao contrário da query acima (que é só pra disparar aviso uma vez). */
+    @Query("""
+        select count(m)
+        from Motorista m
+        where m.ativo = true
+          and m.validadeCnh is not null
+          and m.validadeCnh <= :limite
+    """)
+    long countCnhVencendoOuVencida(@Param("limite") LocalDate limite);
+
     Page<Motorista> findByAtivoTrue(Pageable pageable);
 
     List<Motorista> findByAtivoTrueOrderByNomeAsc();

@@ -45,4 +45,15 @@ public interface MultaRepository extends JpaRepository<Multa, UUID> {
           )
     """)
     List<Multa> buscarComPrazoProximoNaoNotificado(@Param("hoje") LocalDate hoje, @Param("limite") LocalDate limite);
+
+    long countByStatusPagamento(StatusPagamentoMulta status);
+
+    @Query("select coalesce(sum(m.valor), 0) from Multa m where m.statusPagamento = :status")
+    java.math.BigDecimal sumValorByStatusPagamento(@Param("status") StatusPagamentoMulta status);
+
+    @Query("select min(m.dataVencimentoPagamento) from Multa m where m.statusPagamento = :status and m.dataVencimentoPagamento >= :hoje")
+    LocalDate minVencimentoPagamento(@Param("status") StatusPagamentoMulta status, @Param("hoje") LocalDate hoje);
+
+    @Query("select min(m.dataLimiteRecurso) from Multa m where m.statusPagamento = :status and m.dataLimiteRecurso >= :hoje")
+    LocalDate minLimiteRecurso(@Param("status") StatusPagamentoMulta status, @Param("hoje") LocalDate hoje);
 }

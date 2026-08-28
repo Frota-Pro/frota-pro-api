@@ -24,4 +24,13 @@ public interface DocumentoCaminhaoRepository extends JpaRepository<DocumentoCami
           and d.dataValidade <= :limite
     """)
     List<DocumentoCaminhao> buscarComVencimentoProximoNaoNotificado(@Param("hoje") LocalDate hoje, @Param("limite") LocalDate limite);
+
+    /** Pro resumo do Dashboard — conta mesmo os já notificados. */
+    @Query("""
+        select count(d)
+        from DocumentoCaminhao d
+        where d.dataValidade is not null
+          and d.dataValidade <= :limite
+    """)
+    long countVencendoOuVencido(@Param("limite") LocalDate limite);
 }
