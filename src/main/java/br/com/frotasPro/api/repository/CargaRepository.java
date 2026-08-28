@@ -219,6 +219,9 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
 
     long countByStatusCargaAndDtChegada(Status statusCarga, LocalDate dtChegada);
 
+    /** Pro card "Cargas por status" do Dashboard — cargas criadas no mês, não o histórico todo. */
+    long countByStatusCargaAndCriadoEmBetween(Status statusCarga, LocalDateTime inicio, LocalDateTime fim);
+
     List<Carga> findTop5ByOrderByCriadoEmDesc();
 
     List<Carga> findByTransferenciaPendenteTrueAndNumeroCargaExternoIsNotNull();
