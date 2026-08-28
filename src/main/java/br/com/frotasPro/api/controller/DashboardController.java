@@ -2,9 +2,11 @@ package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.response.DashboardResumoResponse;
 import br.com.frotasPro.api.controller.response.DashboardMetasResponse;
+import br.com.frotasPro.api.controller.response.DashboardVisaoGeralResponse;
 import br.com.frotasPro.api.controller.response.SaudeSistemaResponse;
 import br.com.frotasPro.api.service.dashboard.BuscarDashboardMetasService;
 import br.com.frotasPro.api.service.dashboard.BuscarDashboardResumoService;
+import br.com.frotasPro.api.service.dashboard.BuscarDashboardVisaoGeralService;
 import br.com.frotasPro.api.service.dashboard.BuscarSaudeSistemaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -24,12 +26,19 @@ public class DashboardController {
 
     private final BuscarDashboardResumoService buscarDashboardResumoService;
     private final BuscarDashboardMetasService buscarDashboardMetasService;
+    private final BuscarDashboardVisaoGeralService buscarDashboardVisaoGeralService;
     private final BuscarSaudeSistemaService buscarSaudeSistemaService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/resumo")
     public ResponseEntity<DashboardResumoResponse> resumo() {
         return ResponseEntity.ok(buscarDashboardResumoService.executar());
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @GetMapping("/visao-geral")
+    public ResponseEntity<DashboardVisaoGeralResponse> visaoGeral() {
+        return ResponseEntity.ok(buscarDashboardVisaoGeralService.executar());
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
