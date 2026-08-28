@@ -4,6 +4,7 @@ import br.com.frotasPro.api.controller.response.*;
 import br.com.frotasPro.api.domain.enums.TipoMeta;
 import br.com.frotasPro.api.service.relatorios.*;
 import lombok.RequiredArgsConstructor;
+import net.sf.jasperreports.engine.JasperPrint;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -52,6 +54,50 @@ public class RelatorioPdfController {
     ) {
         RelatorioMetaMensalMotoristaResponse rel = relatorioService.gerar(codigoMotorista, inicio, fim);
 
+        byte[] pdf = jasperPdfService.gerarPdfFromJasper(
+                "reports/meta_mensal_motorista.jasper",
+                parametrosMetaMensal(rel),
+                rel.getLinhas()
+        );
+
+        String filename = "meta-mensal-motorista-" + codigoMotorista + ".pdf";
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
+                .body(pdf);
+    }
+
+    /**
+     * Mesmo relatório de cima, só que pra todo mundo de uma vez — um motorista
+     * ativo por página, na ordem alfabética, num PDF só, pra não precisar mais
+     * gerar e imprimir motorista por motorista.
+     */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @GetMapping("/motorista/meta-mensal/todos")
+    public ResponseEntity<byte[]> metaMensalTodosMotoristasPdf(
+            @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam("fim")    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim
+    ) {
+        List<RelatorioMetaMensalMotoristaResponse> relatorios = relatorioService.gerarTodos(inicio, fim);
+
+        List<JasperPrint> prints = relatorios.stream()
+                .map(rel -> jasperPdfService.preencherRelatorio(
+                        "reports/meta_mensal_motorista.jasper",
+                        parametrosMetaMensal(rel),
+                        rel.getLinhas()
+                ))
+                .toList();
+
+        byte[] pdf = jasperPdfService.gerarPdfConsolidado(prints);
+
+        String filename = "meta-mensal-motoristas-" + inicio + "-a-" + fim + ".pdf";
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
+                .body(pdf);
+    }
+
+    private Map<String, Object> parametrosMetaMensal(RelatorioMetaMensalMotoristaResponse rel) {
         Map<String, Object> p = new HashMap<>();
         p.put("nomeMotorista", rel.getNomeMotorista());
         p.put("codigoMotorista", rel.getCodigoMotorista());
@@ -71,18 +117,7 @@ public class RelatorioPdfController {
 
         // Logo (opcional). Se não for usar, remova do JRXML e daqui também.
         aplicarLogo(p);
-
-        byte[] pdf = jasperPdfService.gerarPdfFromJasper(
-                "reports/meta_mensal_motorista.jasper",
-                p,
-                rel.getLinhas()
-        );
-
-        String filename = "meta-mensal-motorista-" + codigoMotorista + ".pdf";
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_PDF)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
-                .body(pdf);
+        return p;
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")

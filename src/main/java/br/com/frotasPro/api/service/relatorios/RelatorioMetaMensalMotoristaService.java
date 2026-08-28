@@ -35,6 +35,14 @@ public class RelatorioMetaMensalMotoristaService {
     private final MotoristaRepository motoristaRepository;
     private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
 
+    /** Um relatório por motorista ativo, na mesma ordem que a tela de Motoristas usa (nome) — pra imprimir tudo de uma vez, um por página. */
+    @Transactional(readOnly = true)
+    public List<RelatorioMetaMensalMotoristaResponse> gerarTodos(LocalDate inicio, LocalDate fim) {
+        return motoristaRepository.findByAtivoTrueOrderByNomeAsc().stream()
+                .map(m -> gerar(m.getCodigo(), inicio, fim))
+                .toList();
+    }
+
     @Transactional(readOnly = true)
     public RelatorioMetaMensalMotoristaResponse gerar(
             String codigoMotorista,
