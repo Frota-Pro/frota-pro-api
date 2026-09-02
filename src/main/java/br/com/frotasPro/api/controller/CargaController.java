@@ -7,6 +7,7 @@ import br.com.frotasPro.api.controller.request.TransferirMotoristaCargaRequest;
 import br.com.frotasPro.api.controller.request.TransferirNotasCargaRequest;
 import br.com.frotasPro.api.controller.response.CargaMinResponse;
 import br.com.frotasPro.api.controller.response.CargaResponse;
+import br.com.frotasPro.api.controller.response.ImportarNotaFiscalResponse;
 import br.com.frotasPro.api.controller.response.RelatorioCargasSumidasWinThorResponse;
 import br.com.frotasPro.api.controller.response.TransferirNotasCargaResponse;
 import br.com.frotasPro.api.service.carga.*;
@@ -331,11 +332,11 @@ public class CargaController {
             @CacheEvict(value = "carga_buscar_codigo_externo", allEntries = true),
             @CacheEvict(value = "carga_listar", allEntries = true)
     })
-    public ResponseEntity<CargaResponse> importarNotasFiscaisXml(
+    public ResponseEntity<ImportarNotaFiscalResponse> importarNotasFiscaisXml(
             @PathVariable String numeroCarga,
             @RequestPart("arquivos") List<MultipartFile> arquivos
     ) {
-        CargaResponse response = importarNotaFiscalCargaService.importar(numeroCarga, arquivos);
+        ImportarNotaFiscalResponse response = importarNotaFiscalCargaService.importar(numeroCarga, arquivos);
         return ResponseEntity.ok(response);
     }
 

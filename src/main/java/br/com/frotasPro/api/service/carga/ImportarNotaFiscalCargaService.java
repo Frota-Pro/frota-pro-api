@@ -1,6 +1,7 @@
 package br.com.frotasPro.api.service.carga;
 
 import br.com.frotasPro.api.controller.response.CargaResponse;
+import br.com.frotasPro.api.controller.response.ImportarNotaFiscalResponse;
 import br.com.frotasPro.api.domain.Arquivo;
 import br.com.frotasPro.api.domain.Carga;
 import br.com.frotasPro.api.domain.CargaNota;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -45,7 +47,7 @@ public class ImportarNotaFiscalCargaService {
             @CacheEvict(value = "carga_buscar_codigo_externo", allEntries = true),
             @CacheEvict(value = "carga_listar", allEntries = true)
     })
-    public CargaResponse importar(String numeroCarga, List<MultipartFile> arquivosXml) {
+    public ImportarNotaFiscalResponse importar(String numeroCarga, List<MultipartFile> arquivosXml) {
         if (arquivosXml == null || arquivosXml.isEmpty()) {
             throw new BusinessException("Nenhum arquivo XML enviado.");
         }
@@ -57,8 +59,17 @@ public class ImportarNotaFiscalCargaService {
         // importação inteira falha (nada fica aplicado pela metade).
         List<NotaFiscalXmlDto> notasLidas = arquivosXml.stream().map(parser::parse).toList();
 
+        List<String> notasJaExistentes = new ArrayList<>();
+        int notasNovas = 0;
+
         for (int i = 0; i < arquivosXml.size(); i++) {
-            aplicarNota(carga, notasLidas.get(i), arquivosXml.get(i));
+            boolean isNova = aplicarNota(carga, notasLidas.get(i), arquivosXml.get(i));
+            if (isNova) {
+                notasNovas++;
+            } else {
+                NotaFiscalXmlDto dto = notasLidas.get(i);
+                notasJaExistentes.add(dto.nomeCliente() + " — nota " + dto.numeroNota());
+            }
         }
 
         ordemEntregaCidadeService.aplicar(carga);
@@ -66,12 +77,23 @@ public class ImportarNotaFiscalCargaService {
         Carga salvo = cargaRepository.save(carga);
 
         boolean integracaoAtiva = integracaoWinThorConfigService.isCargaIntegracaoAtiva();
-        CargaResponse response = CargaMapper.toResponse(salvo);
-        CargaMapper.aplicarNumeroExibicao(response, salvo, integracaoAtiva);
-        return response;
+        CargaResponse cargaResponse = CargaMapper.toResponse(salvo);
+        CargaMapper.aplicarNumeroExibicao(cargaResponse, salvo, integracaoAtiva);
+
+        if (!notasJaExistentes.isEmpty()) {
+            log.info("Importação de notas na carga {}: {} nova(s), {} já existente(s) ({}).",
+                    numeroCarga, notasNovas, notasJaExistentes.size(), notasJaExistentes);
+        }
+
+        return ImportarNotaFiscalResponse.builder()
+                .carga(cargaResponse)
+                .notasNovas(notasNovas)
+                .notasJaExistentes(notasJaExistentes)
+                .build();
     }
 
-    private void aplicarNota(Carga carga, NotaFiscalXmlDto dto, MultipartFile arquivoXml) {
+    /** @return true se a nota era nova (peso/valor somados na carga); false se já existia (só o arquivo pode ter sido vinculado). */
+    private boolean aplicarNota(Carga carga, NotaFiscalXmlDto dto, MultipartFile arquivoXml) {
         String cliente = dto.nomeCliente();
         String nota = dto.numeroNota();
 
@@ -83,9 +105,9 @@ public class ImportarNotaFiscalCargaService {
         Arquivo arquivo = salvarArquivoService.salvar(arquivoXml, "CARGA_" + carga.getNumeroCarga(), "NOTA_FISCAL_XML");
 
         if (existente != null) {
-            // Nota já cadastrada (reenvio do mesmo XML, ou já veio de outra
-            // fonte) — só garante o vínculo com o arquivo, sem somar peso/
-            // valor de novo na carga.
+            // Nota já cadastrada (reenvio do mesmo XML, duplicata dentro do
+            // mesmo upload, ou já veio de outra fonte) — só garante o
+            // vínculo com o arquivo, sem somar peso/valor de novo na carga.
             if (existente.getArquivo() == null) {
                 existente.setArquivo(arquivo);
             }
@@ -94,7 +116,7 @@ public class ImportarNotaFiscalCargaService {
             }
             log.info("Nota {} do cliente {} já existia na carga {} — só vinculando o XML.",
                     nota, cliente, carga.getNumeroCarga());
-            return;
+            return false;
         }
 
         CargaNota cargaNota = new CargaNota();
@@ -115,5 +137,6 @@ public class ImportarNotaFiscalCargaService {
         }
 
         log.info("Nota {} do cliente {} importada via XML pra carga {}.", nota, cliente, carga.getNumeroCarga());
+        return true;
     }
 }
