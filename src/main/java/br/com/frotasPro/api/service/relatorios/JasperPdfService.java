@@ -1,6 +1,9 @@
 package br.com.frotasPro.api.service.relatorios;
 
 import lombok.RequiredArgsConstructor;
+import net.sf.jasperreports.engine.JRPrintElement;
+import net.sf.jasperreports.engine.JRPrintPage;
+import net.sf.jasperreports.engine.JRPrintText;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -20,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +33,7 @@ public class JasperPdfService {
                                      Map<String, Object> params,
                                      List<?> linhas) {
         JasperPrint print = preencherRelatorio(jasperClasspath, params, linhas);
+        renumerarPaginas(List.of(print));
         try {
             return JasperExportManager.exportReportToPdf(print);
         } catch (Exception e) {
@@ -62,6 +67,8 @@ public class JasperPdfService {
      */
     public byte[] gerarPdfConsolidado(List<JasperPrint> relatorios) {
         try {
+            renumerarPaginas(relatorios);
+
             List<ExporterInputItem> itens = new ArrayList<>();
             for (JasperPrint relatorio : relatorios) {
                 itens.add(new SimpleExporterInputItem(relatorio));
@@ -77,6 +84,35 @@ public class JasperPdfService {
             return out.toByteArray();
         } catch (Exception e) {
             throw new RuntimeException("Erro ao consolidar PDFs Jasper", e);
+        }
+    }
+
+    /** UUID do campo "Página X de Y" no rodapé de meta_mensal_motorista.jrxml. */
+    private static final UUID UUID_RODAPE_PAGINA = UUID.fromString("00000000-0000-0000-0000-00000000021f");
+
+    /**
+     * Cada relatório é preenchido separadamente (um por motorista), então a
+     * variável interna PAGE_NUMBER/PAGE_COUNT do Jasper vale só pra aquele
+     * relatório sozinho — todo mundo mostra "Página 1 de 1" no rodapé, em
+     * vez da posição real dentro do PDF consolidado. Renumera na marra,
+     * sobrescrevendo o texto já renderizado do campo de rodapé (achado pelo
+     * uuid dele no .jrxml) com a página global e o total real de páginas.
+     */
+    private void renumerarPaginas(List<JasperPrint> relatorios) {
+        int totalPaginas = relatorios.stream().mapToInt(r -> r.getPages().size()).sum();
+        int paginaAtual = 0;
+
+        for (JasperPrint relatorio : relatorios) {
+            for (JRPrintPage pagina : relatorio.getPages()) {
+                paginaAtual++;
+
+                for (JRPrintElement elemento : pagina.getElements()) {
+                    if (elemento instanceof JRPrintText texto
+                            && UUID_RODAPE_PAGINA.equals(elemento.getUUID())) {
+                        texto.setText("Página " + paginaAtual + " de " + totalPaginas);
+                    }
+                }
+            }
         }
     }
 }
