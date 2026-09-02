@@ -54,6 +54,13 @@ public class CargaResponse {
 
     private List<ClienteCargaResponse> clientes;
 
+    /**
+     * Notas desta carga que têm o XML da NFe anexado (cadastradas na mão via
+     * upload — ver ImportarNotaFiscalCargaService). Vazia pra cargas
+     * totalmente sincronizadas do WinThor, que não têm arquivo por nota.
+     */
+    private List<NotaFiscalArquivoResponse> notasComArquivo;
+
     private Status statusCarga;
     private boolean transferenciaPendente;
     private StatusTransferenciaCarga statusTransferencia;
