@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -34,6 +35,16 @@ public class IntegracaoWinThorConfig {
 
     @Column(name = "intervalo_min")
     private Integer intervaloMin;
+
+    /**
+     * Além da sincronização automática normal (só o dia de hoje, a cada
+     * intervaloMin), roda uma vez por dia nesse horário um reforço cobrindo
+     * do dia 1 do mês até hoje — pega devolução/transferência lançada no
+     * WinThor depois que a carga já tinha sido sincronizada em dias
+     * anteriores do mês (ver CargaScheduled.reforcoMensalAutomatico).
+     */
+    @Column(name = "horario_reforco_mensal", nullable = false)
+    private LocalTime horarioReforcoMensal = LocalTime.of(20, 0);
 
     @Column(name = "sync_caminhoes", nullable = false)
     private boolean syncCaminhoes = true;

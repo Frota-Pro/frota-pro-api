@@ -55,6 +55,7 @@ public class IntegracaoWinThorConfigService {
 
         if (req.ativo() != null) cfg.setAtivo(req.ativo());
         if (req.intervaloMin() != null) cfg.setIntervaloMin(req.intervaloMin());
+        if (req.horarioReforcoMensal() != null) cfg.setHorarioReforcoMensal(req.horarioReforcoMensal());
         if (req.syncCaminhoes() != null) cfg.setSyncCaminhoes(req.syncCaminhoes());
         if (req.syncMotoristas() != null) cfg.setSyncMotoristas(req.syncMotoristas());
         if (req.syncCargas() != null) cfg.setSyncCargas(req.syncCargas());
@@ -76,6 +77,7 @@ public class IntegracaoWinThorConfigService {
                 .empresaId(cfg.getEmpresaId())
                 .ativo(cfg.isAtivo())
                 .intervaloMin(cfg.getIntervaloMin())
+                .horarioReforcoMensal(cfg.getHorarioReforcoMensal())
                 .syncCaminhoes(cfg.isSyncCaminhoes())
                 .syncMotoristas(cfg.isSyncMotoristas())
                 .syncCargas(cfg.isSyncCargas())
