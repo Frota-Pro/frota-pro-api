@@ -5,6 +5,7 @@ import br.com.frotasPro.api.integracao.dto.NotaFiscalXmlDto;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
@@ -16,13 +17,14 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.math.BigDecimal;
 
 /**
  * Lê o XML de uma NFe (modelo 55) já emitida em outro sistema — não emite,
  * não assina, não fala com a SEFAZ, só extrai os dados que hoje vêm prontos
- * do WinThor (cliente, cidade, número da nota, peso, valor) pra permitir
- * cadastrar essas informações numa carga criada na mão, sem a integração.
+ * do WinThor (cliente, cidade, número da nota, peso, valor) mais o que
+ * precisa pro cadastro de Cliente (documento, endereço completo).
  * <p>
  * Usa local-name() no XPath em vez de prefixo de namespace, porque o XML
  * pode vir como {@code <NFe>} solto ou embrulhado em {@code <nfeProc>}
@@ -43,21 +45,35 @@ public class NotaFiscalXmlParser {
             throw new BusinessException("Arquivo \"" + nomeArquivo + "\" não é um XML de NFe.");
         }
 
-        Document documento;
         try (InputStream in = arquivoXml.getInputStream()) {
-            documento = criarDocumentBuilder().parse(in);
+            return parse(criarDocumentBuilder().parse(in), nomeArquivo);
         } catch (SAXException e) {
             throw new BusinessException(
                     "Não foi possível ler \"" + nomeArquivo + "\" — verifique se é um XML de NFe válido.", e);
         } catch (IOException e) {
             throw new BusinessException("Erro ao ler o arquivo \"" + nomeArquivo + "\".", e);
         }
+    }
 
+    /** Mesma leitura, a partir do XML já em memória (ex.: buscado do WinThor sob demanda). */
+    public NotaFiscalXmlDto parse(String xmlContent) {
+        if (xmlContent == null || xmlContent.isBlank()) {
+            throw new BusinessException("XML da nota fiscal vazio.");
+        }
+
+        try {
+            Document documento = criarDocumentBuilder().parse(new InputSource(new StringReader(xmlContent)));
+            return parse(documento, "XML");
+        } catch (SAXException | IOException e) {
+            throw new BusinessException("Não foi possível ler o XML da nota fiscal.", e);
+        }
+    }
+
+    private NotaFiscalXmlDto parse(Document documento, String nomeArquivo) {
         XPath xpath = XPathFactory.newInstance().newXPath();
 
         String numeroNota = textoOuNulo(documento, xpath, "//*[local-name()='ide']/*[local-name()='nNF']");
-        String nomeCliente = textoOuNulo(documento, xpath,
-                "//*[local-name()='dest']/*[local-name()='xNome']");
+        String nomeCliente = textoOuNulo(documento, xpath, "//*[local-name()='dest']/*[local-name()='xNome']");
         String cidadeCliente = textoOuNulo(documento, xpath,
                 "//*[local-name()='dest']/*[local-name()='enderDest']/*[local-name()='xMun']");
         String valorTotalStr = textoOuNulo(documento, xpath,
@@ -71,12 +87,33 @@ public class NotaFiscalXmlParser {
                             + "\" — verifique se é um XML de NFe (modelo 55) válido.");
         }
 
+        String documentoCliente = primeiroNaoNulo(
+                textoOuNulo(documento, xpath, "//*[local-name()='dest']/*[local-name()='CNPJ']"),
+                textoOuNulo(documento, xpath, "//*[local-name()='dest']/*[local-name()='CPF']")
+        );
+
         return NotaFiscalXmlDto.builder()
                 .numeroNota(numeroNota.trim())
                 .nomeCliente(nomeCliente.trim())
-                .cidadeCliente(cidadeCliente != null ? cidadeCliente.trim() : null)
+                .cidadeCliente(limpo(cidadeCliente))
                 .valorTotal(paraBigDecimal(valorTotalStr))
                 .pesoBruto(paraBigDecimal(pesoBrutoStr))
+                .documentoCliente(limpo(documentoCliente))
+                .logradouroCliente(limpo(textoOuNulo(documento, xpath,
+                        "//*[local-name()='dest']/*[local-name()='enderDest']/*[local-name()='xLgr']")))
+                .numeroCliente(limpo(textoOuNulo(documento, xpath,
+                        "//*[local-name()='dest']/*[local-name()='enderDest']/*[local-name()='nro']")))
+                .complementoCliente(limpo(textoOuNulo(documento, xpath,
+                        "//*[local-name()='dest']/*[local-name()='enderDest']/*[local-name()='xCpl']")))
+                .bairroCliente(limpo(textoOuNulo(documento, xpath,
+                        "//*[local-name()='dest']/*[local-name()='enderDest']/*[local-name()='xBairro']")))
+                .ufCliente(limpo(textoOuNulo(documento, xpath,
+                        "//*[local-name()='dest']/*[local-name()='enderDest']/*[local-name()='UF']")))
+                .cepCliente(limpo(textoOuNulo(documento, xpath,
+                        "//*[local-name()='dest']/*[local-name()='enderDest']/*[local-name()='CEP']")))
+                .telefoneCliente(limpo(textoOuNulo(documento, xpath,
+                        "//*[local-name()='dest']/*[local-name()='enderDest']/*[local-name()='fone']")))
+                .emailCliente(limpo(textoOuNulo(documento, xpath, "//*[local-name()='dest']/*[local-name()='email']")))
                 .build();
     }
 
@@ -87,6 +124,14 @@ public class NotaFiscalXmlParser {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private String primeiroNaoNulo(String a, String b) {
+        return a != null ? a : b;
+    }
+
+    private String limpo(String valor) {
+        return valor == null ? null : valor.trim();
     }
 
     private BigDecimal paraBigDecimal(String valor) {

@@ -5,12 +5,14 @@ import br.com.frotasPro.api.controller.response.ImportarNotaFiscalResponse;
 import br.com.frotasPro.api.domain.Arquivo;
 import br.com.frotasPro.api.domain.Carga;
 import br.com.frotasPro.api.domain.CargaNota;
+import br.com.frotasPro.api.domain.Cliente;
 import br.com.frotasPro.api.excption.BusinessException;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.integracao.dto.NotaFiscalXmlDto;
 import br.com.frotasPro.api.mapper.CargaMapper;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.service.arquivo.SalvarArquivoService;
+import br.com.frotasPro.api.service.cliente.ClienteService;
 import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +42,7 @@ public class ImportarNotaFiscalCargaService {
     private final NotaFiscalXmlParser parser;
     private final OrdemEntregaCidadeService ordemEntregaCidadeService;
     private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
+    private final ClienteService clienteService;
 
     @Transactional
     @Caching(evict = {
@@ -103,13 +106,17 @@ public class ImportarNotaFiscalCargaService {
                 .orElse(null);
 
         Arquivo arquivo = salvarArquivoService.salvar(arquivoXml, "CARGA_" + carga.getNumeroCarga(), "NOTA_FISCAL_XML");
+        Cliente clienteCadastrado = clienteService.upsertFromXml(dto, null).orElse(null);
 
         if (existente != null) {
             // Nota já cadastrada (reenvio do mesmo XML, duplicata dentro do
             // mesmo upload, ou já veio de outra fonte) — só garante o
-            // vínculo com o arquivo, sem somar peso/valor de novo na carga.
+            // vínculo com o arquivo/cliente, sem somar peso/valor de novo na carga.
             if (existente.getArquivo() == null) {
                 existente.setArquivo(arquivo);
+            }
+            if (existente.getClienteRef() == null && clienteCadastrado != null) {
+                existente.setClienteRef(clienteCadastrado);
             }
             if (existente.getCidade() == null && dto.cidadeCliente() != null) {
                 existente.setCidade(dto.cidadeCliente());
@@ -125,6 +132,7 @@ public class ImportarNotaFiscalCargaService {
         cargaNota.setNota(nota);
         cargaNota.setCidade(dto.cidadeCliente());
         cargaNota.setArquivo(arquivo);
+        cargaNota.setClienteRef(clienteCadastrado);
         carga.getNotas().add(cargaNota);
 
         if (dto.pesoBruto() != null) {

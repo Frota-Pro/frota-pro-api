@@ -39,4 +39,13 @@ public class CargaNota {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "arquivo_id")
     private Arquivo arquivo;
+
+    /**
+     * Vínculo com o cadastro de Cliente (CNPJ/CPF + endereço), quando já
+     * identificado a partir do XML da nota. Nulo até a nota ser vista/
+     * importada com o XML disponível — vai sendo preenchido aos poucos.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cliente_id")
+    private Cliente clienteRef;
 }

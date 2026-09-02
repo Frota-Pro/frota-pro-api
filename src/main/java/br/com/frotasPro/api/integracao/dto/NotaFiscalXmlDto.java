@@ -11,6 +11,17 @@ public record NotaFiscalXmlDto(
         String nomeCliente,
         String cidadeCliente,
         BigDecimal pesoBruto,
-        BigDecimal valorTotal
+        BigDecimal valorTotal,
+
+        /** CNPJ ou CPF do destinatário, só dígitos — chave natural do cliente. */
+        String documentoCliente,
+        String logradouroCliente,
+        String numeroCliente,
+        String complementoCliente,
+        String bairroCliente,
+        String ufCliente,
+        String cepCliente,
+        String telefoneCliente,
+        String emailCliente
 ) {
 }
