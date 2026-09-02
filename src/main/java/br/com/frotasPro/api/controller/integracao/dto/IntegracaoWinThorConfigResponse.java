@@ -2,6 +2,7 @@ package br.com.frotasPro.api.controller.integracao.dto;
 
 import lombok.Builder;
 
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -11,6 +12,7 @@ public record IntegracaoWinThorConfigResponse(
         UUID empresaId,
         boolean ativo,
         Integer intervaloMin,
+        LocalTime horarioReforcoMensal,
         boolean syncCaminhoes,
         boolean syncMotoristas,
         boolean syncCargas,
