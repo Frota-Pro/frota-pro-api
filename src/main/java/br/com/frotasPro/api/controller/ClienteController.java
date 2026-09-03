@@ -2,7 +2,9 @@ package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.ClienteRequest;
 import br.com.frotasPro.api.controller.response.ClienteResponse;
+import br.com.frotasPro.api.controller.response.ConsultaCnpjResponse;
 import br.com.frotasPro.api.service.cliente.AtualizarClienteService;
+import br.com.frotasPro.api.service.cliente.ConsultarCnpjService;
 import br.com.frotasPro.api.service.cliente.CriarClienteService;
 import br.com.frotasPro.api.service.cliente.ListarClienteService;
 import jakarta.validation.Valid;
@@ -31,6 +33,7 @@ public class ClienteController {
     private final ListarClienteService listarClienteService;
     private final CriarClienteService criarClienteService;
     private final AtualizarClienteService atualizarClienteService;
+    private final ConsultarCnpjService consultarCnpjService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping
@@ -45,6 +48,16 @@ public class ClienteController {
     @GetMapping("/{id}")
     public ResponseEntity<ClienteResponse> buscarPorId(@PathVariable UUID id) {
         return ResponseEntity.ok(listarClienteService.buscarPorId(id));
+    }
+
+    /**
+     * Consulta pública de CNPJ (Receita Federal via BrasilAPI) pra
+     * pré-preencher o formulário de cadastro manual — não salva nada.
+     */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @GetMapping("/consulta-cnpj/{cnpj}")
+    public ResponseEntity<ConsultaCnpjResponse> consultarCnpj(@PathVariable String cnpj) {
+        return ResponseEntity.ok(consultarCnpjService.consultar(cnpj));
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
