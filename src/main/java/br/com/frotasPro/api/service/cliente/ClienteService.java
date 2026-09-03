@@ -7,6 +7,7 @@ import br.com.frotasPro.api.integracao.dto.NotaFiscalXmlDto;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.ClienteRepository;
 import br.com.frotasPro.api.service.carga.NotaFiscalXmlParser;
+import br.com.frotasPro.api.util.DocumentoUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,7 @@ public class ClienteService {
      */
     @Transactional
     public Optional<Cliente> upsertFromXml(NotaFiscalXmlDto dto, String codigoExternoWinThor) {
-        String documento = normalizarDocumento(dto.documentoCliente());
+        String documento = DocumentoUtils.normalizar(dto.documentoCliente());
         if (documento == null) {
             log.warn("XML da nota {} sem CNPJ/CPF do destinatário — cliente \"{}\" não cadastrado.",
                     dto.numeroNota(), dto.nomeCliente());
@@ -132,14 +133,5 @@ public class ClienteService {
         } catch (Exception e) {
             return null;
         }
-    }
-
-    /** Só dígitos — CNPJ/CPF no XML às vezes vem formatado, às vezes não. */
-    private String normalizarDocumento(String documento) {
-        if (documento == null) {
-            return null;
-        }
-        String digitos = documento.replaceAll("\\D", "");
-        return digitos.isBlank() ? null : digitos;
     }
 }

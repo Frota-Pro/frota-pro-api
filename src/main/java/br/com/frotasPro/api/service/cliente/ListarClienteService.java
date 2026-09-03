@@ -21,32 +21,13 @@ public class ListarClienteService {
     @Transactional(readOnly = true)
     public Page<ClienteResponse> listar(String q, Pageable pageable) {
         String query = (q == null || q.trim().isEmpty()) ? null : q.trim();
-        return clienteRepository.search(query, pageable).map(this::toResponse);
+        return clienteRepository.search(query, pageable).map(ClienteMapper::toResponse);
     }
 
     @Transactional(readOnly = true)
     public ClienteResponse buscarPorId(UUID id) {
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFound("Cliente não encontrado para o id: " + id));
-        return toResponse(cliente);
-    }
-
-    private ClienteResponse toResponse(Cliente c) {
-        return ClienteResponse.builder()
-                .id(c.getId())
-                .documento(c.getDocumento())
-                .nome(c.getNome())
-                .logradouro(c.getLogradouro())
-                .numero(c.getNumero())
-                .complemento(c.getComplemento())
-                .bairro(c.getBairro())
-                .cidade(c.getCidade())
-                .uf(c.getUf())
-                .cep(c.getCep())
-                .telefone(c.getTelefone())
-                .email(c.getEmail())
-                .codigoExterno(c.getCodigoExterno())
-                .atualizadoEm(c.getAtualizadoEm())
-                .build();
+        return ClienteMapper.toResponse(cliente);
     }
 }
