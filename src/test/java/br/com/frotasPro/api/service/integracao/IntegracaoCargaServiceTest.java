@@ -53,7 +53,7 @@ class IntegracaoCargaServiceTest {
         job.setId(jobId);
 
         when(cargaRepository.findByTransferenciaPendenteTrueAndNumeroCargaExternoIsNotNull()).thenReturn(List.of());
-        when(jobService.criarJob(empresaId, data)).thenReturn(job);
+        when(jobService.criarJob(empresaId, data, "API_SCHEDULER", "SCHEDULER")).thenReturn(job);
         when(producer.enviar(org.mockito.ArgumentMatchers.any(CargaSyncRequestEvent.class)))
                 .thenReturn(CompletableFuture.completedFuture(null));
 
@@ -76,7 +76,7 @@ class IntegracaoCargaServiceTest {
         job.setId(jobId);
 
         when(cargaRepository.findByTransferenciaPendenteTrueAndNumeroCargaExternoIsNotNull()).thenReturn(List.of());
-        when(jobService.criarJob(empresaId, data)).thenReturn(job);
+        when(jobService.criarJob(empresaId, data, "API_SCHEDULER", "SCHEDULER")).thenReturn(job);
         doThrow(new IllegalStateException("kafka indisponivel")).when(producer)
                 .enviar(org.mockito.ArgumentMatchers.any(CargaSyncRequestEvent.class));
 
@@ -98,7 +98,7 @@ class IntegracaoCargaServiceTest {
                 new CompletableFuture<>();
 
         when(cargaRepository.findByTransferenciaPendenteTrueAndNumeroCargaExternoIsNotNull()).thenReturn(List.of());
-        when(jobService.criarJob(empresaId, data)).thenReturn(job);
+        when(jobService.criarJob(empresaId, data, "API_SCHEDULER", "SCHEDULER")).thenReturn(job);
         when(producer.enviar(org.mockito.ArgumentMatchers.any(CargaSyncRequestEvent.class))).thenReturn(envio);
 
         service.solicitarSincronizacao(

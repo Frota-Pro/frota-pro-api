@@ -15,6 +15,8 @@ public record IntegracaoWinThorJobResponse(
         LocalDate dataReferencia,
         Integer totalRegistros,
         String mensagemErro,
+        /** "Automático", "Reforço mensal", "Manual" ou "Reprocessado" — só pra jobs de CARGAS; null pra caminhões/motoristas. */
+        String origem,
         OffsetDateTime criadoEm,
         OffsetDateTime atualizadoEm
 ) {}

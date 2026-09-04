@@ -44,7 +44,7 @@ public class IntegracaoCargaService {
         List<Integer> codigosMotoristasResolvidos = resolverCodigosMotoristas(empresaId, codigosMotoristas);
         List<Integer> codigosCargasTransferencia = buscarCodigosCargasComTransferenciaPendente();
 
-        var job = jobService.criarJob(empresaId, fim);
+        var job = jobService.criarJob(empresaId, fim, origem, solicitadoPor);
 
         CargaSyncRequestEvent event = CargaSyncRequestEvent.builder()
                 .jobId(job.getId())

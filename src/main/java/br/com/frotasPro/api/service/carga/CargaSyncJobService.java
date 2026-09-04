@@ -25,11 +25,13 @@ public class CargaSyncJobService {
     private final CargaSyncRequestProducer requestProducer;
     private final NotificacaoService notificacaoService;
 
-    public CargaSyncJob criarJob(UUID empresaId, LocalDate dataReferencia) {
+    public CargaSyncJob criarJob(UUID empresaId, LocalDate dataReferencia, String origem, String solicitadoPor) {
         CargaSyncJob job = new CargaSyncJob();
         job.setEmpresaId(empresaId);
         job.setDataReferencia(dataReferencia);
         job.setStatus(StatusSincronizacao.PENDENTE);
+        job.setOrigem(origem);
+        job.setSolicitadoPor(solicitadoPor);
         job.setCriadoEm(OffsetDateTime.now());
         job.setAtualizadoEm(OffsetDateTime.now());
         CargaSyncJob salvo = repository.save(job);
@@ -48,7 +50,7 @@ public class CargaSyncJobService {
     }
 
     public UUID solicitarSincronizacao(UUID empresaId, LocalDate dataReferencia) {
-        CargaSyncJob job = criarJob(empresaId, dataReferencia);
+        CargaSyncJob job = criarJob(empresaId, dataReferencia, "API_SCHEDULER", "SCHEDULER");
 
         CargaSyncRequestEvent event = CargaSyncRequestEvent.builder()
                 .jobId(job.getId())
