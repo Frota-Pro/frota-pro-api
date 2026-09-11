@@ -4,6 +4,7 @@ import br.com.frotasPro.api.controller.request.CargaRequest;
 import br.com.frotasPro.api.controller.response.CargaMinResponse;
 import br.com.frotasPro.api.controller.response.CargaResponse;
 import br.com.frotasPro.api.controller.response.ClienteCargaResponse;
+import br.com.frotasPro.api.controller.response.NotaFiscalArquivoResponse;
 import br.com.frotasPro.api.domain.*;
 
 import java.util.ArrayList;
@@ -93,6 +94,19 @@ public class CargaMapper {
                                                         .map(CargaNota::getNota)
                                                         .toList()
                                         )
+                                        .build()
+                                )
+                                .toList()
+                )
+                .notasComArquivo(
+                        carga.getNotas().stream()
+                                .filter(n -> n.getArquivo() != null)
+                                .map(n -> NotaFiscalArquivoResponse.builder()
+                                        .cliente(n.getCliente())
+                                        .nota(n.getNota())
+                                        .arquivoId(n.getArquivo().getId())
+                                        .nomeArquivo(n.getArquivo().getNomeOriginal())
+                                        .urlDownload("/arquivos/" + n.getArquivo().getId() + "/download")
                                         .build()
                                 )
                                 .toList()

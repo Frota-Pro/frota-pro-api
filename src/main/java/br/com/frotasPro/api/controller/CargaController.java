@@ -7,6 +7,7 @@ import br.com.frotasPro.api.controller.request.TransferirMotoristaCargaRequest;
 import br.com.frotasPro.api.controller.request.TransferirNotasCargaRequest;
 import br.com.frotasPro.api.controller.response.CargaMinResponse;
 import br.com.frotasPro.api.controller.response.CargaResponse;
+import br.com.frotasPro.api.controller.response.ImportarNotaFiscalResponse;
 import br.com.frotasPro.api.controller.response.RelatorioCargasSumidasWinThorResponse;
 import br.com.frotasPro.api.controller.response.TransferirNotasCargaResponse;
 import br.com.frotasPro.api.service.carga.*;
@@ -21,6 +22,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -48,6 +50,7 @@ public class CargaController {
     private final TransferirMotoristaCargaService transferirMotoristaCargaService;
     private final VerificarCargasSumidasWinThorService verificarCargasSumidasWinThorService;
     private final RelatorioCargasSumidasWinThorService relatorioCargasSumidasWinThorService;
+    private final ImportarNotaFiscalCargaService importarNotaFiscalCargaService;
 
     // ========= RECONCILIAÇÃO WINTHOR =========
 
@@ -312,6 +315,28 @@ public class CargaController {
             @Valid @RequestBody TransferirNotasCargaRequest request
     ) {
         TransferirNotasCargaResponse response = transferirNotasCargaService.transferir(numeroCarga, request);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Cadastro manual de clientes/notas fiscais de uma carga, pra quem não
+     * usa a integração WinThor (ou pra reforçar uma carga já sincronizada):
+     * lê o(s) XML(s) de NFe já emitidos em outro sistema e extrai cliente,
+     * cidade, número da nota, peso e valor — não emite nem assina nota
+     * nenhuma, só cadastra o que o XML já traz pronto.
+     */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PostMapping(value = "/{numeroCarga}/notas/xml", consumes = "multipart/form-data")
+    @Caching(evict = {
+            @CacheEvict(value = "carga_buscar_numero", allEntries = true),
+            @CacheEvict(value = "carga_buscar_codigo_externo", allEntries = true),
+            @CacheEvict(value = "carga_listar", allEntries = true)
+    })
+    public ResponseEntity<ImportarNotaFiscalResponse> importarNotasFiscaisXml(
+            @PathVariable String numeroCarga,
+            @RequestPart("arquivos") List<MultipartFile> arquivos
+    ) {
+        ImportarNotaFiscalResponse response = importarNotaFiscalCargaService.importar(numeroCarga, arquivos);
         return ResponseEntity.ok(response);
     }
 

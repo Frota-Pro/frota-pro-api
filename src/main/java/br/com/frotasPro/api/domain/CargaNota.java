@@ -30,4 +30,22 @@ public class CargaNota {
     // cadastrada no WinThor, ou nota sincronizada antes desse campo existir).
     @Column(name = "cidade", length = 150)
     private String cidade;
+
+    /**
+     * XML da NFe que originou esta nota, quando cadastrada manualmente via
+     * upload (ver ImportarNotaFiscalCargaService) em vez de sincronizada do
+     * WinThor. Nulo para notas vindas da integração.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "arquivo_id")
+    private Arquivo arquivo;
+
+    /**
+     * Vínculo com o cadastro de Cliente (CNPJ/CPF + endereço), quando já
+     * identificado a partir do XML da nota. Nulo até a nota ser vista/
+     * importada com o XML disponível — vai sendo preenchido aos poucos.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cliente_id")
+    private Cliente clienteRef;
 }

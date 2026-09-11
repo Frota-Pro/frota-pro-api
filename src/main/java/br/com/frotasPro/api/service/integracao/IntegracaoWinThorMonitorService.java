@@ -99,6 +99,8 @@ public class IntegracaoWinThorMonitorService {
 
         job.setStatus(StatusSincronizacao.PENDENTE);
         job.setMensagemErro(null);
+        job.setOrigem("API_RETRY");
+        job.setSolicitadoPor("USUARIO");
         job.setAtualizadoEm(OffsetDateTime.now());
         cargaRepo.save(job);
 
@@ -216,9 +218,29 @@ public class IntegracaoWinThorMonitorService {
                 .dataReferencia(j.getDataReferencia())
                 .totalRegistros(j.getTotalCargas())
                 .mensagemErro(j.getMensagemErro())
+                .origem(origemLabel(j.getOrigem(), j.getSolicitadoPor()))
                 .criadoEm(j.getCriadoEm())
                 .atualizadoEm(j.getAtualizadoEm())
                 .build();
+    }
+
+    /**
+     * Traduz origem+solicitadoPor (gravados na hora que o job foi criado) num
+     * rótulo direto pra tela — é a única forma de saber, por exemplo, se um
+     * job "CARGAS/Concluído" foi o reforço mensal ou a sincronização normal
+     * por intervalo, sem precisar ir nos Logs.
+     */
+    private String origemLabel(String origem, String solicitadoPor) {
+        if (origem == null) {
+            return null; // job criado antes desta coluna existir
+        }
+        if ("API_RETRY".equals(origem)) {
+            return "Reprocessado";
+        }
+        if ("API_SCHEDULER".equals(origem)) {
+            return "SCHEDULER_REFORCO_MENSAL".equals(solicitadoPor) ? "Reforço mensal" : "Automático";
+        }
+        return "Manual";
     }
 
     private IntegracaoWinThorJobResponse mapCaminhao(CaminhaoSyncJob j) {

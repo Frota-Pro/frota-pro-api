@@ -36,6 +36,14 @@ public class CargaSyncJob {
     @Column(name = "mensagem_erro", length = 500)
     private String mensagemErro;
 
+    /** API_SCHEDULER (automático), API_FROTAPRO (manual) ou API_RETRY (reprocessamento). */
+    @Column(name = "origem", length = 30)
+    private String origem;
+
+    /** Detalha o origem: SCHEDULER, SCHEDULER_REFORCO_MENSAL, sistema ou USUARIO. */
+    @Column(name = "solicitado_por", length = 50)
+    private String solicitadoPor;
+
     @Column(name = "criado_em")
     private OffsetDateTime criadoEm;
 
