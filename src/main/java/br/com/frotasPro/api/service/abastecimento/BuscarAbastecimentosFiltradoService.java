@@ -10,13 +10,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class BuscarAbastecimentosFiltradoService {
+
+    private static final Sort ORDENACAO_PADRAO = Sort.by(Sort.Direction.DESC, "dt_abastecimento");
 
     private final AbastecimentoRepository repository;
 
@@ -40,8 +45,8 @@ public class BuscarAbastecimentosFiltradoService {
         String caminhaoN = norm(caminhao);
         String motoristaN = norm(motorista);
 
-
-        Pageable pageableNoSort = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
+        Pageable pageableComSort = PageRequest.of(
+                pageable.getPageNumber(), pageable.getPageSize(), resolverOrdenacao(pageable.getSort()));
 
         return repository.filtrarNative(
                         qN,
@@ -51,9 +56,37 @@ public class BuscarAbastecimentosFiltradoService {
                         forma != null ? forma.name() : null,
                         periodo.inicio(),
                         periodo.fim(),
-                        pageableNoSort
+                        pageableComSort
                 )
                 .map(AbastecimentoMapper::toResponse);
+    }
+
+    /**
+     * A tela manda uma chave "amigável" de coluna (data, litros, valor) em vez
+     * do nome real da coluna do banco — igual ListarCargaService.resolverOrdenacao,
+     * só que aqui mapeando pra coluna SQL (a query é nativa, não JPQL) em vez de
+     * propriedade de entidade. Sem prefixo de alias ("a.") — o Spring Data já
+     * prefixa sozinho com o alias da query nativa ao montar o ORDER BY.
+     */
+    private Sort resolverOrdenacao(Sort sortSolicitado) {
+        if (sortSolicitado == null || sortSolicitado.isUnsorted()) {
+            return ORDENACAO_PADRAO;
+        }
+
+        List<Sort.Order> ordens = new ArrayList<>();
+        for (Sort.Order ordem : sortSolicitado) {
+            String coluna = switch (ordem.getProperty()) {
+                case "data" -> "dt_abastecimento";
+                case "litros" -> "qt_litros";
+                case "valor" -> "valor_total";
+                default -> null;
+            };
+            if (coluna != null) {
+                ordens.add(new Sort.Order(ordem.getDirection(), coluna));
+            }
+        }
+
+        return ordens.isEmpty() ? ORDENACAO_PADRAO : Sort.by(ordens);
     }
 
     private String norm(String s) {
