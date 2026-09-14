@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.controller.handlers;
 
+import br.com.frotasPro.api.excption.AbastecimentoAvisoResponse;
+import br.com.frotasPro.api.excption.AbastecimentoRequerConfirmacaoException;
 import br.com.frotasPro.api.excption.BusinessException;
 import br.com.frotasPro.api.excption.ConflictException;
 import br.com.frotasPro.api.excption.CustomException;
@@ -47,6 +49,15 @@ public class ControllerExceptionHandler {
     public ResponseEntity<CustomException> conflict(ConflictException e, HttpServletRequest request) {
         HttpStatus status = HttpStatus.CONFLICT;
         CustomException err = new CustomException(Instant.now(), status.value(), e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(AbastecimentoRequerConfirmacaoException.class)
+    public ResponseEntity<AbastecimentoAvisoResponse> abastecimentoRequerConfirmacao(
+            AbastecimentoRequerConfirmacaoException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
+        AbastecimentoAvisoResponse err = new AbastecimentoAvisoResponse(
+                Instant.now(), status.value(), e.getAvisos(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
     }
 

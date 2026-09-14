@@ -131,7 +131,7 @@ public class CriarParadaCargaService {
 
             abastecimento.setMediaKmLitro(media != null ? media : abReq.getMediaKmLitro());
 
-            detectarAnomaliaAbastecimentoService.avaliar(abastecimento);
+            detectarAnomaliaAbastecimentoService.avaliar(abastecimento, Boolean.TRUE.equals(abReq.getConfirmarAvisos()));
 
             parada.getAbastecimentos().add(abastecimento);
 

@@ -63,6 +63,15 @@ public class AtualizarParadaCargaService {
         parada.setKmOdometro(request.getKmOdometro());
         parada.setObservacao(request.getObservacao());
 
+        // Capturado antes do clear() pra excluir da checagem de anomalia
+        // (odômetro repetido / referência de preço) mais abaixo — o registro
+        // antigo ainda não foi removido do banco dentro desta transação, e o
+        // novo Abastecimento criado logo adiante ainda não tem id nenhum.
+        UUID abastecimentoAnteriorId = parada.getAbastecimentos().stream()
+                .findFirst()
+                .map(Abastecimento::getId)
+                .orElse(null);
+
         parada.getDespesaParadas().clear();
         parada.getAbastecimentos().clear();
         if (parada.getManutencoes() != null) {
@@ -129,7 +138,8 @@ public class AtualizarParadaCargaService {
             );
             abastecimento.setMediaKmLitro(media != null ? media : abReq.getMediaKmLitro());
 
-            detectarAnomaliaAbastecimentoService.avaliar(abastecimento);
+            detectarAnomaliaAbastecimentoService.avaliar(
+                    abastecimento, Boolean.TRUE.equals(abReq.getConfirmarAvisos()), abastecimentoAnteriorId);
 
             parada.getAbastecimentos().add(abastecimento);
 
