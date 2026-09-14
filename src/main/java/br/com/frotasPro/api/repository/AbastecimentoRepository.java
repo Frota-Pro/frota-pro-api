@@ -219,6 +219,9 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, UU
             Pageable pageable
     );
 
+    // Sem ORDER BY fixo de propósito: o Pageable chega já com a ordenação
+    // resolvida (ver BuscarAbastecimentosFiltradoService.resolverOrdenacao),
+    // que o Spring Data acrescenta sozinho ao final da query nativa.
     @Query(
             value = """
 select a.*
@@ -258,9 +261,6 @@ and (cast(:forma as text) is null or a.forma_pagamento = cast(:forma as text))
 -- >>> AQUI é o que resolve o 42P18 (tipa o parâmetro mesmo quando vem null)
 and (cast(:inicio as timestamp) is null or a.dt_abastecimento >= cast(:inicio as timestamp))
 and (cast(:fim as timestamp) is null or a.dt_abastecimento <= cast(:fim as timestamp))
-
-
-order by a.dt_abastecimento desc
 """,
             countQuery = """
 select count(1)
