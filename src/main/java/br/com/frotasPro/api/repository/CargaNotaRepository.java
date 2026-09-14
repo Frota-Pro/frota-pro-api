@@ -25,12 +25,24 @@ public interface CargaNotaRepository extends JpaRepository<CargaNota, CargaNotaI
     // Cidade não é chave de agrupamento (cliente é) — na prática é constante
     // por cliente, então max(cn.cidade) só serve pra pegar o valor sem
     // precisar incluir a coluna no GROUP BY.
+    // Endereço vem de cn.clienteRef (tabela Cliente) — igual cidade, na prática
+    // é constante por cliente, então max(...) só serve pra pegar o valor sem
+    // precisar incluir as colunas no GROUP BY. Fica null até a nota ser
+    // enriquecida (ver ClienteService.upsertFromWinThor/upsertFromXml).
     @Query("""
         select cn.cliente as cliente,
                max(cn.cidade) as cidade,
                count(distinct cn.carga.id) as quantidadeCargas,
-               max(cn.carga.dtSaida) as ultimaCargaEm
+               max(cn.carga.dtSaida) as ultimaCargaEm,
+               max(cli.documento) as documento,
+               max(cli.logradouro) as logradouro,
+               max(cli.numero) as numero,
+               max(cli.complemento) as complemento,
+               max(cli.bairro) as bairro,
+               max(cli.uf) as uf,
+               max(cli.cep) as cep
         from CargaNota cn
+        left join cn.clienteRef cli
         where cn.carga.rota.codigo = :codigoRota
         group by cn.cliente
         order by max(cn.cidade) asc nulls last, count(distinct cn.carga.id) desc, cn.cliente asc
@@ -59,8 +71,16 @@ public interface CargaNotaRepository extends JpaRepository<CargaNota, CargaNotaI
         select cn.cliente as cliente,
                cn.cidade as cidade,
                count(distinct cn.carga.id) as quantidadeCargas,
-               max(cn.carga.dtSaida) as ultimaCargaEm
+               max(cn.carga.dtSaida) as ultimaCargaEm,
+               max(cli.documento) as documento,
+               max(cli.logradouro) as logradouro,
+               max(cli.numero) as numero,
+               max(cli.complemento) as complemento,
+               max(cli.bairro) as bairro,
+               max(cli.uf) as uf,
+               max(cli.cep) as cep
         from CargaNota cn
+        left join cn.clienteRef cli
         where cn.cidade = :cidade
         group by cn.cliente, cn.cidade
         order by count(distinct cn.carga.id) desc, cn.cliente asc

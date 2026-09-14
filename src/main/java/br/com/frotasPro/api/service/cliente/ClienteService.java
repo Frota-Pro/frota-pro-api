@@ -16,9 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 /**
- * Cadastro de cliente de verdade (CNPJ/CPF + endereço completo), alimentado
- * pelo XML da NFe — fundação pra uma futura roteirização por endereço, no
- * lugar da lista de nomes parametrizada por cidade que existe hoje.
+ * Cadastro de cliente de verdade (CNPJ/CPF + endereço completo) — fonte
+ * única usada tanto pelo cadastro manual quanto pela roteirização (em vez da
+ * lista de nomes por cidade sem endereço que existia antes). Alimentado de
+ * duas formas: automaticamente, a partir do cadastro do cliente no WinThor
+ * (pcclient), em toda sincronização normal de carga (ver upsertFromWinThor,
+ * chamado por SincronizarCargaService); e pelo XML da NFe, no upload manual
+ * ou quando alguém abre o XML de uma nota específica (upsertFromXml).
  */
 @Slf4j
 @Service
@@ -68,6 +72,43 @@ public class ClienteService {
 
         Cliente salvo = clienteRepository.save(cliente);
         log.info("Cliente {} ({}) {}.", salvo.getNome(), documento, novo ? "cadastrado" : "atualizado");
+        return Optional.of(salvo);
+    }
+
+    /**
+     * Cria/atualiza o cliente a partir do cadastro dele no WinThor (pcclient),
+     * durante a sincronização normal de cargas — sem precisar de XML nem de
+     * chamada extra ao WinThor (o endereço já vem junto na mesma consulta que
+     * traz cliente/cidade da carga). WinThor é tratado como fonte de verdade:
+     * sempre sobrescreve o que já estiver cadastrado (se o cliente se mudou,
+     * o cadastro acompanha). Sem documento (CNPJ/CPF) no WinThor, não cadastra.
+     */
+    @Transactional
+    public Optional<Cliente> upsertFromWinThor(String documento, String nome, String logradouro, String numero,
+                                                 String bairro, String cidade, String uf, String cep,
+                                                 String codigoExternoWinThor) {
+        String doc = DocumentoUtils.normalizar(documento);
+        if (doc == null) {
+            return Optional.empty();
+        }
+
+        Cliente cliente = clienteRepository.findByDocumento(doc).orElseGet(Cliente::new);
+        boolean novo = cliente.getId() == null;
+
+        cliente.setDocumento(doc);
+        cliente.setNome(nome);
+        cliente.setLogradouro(logradouro);
+        cliente.setNumero(numero);
+        cliente.setBairro(bairro);
+        cliente.setCidade(cidade);
+        cliente.setUf(uf);
+        cliente.setCep(cep);
+        if (codigoExternoWinThor != null) {
+            cliente.setCodigoExterno(codigoExternoWinThor);
+        }
+
+        Cliente salvo = clienteRepository.save(cliente);
+        log.info("Cliente {} ({}) {} a partir do sync WinThor.", salvo.getNome(), doc, novo ? "cadastrado" : "atualizado");
         return Optional.of(salvo);
     }
 

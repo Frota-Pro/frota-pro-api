@@ -37,6 +37,13 @@ public class BuscarClientesHistoricoRotaService {
                         .cidade(p.getCidade())
                         .quantidadeCargas(p.getQuantidadeCargas())
                         .ultimaCargaEm(p.getUltimaCargaEm())
+                        .documento(p.getDocumento())
+                        .logradouro(p.getLogradouro())
+                        .numero(p.getNumero())
+                        .complemento(p.getComplemento())
+                        .bairro(p.getBairro())
+                        .uf(p.getUf())
+                        .cep(p.getCep())
                         .build())
                 .toList();
     }
