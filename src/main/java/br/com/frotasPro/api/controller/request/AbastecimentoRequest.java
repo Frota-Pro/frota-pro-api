@@ -68,4 +68,12 @@ public class AbastecimentoRequest {
 
     @Size(max = 60, message = "Nº nota/cupom deve ter no máximo 60 caracteres")
     private String numNotaOuCupom;
+
+    /**
+     * true quando quem está lançando já viu os avisos (preço/valor fora do
+     * padrão, odômetro repetido) e quer salvar mesmo assim — ver
+     * DetectarAnomaliaAbastecimentoService. Sem isso (ou false), o request é
+     * recusado com 409 e a lista de avisos, pra tela mostrar e reenviar.
+     */
+    private Boolean confirmarAvisos;
 }

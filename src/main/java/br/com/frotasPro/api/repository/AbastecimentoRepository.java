@@ -483,16 +483,18 @@ and (cast(:fim as timestamp) is null or a.dt_abastecimento <= cast(:fim as times
     }
 
     /**
-     * Preço médio/L recente (mesmo posto + tipo de combustível, últimos N dias
-     * antes desse abastecimento) — base pra {@code DetectarAnomaliaAbastecimentoService}.
-     * Casa por posto cadastrado quando o abastecimento tem um vinculado; senão
-     * casa pelo texto livre do campo "posto" (mesmo abastecimento nunca conta
-     * na própria média, via :excluirId).
+     * Preço/L e valor total médios recentes (mesmo posto + tipo de combustível,
+     * últimos N dias antes desse abastecimento) — base pra
+     * {@code DetectarAnomaliaAbastecimentoService}. Casa por posto cadastrado
+     * quando o abastecimento tem um vinculado; senão casa pelo texto livre do
+     * campo "posto" (mesmo abastecimento nunca conta na própria média, via
+     * :excluirId).
      */
     @Query(
             value = """
 select
   avg(a.valor_litro) as mediaPreco,
+  avg(a.valor_total) as mediaValorTotal,
   count(1) as amostras
 from tb_abastecimento a
 where a.tipo_combustivel = cast(:tipoCombustivel as text)
@@ -516,8 +518,56 @@ where a.tipo_combustivel = cast(:tipoCombustivel as text)
             @Param("posto") String posto
     );
 
+    /**
+     * Mesma referência de cima, mas sem filtrar por posto — usada como
+     * fallback quando o posto específico ainda não tem histórico suficiente
+     * (posto novo, ou abastecimento raro ali), pra não deixar um preço/valor
+     * completamente fora da curva passar sem nenhuma checagem só por falta de
+     * amostra local.
+     */
+    @Query(
+            value = """
+select
+  avg(a.valor_litro) as mediaPreco,
+  avg(a.valor_total) as mediaValorTotal,
+  count(1) as amostras
+from tb_abastecimento a
+where a.tipo_combustivel = cast(:tipoCombustivel as text)
+  and a.valor_litro is not null
+  and a.dt_abastecimento >= cast(:desde as timestamp)
+  and a.dt_abastecimento < cast(:ate as timestamp)
+  and (cast(:excluirId as uuid) is null or a.id <> cast(:excluirId as uuid))
+""",
+            nativeQuery = true
+    )
+    ReferenciaPrecoRow referenciaPrecoCombustivelFrota(
+            @Param("tipoCombustivel") String tipoCombustivel,
+            @Param("desde") LocalDateTime desde,
+            @Param("ate") LocalDateTime ate,
+            @Param("excluirId") UUID excluirId
+    );
+
     interface ReferenciaPrecoRow {
         BigDecimal getMediaPreco();
+        BigDecimal getMediaValorTotal();
         Long getAmostras();
     }
+
+    /**
+     * Fisicamente não existe carro que abasteça duas vezes com o mesmo
+     * odômetro — quase sempre é erro de digitação. Usada pra avisar antes de
+     * salvar (ver DetectarAnomaliaAbastecimentoService).
+     */
+    @Query("""
+        select count(a) > 0
+        from Abastecimento a
+        where a.caminhao.id = :caminhaoId
+          and a.kmOdometro = :kmOdometro
+          and (:excluirId is null or a.id <> :excluirId)
+        """)
+    boolean existeOutroComMesmoOdometro(
+            @Param("caminhaoId") UUID caminhaoId,
+            @Param("kmOdometro") Integer kmOdometro,
+            @Param("excluirId") UUID excluirId
+    );
 }

@@ -73,7 +73,7 @@ public class CriarAbastecimentoService {
 
         a.setMediaKmLitro(media != null ? media : request.getMediaKmLitro());
 
-        detectarAnomaliaAbastecimentoService.avaliar(a);
+        detectarAnomaliaAbastecimentoService.avaliar(a, Boolean.TRUE.equals(request.getConfirmarAvisos()));
 
         repository.save(a);
         // A meta de consumo (km/l) não é mais atualizada aqui — ela é

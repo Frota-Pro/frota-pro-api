@@ -81,7 +81,7 @@ public class AbastecimentoUpdateService {
         );
         abastecimento.setMediaKmLitro(media != null ? media : request.getMediaKmLitro());
 
-        detectarAnomaliaAbastecimentoService.avaliar(abastecimento);
+        detectarAnomaliaAbastecimentoService.avaliar(abastecimento, Boolean.TRUE.equals(request.getConfirmarAvisos()));
 
         abastecimento = repository.save(abastecimento);
         // A meta de consumo (km/l) é recalculada na finalização da carga, não
