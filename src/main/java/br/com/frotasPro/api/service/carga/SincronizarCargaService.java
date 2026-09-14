@@ -4,6 +4,7 @@ import br.com.frotasPro.api.util.FusoHorarioUtils;
 
 import br.com.frotasPro.api.domain.Carga;
 import br.com.frotasPro.api.domain.CargaNota;
+import br.com.frotasPro.api.domain.Cliente;
 import br.com.frotasPro.api.domain.ParametroSistema;
 import br.com.frotasPro.api.domain.Rota;
 import br.com.frotasPro.api.domain.enums.Status;
@@ -17,6 +18,7 @@ import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.CargaTransferenciaRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.repository.RotaRepository;
+import br.com.frotasPro.api.service.cliente.ClienteService;
 import br.com.frotasPro.api.service.parametrosistema.ParametroSistemaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +52,7 @@ public class SincronizarCargaService {
     private final CargaTransferenciaRepository cargaTransferenciaRepository;
     private final OrdemEntregaCidadeService ordemEntregaCidadeService;
     private final ParametroSistemaService parametroSistemaService;
+    private final ClienteService clienteService;
 
     @Caching(evict = {
             @CacheEvict(value = "carga_listar", allEntries = true),
@@ -176,6 +179,16 @@ public class SincronizarCargaService {
             String clienteStr = cli.getCodCli() + " - " + cli.getNomeCli();
             totalClientes++;
 
+            // Cadastra/atualiza o Cliente (CNPJ/CPF + endereço) a partir do
+            // cadastro dele no WinThor — mesma chamada que já busca cliente/
+            // cidade da carga, sem custo extra. Sem documento, não cadastra
+            // (cliente continua aparecendo normal na carga, só sem vínculo).
+            Cliente clienteCadastro = clienteService.upsertFromWinThor(
+                    cli.getDocumento(), cli.getNomeCli(), cli.getLogradouro(), cli.getNumero(),
+                    cli.getBairro(), cli.getMunicipio(), cli.getUf(), cli.getCep(),
+                    String.valueOf(cli.getCodCli())
+            ).orElse(null);
+
             if (cli.getNotas() != null) {
                 for (Long nota : cli.getNotas()) {
                     String notaStr = String.valueOf(nota);
@@ -189,10 +202,17 @@ public class SincronizarCargaService {
                         cn.setCliente(clienteStr);
                         cn.setNota(notaStr);
                         cn.setCidade(cli.getCidade());
+                        cn.setClienteRef(clienteCadastro);
                         carga.getNotas().add(cn);
-                    } else if (existente.getCidade() == null && cli.getCidade() != null) {
-                        // backfill: nota sincronizada antes do campo cidade existir
-                        existente.setCidade(cli.getCidade());
+                    } else {
+                        if (existente.getCidade() == null && cli.getCidade() != null) {
+                            // backfill: nota sincronizada antes do campo cidade existir
+                            existente.setCidade(cli.getCidade());
+                        }
+                        if (existente.getClienteRef() == null && clienteCadastro != null) {
+                            // backfill: nota sincronizada antes do cliente ter documento no WinThor
+                            existente.setClienteRef(clienteCadastro);
+                        }
                     }
                     totalNotas++;
                 }

@@ -7,15 +7,15 @@ import lombok.Setter;
 import java.util.UUID;
 
 /**
- * Cadastro de cliente de verdade, identificado por CNPJ/CPF — fundação pra
- * uma futura roteirização por endereço (hoje a ordem de entrega é só uma
- * lista de nomes parametrizada por cidade, sem endereço nenhum).
+ * Cadastro de cliente de verdade, identificado por CNPJ/CPF — fonte única
+ * usada tanto pelo cadastro manual quanto pela roteirização por endereço.
  * <p>
- * Alimentado pelo XML da NFe: no upload manual (ver
- * ImportarNotaFiscalCargaService), no ato; do lado do WinThor, só quando
- * alguém abre o XML de uma nota (ver NotaFiscalService) — nunca durante a
- * sincronização em lote, pra não sobrecarregar o canal interativo com o
- * WinThor (propositalmente pequeno/protegido por circuit breaker).
+ * Alimentado automaticamente em toda sincronização normal de carga, a partir
+ * do cadastro do cliente no próprio WinThor (pcclient — ver
+ * ClienteService.upsertFromWinThor / SincronizarCargaService), sem chamada
+ * extra ao canal interativo. Também alimentado pelo XML da NFe: no upload
+ * manual (ver ImportarNotaFiscalCargaService), no ato; ou quando alguém abre
+ * o XML de uma nota específica (ver NotaFiscalService).
  */
 @Getter
 @Setter
