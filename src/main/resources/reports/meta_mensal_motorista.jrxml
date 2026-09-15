@@ -58,26 +58,10 @@
     <field name="tipoLinha" class="br.com.frotasPro.api.domain.enums.TipoLinhaRelatorioMotorista"/>
     <field name="motoristaQueDirigiu" class="java.lang.String"/>
 
-    <!-- Cor de fundo da linha conforme a relação entre quem dirigiu e o
-         titular do caminhão (ver TipoLinhaRelatorioMotorista) — mesmas cores
-         usadas na tela (motorista-detalhe.component.css: linha-sem-km /
-         linha-sem-tonelada). -->
-    <style name="fundoLinha" mode="Opaque" backcolor="#FFFFFF">
-        <conditionalStyle>
-            <conditionExpression><![CDATA[$F{tipoLinha} != null
-&& ($F{tipoLinha}.name().equals("CAMINHAO_DE_OUTRO_TITULAR") || $F{tipoLinha}.name().equals("CAMINHAO_SEM_TITULAR"))]]></conditionExpression>
-            <style backcolor="#FEF3C7"/>
-        </conditionalStyle>
-        <conditionalStyle>
-            <conditionExpression><![CDATA[$F{tipoLinha} != null && $F{tipoLinha}.name().equals("MOTORISTA_TERCEIRO_NO_MEU_CAMINHAO")]]></conditionExpression>
-            <style backcolor="#DBEAFE"/>
-        </conditionalStyle>
-    </style>
-
     <background splitType="Stretch"/>
 
     <!-- ===================== TITLE ===================== -->
-    <title height="132" splitType="Stretch">
+    <title height="150" splitType="Stretch">
 
         <!-- Logo (opcional) -->
         <element kind="image"
@@ -195,6 +179,28 @@
                  bold="true" pattern="#,##0.00" hTextAlign="Center" vTextAlign="Middle"
                  blankWhenNull="true">
             <expression><![CDATA[$P{realizadoToneladaPercentual}]]></expression>
+        </element>
+
+        <!-- Legenda das cores usadas nas linhas de carga com caminhão emprestado. -->
+        <element kind="staticText"
+                 uuid="00000000-0000-0000-0000-00000000022a"
+                 mode="Opaque" backcolor="#D97706"
+                 x="0" y="126" width="10" height="10"/>
+        <element kind="staticText"
+                 uuid="00000000-0000-0000-0000-00000000022b"
+                 x="14" y="124" width="380" height="14"
+                 fontSize="8.0">
+            <text><![CDATA[Carga em caminhão de outro titular — só tonelada conta]]></text>
+        </element>
+        <element kind="staticText"
+                 uuid="00000000-0000-0000-0000-00000000022c"
+                 mode="Opaque" backcolor="#2563EB"
+                 x="410" y="126" width="10" height="10"/>
+        <element kind="staticText"
+                 uuid="00000000-0000-0000-0000-00000000022d"
+                 x="424" y="124" width="380" height="14"
+                 fontSize="8.0">
+            <text><![CDATA[Seu caminhão, dirigido por outro motorista — só km/km-L conta]]></text>
         </element>
 
     </title>
@@ -320,12 +326,35 @@
     <detail>
         <band height="28" splitType="Stretch">
 
-            <!-- Fundo da linha inteira — primeiro elemento, pra ficar atrás dos campos. -->
-            <element kind="staticText"
+            <!-- Fundo + faixa esquerda — laranja: carga em caminhão de outro titular / sem titular (só tonelada conta).
+                 Usa printWhenExpression + cor direta (não style/conditionalStyle nomeado, que não pinta neste engine). -->
+            <element kind="rectangle"
                      uuid="00000000-0000-0000-0000-000000000227"
-                     style="fundoLinha"
+                     mode="Opaque" backcolor="#FEF3C7"
                      x="0" y="0" width="802" height="28">
-                <text><![CDATA[]]></text>
+                <printWhenExpression><![CDATA[$F{tipoLinha} != null
+&& ($F{tipoLinha}.name().equals("CAMINHAO_DE_OUTRO_TITULAR") || $F{tipoLinha}.name().equals("CAMINHAO_SEM_TITULAR"))]]></printWhenExpression>
+            </element>
+            <element kind="rectangle"
+                     uuid="00000000-0000-0000-0000-000000000229"
+                     mode="Opaque" backcolor="#D97706"
+                     x="0" y="0" width="4" height="28">
+                <printWhenExpression><![CDATA[$F{tipoLinha} != null
+&& ($F{tipoLinha}.name().equals("CAMINHAO_DE_OUTRO_TITULAR") || $F{tipoLinha}.name().equals("CAMINHAO_SEM_TITULAR"))]]></printWhenExpression>
+            </element>
+
+            <!-- Fundo + faixa esquerda — azul: seu caminhão dirigido por outro motorista (só km/km-L conta). -->
+            <element kind="rectangle"
+                     uuid="00000000-0000-0000-0000-000000000233"
+                     mode="Opaque" backcolor="#DBEAFE"
+                     x="0" y="0" width="802" height="28">
+                <printWhenExpression><![CDATA[$F{tipoLinha} != null && $F{tipoLinha}.name().equals("MOTORISTA_TERCEIRO_NO_MEU_CAMINHAO")]]></printWhenExpression>
+            </element>
+            <element kind="rectangle"
+                     uuid="00000000-0000-0000-0000-000000000234"
+                     mode="Opaque" backcolor="#2563EB"
+                     x="0" y="0" width="4" height="28">
+                <printWhenExpression><![CDATA[$F{tipoLinha} != null && $F{tipoLinha}.name().equals("MOTORISTA_TERCEIRO_NO_MEU_CAMINHAO")]]></printWhenExpression>
             </element>
 
             <element kind="textField"
@@ -421,22 +450,30 @@
                 <expression><![CDATA[$F{mediaKmLitro}]]></expression>
             </element>
 
-            <!-- Observação — só imprime quando a carga envolve caminhão/motorista
-                 diferente do titular (ver TipoLinhaRelatorioMotorista). -->
+            <!-- Observação — laranja: caminhão de outro titular / sem titular. -->
             <element kind="textField"
                      uuid="00000000-0000-0000-0000-000000000228"
-                     x="0" y="16" width="802" height="11"
+                     x="6" y="16" width="796" height="11"
                      blankWhenNull="true"
-                     fontSize="7.0" italic="true" forecolor="#6B7280"
+                     fontSize="7.5" bold="true" forecolor="#92400E"
                      vTextAlign="Middle">
-                <printWhenExpression><![CDATA[$F{tipoLinha} != null && !$F{tipoLinha}.name().equals("PROPRIA")]]></printWhenExpression>
+                <printWhenExpression><![CDATA[$F{tipoLinha} != null
+&& ($F{tipoLinha}.name().equals("CAMINHAO_DE_OUTRO_TITULAR") || $F{tipoLinha}.name().equals("CAMINHAO_SEM_TITULAR"))]]></printWhenExpression>
                 <expression><![CDATA[
-$F{tipoLinha} == null ? "" :
-$F{tipoLinha}.name().equals("CAMINHAO_DE_OUTRO_TITULAR") ? "Carga em caminhão de outro titular — só a tonelada conta pra este motorista; km rodado e km/L contam no relatório do titular do caminhão." :
-$F{tipoLinha}.name().equals("CAMINHAO_SEM_TITULAR") ? "Caminhão sem titular cadastrado — só a tonelada conta; km rodado e km/L não são atribuídos a ninguém até o titular ser cadastrado." :
-$F{tipoLinha}.name().equals("MOTORISTA_TERCEIRO_NO_MEU_CAMINHAO") ? "Carga dirigida por " + ($F{motoristaQueDirigiu} == null ? "outro motorista" : $F{motoristaQueDirigiu}) + " neste caminhão — só km rodado e km/L contam pra este motorista (é o titular); a tonelada conta no relatório de quem dirigiu." :
-""
+$F{tipoLinha}.name().equals("CAMINHAO_DE_OUTRO_TITULAR") ? "SÓ TONELADA — Carga em caminhão de outro titular; km rodado e km/L contam no relatório do titular do caminhão." :
+"SÓ TONELADA — Caminhão sem titular cadastrado; km rodado e km/L não são atribuídos a ninguém até o titular ser cadastrado."
                 ]]></expression>
+            </element>
+
+            <!-- Observação — azul: seu caminhão dirigido por outro motorista. -->
+            <element kind="textField"
+                     uuid="00000000-0000-0000-0000-000000000235"
+                     x="6" y="16" width="796" height="11"
+                     blankWhenNull="true"
+                     fontSize="7.5" bold="true" forecolor="#1E40AF"
+                     vTextAlign="Middle">
+                <printWhenExpression><![CDATA[$F{tipoLinha} != null && $F{tipoLinha}.name().equals("MOTORISTA_TERCEIRO_NO_MEU_CAMINHAO")]]></printWhenExpression>
+                <expression><![CDATA["SÓ KM/L — Carga dirigida por " + ($F{motoristaQueDirigiu} == null ? "outro motorista" : $F{motoristaQueDirigiu}) + " neste caminhão; a tonelada conta no relatório de quem dirigiu."]]></expression>
             </element>
 
         </band>
