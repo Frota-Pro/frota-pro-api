@@ -359,6 +359,33 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
             @Param("status") Status status
     );
 
+    /**
+     * Mesma ideia de {@link #desempenhoMotoristasNoPeriodo}, mas agrupado pelo
+     * TITULAR do caminhão de cada carga, não por quem dirigiu — km rodado é
+     * responsabilidade do titular do caminhão (empreste ou não), diferente de
+     * tonelada/nº de cargas, que continuam sendo de quem efetivamente
+     * dirigiu. Usado só pra QUILOMETRAGEM em RelatorioMetasMotoristasService
+     * (totalCargas/totalTonelada aqui não devem ser usados).
+     */
+    @Query("""
+        select
+          titular.id as motoristaId,
+          count(c.id) as totalCargas,
+          coalesce(sum(c.pesoCarga), 0) as totalTonelada,
+          coalesce(sum(c.kmFinal - c.kmInicial), 0) as totalKmRodado
+        from Carga c
+        join c.caminhao cam
+        join cam.motoristaTitular titular
+        where c.statusCarga = :status
+          and c.dtChegada between :inicio and :fim
+        group by titular.id
+    """)
+    List<DesempenhoMotoristaRow> desempenhoKmRodadoPorTitularNoPeriodo(
+            @Param("inicio") java.time.LocalDate inicio,
+            @Param("fim") java.time.LocalDate fim,
+            @Param("status") Status status
+    );
+
     /** Base da página de Analytics — cargas finalizadas no período, pra série de tendência semanal. */
     List<Carga> findByStatusCargaAndDtChegadaBetween(Status statusCarga, LocalDate inicio, LocalDate fim);
 

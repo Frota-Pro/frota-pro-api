@@ -171,6 +171,23 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, UU
        """)
     BigDecimal mediaKmLitroPonderadaPorMotoristaEPeriodo(UUID motoristaId, LocalDateTime inicio, LocalDateTime fim);
 
+    /**
+     * Mesma ideia de cima, mas pelo TITULAR do caminhão abastecido, não por
+     * quem abasteceu — consumo/km-por-litro é responsabilidade do titular do
+     * caminhão (empreste ou não). Usado em RelatorioMetasMotoristasService.
+     */
+    @Query("""
+       select case
+                when sum(case when a.mediaKmLitro is not null then coalesce(a.qtLitros, 0) else 0 end) = 0 then null
+                else sum(a.mediaKmLitro * coalesce(a.qtLitros, 0))
+                     / sum(case when a.mediaKmLitro is not null then coalesce(a.qtLitros, 0) else 0 end)
+              end
+       from Abastecimento a
+       where a.caminhao.motoristaTitular.id = :motoristaTitularId
+         and a.dtAbastecimento between :inicio and :fim
+       """)
+    BigDecimal mediaKmLitroPonderadaPorTitularEPeriodo(UUID motoristaTitularId, LocalDateTime inicio, LocalDateTime fim);
+
     @Query("""
     select a
     from Abastecimento a
