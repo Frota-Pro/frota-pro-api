@@ -359,8 +359,9 @@
 
             <element kind="textField"
                      uuid="00000000-0000-0000-0000-000000000213"
-                     x="0" y="1" width="60" height="15"
+                     x="6" y="1" width="54" height="15"
                      blankWhenNull="true"
+                     fontSize="8.0"
                      vTextAlign="Middle">
                 <expression><![CDATA[$F{data}]]></expression>
             </element>
