@@ -55,6 +55,24 @@
     <field name="litros" class="java.math.BigDecimal"/>
     <field name="valorAbastecimento" class="java.math.BigDecimal"/>
     <field name="mediaKmLitro" class="java.math.BigDecimal"/>
+    <field name="tipoLinha" class="br.com.frotasPro.api.domain.enums.TipoLinhaRelatorioMotorista"/>
+    <field name="motoristaQueDirigiu" class="java.lang.String"/>
+
+    <!-- Cor de fundo da linha conforme a relação entre quem dirigiu e o
+         titular do caminhão (ver TipoLinhaRelatorioMotorista) — mesmas cores
+         usadas na tela (motorista-detalhe.component.css: linha-sem-km /
+         linha-sem-tonelada). -->
+    <style name="fundoLinha" mode="Opaque" backcolor="#FFFFFF">
+        <conditionalStyle>
+            <conditionExpression><![CDATA[$F{tipoLinha} != null
+&& ($F{tipoLinha}.name().equals("CAMINHAO_DE_OUTRO_TITULAR") || $F{tipoLinha}.name().equals("CAMINHAO_SEM_TITULAR"))]]></conditionExpression>
+            <style backcolor="#FEF3C7"/>
+        </conditionalStyle>
+        <conditionalStyle>
+            <conditionExpression><![CDATA[$F{tipoLinha} != null && $F{tipoLinha}.name().equals("MOTORISTA_TERCEIRO_NO_MEU_CAMINHAO")]]></conditionExpression>
+            <style backcolor="#DBEAFE"/>
+        </conditionalStyle>
+    </style>
 
     <background splitType="Stretch"/>
 
@@ -300,7 +318,15 @@
 
     <!-- ===================== DETAIL (linhas) ===================== -->
     <detail>
-        <band height="18" splitType="Stretch">
+        <band height="28" splitType="Stretch">
+
+            <!-- Fundo da linha inteira — primeiro elemento, pra ficar atrás dos campos. -->
+            <element kind="staticText"
+                     uuid="00000000-0000-0000-0000-000000000227"
+                     style="fundoLinha"
+                     x="0" y="0" width="802" height="28">
+                <text><![CDATA[]]></text>
+            </element>
 
             <element kind="textField"
                      uuid="00000000-0000-0000-0000-000000000213"
@@ -393,6 +419,24 @@
                      pattern="#,##0.00"
                      hTextAlign="Right" vTextAlign="Middle">
                 <expression><![CDATA[$F{mediaKmLitro}]]></expression>
+            </element>
+
+            <!-- Observação — só imprime quando a carga envolve caminhão/motorista
+                 diferente do titular (ver TipoLinhaRelatorioMotorista). -->
+            <element kind="textField"
+                     uuid="00000000-0000-0000-0000-000000000228"
+                     x="0" y="16" width="802" height="11"
+                     blankWhenNull="true"
+                     fontSize="7.0" italic="true" forecolor="#6B7280"
+                     vTextAlign="Middle">
+                <printWhenExpression><![CDATA[$F{tipoLinha} != null && !$F{tipoLinha}.name().equals("PROPRIA")]]></printWhenExpression>
+                <expression><![CDATA[
+$F{tipoLinha} == null ? "" :
+$F{tipoLinha}.name().equals("CAMINHAO_DE_OUTRO_TITULAR") ? "Carga em caminhão de outro titular — só a tonelada conta pra este motorista; km rodado e km/L contam no relatório do titular do caminhão." :
+$F{tipoLinha}.name().equals("CAMINHAO_SEM_TITULAR") ? "Caminhão sem titular cadastrado — só a tonelada conta; km rodado e km/L não são atribuídos a ninguém até o titular ser cadastrado." :
+$F{tipoLinha}.name().equals("MOTORISTA_TERCEIRO_NO_MEU_CAMINHAO") ? "Carga dirigida por " + ($F{motoristaQueDirigiu} == null ? "outro motorista" : $F{motoristaQueDirigiu}) + " neste caminhão — só km rodado e km/L contam pra este motorista (é o titular); a tonelada conta no relatório de quem dirigiu." :
+""
+                ]]></expression>
             </element>
 
         </band>

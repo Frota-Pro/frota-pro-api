@@ -127,6 +127,27 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
             @Param("fim") LocalDate fim
     );
 
+    // Cargas do caminhão cujo titular é esse motorista, mas dirigidas por
+    // OUTRO motorista (emprestou o caminhão) — usado pra somar km rodado/
+    // km-por-litro no relatório do titular mesmo em cargas que ele não
+    // dirigiu. Ver RelatorioMetaMensalMotoristaService.
+    @Query("""
+            select c
+            from Carga c
+               join fetch c.motorista m
+               join fetch c.caminhao cam
+               join cam.motoristaTitular titular
+            where titular.codigo = :codigoMotoristaTitular
+              and m.codigo <> :codigoMotoristaTitular
+              and c.dtSaida between :inicio and :fim
+            order by c.dtSaida asc, c.id asc
+            """)
+    List<Carga> findByCaminhaoTitularCodigoDirigidaPorOutroNoPeriodo(
+            @Param("codigoMotoristaTitular") String codigoMotoristaTitular,
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim
+    );
+
     @Query("""
        select coalesce(sum(c.kmFinal - c.kmInicial), 0)
        from Carga c
