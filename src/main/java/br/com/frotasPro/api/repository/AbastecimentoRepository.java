@@ -172,9 +172,11 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, UU
     BigDecimal mediaKmLitroPonderadaPorMotoristaEPeriodo(UUID motoristaId, LocalDateTime inicio, LocalDateTime fim);
 
     /**
-     * Mesma ideia de cima, mas pelo TITULAR do caminhão abastecido, não por
-     * quem abasteceu — consumo/km-por-litro é responsabilidade do titular do
-     * caminhão (empreste ou não). Usado em RelatorioMetasMotoristasService.
+     * Mesma ideia de cima, mas pelo TITULAR CONGELADO do abastecimento (foto
+     * de quando ele foi criado, não o titular atual do caminhão — ver
+     * Abastecimento.titularNoPeriodo), não por quem abasteceu — consumo/
+     * km-por-litro é responsabilidade do titular (empreste ou não). Usado em
+     * RelatorioMetasMotoristasService.
      */
     @Query("""
        select case
@@ -183,7 +185,7 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, UU
                      / sum(case when a.mediaKmLitro is not null then coalesce(a.qtLitros, 0) else 0 end)
               end
        from Abastecimento a
-       where a.caminhao.motoristaTitular.id = :motoristaTitularId
+       where a.titularNoPeriodo.id = :motoristaTitularId
          and a.dtAbastecimento between :inicio and :fim
        """)
     BigDecimal mediaKmLitroPonderadaPorTitularEPeriodo(UUID motoristaTitularId, LocalDateTime inicio, LocalDateTime fim);
@@ -410,8 +412,7 @@ and (cast(:fim as timestamp) is null or a.dt_abastecimento <= cast(:fim as times
        from Abastecimento a
        join a.paradaCarga p
        join p.carga c
-       join c.caminhao cam
-       join cam.motoristaTitular titular
+       join c.titularNoPeriodo titular
        where titular.codigo = :codigo
          and c.statusCarga = :status
          and c.dtSaida between :inicio and :fim

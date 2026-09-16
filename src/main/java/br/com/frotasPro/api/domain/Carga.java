@@ -158,6 +158,17 @@ public class Carga extends AuditoriaBase {
     @JoinColumn(name = "caminhao_id", nullable = false)
     private Caminhao caminhao;
 
+    /**
+     * Motorista titular do caminhão no momento em que ESTA carga foi criada
+     * — nunca atualizado depois (nem por re-sync do WinThor), mesmo que o
+     * caminhão troque de titular. É essa "foto" congelada que decide o km
+     * rodado/km-por-litro nos relatórios e metas, pra uma troca de titular
+     * hoje não mudar os números de um mês já fechado.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "titular_no_periodo_id")
+    private Motorista titularNoPeriodo;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "rota_id", nullable = false)
     private Rota rota;

@@ -143,6 +143,13 @@ public class SincronizarCargaService {
         }
         carga.setCaminhao(caminhaoOpt.get());
 
+        // Só na criação — re-sync não pode "atualizar" o titular congelado de
+        // uma carga já existente (senão trocar o titular hoje bagunçaria o
+        // km rodado/km-por-litro de cargas de meses já fechados).
+        if (nova) {
+            carga.setTitularNoPeriodo(caminhaoOpt.get().getMotoristaTitular());
+        }
+
         String destino = dto.getDestino();
         Rota rota = rotaRepository.findByCidadeInicio(destino)
                 .orElseGet(() -> {

@@ -100,7 +100,7 @@ public class RelatorioMetaMensalMotoristaService {
 
         Motorista motorista = !cargasProprias.isEmpty()
                 ? cargasProprias.get(0).getMotorista()
-                : cargasEmprestadas.get(0).getCaminhao().getMotoristaTitular();
+                : cargasEmprestadas.get(0).getTitularNoPeriodo();
 
         // O objetivo do mês é sempre o do caminhão titular do motorista, quando houver
         // vínculo cadastrado — assim, se ele pegar carga em outro caminhão eventualmente,
@@ -127,7 +127,7 @@ public class RelatorioMetaMensalMotoristaService {
         // senão, essa economia é responsabilidade do titular do caminhão
         // emprestado (aparece no relatório dele, não neste).
         for (Carga carga : cargasProprias) {
-            Motorista titular = carga.getCaminhao() != null ? carga.getCaminhao().getMotoristaTitular() : null;
+            Motorista titular = carga.getTitularNoPeriodo();
             TipoLinhaRelatorioMotorista tipo = titular == null
                     ? TipoLinhaRelatorioMotorista.CAMINHAO_SEM_TITULAR
                     : titular.getId().equals(motorista.getId())
