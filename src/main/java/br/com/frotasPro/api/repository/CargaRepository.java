@@ -1,10 +1,12 @@
 package br.com.frotasPro.api.repository;
 
 import br.com.frotasPro.api.domain.Carga;
+import br.com.frotasPro.api.domain.Motorista;
 import br.com.frotasPro.api.domain.enums.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -203,6 +205,28 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
             @Param("inicio") LocalDate inicio,
             @Param("fim") LocalDate fim,
             @Param("status") Status status
+    );
+
+    /**
+     * Correção manual (RecalcularTitularCaminhaoService) — reatribui o
+     * titular congelado das cargas de um caminhão a partir de uma data,
+     * pro caso de cadastro tardio (motorista já dirigia, só não estava
+     * marcado como titular ainda). Ao contrário da atribuição automática
+     * (congelada na criação — ver Carga.titularNoPeriodo), aqui é uma ação
+     * explícita do admin, só quando pedida.
+     */
+    @Modifying
+    @Query("""
+        update Carga c
+        set c.titularNoPeriodo = :titular
+        where c.caminhao.id = :caminhaoId
+          and c.dtSaida is not null
+          and c.dtSaida >= :dataInicio
+        """)
+    int atualizarTitularNoPeriodoPorCaminhaoAPartirDe(
+            @Param("caminhaoId") UUID caminhaoId,
+            @Param("dataInicio") LocalDate dataInicio,
+            @Param("titular") Motorista titular
     );
 
     @Query("""

@@ -1,6 +1,7 @@
 package br.com.frotasPro.api.repository;
 
 import br.com.frotasPro.api.domain.Abastecimento;
+import br.com.frotasPro.api.domain.Motorista;
 import br.com.frotasPro.api.domain.enums.FormaPagamento;
 import br.com.frotasPro.api.domain.enums.Status;
 import br.com.frotasPro.api.domain.enums.TipoCombustivel;
@@ -9,6 +10,7 @@ import br.com.frotasPro.api.projections.AbastecimentoResumoCaminhao;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -422,6 +424,20 @@ and (cast(:fim as timestamp) is null or a.dt_abastecimento <= cast(:fim as times
             @Param("inicio") LocalDate inicio,
             @Param("fim") LocalDate fim,
             @Param("status") Status status
+    );
+
+    /** Correção manual — ver CargaRepository.atualizarTitularNoPeriodoPorCaminhaoAPartirDe. */
+    @Modifying
+    @Query("""
+        update Abastecimento a
+        set a.titularNoPeriodo = :titular
+        where a.caminhao.id = :caminhaoId
+          and a.dtAbastecimento >= :dataInicio
+        """)
+    int atualizarTitularNoPeriodoPorCaminhaoAPartirDe(
+            @Param("caminhaoId") UUID caminhaoId,
+            @Param("dataInicio") LocalDateTime dataInicio,
+            @Param("titular") Motorista titular
     );
 
     boolean existsByPostoAbastecimento_Id(UUID id);
