@@ -1,5 +1,6 @@
 package br.com.frotasPro.api.controller;
 
+import br.com.frotasPro.api.controller.request.MotoristaFeriasRequest;
 import br.com.frotasPro.api.controller.request.MotoristaRequest;
 import br.com.frotasPro.api.controller.response.DocumentoMotoristaResponse;
 import br.com.frotasPro.api.controller.response.MotoristaDispositivoAppResponse;
@@ -42,6 +43,7 @@ public class MotoristaController {
     private final ListarDocumentoMotoristaService listarDocumentoMotoristaService;
     private final RegistrarDocumentoMotoristaService registrarDocumentoMotoristaService;
     private final ListarDispositivosAppMotoristasService listarDispositivosAppMotoristasService;
+    private final AtualizarFeriasMotoristaService atualizarFeriasMotoristaService;
 
     @PreAuthorize("hasAnyAuthority(\'ROLE_CONSULTA\')")
     @GetMapping("/{codigo}")
@@ -107,6 +109,18 @@ public class MotoristaController {
     public ResponseEntity<Void> deletar(@PathVariable String codigo) {
         deletarMotoristaService.deletar(codigo);
         return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasAnyAuthority(\'ROLE_ADMIN\', \'ROLE_GERENTE_LOGISTICA\', \'ROLE_OPERADOR_LOGISTICA\')")
+    @PatchMapping("/{codigo}/ferias")
+    @Caching(evict = {
+            @CacheEvict(value = "motorista_buscar_codigo", allEntries = true),
+            @CacheEvict(value = "motorista_listar", allEntries = true)
+    })
+    public ResponseEntity<MotoristaResponse> atualizarFerias(
+            @PathVariable String codigo,
+            @RequestBody MotoristaFeriasRequest request) {
+        return ResponseEntity.ok(atualizarFeriasMotoristaService.atualizar(codigo, request));
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")

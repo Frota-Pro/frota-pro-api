@@ -1,6 +1,7 @@
 package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.CaminhaoRequest;
+import br.com.frotasPro.api.controller.request.CaminhaoTitularRequest;
 import br.com.frotasPro.api.controller.request.VincularCategoriaCaminhaoEmLoteRequest;
 import br.com.frotasPro.api.controller.response.CaminhaoDetalheResponse;
 import br.com.frotasPro.api.controller.response.CaminhaoResponse;
@@ -37,6 +38,7 @@ public class CaminhaoController {
     private final RegistrarDocumentoCaminhaoService registrarDocumentoCaminhaoService;
     private final BuscarCaminhaoDetalheService buscarCaminhaoDetalheService;
     private final VincularCategoriaCaminhaoEmLoteService vincularCategoriaCaminhaoEmLoteService;
+    private final TransferirTitularCaminhaoService transferirTitularCaminhaoService;
 
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
@@ -156,6 +158,22 @@ public class CaminhaoController {
     public ResponseEntity<Void> ativar(@PathVariable String codigo) {
         ativarCaminhaoService.ativar(codigo);
         return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PatchMapping("/{codigo}/titular")
+    @Caching(evict = {
+            @CacheEvict(value = "caminhao_listar", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_codigo", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_placa", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_codigo_externo", allEntries = true),
+            @CacheEvict(value = "caminhao_detalhes", allEntries = true)
+    })
+    public ResponseEntity<CaminhaoResponse> transferirTitular(
+            @PathVariable String codigo,
+            @RequestBody CaminhaoTitularRequest request) {
+        CaminhaoResponse caminhao = transferirTitularCaminhaoService.transferir(codigo, request.getMotoristaTitular());
+        return ResponseEntity.ok(caminhao);
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")

@@ -16,6 +16,9 @@ public class MotoristaMapper {
                 .validadeCnh(motorista.getValidadeCnh())
                 .status(motorista.getStatus())
                 .ativo(motorista.isAtivo())
+                .emFerias(motorista.isEmFerias())
+                .feriasInicio(motorista.getFeriasInicio())
+                .feriasFimPrevisto(motorista.getFeriasFimPrevisto())
                 .build();
     }
 }
