@@ -9,7 +9,6 @@ import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
 import br.com.frotasPro.api.repository.DocumentoCaminhaoRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,11 +21,13 @@ public class ListarDocumentoCaminhaoService {
     private final CaminhaoRepository caminhaoRepository;
     private final DocumentoCaminhaoRepository documentoCaminhaoRepository;
 
-    // Faltava esse @Cacheable — mesma situação de BuscarCaminhaoDetalheService:
-    // "caminhao_documentos" já era evitado em todo write path, mas nada
-    // populava esse cache. Mesmo padrão de ListarDocumentoMotoristaService
-    // (motorista_documentos), que já funciona.
-    @Cacheable("caminhao_documentos")
+    // NÃO cachear — ao contrário de ListarDocumentoMotoristaService (que
+    // retorna List e cacheia bem), este método retorna Page<T>. Cache Redis
+    // (GenericJackson2JsonRedisSerializer) não consegue desserializar
+    // PageImpl de volta (sem construtor/creator que o Jackson enxergue),
+    // quebrando com "Cannot construct instance of PageImpl" no primeiro
+    // cache-hit em produção. "caminhao_documentos" segue sendo evitado nos
+    // write paths só por segurança, mas nunca é populado.
     @Transactional(readOnly = true)
     public Page<DocumentoCaminhaoResponse> listarPorCaminhao(String codigo, Pageable pageable) {
 

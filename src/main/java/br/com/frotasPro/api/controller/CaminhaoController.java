@@ -6,6 +6,7 @@ import br.com.frotasPro.api.controller.request.VincularCategoriaCaminhaoEmLoteRe
 import br.com.frotasPro.api.controller.response.CaminhaoDetalheResponse;
 import br.com.frotasPro.api.controller.response.CaminhaoResponse;
 import br.com.frotasPro.api.controller.response.DocumentoCaminhaoResponse;
+import br.com.frotasPro.api.controller.response.RecalcularTitularCaminhaoResponse;
 import br.com.frotasPro.api.domain.enums.TipoDocumentoCaminhao;
 import br.com.frotasPro.api.service.caminhao.*;
 import jakarta.validation.Valid;
@@ -14,6 +15,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/caminhao")
@@ -39,6 +42,7 @@ public class CaminhaoController {
     private final BuscarCaminhaoDetalheService buscarCaminhaoDetalheService;
     private final VincularCategoriaCaminhaoEmLoteService vincularCategoriaCaminhaoEmLoteService;
     private final TransferirTitularCaminhaoService transferirTitularCaminhaoService;
+    private final RecalcularTitularCaminhaoService recalcularTitularCaminhaoService;
 
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
@@ -174,6 +178,21 @@ public class CaminhaoController {
             @RequestBody CaminhaoTitularRequest request) {
         CaminhaoResponse caminhao = transferirTitularCaminhaoService.transferir(codigo, request.getMotoristaTitular());
         return ResponseEntity.ok(caminhao);
+    }
+
+    /**
+     * Correção manual — reatribui km rodado/km-por-litro das cargas e
+     * abastecimentos deste caminhão, a partir de uma data, pro titular
+     * ATUAL. Uso: motorista já dirigia esse caminhão, só não estava
+     * cadastrado como titular ainda (diferente de uma troca de titular de
+     * verdade, que não deve mexer em meses já fechados).
+     */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PatchMapping("/{codigo}/recalcular-titular")
+    public ResponseEntity<RecalcularTitularCaminhaoResponse> recalcularTitular(
+            @PathVariable String codigo,
+            @RequestParam("dataInicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio) {
+        return ResponseEntity.ok(recalcularTitularCaminhaoService.recalcular(codigo, dataInicio));
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
