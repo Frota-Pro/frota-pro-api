@@ -51,14 +51,17 @@ public class MetaProgressoService {
             // já é mostrado no relatório de meta mensal do motorista. Não é
             // mais a média entre abastecimentos avulsos (que ignorava de
             // qual carga cada um fazia parte).
+            // Km/L por motorista usa o TITULAR do caminhão (ver
+            // CargaRepository.sumKmRodadoPorTitularNoPeriodo) — mesma regra
+            // de "caminhão emprestado" do relatório de meta mensal.
             Long kmRodado = null;
             BigDecimal litros = null;
             if (caminhao != null) {
                 kmRodado = cargaRepository.sumKmRodadoPorCaminhaoNoPeriodo(caminhao.getCodigo(), inicio, fim, Status.FINALIZADA);
                 litros = abastecimentoRepository.sumLitrosVinculadosACargaPorCaminhaoNoPeriodo(caminhao.getCodigo(), inicio, fim, Status.FINALIZADA);
             } else if (motorista != null) {
-                kmRodado = cargaRepository.sumKmRodadoPorMotoristaNoPeriodo(motorista.getCodigo(), inicio, fim, Status.FINALIZADA);
-                litros = abastecimentoRepository.sumLitrosVinculadosACargaPorMotoristaNoPeriodo(motorista.getCodigo(), inicio, fim, Status.FINALIZADA);
+                kmRodado = cargaRepository.sumKmRodadoPorTitularNoPeriodo(motorista.getCodigo(), inicio, fim, Status.FINALIZADA);
+                litros = abastecimentoRepository.sumLitrosVinculadosACargaPorTitularNoPeriodo(motorista.getCodigo(), inicio, fim, Status.FINALIZADA);
             } else {
                 return meta.getValorRealizado();
             }
@@ -70,11 +73,13 @@ public class MetaProgressoService {
         }
 
         if (tipo == TipoMeta.QUILOMETRAGEM) {
+            // Km rodado por motorista usa o TITULAR do caminhão, não quem
+            // dirigiu — ver CargaRepository.sumKmRodadoPorTitularNoPeriodo.
             Long total = null;
             if (caminhao != null) {
                 total = cargaRepository.sumKmRodadoPorCaminhaoNoPeriodo(caminhao.getCodigo(), inicio, fim, Status.FINALIZADA);
             } else if (motorista != null) {
-                total = cargaRepository.sumKmRodadoPorMotoristaNoPeriodo(motorista.getCodigo(), inicio, fim, Status.FINALIZADA);
+                total = cargaRepository.sumKmRodadoPorTitularNoPeriodo(motorista.getCodigo(), inicio, fim, Status.FINALIZADA);
             }
             return total != null ? BigDecimal.valueOf(total) : meta.getValorRealizado();
         }

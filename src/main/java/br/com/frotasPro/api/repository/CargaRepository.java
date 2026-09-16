@@ -180,6 +180,30 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
             @Param("status") Status status
     );
 
+    /**
+     * Km rodado é responsabilidade do TITULAR do caminhão, mesmo nas cargas
+     * que ele não dirigiu pessoalmente (emprestou o caminhão) — mesma regra
+     * de RelatorioMetaMensalMotoristaService. Cargas em caminhão sem titular
+     * cadastrado ficam de fora (inner join), igual ao relatório.
+     */
+    @Query("""
+       select coalesce(sum(c.kmFinal - c.kmInicial), 0)
+       from Carga c
+       join c.caminhao cam
+       join cam.motoristaTitular titular
+       where titular.codigo = :codigo
+         and c.statusCarga = :status
+         and c.dtSaida between :inicio and :fim
+         and c.kmFinal is not null
+         and c.kmInicial is not null
+       """)
+    Long sumKmRodadoPorTitularNoPeriodo(
+            @Param("codigo") String codigo,
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim,
+            @Param("status") Status status
+    );
+
     @Query("""
        select coalesce(sum(c.pesoCarga), 0)
        from Carga c

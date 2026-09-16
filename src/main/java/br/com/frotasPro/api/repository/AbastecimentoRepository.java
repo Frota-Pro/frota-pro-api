@@ -404,6 +404,25 @@ and (cast(:fim as timestamp) is null or a.dt_abastecimento <= cast(:fim as times
             @Param("status") Status status
     );
 
+    /** Litros da mesma regra de titular usada em sumKmRodadoPorTitularNoPeriodo (CargaRepository) — ver lá. */
+    @Query("""
+       select coalesce(sum(a.qtLitros), 0)
+       from Abastecimento a
+       join a.paradaCarga p
+       join p.carga c
+       join c.caminhao cam
+       join cam.motoristaTitular titular
+       where titular.codigo = :codigo
+         and c.statusCarga = :status
+         and c.dtSaida between :inicio and :fim
+       """)
+    BigDecimal sumLitrosVinculadosACargaPorTitularNoPeriodo(
+            @Param("codigo") String codigo,
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim,
+            @Param("status") Status status
+    );
+
     boolean existsByPostoAbastecimento_Id(UUID id);
 
     /** Analytics por motorista/caminhão — abastecimentos de um específico no período. */
