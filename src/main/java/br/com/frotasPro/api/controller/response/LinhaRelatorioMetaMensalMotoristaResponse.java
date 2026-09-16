@@ -1,5 +1,6 @@
 package br.com.frotasPro.api.controller.response;
 
+import br.com.frotasPro.api.domain.enums.TipoLinhaRelatorioMotorista;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,4 +29,14 @@ public class LinhaRelatorioMetaMensalMotoristaResponse {
     private BigDecimal valorAbastecimento;
 
     private BigDecimal mediaKmLitro;
+
+    /** PROPRIA (padrão) ou uma das variantes de caminhão emprestado — ver o enum. */
+    private TipoLinhaRelatorioMotorista tipoLinha;
+
+    /**
+     * Nome de quem efetivamente dirigiu essa carga — só preenchido quando
+     * tipoLinha = MOTORISTA_TERCEIRO_NO_MEU_CAMINHAO (o motorista do
+     * relatório é o titular do caminhão, não quem está nessa linha).
+     */
+    private String motoristaQueDirigiu;
 }

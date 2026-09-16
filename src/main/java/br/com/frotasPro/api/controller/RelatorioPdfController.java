@@ -39,6 +39,7 @@ public class RelatorioPdfController {
     private final RelatorioMetaCategoriaService metaCategoriaService;
     private final RelatorioDesempenhoMetasService desempenhoMetasService;
     private final RelatorioCargasSumidasWinThorService cargasSumidasWinThorService;
+    private final RelatorioVinculoMotoristaCaminhaoService vinculoMotoristaCaminhaoService;
 
     private static final String LOGO_CLASSPATH = "reports/logo.png";
 
@@ -504,6 +505,33 @@ public class RelatorioPdfController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "inline; filename=\"cargas-sumidas-winthor.pdf\"")
+                .body(pdf);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @GetMapping("/motoristas/vinculo-caminhao")
+    public ResponseEntity<byte[]> vinculoMotoristaCaminhaoPdf() {
+        RelatorioVinculoMotoristaCaminhaoResponse rel = vinculoMotoristaCaminhaoService.gerar();
+
+        Map<String, Object> p = new HashMap<>();
+        p.put("geradoEm", rel.getGeradoEm());
+        p.put("totalMotoristasAtivos", rel.getTotalMotoristasAtivos());
+        p.put("totalCaminhoesAtivos", rel.getTotalCaminhoesAtivos());
+        p.put("totalComVinculo", rel.getTotalComVinculo());
+        p.put("totalMotoristasSemCaminhao", rel.getTotalMotoristasSemCaminhao());
+        p.put("totalCaminhoesSemMotorista", rel.getTotalCaminhoesSemMotorista());
+        aplicarLogo(p);
+
+        byte[] pdf = jasperPdfService.gerarPdfFromJasper(
+                "reports/vinculo_motorista_caminhao.jasper",
+                p,
+                rel.getLinhas()
+        );
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=\"vinculo-motorista-caminhao.pdf\"")
                 .body(pdf);
     }
 

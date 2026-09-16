@@ -46,6 +46,10 @@ public class RelatorioMetasMotoristasService {
         Map<UUID, Meta> metasPorMotorista = buscarMetasPorMotorista(motoristaIds, inicio, fim, tipo);
         Map<UUID, CargaRepository.DesempenhoMotoristaRow> desempenhoPorMotorista =
                 buscarDesempenhoPorMotorista(inicio, fim);
+        // Só populado quando faz diferença pra este tipo de meta — km rodado
+        // é do titular do caminhão, não de quem dirigiu (ver os dois métodos).
+        Map<UUID, CargaRepository.DesempenhoMotoristaRow> desempenhoPorTitular =
+                tipo == TipoMeta.QUILOMETRAGEM ? buscarDesempenhoPorTitular(inicio, fim) : Map.of();
 
         LocalDateTime inicioPeriodo = inicio.atStartOfDay();
         LocalDateTime fimPeriodo = fim.atTime(23, 59, 59);
@@ -55,6 +59,7 @@ public class RelatorioMetasMotoristasService {
                         motorista,
                         metasPorMotorista.get(motorista.getId()),
                         desempenhoPorMotorista.get(motorista.getId()),
+                        desempenhoPorTitular.get(motorista.getId()),
                         tipo,
                         inicioPeriodo,
                         fimPeriodo
@@ -111,14 +116,28 @@ public class RelatorioMetasMotoristasService {
         return desempenhoPorMotorista;
     }
 
+    private Map<UUID, CargaRepository.DesempenhoMotoristaRow> buscarDesempenhoPorTitular(LocalDate inicio,
+                                                                                         LocalDate fim) {
+        Map<UUID, CargaRepository.DesempenhoMotoristaRow> desempenhoPorTitular = new HashMap<>();
+        List<CargaRepository.DesempenhoMotoristaRow> rows =
+                cargaRepository.desempenhoKmRodadoPorTitularNoPeriodo(inicio, fim, Status.FINALIZADA);
+
+        for (CargaRepository.DesempenhoMotoristaRow row : rows) {
+            desempenhoPorTitular.put(row.getMotoristaId(), row);
+        }
+
+        return desempenhoPorTitular;
+    }
+
     private RelatorioMetasMotoristasResponse.Linha montarLinha(Motorista motorista,
                                                                Meta meta,
                                                                CargaRepository.DesempenhoMotoristaRow desempenho,
+                                                               CargaRepository.DesempenhoMotoristaRow desempenhoComoTitular,
                                                                TipoMeta tipoMeta,
                                                                LocalDateTime inicio,
                                                                LocalDateTime fim) {
         BigDecimal valorMeta = meta != null ? meta.getValorMeta() : null;
-        BigDecimal realizado = calcularRealizado(motorista, desempenho, tipoMeta, inicio, fim);
+        BigDecimal realizado = calcularRealizado(motorista, desempenho, desempenhoComoTitular, tipoMeta, inicio, fim);
         BigDecimal percentual = calcularPercentual(realizado, valorMeta);
         boolean dentroMeta = dentroDaMeta(tipoMeta, realizado, valorMeta);
 
@@ -143,11 +162,17 @@ public class RelatorioMetasMotoristasService {
 
     private BigDecimal calcularRealizado(Motorista motorista,
                                          CargaRepository.DesempenhoMotoristaRow desempenho,
+                                         CargaRepository.DesempenhoMotoristaRow desempenhoComoTitular,
                                          TipoMeta tipoMeta,
                                          LocalDateTime inicio,
                                          LocalDateTime fim) {
+        // Consumo (km/L) e quilometragem são responsabilidade do TITULAR do
+        // caminhão (empreste ou não), não de quem efetivamente dirigiu — ver
+        // AbastecimentoRepository.mediaKmLitroPonderadaPorTitularEPeriodo e
+        // CargaRepository.desempenhoKmRodadoPorTitularNoPeriodo. Tonelada e nº
+        // de cargas continuam sendo de quem dirigiu (calculado normal, abaixo).
         if (tipoMeta == TipoMeta.CONSUMO_COMBUSTIVEL) {
-            BigDecimal media = abastecimentoRepository.mediaKmLitroPonderadaPorMotoristaEPeriodo(
+            BigDecimal media = abastecimentoRepository.mediaKmLitroPonderadaPorTitularEPeriodo(
                     motorista.getId(),
                     inicio,
                     fim
@@ -155,21 +180,24 @@ public class RelatorioMetasMotoristasService {
             return media != null ? media : BigDecimal.ZERO;
         }
 
+        if (tipoMeta == TipoMeta.QUILOMETRAGEM) {
+            return desempenhoComoTitular != null && desempenhoComoTitular.getTotalKmRodado() != null
+                    ? BigDecimal.valueOf(desempenhoComoTitular.getTotalKmRodado())
+                    : BigDecimal.ZERO;
+        }
+
         if (desempenho == null) {
             return BigDecimal.ZERO;
         }
 
         return switch (tipoMeta) {
-            case QUILOMETRAGEM -> BigDecimal.valueOf(desempenho.getTotalKmRodado() != null
-                    ? desempenho.getTotalKmRodado()
-                    : 0L);
             case CARGA_TRANSPORTADA -> BigDecimal.valueOf(desempenho.getTotalCargas() != null
                     ? desempenho.getTotalCargas()
                     : 0L);
             case TONELADA -> desempenho.getTotalTonelada() != null
                     ? desempenho.getTotalTonelada()
                     : BigDecimal.ZERO;
-            case CONSUMO_COMBUSTIVEL -> BigDecimal.ZERO;
+            case QUILOMETRAGEM, CONSUMO_COMBUSTIVEL -> BigDecimal.ZERO; // tratados acima, nunca chega aqui
         };
     }
 

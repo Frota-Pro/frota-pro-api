@@ -32,4 +32,12 @@ public class MotoristaResponse {
 
     private Status status;
     private boolean ativo;
+
+    private boolean emFerias;
+
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    private LocalDate feriasInicio;
+
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    private LocalDate feriasFimPrevisto;
 }

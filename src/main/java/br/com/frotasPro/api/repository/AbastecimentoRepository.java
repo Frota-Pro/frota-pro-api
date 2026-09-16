@@ -171,6 +171,23 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, UU
        """)
     BigDecimal mediaKmLitroPonderadaPorMotoristaEPeriodo(UUID motoristaId, LocalDateTime inicio, LocalDateTime fim);
 
+    /**
+     * Mesma ideia de cima, mas pelo TITULAR do caminhão abastecido, não por
+     * quem abasteceu — consumo/km-por-litro é responsabilidade do titular do
+     * caminhão (empreste ou não). Usado em RelatorioMetasMotoristasService.
+     */
+    @Query("""
+       select case
+                when sum(case when a.mediaKmLitro is not null then coalesce(a.qtLitros, 0) else 0 end) = 0 then null
+                else sum(a.mediaKmLitro * coalesce(a.qtLitros, 0))
+                     / sum(case when a.mediaKmLitro is not null then coalesce(a.qtLitros, 0) else 0 end)
+              end
+       from Abastecimento a
+       where a.caminhao.motoristaTitular.id = :motoristaTitularId
+         and a.dtAbastecimento between :inicio and :fim
+       """)
+    BigDecimal mediaKmLitroPonderadaPorTitularEPeriodo(UUID motoristaTitularId, LocalDateTime inicio, LocalDateTime fim);
+
     @Query("""
     select a
     from Abastecimento a
@@ -381,6 +398,25 @@ and (cast(:fim as timestamp) is null or a.dt_abastecimento <= cast(:fim as times
          and c.dtSaida between :inicio and :fim
        """)
     BigDecimal sumLitrosVinculadosACargaPorMotoristaNoPeriodo(
+            @Param("codigo") String codigo,
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim,
+            @Param("status") Status status
+    );
+
+    /** Litros da mesma regra de titular usada em sumKmRodadoPorTitularNoPeriodo (CargaRepository) — ver lá. */
+    @Query("""
+       select coalesce(sum(a.qtLitros), 0)
+       from Abastecimento a
+       join a.paradaCarga p
+       join p.carga c
+       join c.caminhao cam
+       join cam.motoristaTitular titular
+       where titular.codigo = :codigo
+         and c.statusCarga = :status
+         and c.dtSaida between :inicio and :fim
+       """)
+    BigDecimal sumLitrosVinculadosACargaPorTitularNoPeriodo(
             @Param("codigo") String codigo,
             @Param("inicio") LocalDate inicio,
             @Param("fim") LocalDate fim,

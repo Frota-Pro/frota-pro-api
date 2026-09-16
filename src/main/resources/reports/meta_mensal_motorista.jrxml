@@ -55,11 +55,13 @@
     <field name="litros" class="java.math.BigDecimal"/>
     <field name="valorAbastecimento" class="java.math.BigDecimal"/>
     <field name="mediaKmLitro" class="java.math.BigDecimal"/>
+    <field name="tipoLinha" class="br.com.frotasPro.api.domain.enums.TipoLinhaRelatorioMotorista"/>
+    <field name="motoristaQueDirigiu" class="java.lang.String"/>
 
     <background splitType="Stretch"/>
 
     <!-- ===================== TITLE ===================== -->
-    <title height="132" splitType="Stretch">
+    <title height="158" splitType="Stretch">
 
         <!-- Logo (opcional) -->
         <element kind="image"
@@ -177,6 +179,28 @@
                  bold="true" pattern="#,##0.00" hTextAlign="Center" vTextAlign="Middle"
                  blankWhenNull="true">
             <expression><![CDATA[$P{realizadoToneladaPercentual}]]></expression>
+        </element>
+
+        <!-- Legenda das cores usadas nas linhas de carga com caminhão emprestado. -->
+        <element kind="staticText"
+                 uuid="00000000-0000-0000-0000-00000000022a"
+                 mode="Opaque" backcolor="#D97706"
+                 x="0" y="136" width="10" height="10"/>
+        <element kind="staticText"
+                 uuid="00000000-0000-0000-0000-00000000022b"
+                 x="14" y="134" width="380" height="14"
+                 fontSize="8.0">
+            <text><![CDATA[Carga em caminhão de outro titular — só tonelada conta]]></text>
+        </element>
+        <element kind="staticText"
+                 uuid="00000000-0000-0000-0000-00000000022c"
+                 mode="Opaque" backcolor="#2563EB"
+                 x="410" y="136" width="10" height="10"/>
+        <element kind="staticText"
+                 uuid="00000000-0000-0000-0000-00000000022d"
+                 x="424" y="134" width="380" height="14"
+                 fontSize="8.0">
+            <text><![CDATA[Seu caminhão, dirigido por outro motorista — só km/km-L conta]]></text>
         </element>
 
     </title>
@@ -300,19 +324,51 @@
 
     <!-- ===================== DETAIL (linhas) ===================== -->
     <detail>
-        <band height="18" splitType="Stretch">
+        <band height="34" splitType="Stretch">
+
+            <!-- Fundo + faixa esquerda — laranja: carga em caminhão de outro titular / sem titular (só tonelada conta).
+                 Usa printWhenExpression + cor direta (não style/conditionalStyle nomeado, que não pinta neste engine). -->
+            <element kind="rectangle"
+                     uuid="00000000-0000-0000-0000-000000000227"
+                     mode="Opaque" backcolor="#FEF3C7"
+                     x="0" y="0" width="802" height="34">
+                <printWhenExpression><![CDATA[$F{tipoLinha} != null
+&& ($F{tipoLinha}.name().equals("CAMINHAO_DE_OUTRO_TITULAR") || $F{tipoLinha}.name().equals("CAMINHAO_SEM_TITULAR"))]]></printWhenExpression>
+            </element>
+            <element kind="rectangle"
+                     uuid="00000000-0000-0000-0000-000000000229"
+                     mode="Opaque" backcolor="#D97706"
+                     x="0" y="0" width="4" height="34">
+                <printWhenExpression><![CDATA[$F{tipoLinha} != null
+&& ($F{tipoLinha}.name().equals("CAMINHAO_DE_OUTRO_TITULAR") || $F{tipoLinha}.name().equals("CAMINHAO_SEM_TITULAR"))]]></printWhenExpression>
+            </element>
+
+            <!-- Fundo + faixa esquerda — azul: seu caminhão dirigido por outro motorista (só km/km-L conta). -->
+            <element kind="rectangle"
+                     uuid="00000000-0000-0000-0000-000000000233"
+                     mode="Opaque" backcolor="#DBEAFE"
+                     x="0" y="0" width="802" height="34">
+                <printWhenExpression><![CDATA[$F{tipoLinha} != null && $F{tipoLinha}.name().equals("MOTORISTA_TERCEIRO_NO_MEU_CAMINHAO")]]></printWhenExpression>
+            </element>
+            <element kind="rectangle"
+                     uuid="00000000-0000-0000-0000-000000000234"
+                     mode="Opaque" backcolor="#2563EB"
+                     x="0" y="0" width="4" height="34">
+                <printWhenExpression><![CDATA[$F{tipoLinha} != null && $F{tipoLinha}.name().equals("MOTORISTA_TERCEIRO_NO_MEU_CAMINHAO")]]></printWhenExpression>
+            </element>
 
             <element kind="textField"
                      uuid="00000000-0000-0000-0000-000000000213"
-                     x="0" y="1" width="60" height="15"
+                     x="6" y="4" width="54" height="16"
                      blankWhenNull="true"
+                     fontSize="8.0"
                      vTextAlign="Middle">
                 <expression><![CDATA[$F{data}]]></expression>
             </element>
 
             <element kind="textField"
                      uuid="00000000-0000-0000-0000-000000000214"
-                     x="60" y="1" width="80" height="15"
+                     x="60" y="4" width="80" height="16"
                      blankWhenNull="true"
                      vTextAlign="Middle">
                 <expression><![CDATA[$F{lote}]]></expression>
@@ -320,7 +376,7 @@
 
             <element kind="textField"
                      uuid="00000000-0000-0000-0000-000000000215"
-                     x="140" y="1" width="120" height="15"
+                     x="140" y="4" width="120" height="16"
                      blankWhenNull="true"
                      vTextAlign="Middle">
                 <expression><![CDATA[$F{cidade}]]></expression>
@@ -328,7 +384,7 @@
 
             <element kind="textField"
                      uuid="00000000-0000-0000-0000-000000000216"
-                     x="260" y="1" width="90" height="15"
+                     x="260" y="4" width="90" height="16"
                      blankWhenNull="true"
                      pattern="'R$ ' #,##0.00"
                      hTextAlign="Right" vTextAlign="Middle">
@@ -337,7 +393,7 @@
 
             <element kind="textField"
                      uuid="00000000-0000-0000-0000-000000000217"
-                     x="350" y="1" width="70" height="15"
+                     x="350" y="4" width="70" height="16"
                      blankWhenNull="true"
                      pattern="#,##0.000"
                      hTextAlign="Right" vTextAlign="Middle">
@@ -346,7 +402,7 @@
 
             <element kind="textField"
                      uuid="00000000-0000-0000-0000-000000000218"
-                     x="420" y="1" width="60" height="15"
+                     x="420" y="4" width="60" height="16"
                      blankWhenNull="true"
                      hTextAlign="Right" vTextAlign="Middle">
                 <expression><![CDATA[$F{kmInicial}]]></expression>
@@ -354,7 +410,7 @@
 
             <element kind="textField"
                      uuid="00000000-0000-0000-0000-000000000219"
-                     x="480" y="1" width="60" height="15"
+                     x="480" y="4" width="60" height="16"
                      blankWhenNull="true"
                      hTextAlign="Right" vTextAlign="Middle">
                 <expression><![CDATA[$F{kmFinal}]]></expression>
@@ -362,7 +418,7 @@
 
             <element kind="textField"
                      uuid="00000000-0000-0000-0000-00000000021a"
-                     x="540" y="1" width="60" height="15"
+                     x="540" y="4" width="60" height="16"
                      blankWhenNull="true"
                      hTextAlign="Right" vTextAlign="Middle">
                 <expression><![CDATA[$F{kmRodado}]]></expression>
@@ -370,7 +426,7 @@
 
             <element kind="textField"
                      uuid="00000000-0000-0000-0000-00000000021b"
-                     x="600" y="1" width="70" height="15"
+                     x="600" y="4" width="70" height="16"
                      blankWhenNull="true"
                      pattern="#,##0.00"
                      hTextAlign="Right" vTextAlign="Middle">
@@ -379,7 +435,7 @@
 
             <element kind="textField"
                      uuid="00000000-0000-0000-0000-00000000021c"
-                     x="670" y="1" width="90" height="15"
+                     x="670" y="4" width="90" height="16"
                      blankWhenNull="true"
                      pattern="'R$ ' #,##0.00"
                      hTextAlign="Right" vTextAlign="Middle">
@@ -388,11 +444,37 @@
 
             <element kind="textField"
                      uuid="00000000-0000-0000-0000-00000000021d"
-                     x="760" y="1" width="42" height="15"
+                     x="760" y="4" width="42" height="16"
                      blankWhenNull="true"
                      pattern="#,##0.00"
                      hTextAlign="Right" vTextAlign="Middle">
                 <expression><![CDATA[$F{mediaKmLitro}]]></expression>
+            </element>
+
+            <!-- Observação — laranja: caminhão de outro titular / sem titular. -->
+            <element kind="textField"
+                     uuid="00000000-0000-0000-0000-000000000228"
+                     x="6" y="21" width="796" height="12"
+                     blankWhenNull="true"
+                     fontSize="7.5" bold="true" forecolor="#92400E"
+                     vTextAlign="Middle">
+                <printWhenExpression><![CDATA[$F{tipoLinha} != null
+&& ($F{tipoLinha}.name().equals("CAMINHAO_DE_OUTRO_TITULAR") || $F{tipoLinha}.name().equals("CAMINHAO_SEM_TITULAR"))]]></printWhenExpression>
+                <expression><![CDATA[
+$F{tipoLinha}.name().equals("CAMINHAO_DE_OUTRO_TITULAR") ? "SÓ TONELADA — Carga em caminhão de outro titular; km rodado e km/L contam no relatório do titular do caminhão." :
+"SÓ TONELADA — Caminhão sem titular cadastrado; km rodado e km/L não são atribuídos a ninguém até o titular ser cadastrado."
+                ]]></expression>
+            </element>
+
+            <!-- Observação — azul: seu caminhão dirigido por outro motorista. -->
+            <element kind="textField"
+                     uuid="00000000-0000-0000-0000-000000000235"
+                     x="6" y="21" width="796" height="12"
+                     blankWhenNull="true"
+                     fontSize="7.5" bold="true" forecolor="#1E40AF"
+                     vTextAlign="Middle">
+                <printWhenExpression><![CDATA[$F{tipoLinha} != null && $F{tipoLinha}.name().equals("MOTORISTA_TERCEIRO_NO_MEU_CAMINHAO")]]></printWhenExpression>
+                <expression><![CDATA["SÓ KM/L — Carga dirigida por " + ($F{motoristaQueDirigiu} == null ? "outro motorista" : $F{motoristaQueDirigiu}) + " neste caminhão; a tonelada conta no relatório de quem dirigiu."]]></expression>
             </element>
 
         </band>

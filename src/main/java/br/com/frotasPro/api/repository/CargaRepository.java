@@ -127,6 +127,27 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
             @Param("fim") LocalDate fim
     );
 
+    // Cargas do caminhão cujo titular é esse motorista, mas dirigidas por
+    // OUTRO motorista (emprestou o caminhão) — usado pra somar km rodado/
+    // km-por-litro no relatório do titular mesmo em cargas que ele não
+    // dirigiu. Ver RelatorioMetaMensalMotoristaService.
+    @Query("""
+            select c
+            from Carga c
+               join fetch c.motorista m
+               join fetch c.caminhao cam
+               join cam.motoristaTitular titular
+            where titular.codigo = :codigoMotoristaTitular
+              and m.codigo <> :codigoMotoristaTitular
+              and c.dtSaida between :inicio and :fim
+            order by c.dtSaida asc, c.id asc
+            """)
+    List<Carga> findByCaminhaoTitularCodigoDirigidaPorOutroNoPeriodo(
+            @Param("codigoMotoristaTitular") String codigoMotoristaTitular,
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim
+    );
+
     @Query("""
        select coalesce(sum(c.kmFinal - c.kmInicial), 0)
        from Carga c
@@ -153,6 +174,30 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
          and c.kmInicial is not null
        """)
     Long sumKmRodadoPorMotoristaNoPeriodo(
+            @Param("codigo") String codigo,
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim,
+            @Param("status") Status status
+    );
+
+    /**
+     * Km rodado é responsabilidade do TITULAR do caminhão, mesmo nas cargas
+     * que ele não dirigiu pessoalmente (emprestou o caminhão) — mesma regra
+     * de RelatorioMetaMensalMotoristaService. Cargas em caminhão sem titular
+     * cadastrado ficam de fora (inner join), igual ao relatório.
+     */
+    @Query("""
+       select coalesce(sum(c.kmFinal - c.kmInicial), 0)
+       from Carga c
+       join c.caminhao cam
+       join cam.motoristaTitular titular
+       where titular.codigo = :codigo
+         and c.statusCarga = :status
+         and c.dtSaida between :inicio and :fim
+         and c.kmFinal is not null
+         and c.kmInicial is not null
+       """)
+    Long sumKmRodadoPorTitularNoPeriodo(
             @Param("codigo") String codigo,
             @Param("inicio") LocalDate inicio,
             @Param("fim") LocalDate fim,
@@ -333,6 +378,33 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
         group by m.id
     """)
     List<DesempenhoMotoristaRow> desempenhoMotoristasNoPeriodo(
+            @Param("inicio") java.time.LocalDate inicio,
+            @Param("fim") java.time.LocalDate fim,
+            @Param("status") Status status
+    );
+
+    /**
+     * Mesma ideia de {@link #desempenhoMotoristasNoPeriodo}, mas agrupado pelo
+     * TITULAR do caminhão de cada carga, não por quem dirigiu — km rodado é
+     * responsabilidade do titular do caminhão (empreste ou não), diferente de
+     * tonelada/nº de cargas, que continuam sendo de quem efetivamente
+     * dirigiu. Usado só pra QUILOMETRAGEM em RelatorioMetasMotoristasService
+     * (totalCargas/totalTonelada aqui não devem ser usados).
+     */
+    @Query("""
+        select
+          titular.id as motoristaId,
+          count(c.id) as totalCargas,
+          coalesce(sum(c.pesoCarga), 0) as totalTonelada,
+          coalesce(sum(c.kmFinal - c.kmInicial), 0) as totalKmRodado
+        from Carga c
+        join c.caminhao cam
+        join cam.motoristaTitular titular
+        where c.statusCarga = :status
+          and c.dtChegada between :inicio and :fim
+        group by titular.id
+    """)
+    List<DesempenhoMotoristaRow> desempenhoKmRodadoPorTitularNoPeriodo(
             @Param("inicio") java.time.LocalDate inicio,
             @Param("fim") java.time.LocalDate fim,
             @Param("status") Status status

@@ -66,6 +66,15 @@ public class Motorista extends AuditoriaBase{
     @Column(nullable = false)
     private boolean ativo = true;
 
+    @Column(name = "em_ferias", nullable = false)
+    private boolean emFerias = false;
+
+    @Column(name = "ferias_inicio")
+    private LocalDate feriasInicio;
+
+    @Column(name = "ferias_fim_previsto")
+    private LocalDate feriasFimPrevisto;
+
     @OneToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "usuario_id", unique = true)
     private Usuario usuario;
