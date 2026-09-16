@@ -45,6 +45,11 @@ public class Abastecimento extends AuditoriaBase{
     @JoinColumn(name = "motorista_id")
     private Motorista motorista;
 
+    /** Mesma ideia de Carga.titularNoPeriodo — congelado na criação, nunca atualizado depois. */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "titular_no_periodo_id")
+    private Motorista titularNoPeriodo;
+
     // Posto cadastrado (com contrato) — alternativa ao campo "posto" (texto livre)
     // logo abaixo, usado quando o motorista abastece num posto fora da lista.
     @ManyToOne(fetch = FetchType.LAZY, optional = true)

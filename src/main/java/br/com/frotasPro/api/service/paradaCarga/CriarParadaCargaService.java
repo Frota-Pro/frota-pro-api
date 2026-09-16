@@ -106,6 +106,7 @@ public class CriarParadaCargaService {
             Abastecimento abastecimento = new Abastecimento();
             abastecimento.setParadaCarga(parada);
             abastecimento.setCaminhao(carga.getCaminhao());
+            abastecimento.setTitularNoPeriodo(carga.getTitularNoPeriodo());
             abastecimento.setMotorista(carga.getMotorista());
             abastecimento.setDtAbastecimento(
                     request.getDtInicio() != null ? request.getDtInicio() : FusoHorarioUtils.agoraBrasil()

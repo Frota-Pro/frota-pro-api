@@ -44,6 +44,7 @@ public class CriarAbastecimentoService {
 
         Abastecimento a = new Abastecimento();
         a.setCaminhao(caminhao);
+        a.setTitularNoPeriodo(caminhao.getMotoristaTitular());
         a.setMotorista(motorista);
         a.setDtAbastecimento(request.getDtAbastecimento());
         a.setKmOdometro(request.getKmOdometro());

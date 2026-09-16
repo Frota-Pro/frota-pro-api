@@ -36,6 +36,7 @@ public class CargaMapper {
         carga.setCaminhao(caminhao);
         carga.setRota(rota);
         carga.setAjudantes(ajudantes);
+        carga.setTitularNoPeriodo(caminhao != null ? caminhao.getMotoristaTitular() : null);
 
         return carga;
     }
