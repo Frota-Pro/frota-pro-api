@@ -3,7 +3,6 @@ package br.com.frotasPro.api.service.caminhao;
 import br.com.frotasPro.api.controller.response.CaminhaoResponse;
 import br.com.frotasPro.api.domain.Caminhao;
 import br.com.frotasPro.api.domain.Motorista;
-import br.com.frotasPro.api.excption.BusinessException;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.mapper.CaminhaoMapper;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
@@ -46,11 +45,22 @@ public class TransferirTitularCaminhaoService {
                     .orElseThrow(() -> new ObjectNotFound(
                             "ERRO: Motorista titular não encontrado: " + motoristaTitularCodigo));
 
+            // Motorista já é titular de outro caminhão? Desvincula de lá em vez
+            // de travar com erro — reatribuir titular é justamente pra isso
+            // (motorista trocou de caminhão), não faz sentido exigir que o
+            // usuário vá desvincular manualmente no outro cadastro antes.
             caminhaoRepository.findByMotoristaTitularId(motoristaTitular.getId())
                     .filter(outroCaminhao -> !outroCaminhao.getId().equals(caminhao.getId()))
                     .ifPresent(outroCaminhao -> {
-                        throw new BusinessException(
-                                "Motorista já é titular do caminhão " + outroCaminhao.getCodigo());
+                        outroCaminhao.setMotoristaTitular(null);
+                        // saveAndFlush (não save) de propósito: precisa ir pro
+                        // banco JÁ, antes de setar esse motorista como titular
+                        // do caminhão atual mais abaixo — senão o Hibernate
+                        // pode ordenar os dois UPDATEs ao contrário na hora do
+                        // flush e violar a constraint única por um instante
+                        // (o motorista apareceria titular dos dois ao mesmo
+                        // tempo), estourando DataIntegrityViolationException.
+                        caminhaoRepository.saveAndFlush(outroCaminhao);
                     });
 
             caminhao.setMotoristaTitular(motoristaTitular);
