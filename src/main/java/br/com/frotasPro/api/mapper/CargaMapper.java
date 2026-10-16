@@ -56,8 +56,17 @@ public class CargaMapper {
         carga.setKmFinal(request.getKmFinal());
         carga.setStatusCarga(request.getStatusCarga());
 
+        // O titular congelado é do caminhão da carga: se a edição trocou o
+        // caminhão, o titular antigo ficaria apontando pro veículo errado.
+        boolean trocouCaminhao = carga.getCaminhao() == null
+                || caminhao == null
+                || !carga.getCaminhao().getId().equals(caminhao.getId());
+
         carga.setMotorista(motorista);
         carga.setCaminhao(caminhao);
+        if (trocouCaminhao) {
+            carga.setTitularNoPeriodo(caminhao != null ? caminhao.getMotoristaTitular() : null);
+        }
         carga.setRota(rota);
         carga.setAjudantes(ajudantes);
     }

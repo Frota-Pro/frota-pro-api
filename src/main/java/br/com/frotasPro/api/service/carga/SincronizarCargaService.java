@@ -141,12 +141,17 @@ public class SincronizarCargaService {
                     dto.getCodVeiculo(), dto.getNumMdfe());
             return;
         }
+        boolean trocouCaminhao = nova
+                || carga.getCaminhao() == null
+                || !carga.getCaminhao().getId().equals(caminhaoOpt.get().getId());
         carga.setCaminhao(caminhaoOpt.get());
 
-        // Só na criação — re-sync não pode "atualizar" o titular congelado de
-        // uma carga já existente (senão trocar o titular hoje bagunçaria o
-        // km rodado/km-por-litro de cargas de meses já fechados).
-        if (nova) {
+        // Só na criação ou quando o MDF-e foi reemitido com outro veículo — re-sync
+        // do mesmo caminhão não pode "atualizar" o titular congelado de uma carga
+        // já existente (senão trocar o titular hoje bagunçaria o km rodado/km-por-litro
+        // de cargas de meses já fechados). Com caminhão novo, o titular congelado
+        // antigo seria de um veículo que nem é mais o da carga.
+        if (trocouCaminhao) {
             carga.setTitularNoPeriodo(caminhaoOpt.get().getMotoristaTitular());
         }
 
