@@ -40,6 +40,9 @@ public class ParametroSistemaService {
     public ParametroSistemaResponse atualizar(ParametroSistemaUpdateRequest request) {
         ParametroSistema parametro = ensureExists(empresaIdPadrao);
 
+        if (request.getDiasUteisFechamentoMeta() != null) {
+            parametro.setDiasUteisFechamentoMeta(request.getDiasUteisFechamentoMeta());
+        }
         parametro.setDiasAntecedenciaVencimentoDocumento(request.getDiasAntecedenciaVencimentoDocumento());
         parametro.setKmAntecedenciaManutencaoPreventiva(request.getKmAntecedenciaManutencaoPreventiva());
         parametro.setDiasManutencaoEstagnada(request.getDiasManutencaoEstagnada());
@@ -65,6 +68,7 @@ public class ParametroSistemaService {
 
     private ParametroSistemaResponse toResponse(ParametroSistema parametro) {
         return ParametroSistemaResponse.builder()
+                .diasUteisFechamentoMeta(parametro.getDiasUteisFechamentoMeta())
                 .diasAntecedenciaVencimentoDocumento(parametro.getDiasAntecedenciaVencimentoDocumento())
                 .kmAntecedenciaManutencaoPreventiva(parametro.getKmAntecedenciaManutencaoPreventiva())
                 .diasManutencaoEstagnada(parametro.getDiasManutencaoEstagnada())

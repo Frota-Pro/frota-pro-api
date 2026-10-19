@@ -1,6 +1,7 @@
 package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.MetaRequest;
+import br.com.frotasPro.api.controller.response.FechamentoMetaResponse;
 import br.com.frotasPro.api.controller.response.MetaCategoriaDesempenhoResponse;
 import br.com.frotasPro.api.controller.response.MetaResponse;
 import br.com.frotasPro.api.controller.response.RelatorioDesempenhoMetasResponse;
@@ -25,6 +26,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,6 +45,7 @@ public class MetaController {
     private final BuscarDesempenhoMetaCategoriaService buscarDesempenhoMetaCategoriaService;
     private final RelatorioDesempenhoMetasService relatorioDesempenhoMetasService;
     private final BuscarMinhaMetaMensalService buscarMinhaMetaMensalService;
+    private final FechamentoMetaMotoristaService fechamentoMetaMotoristaService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @PostMapping
@@ -202,6 +205,49 @@ public class MetaController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim
     ) {
         return ResponseEntity.ok(buscarMinhaMetaMensalService.buscar(inicio, fim));
+    }
+
+    // ========= FECHAMENTO DA META (prazo em dias úteis + confirmação do motorista) =========
+
+    /** Situação do fechamento do mês pro motorista logado. Sem "mes" (yyyy-MM) vale o mês que acabou de terminar. */
+    @PreAuthorize("hasAuthority('ROLE_MOTORISTA')")
+    @GetMapping("/meu-fechamento")
+    public ResponseEntity<FechamentoMetaResponse> meuFechamento(
+            @RequestParam(value = "mes", required = false) @DateTimeFormat(pattern = "yyyy-MM") YearMonth mes) {
+        return ResponseEntity.ok(fechamentoMetaMotoristaService.statusDoMotoristaLogado(mes));
+    }
+
+    /** O motorista confirma que a meta do mês está ok: o mês fecha pra ele e as próximas cargas contam no mês seguinte. */
+    @PreAuthorize("hasAuthority('ROLE_MOTORISTA')")
+    @PostMapping("/meu-fechamento/confirmar")
+    public ResponseEntity<FechamentoMetaResponse> confirmarMeuFechamento(
+            @RequestParam(value = "mes", required = false) @DateTimeFormat(pattern = "yyyy-MM") YearMonth mes) {
+        return ResponseEntity.ok(fechamentoMetaMotoristaService.confirmarDoMotoristaLogado(mes));
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_CONSULTA')")
+    @GetMapping("/fechamento/motorista/{codigoMotorista}")
+    public ResponseEntity<FechamentoMetaResponse> fechamentoDoMotorista(
+            @PathVariable String codigoMotorista,
+            @RequestParam(value = "mes", required = false) @DateTimeFormat(pattern = "yyyy-MM") YearMonth mes) {
+        return ResponseEntity.ok(fechamentoMetaMotoristaService.statusDoMotorista(codigoMotorista, mes));
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PostMapping("/fechamento/motorista/{codigoMotorista}/confirmar")
+    public ResponseEntity<FechamentoMetaResponse> confirmarFechamentoDoMotorista(
+            @PathVariable String codigoMotorista,
+            @RequestParam(value = "mes", required = false) @DateTimeFormat(pattern = "yyyy-MM") YearMonth mes) {
+        return ResponseEntity.ok(fechamentoMetaMotoristaService.confirmarPeloAdmin(codigoMotorista, mes));
+    }
+
+    /** Desfaz a confirmação. Cargas que já foram pro mês seguinte por causa dela não voltam. */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PostMapping("/fechamento/motorista/{codigoMotorista}/reabrir")
+    public ResponseEntity<FechamentoMetaResponse> reabrirFechamentoDoMotorista(
+            @PathVariable String codigoMotorista,
+            @RequestParam(value = "mes", required = false) @DateTimeFormat(pattern = "yyyy-MM") YearMonth mes) {
+        return ResponseEntity.ok(fechamentoMetaMotoristaService.reabrir(codigoMotorista, mes));
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_CONSULTA')")

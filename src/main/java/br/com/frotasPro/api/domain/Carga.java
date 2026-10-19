@@ -46,6 +46,19 @@ public class Carga extends AuditoriaBase {
     @Column(name = "data_saida")
     private LocalDate dtSaida;
 
+    /**
+     * Mês (dia 1) em que a carga conta pras metas/relatórios quando NÃO é o mês de dtSaida —
+     * carga finalizada depois do mês dela ter fechado conta no primeiro mês ainda aberto
+     * (ver FechamentoMetaService). Nulo = vale a data de saída.
+     */
+    @Column(name = "dt_competencia")
+    private LocalDate dtCompetencia;
+
+    /** Data que decide em qual mês a carga conta pra meta/relatório. */
+    public LocalDate getDataCompetencia() {
+        return dtCompetencia != null ? dtCompetencia : dtSaida;
+    }
+
     @Column(name = "data_prevista")
     private LocalDate dtPrevista;
 

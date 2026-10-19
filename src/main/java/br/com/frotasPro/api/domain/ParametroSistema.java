@@ -28,6 +28,14 @@ public class ParametroSistema extends AuditoriaBase {
     @Column(name = "empresa_id", nullable = false, columnDefinition = "uuid")
     private UUID empresaId;
 
+    /**
+     * Dias úteis (seg-sex) depois do fim do mês em que a meta mensal continua aberta
+     * (motorista que viaja no fim do mês só volta depois da virada). 0 = desativado:
+     * a meta fecha no dia seguinte ao fim do mês, como sempre foi. Ver FechamentoMetaService.
+     */
+    @Column(name = "dias_uteis_fechamento_meta", nullable = false)
+    private int diasUteisFechamentoMeta = 0;
+
     /** Dias antes do vencimento da CNH/documento do caminhão pra avisar. */
     @Column(name = "dias_antecedencia_vencimento_documento", nullable = false)
     private int diasAntecedenciaVencimentoDocumento = 5;

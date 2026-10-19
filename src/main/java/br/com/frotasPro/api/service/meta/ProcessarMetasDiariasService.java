@@ -34,6 +34,7 @@ public class ProcessarMetasDiariasService {
     private final MetaProgressoService metaProgressoService;
     private final NotificacaoService notificacaoService;
     private final NotificacaoRepository notificacaoRepository;
+    private final FechamentoMetaService fechamentoMetaService;
 
     // Job diário (1h da manhã) — não passa por controller, então nunca
     // invalidava esses caches: fecha/renova metas automaticamente todo dia,
@@ -58,11 +59,18 @@ public class ProcessarMetasDiariasService {
                 .findByDataFimBeforeAndStatusMeta(hoje, StatusMeta.EM_ANDAMENTO);
 
         for (Meta meta : metasVencidas) {
-            meta.setStatusMeta(StatusMeta.CONCLUIDA);
+            // Com o prazo de fechamento (dias úteis depois do fim do mês) a meta pode já ter
+            // passado do dataFim e continuar em andamento — só conclui quando o mês fechou.
+            if (fechamentoMetaService.metaFechada(meta, hoje)) {
+                meta.setStatusMeta(StatusMeta.CONCLUIDA);
+            }
         }
 
+        // Renova toda meta que já passou do fim, também as ainda em andamento por causa do
+        // prazo de fechamento: o mês seguinte precisa existir desde o dia 1, senão o motorista
+        // ficaria sem meta nova até o prazo vencer. A checagem de conflito evita duplicar.
         List<Meta> metasConcluidas = metaRepository
-                .findByDataFimBeforeAndStatusMeta(hoje, StatusMeta.CONCLUIDA);
+                .findByDataFimBeforeAndStatusMetaIn(hoje, List.of(StatusMeta.EM_ANDAMENTO, StatusMeta.CONCLUIDA));
 
         for (Meta meta : metasConcluidas) {
             if (!meta.isRenovarAutomaticamente()) continue;
@@ -124,11 +132,22 @@ public class ProcessarMetasDiariasService {
     private void atualizarStatusAutomatico(LocalDate hoje) {
         List<Meta> metas = metaRepository.findByStatusMetaNot(StatusMeta.CANCELADA);
         for (Meta meta : metas) {
-            StatusMeta status = statusPorPeriodo(meta.getDataIncio(), meta.getDataFim(), hoje);
+            StatusMeta status = statusDaMeta(meta, hoje);
             if (status != null && meta.getStatusMeta() != status) {
                 meta.setStatusMeta(status);
             }
         }
+    }
+
+    /** Igual a statusPorPeriodo, mas "concluída" só depois do prazo de fechamento da meta. */
+    private StatusMeta statusDaMeta(Meta meta, LocalDate hoje) {
+        if (meta.getDataIncio() == null || meta.getDataFim() == null) {
+            return null;
+        }
+        if (hoje.isBefore(meta.getDataIncio())) {
+            return StatusMeta.NAO_INICIADA;
+        }
+        return fechamentoMetaService.metaFechada(meta, hoje) ? StatusMeta.CONCLUIDA : StatusMeta.EM_ANDAMENTO;
     }
 
     private StatusMeta statusPorPeriodo(LocalDate inicio, LocalDate fim, LocalDate hoje) {

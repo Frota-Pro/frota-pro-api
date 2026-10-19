@@ -1,5 +1,6 @@
 package br.com.frotasPro.api.controller.request;
 
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -9,6 +10,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ParametroSistemaUpdateRequest {
+
+    // Opcional de propósito: cliente antigo (sem o campo) não derruba o PUT — nulo mantém o valor atual.
+    @Min(value = 0, message = "Dias úteis de fechamento da meta deve ser >= 0")
+    @Max(value = 15, message = "Dias úteis de fechamento da meta deve ser <= 15")
+    private Integer diasUteisFechamentoMeta;
 
     @NotNull(message = "Dias de antecedência de vencimento de documento é obrigatório")
     @Min(value = 0, message = "Dias de antecedência deve ser >= 0")
