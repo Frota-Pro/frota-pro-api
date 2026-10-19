@@ -39,6 +39,7 @@ public class RelatorioPdfController {
     private final RelatorioMetaCategoriaService metaCategoriaService;
     private final RelatorioDesempenhoMetasService desempenhoMetasService;
     private final RelatorioCargasSumidasWinThorService cargasSumidasWinThorService;
+    private final RelatorioCargasNaoSincronizadasService cargasNaoSincronizadasService;
     private final RelatorioVinculoMotoristaCaminhaoService vinculoMotoristaCaminhaoService;
 
     private static final String LOGO_CLASSPATH = "reports/logo.png";
@@ -509,6 +510,35 @@ public class RelatorioPdfController {
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @GetMapping("/carga/nao-sincronizadas")
+    public ResponseEntity<byte[]> cargasNaoSincronizadasPdf(
+            @RequestParam(value = "inicio", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam(value = "fim", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim,
+            @RequestParam(value = "motivo", required = false) String motivo
+    ) {
+        RelatorioCargasNaoSincronizadasResponse rel = cargasNaoSincronizadasService.gerar(inicio, fim, motivo);
+
+        Map<String, Object> p = new HashMap<>();
+        p.put("periodoDescricao", descricaoPeriodoNaoSincronizadas(inicio, fim));
+        p.put("totalCargas", rel.getTotal());
+        p.put("totalSemMotorista", rel.getTotalSemMotorista());
+        p.put("totalSemCaminhao", rel.getTotalSemCaminhao());
+        aplicarLogo(p);
+
+        byte[] pdf = jasperPdfService.gerarPdfFromJasper(
+                "reports/cargas_nao_sincronizadas.jasper",
+                p,
+                rel.getLinhas()
+        );
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=\"cargas-nao-sincronizadas.pdf\"")
+                .body(pdf);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/motoristas/vinculo-caminhao")
     public ResponseEntity<byte[]> vinculoMotoristaCaminhaoPdf() {
         RelatorioVinculoMotoristaCaminhaoResponse rel = vinculoMotoristaCaminhaoService.gerar();
@@ -533,6 +563,15 @@ public class RelatorioPdfController {
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "inline; filename=\"vinculo-motorista-caminhao.pdf\"")
                 .body(pdf);
+    }
+
+    private String descricaoPeriodoNaoSincronizadas(LocalDate inicio, LocalDate fim) {
+        if (inicio == null && fim == null) {
+            return "Período: todas as cargas descartadas";
+        }
+        String de = inicio != null ? inicio.toString() : "início";
+        String ate = fim != null ? fim.toString() : "hoje";
+        return "Data de saída: " + de + " até " + ate;
     }
 
     private String descricaoPeriodoSumidas(LocalDate inicio, LocalDate fim) {

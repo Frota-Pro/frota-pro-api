@@ -7,6 +7,7 @@ import br.com.frotasPro.api.domain.CargaNota;
 import br.com.frotasPro.api.domain.Cliente;
 import br.com.frotasPro.api.domain.ParametroSistema;
 import br.com.frotasPro.api.domain.Rota;
+import br.com.frotasPro.api.domain.enums.MotivoCargaSyncDescartada;
 import br.com.frotasPro.api.domain.enums.Status;
 import br.com.frotasPro.api.domain.enums.StatusTransferenciaCarga;
 import br.com.frotasPro.api.integracao.dto.CargaSyncResponseEvent;
@@ -53,6 +54,7 @@ public class SincronizarCargaService {
     private final OrdemEntregaCidadeService ordemEntregaCidadeService;
     private final ParametroSistemaService parametroSistemaService;
     private final ClienteService clienteService;
+    private final RegistrarCargaSyncDescartadaService registrarCargaSyncDescartadaService;
 
     @Caching(evict = {
             @CacheEvict(value = "carga_listar", allEntries = true),
@@ -128,6 +130,11 @@ public class SincronizarCargaService {
             if (motoristaOpt.isEmpty()) {
                 log.warn("Motorista WinThor {} não encontrado. Ignorando MDF-e {}",
                         dto.getCodMotorista(), dto.getNumMdfe());
+                boolean caminhaoTambemFalta = caminhaoRepository
+                        .findByCodigoExterno(String.valueOf(dto.getCodVeiculo())).isEmpty();
+                registrarCargaSyncDescartadaService.registrar(dto, caminhaoTambemFalta
+                        ? MotivoCargaSyncDescartada.MOTORISTA_E_CAMINHAO_NAO_CADASTRADOS
+                        : MotivoCargaSyncDescartada.MOTORISTA_NAO_CADASTRADO);
                 return;
             }
             carga.setMotorista(motoristaOpt.get());
@@ -139,8 +146,12 @@ public class SincronizarCargaService {
         if (caminhaoOpt.isEmpty()) {
             log.warn("Caminhão WinThor {} não encontrado. Ignorando MDF-e {}",
                     dto.getCodVeiculo(), dto.getNumMdfe());
+            registrarCargaSyncDescartadaService.registrar(dto, MotivoCargaSyncDescartada.CAMINHAO_NAO_CADASTRADO);
             return;
         }
+
+        // Passou nas duas checagens: se essa carga estava na lista de descartadas, sai dela.
+        registrarCargaSyncDescartadaService.resolver(dto.getNumCar());
         boolean trocouCaminhao = nova
                 || carga.getCaminhao() == null
                 || !carga.getCaminhao().getId().equals(caminhaoOpt.get().getId());

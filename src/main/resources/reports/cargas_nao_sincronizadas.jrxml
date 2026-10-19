@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport name="Relatório - Cargas Não Sincronizadas" language="java"
+              whenNoDataType="AllSectionsNoDetail"
+              pageWidth="842" pageHeight="595" orientation="Landscape"
+              columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+
+    <parameter name="logoPath" class="java.lang.Object"/>
+
+    <parameter name="periodoDescricao" class="java.lang.String"/>
+    <parameter name="totalCargas" class="java.lang.Long"/>
+    <parameter name="totalSemMotorista" class="java.lang.Long"/>
+    <parameter name="totalSemCaminhao" class="java.lang.Long"/>
+
+    <field name="numeroCargaExterno" class="java.lang.String"/>
+    <field name="numMdfe" class="java.lang.Long"/>
+    <field name="situacaoMdfe" class="java.lang.String"/>
+    <field name="motivo" class="java.lang.String"/>
+    <field name="motivoDescricao" class="java.lang.String"/>
+    <field name="codigoMotoristaExterno" class="java.lang.String"/>
+    <field name="nomeMotoristaExterno" class="java.lang.String"/>
+    <field name="codigoVeiculoExterno" class="java.lang.String"/>
+    <field name="placaVeiculoExterno" class="java.lang.String"/>
+    <field name="dtSaida" class="java.time.LocalDate"/>
+    <field name="pesoCarga" class="java.math.BigDecimal"/>
+    <field name="valorTotal" class="java.math.BigDecimal"/>
+    <field name="destino" class="java.lang.String"/>
+    <field name="tentativas" class="java.lang.Integer"/>
+    <field name="ultimaOcorrenciaEm" class="java.time.LocalDateTime"/>
+
+    <title height="150">
+        <element kind="image" x="10" y="5" width="120" height="50">
+            <expression><![CDATA[$P{logoPath}]]></expression>
+        </element>
+
+        <element kind="staticText" x="140" y="6" width="500" height="20" fontSize="14" bold="true">
+            <text><![CDATA[RELATÓRIO DE CARGAS NÃO SINCRONIZADAS DO WINTHOR]]></text>
+        </element>
+
+        <element kind="textField" x="140" y="30" width="500" height="16">
+            <expression><![CDATA[$P{periodoDescricao}]]></expression>
+        </element>
+
+        <element kind="textField" x="640" y="12" width="162" height="16" hTextAlign="Right">
+            <expression><![CDATA["Total: " + $P{totalCargas}]]></expression>
+        </element>
+
+        <element kind="staticText" mode="Opaque" x="0" y="64" width="802" height="22" forecolor="#FFFFFF" backcolor="#B45309" bold="true" hTextAlign="Center" vTextAlign="Middle">
+            <text><![CDATA[CARGAS DO WINTHOR QUE NÃO ENTRARAM NO FROTAPRO — CADASTRO FALTANDO]]></text>
+        </element>
+        <element kind="textField" mode="Opaque" x="0" y="86" width="802" height="22" forecolor="#111827" backcolor="#E5E7EB" hTextAlign="Center" vTextAlign="Middle">
+            <expression><![CDATA["Sem motorista cadastrado: " + $P{totalSemMotorista} + "     |     Sem caminhão cadastrado: " + $P{totalSemCaminhao}]]></expression>
+        </element>
+        <element kind="staticText" x="0" y="112" width="802" height="30" fontSize="8" forecolor="#374151">
+            <text><![CDATA[Como resolver: cadastre o motorista/caminhão (com o código externo igual ao do WinThor) ou rode a sincronização de motoristas/caminhões e depois a de cargas. A carga sai desta lista sozinha assim que sincronizar. Motorista terceirizado precisa ser cadastrado para a carga entrar.]]></text>
+        </element>
+    </title>
+
+    <columnHeader height="24">
+        <element kind="staticText" mode="Opaque" x="0" y="3" width="52" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" fontSize="8" hTextAlign="Center">
+            <text><![CDATA[CARGA]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="52" y="3" width="50" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" fontSize="8" hTextAlign="Center">
+            <text><![CDATA[MDF-E]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="102" y="3" width="55" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" fontSize="8" hTextAlign="Center">
+            <text><![CDATA[SAÍDA]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="157" y="3" width="175" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" fontSize="8" hTextAlign="Center">
+            <text><![CDATA[MOTORISTA (WINTHOR)]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="332" y="3" width="95" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" fontSize="8" hTextAlign="Center">
+            <text><![CDATA[CAMINHÃO (WINTHOR)]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="427" y="3" width="85" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" fontSize="8" hTextAlign="Center">
+            <text><![CDATA[DESTINO]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="512" y="3" width="45" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" fontSize="8" hTextAlign="Center">
+            <text><![CDATA[PESO]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="557" y="3" width="70" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" fontSize="8" hTextAlign="Center">
+            <text><![CDATA[VALOR]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="627" y="3" width="110" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" fontSize="8" hTextAlign="Center">
+            <text><![CDATA[O QUE FALTA]]></text>
+        </element>
+        <element kind="staticText" mode="Opaque" x="737" y="3" width="65" height="18" forecolor="#FFFFFF" backcolor="#334155" bold="true" fontSize="8" hTextAlign="Center">
+            <text><![CDATA[TENTATIVA]]></text>
+        </element>
+    </columnHeader>
+
+    <detail>
+        <band height="20">
+            <element kind="textField" x="0" y="2" width="52" height="15" fontSize="8" bold="true" hTextAlign="Center">
+                <expression><![CDATA[$F{numeroCargaExterno}]]></expression>
+            </element>
+            <element kind="textField" x="52" y="2" width="50" height="15" fontSize="8" hTextAlign="Center" blankWhenNull="true">
+                <expression><![CDATA[$F{numMdfe}]]></expression>
+            </element>
+            <element kind="textField" x="102" y="2" width="55" height="15" fontSize="8" hTextAlign="Center">
+                <expression><![CDATA[$F{dtSaida} == null ? "" : $F{dtSaida}.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"))]]></expression>
+            </element>
+            <element kind="textField" x="157" y="2" width="175" height="15" fontSize="8" blankWhenNull="true">
+                <expression><![CDATA[($F{codigoMotoristaExterno} == null ? "" : $F{codigoMotoristaExterno}) + ($F{nomeMotoristaExterno} == null ? "" : " - " + $F{nomeMotoristaExterno})]]></expression>
+            </element>
+            <element kind="textField" x="332" y="2" width="95" height="15" fontSize="8" hTextAlign="Center" blankWhenNull="true">
+                <expression><![CDATA[($F{codigoVeiculoExterno} == null ? "" : $F{codigoVeiculoExterno}) + ($F{placaVeiculoExterno} == null ? "" : " - " + $F{placaVeiculoExterno})]]></expression>
+            </element>
+            <element kind="textField" x="427" y="2" width="85" height="15" fontSize="8" blankWhenNull="true">
+                <expression><![CDATA[$F{destino}]]></expression>
+            </element>
+            <element kind="textField" x="512" y="2" width="45" height="15" fontSize="8" pattern="#,##0.000" hTextAlign="Right" blankWhenNull="true">
+                <expression><![CDATA[$F{pesoCarga}]]></expression>
+            </element>
+            <element kind="textField" x="557" y="2" width="70" height="15" fontSize="8" pattern="'R$ ' #,##0.00" hTextAlign="Right" blankWhenNull="true">
+                <expression><![CDATA[$F{valorTotal}]]></expression>
+            </element>
+            <element kind="textField" x="627" y="2" width="110" height="15" fontSize="7.5" bold="true" forecolor="#92400E" hTextAlign="Center">
+                <expression><![CDATA[$F{motivo}.equals("MOTORISTA_NAO_CADASTRADO") ? "Só o MOTORISTA" : ($F{motivo}.equals("CAMINHAO_NAO_CADASTRADO") ? "Só o CAMINHÃO" : "MOTORISTA e CAMINHÃO")]]></expression>
+            </element>
+            <element kind="textField" x="737" y="2" width="65" height="15" fontSize="8" hTextAlign="Center">
+                <expression><![CDATA[$F{ultimaOcorrenciaEm} == null ? "" : $F{ultimaOcorrenciaEm}.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM HH:mm"))]]></expression>
+            </element>
+        </band>
+    </detail>
+
+    <noData height="40">
+        <element kind="staticText" x="0" y="10" width="802" height="20" hTextAlign="Center" bold="true">
+            <text><![CDATA[Nenhuma carga descartada na sincronização. Todas as cargas do WinThor entraram no sistema.]]></text>
+        </element>
+    </noData>
+
+    <pageFooter height="24">
+        <element kind="textField" x="0" y="6" width="300" height="15">
+            <expression><![CDATA["Emitido em: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())]]></expression>
+        </element>
+        <element kind="textField" x="700" y="6" width="102" height="15" hTextAlign="Right">
+            <expression><![CDATA["Página " + $V{PAGE_NUMBER}]]></expression>
+        </element>
+    </pageFooter>
+
+</jasperReport>

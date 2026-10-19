@@ -21,6 +21,10 @@ public class CargaWinThorDto {
     private String codVeiculo;
     private Integer codMotorista;
 
+    /** Só informativos (relatório de cargas descartadas no sync) — o vínculo é sempre pelo código. */
+    private String nomeMotorista;
+    private String placaVeiculo;
+
     private OffsetDateTime dtSaida;
     private String destino;
 
