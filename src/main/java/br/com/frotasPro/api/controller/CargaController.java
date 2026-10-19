@@ -8,9 +8,11 @@ import br.com.frotasPro.api.controller.request.TransferirNotasCargaRequest;
 import br.com.frotasPro.api.controller.response.CargaMinResponse;
 import br.com.frotasPro.api.controller.response.CargaResponse;
 import br.com.frotasPro.api.controller.response.ImportarNotaFiscalResponse;
+import br.com.frotasPro.api.controller.response.RelatorioCargasNaoSincronizadasResponse;
 import br.com.frotasPro.api.controller.response.RelatorioCargasSumidasWinThorResponse;
 import br.com.frotasPro.api.controller.response.TransferirNotasCargaResponse;
 import br.com.frotasPro.api.service.carga.*;
+import br.com.frotasPro.api.service.relatorios.RelatorioCargasNaoSincronizadasService;
 import br.com.frotasPro.api.service.relatorios.RelatorioCargasSumidasWinThorService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -50,6 +52,7 @@ public class CargaController {
     private final TransferirMotoristaCargaService transferirMotoristaCargaService;
     private final VerificarCargasSumidasWinThorService verificarCargasSumidasWinThorService;
     private final RelatorioCargasSumidasWinThorService relatorioCargasSumidasWinThorService;
+    private final RelatorioCargasNaoSincronizadasService relatorioCargasNaoSincronizadasService;
     private final ImportarNotaFiscalCargaService importarNotaFiscalCargaService;
 
     // ========= RECONCILIAÇÃO WINTHOR =========
@@ -73,6 +76,19 @@ public class CargaController {
     ) {
         return ResponseEntity.ok(
                 relatorioCargasSumidasWinThorService.gerar(inicio, fim, codigoMotorista, codigoCaminhao));
+    }
+
+    /** Cargas que o sync do WinThor descartou (motorista/caminhão do MDF-e sem cadastro no FrotaPRO). */
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @GetMapping("/relatorio-nao-sincronizadas")
+    public ResponseEntity<RelatorioCargasNaoSincronizadasResponse> relatorioCargasNaoSincronizadas(
+            @RequestParam(value = "inicio", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam(value = "fim", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim,
+            @RequestParam(value = "motivo", required = false) String motivo
+    ) {
+        return ResponseEntity.ok(relatorioCargasNaoSincronizadasService.gerar(inicio, fim, motivo));
     }
 
     // ========= BUSCA ÚNICA =========
