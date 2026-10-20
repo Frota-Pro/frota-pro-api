@@ -46,6 +46,7 @@ public class MetaController {
     private final RelatorioDesempenhoMetasService relatorioDesempenhoMetasService;
     private final BuscarMinhaMetaMensalService buscarMinhaMetaMensalService;
     private final FechamentoMetaMotoristaService fechamentoMetaMotoristaService;
+    private final ProcessarMetasDiariasService processarMetasDiariasService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @PostMapping
@@ -208,6 +209,18 @@ public class MetaController {
     }
 
     // ========= FECHAMENTO DA META (prazo em dias úteis + confirmação do motorista) =========
+
+    /**
+     * Roda agora a mesma rotina que roda todo dia às 1h (fecha/reabre metas conforme o prazo de
+     * fechamento e renova o mês seguinte). Útil depois de mudar o parâmetro de dias úteis, pra
+     * não esperar até a madrugada. É idempotente — rodar duas vezes não duplica nada.
+     */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PostMapping("/processar-agora")
+    public ResponseEntity<Void> processarAgora() {
+        processarMetasDiariasService.processar();
+        return ResponseEntity.noContent().build();
+    }
 
     /** Situação do fechamento do mês pro motorista logado. Sem "mes" (yyyy-MM) vale o mês que acabou de terminar. */
     @PreAuthorize("hasAuthority('ROLE_MOTORISTA')")
