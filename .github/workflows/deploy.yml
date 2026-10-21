@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted
+    runs-on: [self-hosted, vps10364]
 
     steps:
       - uses: actions/checkout@v4
@@ -32,7 +32,7 @@ jobs:
 
       - name: Deploy locally
         run: |
-          cd /home/frotapro/deploy/frotapro
-          docker compose pull frotapro-api
-          docker compose up -d --no-deps --remove-orphans frotapro-api
+          cd /opt/apps/frotapro-prod
+          docker compose --env-file /opt/env/frotapro-prod/.env.prod pull frotapro-api
+          docker compose --env-file /opt/env/frotapro-prod/.env.prod up -d --no-deps --remove-orphans frotapro-api
           docker compose logs --tail=200 frotapro-api
