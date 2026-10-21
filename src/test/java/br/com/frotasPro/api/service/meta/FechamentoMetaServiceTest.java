@@ -135,37 +135,31 @@ class FechamentoMetaServiceTest {
         motoristaConfirmou(YearMonth.of(2026, 9), false);
 
         // saiu dia 30/09, voltou e finalizou em 03/10 (prazo vai até 07/10)
-        assertNull(service.calcularCompetencia(LocalDate.of(2026, 9, 30), null, motorista, LocalDate.of(2026, 10, 3)));
+        assertNull(service.calcularCompetencia(LocalDate.of(2026, 9, 30), null, motorista));
     }
 
     @Test
-    void cargaFinalizadaDepoisDeConfirmarVaiParaOMesSeguinte() {
+    void cargaQueSaiuAntesDeConfirmarFicaNoMesDaSaidaMesmoFinalizadaDepois() {
         diasUteis(5);
-        motoristaConfirmou(YearMonth.of(2026, 9), true);
+        confirmacao(YearMonth.of(2026, 9), LocalDateTime.of(2026, 10, 2, 10, 0), true);
 
-        assertEquals(LocalDate.of(2026, 10, 1),
-                service.calcularCompetencia(LocalDate.of(2026, 9, 30), null, motorista, LocalDate.of(2026, 10, 3)));
+        // saiu 30/09, o motorista confirmou setembro em 02/10 e a carga so foi finalizada depois:
+        // continua em setembro (o que conta e quando saiu)
+        assertNull(service.calcularCompetencia(LocalDate.of(2026, 9, 30), LocalDateTime.of(2026, 9, 30, 18, 0), motorista));
     }
 
     @Test
-    void cargaFinalizadaDepoisDoPrazoGeralVaiParaOMesSeguinte() {
+    void cargaQueSaiuNoFimDoMesFinalizadaDepoisDoPrazoContinuaNoMesDaSaida() {
         diasUteis(5);
-        motoristaConfirmou(YearMonth.of(2026, 9), false);
-
-        assertEquals(LocalDate.of(2026, 10, 1),
-                service.calcularCompetencia(LocalDate.of(2026, 9, 28), null, motorista, LocalDate.of(2026, 10, 20)));
+        // saiu 29/10, voltou e finalizou depois do prazo (06/11): continua em outubro
+        assertNull(service.calcularCompetencia(LocalDate.of(2026, 10, 29), LocalDateTime.of(2026, 10, 29, 8, 0), motorista));
     }
 
     @Test
-    void cargaMuitoAtrasadaVaiParaOPrimeiroMesAbertoNaoParaOMesSeguinteFechado() {
+    void cargaMuitoAtrasadaContinuaNoMesDaSaida() {
         diasUteis(5);
-        motoristaConfirmou(YearMonth.of(2026, 7), false);
-        motoristaConfirmou(YearMonth.of(2026, 8), false);
-        motoristaConfirmou(YearMonth.of(2026, 9), false);
-
-        // saiu em julho, só finalizou em 20/10: julho, agosto e setembro já fecharam -> outubro
-        assertEquals(LocalDate.of(2026, 10, 1),
-                service.calcularCompetencia(LocalDate.of(2026, 7, 15), null, motorista, LocalDate.of(2026, 10, 20)));
+        // saiu em julho, so finalizou em outubro: continua em julho
+        assertNull(service.calcularCompetencia(LocalDate.of(2026, 7, 15), LocalDateTime.of(2026, 7, 15, 8, 0), motorista));
     }
 
     @Test
@@ -173,7 +167,7 @@ class FechamentoMetaServiceTest {
         diasUteis(5);
         motoristaConfirmou(YearMonth.of(2026, 10), true);
 
-        assertNull(service.calcularCompetencia(LocalDate.of(2026, 10, 12), null, motorista, LocalDate.of(2026, 10, 13)));
+        assertNull(service.calcularCompetencia(LocalDate.of(2026, 10, 12), null, motorista));
     }
 
     @Test
@@ -181,7 +175,7 @@ class FechamentoMetaServiceTest {
         diasUteis(0);
         motoristaConfirmou(YearMonth.of(2026, 9), true);
 
-        assertNull(service.calcularCompetencia(LocalDate.of(2026, 9, 28), null, motorista, LocalDate.of(2026, 11, 20)));
+        assertNull(service.calcularCompetencia(LocalDate.of(2026, 9, 28), null, motorista));
     }
 
     // ---- carga iniciada nos dias úteis a mais do mês anterior
@@ -205,7 +199,7 @@ class FechamentoMetaServiceTest {
         // Saiu 03/11, só voltou e finalizou em 07/11 (o prazo já fechou em 06/11): conta em outubro.
         assertEquals(LocalDate.of(2026, 10, 1),
                 service.calcularCompetencia(LocalDate.of(2026, 11, 3), LocalDateTime.of(2026, 11, 3, 8, 0),
-                        motorista, LocalDate.of(2026, 11, 7)));
+                        motorista));
     }
 
     @Test
@@ -213,14 +207,14 @@ class FechamentoMetaServiceTest {
         diasUteis(5);
         assertEquals(LocalDate.of(2026, 10, 1),
                 service.calcularCompetencia(LocalDate.of(2026, 11, 6), LocalDateTime.of(2026, 11, 6, 23, 0),
-                        motorista, LocalDate.of(2026, 11, 6)));
+                        motorista));
     }
 
     @Test
     void cargaIniciadaDepoisDoPrazoContaNoMesDaSaida() {
         diasUteis(5);
         assertNull(service.calcularCompetencia(LocalDate.of(2026, 11, 9), LocalDateTime.of(2026, 11, 9, 8, 0),
-                motorista, LocalDate.of(2026, 11, 12)));
+                motorista));
     }
 
     @Test
@@ -229,7 +223,7 @@ class FechamentoMetaServiceTest {
         confirmacao(YearMonth.of(2026, 10), LocalDateTime.of(2026, 11, 2, 10, 0), true);
 
         assertNull(service.calcularCompetencia(LocalDate.of(2026, 11, 3), LocalDateTime.of(2026, 11, 3, 8, 0),
-                motorista, LocalDate.of(2026, 11, 4)));
+                motorista));
     }
 
     @Test
@@ -240,7 +234,7 @@ class FechamentoMetaServiceTest {
 
         assertEquals(LocalDate.of(2026, 10, 1),
                 service.calcularCompetencia(LocalDate.of(2026, 11, 3), LocalDateTime.of(2026, 11, 3, 8, 0),
-                        motorista, LocalDate.of(2026, 11, 7)));
+                        motorista));
     }
 
     @Test
@@ -250,13 +244,13 @@ class FechamentoMetaServiceTest {
 
         assertEquals(LocalDate.of(2026, 10, 1),
                 service.calcularCompetencia(LocalDate.of(2026, 11, 3), LocalDateTime.of(2026, 11, 3, 8, 0),
-                        motorista, LocalDate.of(2026, 11, 4)));
+                        motorista));
     }
 
     @Test
     void desativadoIgnoraOsDiasUteisAMais() {
         diasUteis(0);
         assertNull(service.calcularCompetencia(LocalDate.of(2026, 11, 3), LocalDateTime.of(2026, 11, 3, 8, 0),
-                motorista, LocalDate.of(2026, 11, 7)));
+                motorista));
     }
 }
