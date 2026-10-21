@@ -14,16 +14,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 
 /**
  * Regra de "mês aberto/fechado" das metas.
  *
  * <p>Com {@code diasUteisFechamentoMeta = N > 0}, o mês M continua aberto até o N-ésimo dia
- * útil do mês seguinte (motorista que viaja no fim do mês só volta depois da virada). Dois
- * jeitos de fechar: o prazo geral vencer, ou o motorista confirmar no app que a meta dele
- * está ok. Mês fechado não recebe mais cargas: a carga finalizada depois do fechamento passa
- * a contar no primeiro mês ainda aberto (ver {@link #calcularCompetencia}).
+ * útil do mês seguinte: o motorista ganha esses dias pra bater a meta de M, e toda carga que
+ * ele INICIAR nesse período conta em M. Dois jeitos de fechar: o prazo geral vencer, ou o
+ * motorista confirmar no app que a meta dele está ok (cargas iniciadas depois disso contam no
+ * mês seguinte). Ver {@link #calcularCompetencia}.
  *
  * <p>Com N = 0 (padrão) nada disso vale: tudo se comporta como antes (carga conta no mês
  * da data de saída, meta fecha no dia seguinte ao fim).
@@ -88,20 +89,48 @@ public class FechamentoMetaService {
                 && repository.existsByMotoristaIdAndMesReferenciaAndReabertoEmIsNull(motorista.getId(), mes.atDay(1));
     }
 
+    /** O motorista já tinha confirmado a meta de {@code mes} no momento em que a carga saiu? */
+    private boolean confirmadoAteASaida(Motorista motorista, YearMonth mes, LocalDate dtSaida, LocalDateTime dtHoraSaida) {
+        if (motorista == null || motorista.getId() == null) {
+            return false;
+        }
+        LocalDateTime saiuEm = dtHoraSaida != null ? dtHoraSaida : dtSaida.atStartOfDay();
+        return repository.findByMotoristaIdAndMesReferencia(motorista.getId(), mes.atDay(1))
+                .filter(FechamentoMetaMotorista::isAtivo)
+                .map(f -> !f.getConfirmadoEm().isAfter(saiuEm))
+                .orElse(false);
+    }
+
     private boolean mesFechadoParaMotorista(Motorista motorista, YearMonth mes, LocalDate hoje) {
         return hoje.isAfter(ultimoDiaAberto(mes)) || confirmadoPeloMotorista(motorista, mes);
     }
 
     /**
      * Mês de competência de uma carga que está sendo finalizada agora. Devolve {@code null}
-     * (= vale a data de saída, o normal) a menos que o mês da data de saída já esteja fechado
-     * pra esse motorista — aí devolve o dia 1 do primeiro mês ainda aberto.
+     * (= vale a data de saída, o normal) nos casos abaixo, em ordem:
+     *
+     * <ol>
+     *   <li>A carga SAIU (foi iniciada) nos primeiros dias úteis de um mês, dentro do prazo de
+     *       fechamento do mês anterior, e o motorista ainda não tinha confirmado a meta do mês
+     *       anterior quando saiu: conta no mês anterior (devolve o dia 1 dele). É o que dá os
+     *       "dias úteis a mais" pra bater a meta. Vale mesmo que ela só seja finalizada depois
+     *       do prazo — o que conta é quando saiu, não quando voltou.</li>
+     *   <li>Senão, se o mês da data de saída já estiver fechado pra esse motorista (prazo geral
+     *       vencido ou confirmação), devolve o dia 1 do primeiro mês ainda aberto.</li>
+     * </ol>
      */
-    public LocalDate calcularCompetencia(LocalDate dtSaida, Motorista motorista, LocalDate hoje) {
+    public LocalDate calcularCompetencia(LocalDate dtSaida, LocalDateTime dtHoraSaida, Motorista motorista, LocalDate hoje) {
         if (!isAtivo() || dtSaida == null) {
             return null;
         }
-        YearMonth base = YearMonth.from(dtSaida);
+        YearMonth saida = YearMonth.from(dtSaida);
+        YearMonth anterior = saida.minusMonths(1);
+        if (!dtSaida.isAfter(ultimoDiaAberto(anterior))
+                && !confirmadoAteASaida(motorista, anterior, dtSaida, dtHoraSaida)) {
+            return anterior.atDay(1);
+        }
+
+        YearMonth base = saida;
         YearMonth alvo = base;
         YearMonth atual = YearMonth.from(hoje);
 

@@ -1,5 +1,6 @@
 package br.com.frotasPro.api.service.meta;
 
+import br.com.frotasPro.api.domain.FechamentoMetaMotorista;
 import br.com.frotasPro.api.domain.Meta;
 import br.com.frotasPro.api.domain.Motorista;
 import br.com.frotasPro.api.domain.ParametroSistema;
@@ -13,7 +14,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -132,7 +135,7 @@ class FechamentoMetaServiceTest {
         motoristaConfirmou(YearMonth.of(2026, 9), false);
 
         // saiu dia 30/09, voltou e finalizou em 03/10 (prazo vai até 07/10)
-        assertNull(service.calcularCompetencia(LocalDate.of(2026, 9, 30), motorista, LocalDate.of(2026, 10, 3)));
+        assertNull(service.calcularCompetencia(LocalDate.of(2026, 9, 30), null, motorista, LocalDate.of(2026, 10, 3)));
     }
 
     @Test
@@ -141,7 +144,7 @@ class FechamentoMetaServiceTest {
         motoristaConfirmou(YearMonth.of(2026, 9), true);
 
         assertEquals(LocalDate.of(2026, 10, 1),
-                service.calcularCompetencia(LocalDate.of(2026, 9, 30), motorista, LocalDate.of(2026, 10, 3)));
+                service.calcularCompetencia(LocalDate.of(2026, 9, 30), null, motorista, LocalDate.of(2026, 10, 3)));
     }
 
     @Test
@@ -150,7 +153,7 @@ class FechamentoMetaServiceTest {
         motoristaConfirmou(YearMonth.of(2026, 9), false);
 
         assertEquals(LocalDate.of(2026, 10, 1),
-                service.calcularCompetencia(LocalDate.of(2026, 9, 28), motorista, LocalDate.of(2026, 10, 20)));
+                service.calcularCompetencia(LocalDate.of(2026, 9, 28), null, motorista, LocalDate.of(2026, 10, 20)));
     }
 
     @Test
@@ -162,7 +165,7 @@ class FechamentoMetaServiceTest {
 
         // saiu em julho, só finalizou em 20/10: julho, agosto e setembro já fecharam -> outubro
         assertEquals(LocalDate.of(2026, 10, 1),
-                service.calcularCompetencia(LocalDate.of(2026, 7, 15), motorista, LocalDate.of(2026, 10, 20)));
+                service.calcularCompetencia(LocalDate.of(2026, 7, 15), null, motorista, LocalDate.of(2026, 10, 20)));
     }
 
     @Test
@@ -170,7 +173,7 @@ class FechamentoMetaServiceTest {
         diasUteis(5);
         motoristaConfirmou(YearMonth.of(2026, 10), true);
 
-        assertNull(service.calcularCompetencia(LocalDate.of(2026, 10, 5), motorista, LocalDate.of(2026, 10, 6)));
+        assertNull(service.calcularCompetencia(LocalDate.of(2026, 10, 12), null, motorista, LocalDate.of(2026, 10, 13)));
     }
 
     @Test
@@ -178,6 +181,82 @@ class FechamentoMetaServiceTest {
         diasUteis(0);
         motoristaConfirmou(YearMonth.of(2026, 9), true);
 
-        assertNull(service.calcularCompetencia(LocalDate.of(2026, 9, 28), motorista, LocalDate.of(2026, 11, 20)));
+        assertNull(service.calcularCompetencia(LocalDate.of(2026, 9, 28), null, motorista, LocalDate.of(2026, 11, 20)));
+    }
+
+    // ---- carga iniciada nos dias úteis a mais do mês anterior
+
+    private void confirmacao(YearMonth mes, LocalDateTime em, boolean ativa) {
+        FechamentoMetaMotorista f = new FechamentoMetaMotorista();
+        f.setMotorista(motorista);
+        f.setMesReferencia(mes.atDay(1));
+        f.setConfirmadoEm(em);
+        if (!ativa) {
+            f.setReabertoEm(em.plusHours(1));
+        }
+        lenient().when(repository.findByMotoristaIdAndMesReferencia(motorista.getId(), mes.atDay(1)))
+                .thenReturn(Optional.of(f));
+    }
+
+    @Test
+    void cargaIniciadaNosDiasUteisAMaisContaNoMesAnteriorMesmoFinalizadaDepoisDoPrazo() {
+        diasUteis(5);
+        // outubro termina sábado 31/10: os 5 dias úteis vão de 02/11 a 06/11.
+        // Saiu 03/11, só voltou e finalizou em 07/11 (o prazo já fechou em 06/11): conta em outubro.
+        assertEquals(LocalDate.of(2026, 10, 1),
+                service.calcularCompetencia(LocalDate.of(2026, 11, 3), LocalDateTime.of(2026, 11, 3, 8, 0),
+                        motorista, LocalDate.of(2026, 11, 7)));
+    }
+
+    @Test
+    void cargaIniciadaNoUltimoDiaDoPrazoAindaContaNoMesAnterior() {
+        diasUteis(5);
+        assertEquals(LocalDate.of(2026, 10, 1),
+                service.calcularCompetencia(LocalDate.of(2026, 11, 6), LocalDateTime.of(2026, 11, 6, 23, 0),
+                        motorista, LocalDate.of(2026, 11, 6)));
+    }
+
+    @Test
+    void cargaIniciadaDepoisDoPrazoContaNoMesDaSaida() {
+        diasUteis(5);
+        assertNull(service.calcularCompetencia(LocalDate.of(2026, 11, 9), LocalDateTime.of(2026, 11, 9, 8, 0),
+                motorista, LocalDate.of(2026, 11, 12)));
+    }
+
+    @Test
+    void cargaIniciadaDepoisDeConfirmarContaNoMesDaSaida() {
+        diasUteis(5);
+        confirmacao(YearMonth.of(2026, 10), LocalDateTime.of(2026, 11, 2, 10, 0), true);
+
+        assertNull(service.calcularCompetencia(LocalDate.of(2026, 11, 3), LocalDateTime.of(2026, 11, 3, 8, 0),
+                motorista, LocalDate.of(2026, 11, 4)));
+    }
+
+    @Test
+    void cargaIniciadaAntesDeConfirmarFicaNoMesAnterior() {
+        diasUteis(5);
+        // saiu 03/11 de manhã; o motorista só confirmou outubro em 05/11
+        confirmacao(YearMonth.of(2026, 10), LocalDateTime.of(2026, 11, 5, 10, 0), true);
+
+        assertEquals(LocalDate.of(2026, 10, 1),
+                service.calcularCompetencia(LocalDate.of(2026, 11, 3), LocalDateTime.of(2026, 11, 3, 8, 0),
+                        motorista, LocalDate.of(2026, 11, 7)));
+    }
+
+    @Test
+    void confirmacaoReabertaNaoImpedeACargaDeContarNoMesAnterior() {
+        diasUteis(5);
+        confirmacao(YearMonth.of(2026, 10), LocalDateTime.of(2026, 11, 2, 10, 0), false);
+
+        assertEquals(LocalDate.of(2026, 10, 1),
+                service.calcularCompetencia(LocalDate.of(2026, 11, 3), LocalDateTime.of(2026, 11, 3, 8, 0),
+                        motorista, LocalDate.of(2026, 11, 4)));
+    }
+
+    @Test
+    void desativadoIgnoraOsDiasUteisAMais() {
+        diasUteis(0);
+        assertNull(service.calcularCompetencia(LocalDate.of(2026, 11, 3), LocalDateTime.of(2026, 11, 3, 8, 0),
+                motorista, LocalDate.of(2026, 11, 7)));
     }
 }
