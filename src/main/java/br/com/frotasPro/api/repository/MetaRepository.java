@@ -90,6 +90,8 @@ public interface MetaRepository extends JpaRepository <Meta, UUID>{
 
     List<Meta> findByDataFimBeforeAndStatusMeta(LocalDate data, StatusMeta statusMeta);
 
+    List<Meta> findByDataFimBeforeAndStatusMetaIn(LocalDate data, java.util.Collection<StatusMeta> status);
+
     List<Meta> findByStatusMetaNot(StatusMeta statusMeta);
 
     List<Meta> findByStatusMeta(StatusMeta statusMeta);

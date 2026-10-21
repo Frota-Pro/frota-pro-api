@@ -383,7 +383,7 @@ and (cast(:fim as timestamp) is null or a.dt_abastecimento <= cast(:fim as times
        join p.carga c
        where c.caminhao.codigo = :codigo
          and c.statusCarga = :status
-         and c.dtSaida between :inicio and :fim
+         and coalesce(c.dtCompetencia, c.dtSaida) between :inicio and :fim
        """)
     BigDecimal sumLitrosVinculadosACargaPorCaminhaoNoPeriodo(
             @Param("codigo") String codigo,
@@ -399,7 +399,7 @@ and (cast(:fim as timestamp) is null or a.dt_abastecimento <= cast(:fim as times
        join p.carga c
        where c.motorista.codigo = :codigo
          and c.statusCarga = :status
-         and c.dtSaida between :inicio and :fim
+         and coalesce(c.dtCompetencia, c.dtSaida) between :inicio and :fim
        """)
     BigDecimal sumLitrosVinculadosACargaPorMotoristaNoPeriodo(
             @Param("codigo") String codigo,
@@ -417,7 +417,7 @@ and (cast(:fim as timestamp) is null or a.dt_abastecimento <= cast(:fim as times
        join c.titularNoPeriodo titular
        where titular.codigo = :codigo
          and c.statusCarga = :status
-         and c.dtSaida between :inicio and :fim
+         and coalesce(c.dtCompetencia, c.dtSaida) between :inicio and :fim
        """)
     BigDecimal sumLitrosVinculadosACargaPorTitularNoPeriodo(
             @Param("codigo") String codigo,

@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ParametroSistemaResponse {
 
+    private int diasUteisFechamentoMeta;
     private int diasAntecedenciaVencimentoDocumento;
     private int kmAntecedenciaManutencaoPreventiva;
     private int diasManutencaoEstagnada;

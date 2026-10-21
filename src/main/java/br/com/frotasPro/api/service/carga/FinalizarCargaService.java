@@ -16,6 +16,7 @@ import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.repository.RoteirizacaoCidadeRepository;
 import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
+import br.com.frotasPro.api.service.meta.FechamentoMetaService;
 import br.com.frotasPro.api.service.parametrosistema.ParametroSistemaService;
 import br.com.frotasPro.api.util.AtualizarMetaCargaTransportadaService;
 import br.com.frotasPro.api.util.AtualizarMetaConsumoCombustivelService;
@@ -45,6 +46,7 @@ public class FinalizarCargaService {
     private final IntegracaoWinThorConfigService integracaoWinThorConfigService;
     private final ParametroSistemaService parametroSistemaService;
     private final RoteirizacaoCidadeRepository roteirizacaoCidadeRepository;
+    private final FechamentoMetaService fechamentoMetaService;
 
 
     @Transactional
@@ -87,6 +89,12 @@ public class FinalizarCargaService {
         carga.setKmFinal(kmFinal);
         carga.setStatusCarga(Status.FINALIZADA);
 
+        // Carga que saiu dentro do prazo de fechamento do mês anterior conta nele; mês da saída
+        // já fechado (prazo geral vencido ou motorista confirmou) passa a contar no primeiro mês
+        // aberto. Nulo = continua valendo a data de saída.
+        carga.setDtCompetencia(fechamentoMetaService.calcularCompetencia(
+                carga.getDtSaida(), carga.getDtHoraSaida(), carga.getMotorista(), FusoHorarioUtils.hojeBrasil()));
+
         // Conta pela data de INÍCIO da carga (dtSaida), não pela de chegada:
         // uma carga que começou no fim de um mês e só termina no mês
         // seguinte deve continuar pertencendo à meta do mês em que ela foi
@@ -100,7 +108,7 @@ public class FinalizarCargaService {
         // iniciado antes da verificação rodar (job roda a cada 3h), essa
         // trava evita inflar a meta com uma carga fantasma.
         if (!carga.isNaoEncontradaNoWinThor()) {
-            LocalDate dataReferenciaMeta = carga.getDtSaida();
+            LocalDate dataReferenciaMeta = carga.getDataCompetencia();
 
             atualizarMetaQuilometragemService.registrarQuilometragem(
                     carga.getCaminhao().getCodigo(),

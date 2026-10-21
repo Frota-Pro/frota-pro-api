@@ -43,6 +43,8 @@ class ProcessarMetasDiariasServiceTest {
     private NotificacaoService notificacaoService;
     @Mock
     private NotificacaoRepository notificacaoRepository;
+    @Mock
+    private FechamentoMetaService fechamentoMetaService;
 
     private ProcessarMetasDiariasService service;
 
@@ -54,7 +56,8 @@ class ProcessarMetasDiariasServiceTest {
                 caminhaoRepository,
                 metaProgressoService,
                 notificacaoService,
-                notificacaoRepository
+                notificacaoRepository,
+                fechamentoMetaService
         );
     }
 
@@ -76,7 +79,8 @@ class ProcessarMetasDiariasServiceTest {
         when(metaRepository.findByStatusMetaNot(StatusMeta.CANCELADA)).thenReturn(List.of(meta));
         when(metaRepository.findByStatusMetaInAndDataFimBetween(any(), any(), any())).thenReturn(List.of());
         when(metaRepository.findByDataFimBeforeAndStatusMeta(any(), eq(StatusMeta.EM_ANDAMENTO))).thenReturn(List.of());
-        when(metaRepository.findByDataFimBeforeAndStatusMeta(any(), eq(StatusMeta.CONCLUIDA))).thenReturn(List.of(meta));
+        when(metaRepository.findByDataFimBeforeAndStatusMetaIn(any(), any())).thenReturn(List.of(meta));
+        when(fechamentoMetaService.metaFechada(any(), any())).thenReturn(true);
         when(metaRepository.existsMetaNaoCanceladaConflitante(
                 eq(TipoMeta.QUILOMETRAGEM),
                 eq(LocalDate.of(2026, 4, 1)),
