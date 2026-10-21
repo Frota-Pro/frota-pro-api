@@ -182,26 +182,40 @@ public class FechamentoMetaService {
         return montarStatus(motorista, mes, FusoHorarioUtils.hojeBrasil());
     }
 
+    public static final String SITUACAO_DESATIVADO = "DESATIVADO";
+    public static final String SITUACAO_EM_ANDAMENTO = "EM_ANDAMENTO";
+    public static final String SITUACAO_ABERTO = "ABERTO";
+    public static final String SITUACAO_CONFIRMADO = "CONFIRMADO";
+    public static final String SITUACAO_FECHADO = "FECHADO";
+
+    /**
+     * Situação de um mês para um motorista, sem consultar o banco (quem chama já sabe se ele
+     * confirmou). Única regra usada pelo status individual, pelo resumo do painel e pelo PDF.
+     */
+    public String situacaoDoMes(int dias, YearMonth mes, LocalDate hoje, boolean confirmado) {
+        if (dias <= 0) {
+            return SITUACAO_DESATIVADO;
+        }
+        if (!hoje.isAfter(mes.atEndOfMonth())) {
+            return SITUACAO_EM_ANDAMENTO;
+        }
+        if (confirmado) {
+            return SITUACAO_CONFIRMADO;
+        }
+        if (hoje.isAfter(ultimoDiaAberto(mes, dias))) {
+            return SITUACAO_FECHADO;
+        }
+        return SITUACAO_ABERTO;
+    }
+
     private FechamentoMetaResponse montarStatus(Motorista motorista, YearMonth mes, LocalDate hoje) {
         int dias = diasUteis();
         LocalDate limite = ultimoDiaAberto(mes, dias);
         var confirmacao = repository.findByMotoristaIdAndMesReferencia(motorista.getId(), mes.atDay(1))
                 .filter(FechamentoMetaMotorista::isAtivo);
 
-        String situacao;
-        boolean podeConfirmar = false;
-        if (dias <= 0) {
-            situacao = "DESATIVADO";
-        } else if (!hoje.isAfter(mes.atEndOfMonth())) {
-            situacao = "EM_ANDAMENTO";
-        } else if (confirmacao.isPresent()) {
-            situacao = "CONFIRMADO";
-        } else if (hoje.isAfter(limite)) {
-            situacao = "FECHADO";
-        } else {
-            situacao = "ABERTO";
-            podeConfirmar = true;
-        }
+        String situacao = situacaoDoMes(dias, mes, hoje, confirmacao.isPresent());
+        boolean podeConfirmar = SITUACAO_ABERTO.equals(situacao);
 
         return FechamentoMetaResponse.builder()
                 .mesReferencia(mes.atDay(1))
