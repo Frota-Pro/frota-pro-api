@@ -2,6 +2,8 @@ package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.response.*;
 import br.com.frotasPro.api.domain.enums.TipoMeta;
+import br.com.frotasPro.api.excption.BusinessException;
+import br.com.frotasPro.api.service.meta.FechamentoMetaResumoService;
 import br.com.frotasPro.api.service.relatorios.*;
 import lombok.RequiredArgsConstructor;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -13,8 +15,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -28,6 +32,7 @@ public class RelatorioPdfController {
     private final JasperPdfService jasperPdfService;
 
     private final RelatorioMetaMensalMotoristaService relatorioService;
+    private final FechamentoMetaResumoService fechamentoMetaResumoService;
     private final RelatorioCustoPorCaminhaoService custoPorCaminhaoService;
     private final RelatorioAbastecimentoPeriodoService abastecimentoPeriodoService;
     private final RelatorioCargaCompletaService cargaCompletaService;
@@ -68,10 +73,12 @@ public class RelatorioPdfController {
             @RequestParam("fim")    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim
     ) {
         RelatorioMetaMensalMotoristaResponse rel = relatorioService.gerar(codigoMotorista, inicio, fim);
-
+        YearMonth mes = mesInteiro(inicio, fim);
+        String situacao = mes == null ? null
+                : fechamentoMetaResumoService.textoDoMotorista(fechamentoMetaResumoService.resumo(mes), codigoMotorista);
         byte[] pdf = jasperPdfService.gerarPdfFromJasper(
                 "reports/meta_mensal_motorista.jasper",
-                parametrosMetaMensal(rel),
+                parametrosMetaMensal(rel, situacao),
                 rel.getLinhas()
         );
 
@@ -91,9 +98,26 @@ public class RelatorioPdfController {
     @GetMapping("/motorista/meta-mensal/todos")
     public ResponseEntity<byte[]> metaMensalTodosMotoristasPdf(
             @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
-            @RequestParam("fim")    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim
+            @RequestParam("fim")    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim,
+            @RequestParam(value = "somenteFinalizados", defaultValue = "false") boolean somenteFinalizados
     ) {
         List<String> codigos = relatorioService.listarCodigosMotoristasAtivos();
+
+        // Situação do fechamento só faz sentido para um mês inteiro (dia 1 ao último dia).
+        YearMonth mes = mesInteiro(inicio, fim);
+        var resumo = mes != null ? fechamentoMetaResumoService.resumo(mes) : null;
+
+        if (somenteFinalizados) {
+            if (resumo == null) {
+                throw new BusinessException("Para trazer só quem já finalizou o mês, escolha o mês inteiro (do dia 1 ao último dia).");
+            }
+            Set<String> finalizados = fechamentoMetaResumoService.codigosFinalizados(mes);
+            codigos = codigos.stream().filter(finalizados::contains).toList();
+            if (codigos.isEmpty()) {
+                throw new BusinessException("Nenhum motorista finalizou a meta de "
+                        + String.format("%02d/%d", mes.getMonthValue(), mes.getYear()) + " ainda.");
+            }
+        }
 
         // Cada gerar()/preencherRelatorio() é independente (só leitura, motorista
         // por motorista) — dá pra rodar em paralelo com segurança. .join() mantém
@@ -101,9 +125,10 @@ public class RelatorioPdfController {
         List<CompletableFuture<JasperPrint>> tarefas = codigos.stream()
                 .map(codigo -> CompletableFuture.supplyAsync(() -> {
                     RelatorioMetaMensalMotoristaResponse rel = relatorioService.gerar(codigo, inicio, fim);
+                    String situacao = resumo == null ? null : fechamentoMetaResumoService.textoDoMotorista(resumo, codigo);
                     return jasperPdfService.preencherRelatorio(
                             "reports/meta_mensal_motorista.jasper",
-                            parametrosMetaMensal(rel),
+                            parametrosMetaMensal(rel, situacao),
                             rel.getLinhas()
                     );
                 }, RELATORIO_EXECUTOR))
@@ -120,8 +145,18 @@ public class RelatorioPdfController {
                 .body(pdf);
     }
 
-    private Map<String, Object> parametrosMetaMensal(RelatorioMetaMensalMotoristaResponse rel) {
+    /** O período é exatamente um mês de calendário (dia 1 ao último dia)? Devolve o mês, ou nulo. */
+    private static YearMonth mesInteiro(LocalDate inicio, LocalDate fim) {
+        if (inicio != null && fim != null && inicio.getDayOfMonth() == 1
+                && fim.equals(inicio.withDayOfMonth(inicio.lengthOfMonth()))) {
+            return YearMonth.from(inicio);
+        }
+        return null;
+    }
+
+    private Map<String, Object> parametrosMetaMensal(RelatorioMetaMensalMotoristaResponse rel, String situacaoFechamento) {
         Map<String, Object> p = new HashMap<>();
+        p.put("situacaoFechamento", situacaoFechamento);
         p.put("nomeMotorista", rel.getNomeMotorista());
         p.put("codigoMotorista", rel.getCodigoMotorista());
         p.put("placaCaminhao", rel.getPlacaCaminhao());

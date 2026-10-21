@@ -2,6 +2,7 @@ package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.MetaRequest;
 import br.com.frotasPro.api.controller.response.FechamentoMetaResponse;
+import br.com.frotasPro.api.controller.response.FechamentoMetaResumoResponse;
 import br.com.frotasPro.api.controller.response.MetaCategoriaDesempenhoResponse;
 import br.com.frotasPro.api.controller.response.MetaResponse;
 import br.com.frotasPro.api.controller.response.RelatorioDesempenhoMetasResponse;
@@ -11,6 +12,7 @@ import br.com.frotasPro.api.domain.enums.TipoMeta;
 import br.com.frotasPro.api.service.meta.*;
 import br.com.frotasPro.api.service.relatorios.BuscarMinhaMetaMensalService;
 import br.com.frotasPro.api.service.relatorios.RelatorioDesempenhoMetasService;
+import br.com.frotasPro.api.util.FusoHorarioUtils;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +48,7 @@ public class MetaController {
     private final RelatorioDesempenhoMetasService relatorioDesempenhoMetasService;
     private final BuscarMinhaMetaMensalService buscarMinhaMetaMensalService;
     private final FechamentoMetaMotoristaService fechamentoMetaMotoristaService;
+    private final FechamentoMetaResumoService fechamentoMetaResumoService;
     private final ProcessarMetasDiariasService processarMetasDiariasService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
@@ -236,6 +239,15 @@ public class MetaController {
     public ResponseEntity<FechamentoMetaResponse> confirmarMeuFechamento(
             @RequestParam(value = "mes", required = false) @DateTimeFormat(pattern = "yyyy-MM") YearMonth mes) {
         return ResponseEntity.ok(fechamentoMetaMotoristaService.confirmarDoMotoristaLogado(mes));
+    }
+
+    /** Quem já finalizou e quem não a meta do mês, de todos os motoristas ativos. Sem "mes" vale o mês que acabou de terminar. */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_CONSULTA')")
+    @GetMapping("/fechamento/resumo")
+    public ResponseEntity<FechamentoMetaResumoResponse> resumoDoFechamento(
+            @RequestParam(value = "mes", required = false) @DateTimeFormat(pattern = "yyyy-MM") YearMonth mes) {
+        YearMonth alvo = mes != null ? mes : YearMonth.from(FusoHorarioUtils.hojeBrasil()).minusMonths(1);
+        return ResponseEntity.ok(fechamentoMetaResumoService.resumo(alvo));
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA', 'ROLE_CONSULTA')")

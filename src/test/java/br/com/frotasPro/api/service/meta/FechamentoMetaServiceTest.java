@@ -253,4 +253,34 @@ class FechamentoMetaServiceTest {
         assertNull(service.calcularCompetencia(LocalDate.of(2026, 11, 3), LocalDateTime.of(2026, 11, 3, 8, 0),
                 motorista));
     }
+
+    // ---- situacaoDoMes (regra única do status, do resumo e do relatório)
+
+    @Test
+    void situacaoDoMesComOsCincoDiasUteisDeOutubro() {
+        YearMonth outubro = YearMonth.of(2026, 10); // termina sábado 31/10; prazo até sexta 06/11
+
+        assertEquals("EM_ANDAMENTO", service.situacaoDoMes(5, outubro, LocalDate.of(2026, 10, 31), false));
+        assertEquals("ABERTO", service.situacaoDoMes(5, outubro, LocalDate.of(2026, 11, 1), false));
+        assertEquals("ABERTO", service.situacaoDoMes(5, outubro, LocalDate.of(2026, 11, 6), false));
+        assertEquals("FECHADO", service.situacaoDoMes(5, outubro, LocalDate.of(2026, 11, 7), false));
+    }
+
+    @Test
+    void situacaoDoMesConfirmadoSoValeDepoisQueOMesAcaba() {
+        YearMonth outubro = YearMonth.of(2026, 10);
+
+        assertEquals("CONFIRMADO", service.situacaoDoMes(5, outubro, LocalDate.of(2026, 11, 2), true));
+        assertEquals("EM_ANDAMENTO", service.situacaoDoMes(5, outubro, LocalDate.of(2026, 10, 20), true));
+    }
+
+    @Test
+    void situacaoDoMesConfirmadoGanhaDoPrazoVencido() {
+        assertEquals("CONFIRMADO", service.situacaoDoMes(5, YearMonth.of(2026, 10), LocalDate.of(2026, 12, 1), true));
+    }
+
+    @Test
+    void situacaoDoMesComParametroDesligado() {
+        assertEquals("DESATIVADO", service.situacaoDoMes(0, YearMonth.of(2026, 10), LocalDate.of(2026, 11, 20), true));
+    }
 }

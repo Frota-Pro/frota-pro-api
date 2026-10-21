@@ -42,6 +42,9 @@
          Se não usar, deixe null no params e marque "blankWhenNull" no image. -->
     <parameter name="logoPath" class="java.net.URL"/>
 
+    <!-- Situação do fechamento da meta do mês (finalizada pelo motorista, fechada pelo prazo, em aberto...). Opcional. -->
+    <parameter name="situacaoFechamento" class="java.lang.String"/>
+
     <!-- ============ FIELDS (detail / linhas) ============ -->
     <!-- Tipos alinhados ao JSON/DTO informado -->
     <field name="data" class="java.time.LocalDate"/>
@@ -100,6 +103,15 @@
 "Caminhão: " + ($P{placaCaminhao} == null ? "-" : $P{placaCaminhao})
 + " (" + ($P{codigoCaminhao} == null ? "-" : $P{codigoCaminhao}) + ")"
             ]]></expression>
+        </element>
+
+        <element kind="textField"
+                 uuid="00000000-0000-0000-0000-000000000230"
+                 x="140" y="66" width="480" height="12"
+                 blankWhenNull="true"
+                 fontSize="9.0" bold="true"
+                 vTextAlign="Middle">
+            <expression><![CDATA[$P{situacaoFechamento}]]></expression>
         </element>
 
         <element kind="textField"

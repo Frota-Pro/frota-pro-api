@@ -12,4 +12,7 @@ public interface FechamentoMetaMotoristaRepository extends JpaRepository<Fechame
     Optional<FechamentoMetaMotorista> findByMotoristaIdAndMesReferencia(UUID motoristaId, LocalDate mesReferencia);
 
     boolean existsByMotoristaIdAndMesReferenciaAndReabertoEmIsNull(UUID motoristaId, LocalDate mesReferencia);
+
+    /** Confirmações ativas (não reabertas) de todos os motoristas num mês. */
+    java.util.List<FechamentoMetaMotorista> findByMesReferenciaAndReabertoEmIsNull(LocalDate mesReferencia);
 }
