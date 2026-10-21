@@ -20,17 +20,12 @@ public enum TipoMeta {
             return false;
         }
 
-        if (this == CONSUMO_COMBUSTIVEL) {
-            return realizado.compareTo(valorMeta) <= 0;
-        }
-
+        // Vale para todos os tipos, inclusive consumo: a meta de consumo e em km/L, entao quanto
+        // MAIS o caminhao rende, melhor ("pelo menos 2,5 km por litro").
         return realizado.compareTo(valorMeta) >= 0;
     }
 
     public String getRegraAtingimento() {
-        if (this == CONSUMO_COMBUSTIVEL) {
-            return "MENOR_OU_IGUAL";
-        }
         return "MAIOR_OU_IGUAL";
     }
 }
