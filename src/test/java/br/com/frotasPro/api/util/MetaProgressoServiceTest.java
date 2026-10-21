@@ -224,11 +224,11 @@ class MetaProgressoServiceTest {
     }
 
     @Test
-    void consumoBateQuandoOKmPorLitroEMenorOuIgualAMeta() {
-        // regra do sistema: no consumo, "menor ou igual" bate a meta
+    void consumoBateQuandoOKmPorLitroEMaiorOuIgualAMeta() {
+        // meta de consumo e em km/L: "pelo menos 2,5 km por litro" -> quanto mais rende, melhor
         assertTrue(service.metaAtingida(TipoMeta.CONSUMO_COMBUSTIVEL, new BigDecimal("2.5"), new BigDecimal("2.5")));
-        assertTrue(service.metaAtingida(TipoMeta.CONSUMO_COMBUSTIVEL, new BigDecimal("2.0"), new BigDecimal("2.5")));
-        assertFalse(service.metaAtingida(TipoMeta.CONSUMO_COMBUSTIVEL, new BigDecimal("3.0"), new BigDecimal("2.5")));
+        assertTrue(service.metaAtingida(TipoMeta.CONSUMO_COMBUSTIVEL, new BigDecimal("3.38"), new BigDecimal("2.96")));
+        assertFalse(service.metaAtingida(TipoMeta.CONSUMO_COMBUSTIVEL, new BigDecimal("2.4"), new BigDecimal("2.5")));
     }
 
     @Test
