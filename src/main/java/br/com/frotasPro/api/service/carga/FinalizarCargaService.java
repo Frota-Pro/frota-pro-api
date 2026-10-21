@@ -89,11 +89,10 @@ public class FinalizarCargaService {
         carga.setKmFinal(kmFinal);
         carga.setStatusCarga(Status.FINALIZADA);
 
-        // Carga que saiu dentro do prazo de fechamento do mês anterior conta nele; mês da saída
-        // já fechado (prazo geral vencido ou motorista confirmou) passa a contar no primeiro mês
-        // aberto. Nulo = continua valendo a data de saída.
+        // Carga que saiu dentro do prazo de fechamento do mês anterior conta nele. Nulo = vale o
+        // mês da data de saída (nunca o da finalização).
         carga.setDtCompetencia(fechamentoMetaService.calcularCompetencia(
-                carga.getDtSaida(), carga.getDtHoraSaida(), carga.getMotorista(), FusoHorarioUtils.hojeBrasil()));
+                carga.getDtSaida(), carga.getDtHoraSaida(), carga.getMotorista()));
 
         // Conta pela data de INÍCIO da carga (dtSaida), não pela de chegada:
         // uma carga que começou no fim de um mês e só termina no mês
