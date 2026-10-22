@@ -85,6 +85,24 @@ frotapro:
       caminhao-sync-request: frotapro.caminhao.sync.request
       caminhao-sync-response: frotapro.caminhao.sync.response
 
+  # BI do gerente (Metabase). Sem BI_EMBEDDING_SECRET o recurso fica desligado (503).
+  bi:
+    metabase-site-url: ${BI_METABASE_URL:}
+    embedding-secret: ${BI_EMBEDDING_SECRET:}
+    token-ttl-minutos: 30
+    dashboards:
+      - { id: 2, titulo: "Operação, combustível e custos", descricao: "Visão geral: cargas, combustível, custo por km, metas e rankings" }
+      - { id: 10, titulo: "Manutenção, pneus e custo total", descricao: "Gasto com manutenção, pneus e custo total por caminhão" }
+      - { id: 4, titulo: "Postos e preço do diesel", descricao: "Preço médio do litro, ranking de postos e economia possível" }
+      - { id: 5, titulo: "Ocupação e tempo de viagem", descricao: "Ocupação da capacidade, duração das viagens e cargas em rota" }
+      - { id: 12, titulo: "Previsto × realizado nas rotas", descricao: "Pontualidade das viagens por motorista e por rota" }
+      - { id: 6, titulo: "Clientes e custo do frete", descricao: "Valor transportado, notas por cidade e custo por rota" }
+      - { id: 9, titulo: "Vencimentos", descricao: "Documentos e preventivas vencidos ou a vencer" }
+      - { id: 11, titulo: "Multas", descricao: "Multas, pontos na CNH e valores em aberto" }
+      - { id: 3, titulo: "Erros para corrigir", descricao: "Lançamentos com valores absurdos, duplicados ou incompletos" }
+      - { id: 8, titulo: "Implantação dos módulos", descricao: "Quanto cada módulo já está sendo lançado", somenteAdmin: true }
+      - { id: 7, titulo: "Integração Winthor e saúde do sistema", descricao: "Sincronização, auditoria, uso e segurança", somenteAdmin: true }
+
   storage:
     upload-dir: ./data/uploads
   security:
