@@ -66,6 +66,7 @@ public class AuditoriaDescricaoResolver {
         FRASES_POR_SUFIXO.put("/observacao", "Alterou a observação de uma carga");
         FRASES_POR_SUFIXO.put("/transferir-notas", "Transferiu notas fiscais entre cargas");
         FRASES_POR_SUFIXO.put("/transferir-motorista", "Transferiu o motorista de uma carga");
+        FRASES_POR_SUFIXO.put("/transferir-caminhao", "Transferiu o caminhão de uma carga");
         FRASES_POR_SUFIXO.put("/ativo", "Ativou ou desativou um usuário");
         FRASES_POR_SUFIXO.put("/senha", "Alterou a senha de um usuário");
         FRASES_POR_SUFIXO.put("/aprovar-orcamento", "Aprovou o orçamento de uma manutenção");

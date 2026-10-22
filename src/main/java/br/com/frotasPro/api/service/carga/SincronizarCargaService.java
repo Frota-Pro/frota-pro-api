@@ -140,31 +140,37 @@ public class SincronizarCargaService {
             carga.setMotorista(motoristaOpt.get());
         }
 
-        var caminhaoOpt = caminhaoRepository
-                .findByCodigoExterno(String.valueOf(dto.getCodVeiculo()));
+        // Mesma regra do motorista: se o caminhão foi corrigido manualmente
+        // (TransferirCaminhaoCargaService), o MDF-e continua com o veículo errado e o
+        // sync não pode desfazer a correção nem refazer o titular congelado.
+        if (!carga.isCaminhaoDefinidoManualmente()) {
+            var caminhaoOpt = caminhaoRepository
+                    .findByCodigoExterno(String.valueOf(dto.getCodVeiculo()));
 
-        if (caminhaoOpt.isEmpty()) {
-            log.warn("Caminhão WinThor {} não encontrado. Ignorando MDF-e {}",
-                    dto.getCodVeiculo(), dto.getNumMdfe());
-            registrarCargaSyncDescartadaService.registrar(dto, MotivoCargaSyncDescartada.CAMINHAO_NAO_CADASTRADO);
-            return;
+            if (caminhaoOpt.isEmpty()) {
+                log.warn("Caminhão WinThor {} não encontrado. Ignorando MDF-e {}",
+                        dto.getCodVeiculo(), dto.getNumMdfe());
+                registrarCargaSyncDescartadaService.registrar(dto, MotivoCargaSyncDescartada.CAMINHAO_NAO_CADASTRADO);
+                return;
+            }
+
+            boolean trocouCaminhao = nova
+                    || carga.getCaminhao() == null
+                    || !carga.getCaminhao().getId().equals(caminhaoOpt.get().getId());
+            carga.setCaminhao(caminhaoOpt.get());
+
+            // Só na criação ou quando o MDF-e foi reemitido com outro veículo — re-sync
+            // do mesmo caminhão não pode "atualizar" o titular congelado de uma carga
+            // já existente (senão trocar o titular hoje bagunçaria o km rodado/km-por-litro
+            // de cargas de meses já fechados). Com caminhão novo, o titular congelado
+            // antigo seria de um veículo que nem é mais o da carga.
+            if (trocouCaminhao) {
+                carga.setTitularNoPeriodo(caminhaoOpt.get().getMotoristaTitular());
+            }
         }
 
-        // Passou nas duas checagens: se essa carga estava na lista de descartadas, sai dela.
+        // Passou nas checagens: se essa carga estava na lista de descartadas, sai dela.
         registrarCargaSyncDescartadaService.resolver(dto.getNumCar());
-        boolean trocouCaminhao = nova
-                || carga.getCaminhao() == null
-                || !carga.getCaminhao().getId().equals(caminhaoOpt.get().getId());
-        carga.setCaminhao(caminhaoOpt.get());
-
-        // Só na criação ou quando o MDF-e foi reemitido com outro veículo — re-sync
-        // do mesmo caminhão não pode "atualizar" o titular congelado de uma carga
-        // já existente (senão trocar o titular hoje bagunçaria o km rodado/km-por-litro
-        // de cargas de meses já fechados). Com caminhão novo, o titular congelado
-        // antigo seria de um veículo que nem é mais o da carga.
-        if (trocouCaminhao) {
-            carga.setTitularNoPeriodo(caminhaoOpt.get().getMotoristaTitular());
-        }
 
         String destino = dto.getDestino();
         Rota rota = rotaRepository.findByCidadeInicio(destino)
