@@ -107,6 +107,12 @@ public class Carga extends AuditoriaBase {
     @Column(name = "motorista_definido_manualmente", nullable = false)
     private boolean motoristaDefinidoManualmente = false;
 
+    // Mesma ideia do motorista: o MDF-e saiu no WinThor com o caminhão errado.
+    // Enquanto true, o sync do WinThor não sobrescreve o caminhão (nem o titular
+    // congelado) desta carga.
+    @Column(name = "caminhao_definido_manualmente", nullable = false)
+    private boolean caminhaoDefinidoManualmente = false;
+
     /**
      * Códigos de devolução (CODDEVOL) encontrados no WinThor no último sync
      * desta carga, separados por vírgula (ex.: "53,56"). Null/vazio = não foi

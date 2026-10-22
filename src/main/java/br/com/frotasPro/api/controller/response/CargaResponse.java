@@ -96,6 +96,9 @@ public class CargaResponse {
      */
     private boolean motoristaDefinidoManualmente;
 
+    /** true quando o caminhão desta carga foi corrigido manualmente — o sync do WinThor não sobrescreve. */
+    private boolean caminhaoDefinidoManualmente;
+
     /**
      * Códigos de devolução (CODDEVOL) encontrados no último sync com o
      * WinThor pra esta carga. Null = não foi encontrada nenhuma devolução.

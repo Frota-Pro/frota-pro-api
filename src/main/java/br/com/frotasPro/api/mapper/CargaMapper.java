@@ -66,6 +66,8 @@ public class CargaMapper {
         carga.setCaminhao(caminhao);
         if (trocouCaminhao) {
             carga.setTitularNoPeriodo(caminhao != null ? caminhao.getMotoristaTitular() : null);
+            // correção manual: o próximo sync do WinThor não pode desfazer
+            carga.setCaminhaoDefinidoManualmente(true);
         }
         carga.setRota(rota);
         carga.setAjudantes(ajudantes);
@@ -139,6 +141,7 @@ public class CargaMapper {
                 .clientesNaoRoteirizados(new ArrayList<>(carga.getClientesNaoRoteirizados()))
                 .observacaoMotorista(carga.getObservacaoMotorista())
                 .motoristaDefinidoManualmente(carga.isMotoristaDefinidoManualmente())
+                .caminhaoDefinidoManualmente(carga.isCaminhaoDefinidoManualmente())
                 .codigosDevolucaoEncontrados(
                         carga.getCodigosDevolucaoEncontrados() != null && !carga.getCodigosDevolucaoEncontrados().isBlank()
                                 ? Arrays.stream(carga.getCodigosDevolucaoEncontrados().split(","))

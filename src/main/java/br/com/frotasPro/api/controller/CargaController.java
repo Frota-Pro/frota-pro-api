@@ -3,6 +3,7 @@ package br.com.frotasPro.api.controller;
 import br.com.frotasPro.api.controller.request.AtualizarObservacaoMotoristaRequest;
 import br.com.frotasPro.api.controller.request.AtualizarOrdemEntregaRequest;
 import br.com.frotasPro.api.controller.request.CargaRequest;
+import br.com.frotasPro.api.controller.request.TransferirCaminhaoCargaRequest;
 import br.com.frotasPro.api.controller.request.TransferirMotoristaCargaRequest;
 import br.com.frotasPro.api.controller.request.TransferirNotasCargaRequest;
 import br.com.frotasPro.api.controller.response.CargaMinResponse;
@@ -50,6 +51,7 @@ public class CargaController {
     private final AtualizarObservacaoMotoristaService atualizarObservacaoMotoristaService;
     private final TransferirNotasCargaService transferirNotasCargaService;
     private final TransferirMotoristaCargaService transferirMotoristaCargaService;
+    private final TransferirCaminhaoCargaService transferirCaminhaoCargaService;
     private final VerificarCargasSumidasWinThorService verificarCargasSumidasWinThorService;
     private final RelatorioCargasSumidasWinThorService relatorioCargasSumidasWinThorService;
     private final RelatorioCargasNaoSincronizadasService relatorioCargasNaoSincronizadasService;
@@ -374,6 +376,27 @@ public class CargaController {
             @Valid @RequestBody TransferirMotoristaCargaRequest request
     ) {
         CargaResponse response = transferirMotoristaCargaService.transferir(numeroCarga, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PatchMapping("/{numeroCarga}/transferir-caminhao")
+    @Caching(evict = {
+            @CacheEvict(value = "carga_buscar_numero", allEntries = true),
+            @CacheEvict(value = "carga_buscar_codigo_externo", allEntries = true),
+            @CacheEvict(value = "carga_listar", allEntries = true),
+            @CacheEvict(value = "carga_data_saida", allEntries = true),
+            @CacheEvict(value = "carga_periodo_saida", allEntries = true),
+            @CacheEvict(value = "carga_periodo_criacao", allEntries = true),
+            @CacheEvict(value = "carga_motorista", allEntries = true),
+            @CacheEvict(value = "carga_caminhao", allEntries = true),
+            @CacheEvict(value = "carga_minha_atual", allEntries = true)
+    })
+    public ResponseEntity<CargaResponse> transferirCaminhao(
+            @PathVariable String numeroCarga,
+            @Valid @RequestBody TransferirCaminhaoCargaRequest request
+    ) {
+        CargaResponse response = transferirCaminhaoCargaService.transferir(numeroCarga, request);
         return ResponseEntity.ok(response);
     }
 
