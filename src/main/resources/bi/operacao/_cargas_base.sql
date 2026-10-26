@@ -9,4 +9,4 @@ cg AS (SELECT c.numero_carga carga, COALESCE(c.data_saida, c.data_faturamento) d
   FROM tb_carga c JOIN tb_caminhao k ON k.id = c.caminhao_id LEFT JOIN tb_categoria_caminhao cc ON cc.id = k.categoria_caminhao_id
   JOIN tb_motorista mo ON mo.id = c.motorista_id JOIN tb_rota r ON r.id = c.rota_id
   LEFT JOIN abc ON abc.carga_id = c.id LEFT JOIN dpc ON dpc.carga_id = c.id LEFT JOIN en ON en.carga_id = c.id LEFT JOIN nf ON nf.carga_id = c.id
-  WHERE 1 = 1 AND COALESCE(c.data_saida, c.data_faturamento) >= current_date - make_interval(months => :meses))
+  WHERE 1 = 1 AND COALESCE(c.data_saida, c.data_faturamento) BETWEEN :inicio AND :fim)

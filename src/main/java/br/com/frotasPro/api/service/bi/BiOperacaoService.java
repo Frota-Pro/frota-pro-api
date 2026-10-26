@@ -7,7 +7,7 @@ import br.com.frotasPro.api.controller.response.BiOperacaoResponse.MesCargas;
 import br.com.frotasPro.api.controller.response.BiOperacaoResponse.MesCombustivel;
 import br.com.frotasPro.api.controller.response.BiOperacaoResponse.MesMetas;
 import br.com.frotasPro.api.controller.response.BiOperacaoResponse.RotaCargas;
-import br.com.frotasPro.api.excption.BusinessException;
+import br.com.frotasPro.api.util.FusoHorarioUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -31,18 +32,15 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class BiOperacaoService {
 
-    public static final int MESES_PADRAO = 6;
-    public static final int MESES_MAXIMO = 24;
-
     private final NamedParameterJdbcTemplate jdbc;
 
     @Transactional(readOnly = true)
-    public BiOperacaoResponse buscar(int meses) {
-        if (meses < 1 || meses > MESES_MAXIMO) {
-            throw new BusinessException("O período deve ser de 1 a " + MESES_MAXIMO + " meses.");
-        }
+    public BiOperacaoResponse buscar(Integer meses, LocalDate de, LocalDate ate) {
+        BiPeriodo periodo = BiPeriodo.resolver(meses, de, ate, FusoHorarioUtils.hojeBrasil());
 
-        var parametros = new MapSqlParameterSource("meses", meses);
+        var parametros = new MapSqlParameterSource()
+                .addValue("inicio", periodo.inicio())
+                .addValue("fim", periodo.fimDaConsulta());
 
         Map<String, Object> kpisCargas = primeira(jdbc.queryForList(sqlComBase("_cargas_base", "kpis_cargas"), parametros));
         Map<String, Object> kpisCombustivel = primeira(jdbc.queryForList(sqlComBase("_abastecimentos_base", "kpis_combustivel"), parametros));
@@ -52,11 +50,11 @@ public class BiOperacaoService {
         List<Map<String, Object>> consumo = jdbc.queryForList(sql("consumo_por_categoria"), parametros);
         List<Map<String, Object>> metas = jdbc.queryForList(sql("metas_por_mes"), parametros);
 
-        return montar(meses, OffsetDateTime.now(), kpisCargas, kpisCombustivel, cargasPorMes, combustivelPorMes, cargasPorRota, consumo, metas);
+        return montar(periodo, OffsetDateTime.now(), kpisCargas, kpisCombustivel, cargasPorMes, combustivelPorMes, cargasPorRota, consumo, metas);
     }
 
     /** Converte as linhas do banco no JSON do app (separado da consulta para poder ser testado sem banco). */
-    static BiOperacaoResponse montar(int meses,
+    static BiOperacaoResponse montar(BiPeriodo periodo,
                                      OffsetDateTime geradoEm,
                                      Map<String, Object> kpisCargas,
                                      Map<String, Object> kpisCombustivel,
@@ -78,7 +76,9 @@ public class BiOperacaoService {
         );
 
         return new BiOperacaoResponse(
-                meses,
+                periodo.meses(),
+                periodo.inicio(),
+                periodo.fim(),
                 geradoEm,
                 kpis,
                 cargasPorMes.stream()

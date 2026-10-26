@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,7 @@ import static org.mockito.Mockito.when;
 class BiOperacaoServiceTest {
 
     private static final OffsetDateTime AGORA = OffsetDateTime.parse("2026-10-23T10:00:00Z");
+    private static final LocalDate HOJE = LocalDate.of(2026, 10, 23);
 
     private static Map<String, Object> linha(Object... pares) {
         Map<String, Object> m = new HashMap<>();
@@ -38,12 +40,14 @@ class BiOperacaoServiceTest {
 
     @Test
     void montaOsKpisComOsTiposDoBanco() {
-        var r = BiOperacaoService.montar(6, AGORA,
+        var r = BiOperacaoService.montar(BiPeriodo.resolver(6, null, null, HOJE), AGORA,
                 linha("cargas", 1017L, "entregas", new BigDecimal("21361"), "notas", 35992L, "km", new BigDecimal("263214"), "custo_por_km", new BigDecimal("1.47")),
                 linha("litros", new BigDecimal("58309"), "gasto", new BigDecimal("399194.49"), "preco_medio", new BigDecimal("6.85")),
                 List.of(), List.of(), List.of(), List.of(), List.of());
 
-        assertEquals(6, r.meses());
+        assertEquals(Integer.valueOf(6), r.meses());
+        assertEquals(LocalDate.of(2026, 4, 23), r.inicio());
+        assertEquals(HOJE, r.fim());
         assertEquals(AGORA, r.geradoEm());
         assertEquals(1017, r.kpis().cargas());
         assertEquals(21361, r.kpis().entregas());
@@ -57,7 +61,7 @@ class BiOperacaoServiceTest {
 
     @Test
     void semDadosOsKpisFicamZeradosOuNulos() {
-        var r = BiOperacaoService.montar(3, AGORA, Map.of(), Map.of(), List.of(), List.of(), List.of(), List.of(), List.of());
+        var r = BiOperacaoService.montar(BiPeriodo.resolver(3, null, null, HOJE), AGORA, Map.of(), Map.of(), List.of(), List.of(), List.of(), List.of(), List.of());
 
         assertEquals(0, r.kpis().cargas());
         assertEquals(0, r.kpis().kmRodados());
@@ -70,7 +74,7 @@ class BiOperacaoServiceTest {
 
     @Test
     void montaAsSeriesMantendoAOrdemDoBanco() {
-        var r = BiOperacaoService.montar(6, AGORA, Map.of(), Map.of(),
+        var r = BiOperacaoService.montar(BiPeriodo.resolver(6, null, null, HOJE), AGORA, Map.of(), Map.of(),
                 List.of(linha("mes", "2026-08", "cargas", 7278L, "entregas", 160, "notas", 300), linha("mes", "2026-09", "cargas", 7912L, "entregas", 290L, "notas", 310L)),
                 List.of(linha("mes", "2026-08", "litros", new BigDecimal("1000"), "gasto", new BigDecimal("6000.5"), "preco_medio", new BigDecimal("6.00"))),
                 List.of(linha("rota", "ROT-000004 · SOUSA", "cargas", 73L)),
@@ -106,9 +110,9 @@ class BiOperacaoServiceTest {
         NamedParameterJdbcTemplate jdbc = mock(NamedParameterJdbcTemplate.class);
         var service = new BiOperacaoService(jdbc);
 
-        assertThrows(BusinessException.class, () -> service.buscar(0));
-        assertThrows(BusinessException.class, () -> service.buscar(-3));
-        assertThrows(BusinessException.class, () -> service.buscar(BiOperacaoService.MESES_MAXIMO + 1));
+        assertThrows(BusinessException.class, () -> service.buscar(0, null, null));
+        assertThrows(BusinessException.class, () -> service.buscar(-3, null, null));
+        assertThrows(BusinessException.class, () -> service.buscar(BiPeriodo.MESES_MAXIMO + 1, null, null));
 
         verify(jdbc, never()).queryForList(anyString(), any(MapSqlParameterSource.class));
     }
@@ -119,11 +123,11 @@ class BiOperacaoServiceTest {
         when(jdbc.queryForList(anyString(), any(MapSqlParameterSource.class))).thenReturn(List.of());
         var service = new BiOperacaoService(jdbc);
 
-        var r = service.buscar(12);
+        var r = service.buscar(12, null, null);
 
-        assertEquals(12, r.meses());
+        assertEquals(Integer.valueOf(12), r.meses());
         assertEquals(0, r.kpis().cargas());
-        verify(jdbc, org.mockito.Mockito.times(7)).queryForList(anyString(), org.mockito.ArgumentMatchers.argThat((MapSqlParameterSource p) -> Integer.valueOf(12).equals(p.getValue("meses"))));
+        verify(jdbc, org.mockito.Mockito.times(7)).queryForList(anyString(), org.mockito.ArgumentMatchers.argThat((MapSqlParameterSource p) -> p.getValue("inicio") instanceof LocalDate i && i.isBefore(LocalDate.now().minusMonths(11)) && p.hasValue("fim")));
     }
 
     @Test
@@ -139,12 +143,27 @@ class BiOperacaoServiceTest {
 
         for (String sql : consultas) {
             String minusculo = sql.toLowerCase();
-            assertTrue(sql.contains(":meses"), "toda consulta filtra pelo periodo");
+            assertTrue(sql.contains(":inicio") && sql.contains(":fim"), "toda consulta filtra pelo periodo");
             assertTrue(minusculo.trim().startsWith("with"), "consulta de leitura");
             for (String proibido : List.of("insert ", "update ", "delete ", "drop ", "alter ", "truncate ", "create ")) {
                 assertFalse(minusculo.contains(proibido), "consulta do BI nao pode escrever: " + proibido);
             }
         }
+    }
+
+    @Test
+    void periodoPersonalizadoUsaAsDatasEscolhidasENaoOsMeses() {
+        NamedParameterJdbcTemplate jdbc = mock(NamedParameterJdbcTemplate.class);
+        when(jdbc.queryForList(anyString(), any(MapSqlParameterSource.class))).thenReturn(List.of());
+        var service = new BiOperacaoService(jdbc);
+
+        var r = service.buscar(null, LocalDate.of(2026, 10, 1), LocalDate.of(2026, 10, 15));
+
+        assertNull(r.meses());
+        assertEquals(LocalDate.of(2026, 10, 1), r.inicio());
+        assertEquals(LocalDate.of(2026, 10, 15), r.fim());
+        verify(jdbc, org.mockito.Mockito.times(7)).queryForList(anyString(), org.mockito.ArgumentMatchers.argThat((MapSqlParameterSource p) ->
+                LocalDate.of(2026, 10, 1).equals(p.getValue("inicio")) && LocalDate.of(2026, 10, 15).equals(p.getValue("fim"))));
     }
 
     @Test

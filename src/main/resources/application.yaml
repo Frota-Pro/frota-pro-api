@@ -88,6 +88,7 @@ frotapro:
   # BI do gerente (Metabase). Sem BI_EMBEDDING_SECRET o recurso fica desligado (503).
   bi:
     metabase-site-url: ${BI_METABASE_URL:}
+    metabase-api-url: ${BI_METABASE_API_URL:}
     embedding-secret: ${BI_EMBEDDING_SECRET:}
     token-ttl-minutos: 30
     dashboards:
