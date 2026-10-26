@@ -37,7 +37,7 @@ public class MetabaseEmbedService {
     public List<BiDashboardResponse> listar(boolean admin) {
         return props.getDashboards().stream()
                 .filter(d -> admin || !d.isSomenteAdmin())
-                .map(d -> new BiDashboardResponse(d.getId(), d.getTitulo(), d.getDescricao()))
+                .map(d -> new BiDashboardResponse(d.getId(), d.getTitulo(), d.getDescricao(), d.getCategoria(), d.getIcone()))
                 .toList();
     }
 
