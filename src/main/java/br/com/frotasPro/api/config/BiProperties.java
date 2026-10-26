@@ -22,6 +22,12 @@ public class BiProperties {
     /** Endereço do Metabase como o celular enxerga (ex.: https://bi.empresa.com.br). */
     private String metabaseSiteUrl = "";
 
+    /**
+     * Endereço que a API usa para buscar os dados dos dashboards no Metabase (ex.: http://192.168.2.245:3000,
+     * dentro da rede). Vazio = usa o mesmo endereço público acima.
+     */
+    private String metabaseApiUrl = "";
+
     /** Segredo de incorporação do Metabase (Admin > Embedding). Nunca vai pro app nem pro log. */
     private String embeddingSecret = "";
 
@@ -29,6 +35,11 @@ public class BiProperties {
     private int tokenTtlMinutos = 30;
 
     private List<Dashboard> dashboards = new ArrayList<>();
+
+    public String urlDaApiMetabase() {
+        String url = metabaseApiUrl != null && !metabaseApiUrl.isBlank() ? metabaseApiUrl : metabaseSiteUrl;
+        return url.trim().replaceAll("/+$", "");
+    }
 
     public boolean configurado() {
         return metabaseSiteUrl != null && !metabaseSiteUrl.isBlank()

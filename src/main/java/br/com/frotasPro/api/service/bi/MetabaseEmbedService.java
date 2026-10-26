@@ -41,7 +41,17 @@ public class MetabaseEmbedService {
                 .toList();
     }
 
-    public BiEmbedUrlResponse gerarUrl(int dashboardId, boolean admin) {
+    /** Dados para a API buscar os cartões de um dashboard no Metabase (token curto, nunca vai ao app). */
+    public record AcessoDados(String titulo, String token) {
+    }
+
+    public AcessoDados acessoParaDados(int dashboardId, boolean admin) {
+        BiProperties.Dashboard dashboard = validar(dashboardId, admin);
+        Instant expira = Instant.now().plusSeconds(300);
+        return new AcessoDados(dashboard.getTitulo(), assinar(dashboardId, expira));
+    }
+
+    private BiProperties.Dashboard validar(int dashboardId, boolean admin) {
         if (!props.configurado()) {
             throw new IntegracaoIndisponivelException("O BI ainda não foi configurado neste ambiente.");
         }
@@ -54,6 +64,11 @@ public class MetabaseEmbedService {
         if (dashboard.isSomenteAdmin() && !admin) {
             throw new AccessDeniedException("Este dashboard é restrito ao administrador.");
         }
+        return dashboard;
+    }
+
+    public BiEmbedUrlResponse gerarUrl(int dashboardId, boolean admin) {
+        validar(dashboardId, admin);
 
         Instant expira = Instant.now().plusSeconds(60L * Math.max(1, props.getTokenTtlMinutos()));
         String token = assinar(dashboardId, expira);

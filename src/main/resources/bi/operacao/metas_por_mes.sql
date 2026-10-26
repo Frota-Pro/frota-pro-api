@@ -13,7 +13,7 @@ mr AS (SELECT mt.*,
   (SELECT r.meta_atingida FROM tb_meta_resultado r WHERE r.meta_id = mt.meta_id AND r.caminhao_id = mt.caminhao_id ORDER BY r.periodo_fim DESC, r.calculado_em DESC LIMIT 1) atingida_sistema,
   (current_date BETWEEN mt.data_inicio AND mt.data_fim) em_andamento
  FROM mt WHERE mt.data_inicio <= current_date
-  AND mt.data_fim >= current_date - make_interval(months => :meses))
+  AND mt.data_fim >= :inicio AND mt.data_inicio <= :fim)
 SELECT to_char(data_inicio, 'YYYY-MM') AS mes,
  round(100.0 * count(*) FILTER (WHERE tipo_meta = 'CONSUMO_COMBUSTIVEL' AND realizado >= valor_meta) / NULLIF(count(*) FILTER (WHERE tipo_meta = 'CONSUMO_COMBUSTIVEL' AND realizado IS NOT NULL), 0), 1) AS consumo_pct,
  round(100.0 * count(*) FILTER (WHERE tipo_meta = 'TONELADA' AND realizado >= valor_meta) / NULLIF(count(*) FILTER (WHERE tipo_meta = 'TONELADA' AND realizado IS NOT NULL), 0), 1) AS toneladas_pct,

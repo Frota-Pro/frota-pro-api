@@ -1,5 +1,6 @@
 package br.com.frotasPro.api.controller.response;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -9,7 +10,9 @@ import java.util.List;
  * Os meses vão no formato {@code yyyy-MM}.
  */
 public record BiOperacaoResponse(
-        int meses,
+        Integer meses,
+        LocalDate inicio,
+        LocalDate fim,
         OffsetDateTime geradoEm,
         Kpis kpis,
         List<MesCargas> cargasPorMes,
