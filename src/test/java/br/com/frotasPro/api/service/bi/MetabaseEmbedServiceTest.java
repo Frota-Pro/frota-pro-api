@@ -48,6 +48,8 @@ class MetabaseEmbedServiceTest {
         d.setId(id);
         d.setTitulo(titulo);
         d.setDescricao("desc " + titulo);
+        d.setCategoria("Cat " + titulo);
+        d.setIcone("painel");
         d.setSomenteAdmin(somenteAdmin);
         return d;
     }
@@ -64,6 +66,14 @@ class MetabaseEmbedServiceTest {
         assertEquals(1, lista.size());
         assertEquals(2, lista.get(0).id());
         assertEquals("Operação", lista.get(0).titulo());
+    }
+
+    @Test
+    void listaTrazCategoriaEIconeParaOAppAgrupar() {
+        BiDashboardResponse d = service.listar(true).get(0);
+
+        assertEquals("Cat Operação", d.categoria());
+        assertEquals("painel", d.icone());
     }
 
     @Test

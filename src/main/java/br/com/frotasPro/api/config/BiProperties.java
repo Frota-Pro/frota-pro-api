@@ -42,6 +42,10 @@ public class BiProperties {
         private int id;
         private String titulo;
         private String descricao;
+        /** Grupo em que o app mostra o dashboard (ex.: "Combustível e custos"). */
+        private String categoria;
+        /** Nome do ícone (o app conhece: painel, combustivel, dinheiro, caminhao, relogio, manutencao, agenda, multa, regra, lista, sync). */
+        private String icone;
         /** true = só ROLE_ADMIN vê (ex.: saúde da integração, uso técnico). */
         private boolean somenteAdmin;
     }
