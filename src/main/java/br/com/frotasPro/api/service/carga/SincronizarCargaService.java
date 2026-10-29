@@ -20,7 +20,6 @@ import br.com.frotasPro.api.repository.CargaTransferenciaRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.repository.RotaRepository;
 import br.com.frotasPro.api.service.cliente.ClienteService;
-import br.com.frotasPro.api.util.NomeCidadeUtils;
 import br.com.frotasPro.api.service.parametrosistema.ParametroSistemaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +33,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -57,23 +55,6 @@ public class SincronizarCargaService {
     private final ParametroSistemaService parametroSistemaService;
     private final ClienteService clienteService;
     private final RegistrarCargaSyncDescartadaService registrarCargaSyncDescartadaService;
-
-    /**
-     * O destino é texto livre do faturista: acha a rota ignorando acento, caixa e os
-     * sufixos configurados (ParametroSistema.sufixosRotaIgnorados); só cria se não houver.
-     */
-    private Rota encontrarOuCriarRota(String destino) {
-        List<String> sufixos = NomeCidadeUtils.sufixos(parametroSistemaService.buscarOuPadrao().getSufixosRotaIgnorados());
-        String chave = NomeCidadeUtils.chave(destino, sufixos);
-        return rotaRepository.findAll().stream()
-                .filter(r -> chave != null && chave.equals(NomeCidadeUtils.chave(r.getCidadeInicio(), sufixos)))
-                .min(Comparator.comparing(Rota::getCodigo, Comparator.nullsLast(Comparator.naturalOrder())))
-                .orElseGet(() -> {
-                    Rota novaRota = new Rota();
-                    novaRota.setCidadeInicio(NomeCidadeUtils.nomeDaRota(destino, sufixos));
-                    return rotaRepository.save(novaRota);
-                });
-    }
 
     @Caching(evict = {
             @CacheEvict(value = "carga_listar", allEntries = true),
@@ -191,7 +172,14 @@ public class SincronizarCargaService {
         // Passou nas checagens: se essa carga estava na lista de descartadas, sai dela.
         registrarCargaSyncDescartadaService.resolver(dto.getNumCar());
 
-        carga.setRota(encontrarOuCriarRota(dto.getDestino()));
+        String destino = dto.getDestino();
+        Rota rota = rotaRepository.findByCidadeInicio(destino)
+                .orElseGet(() -> {
+                    Rota novaRota = new Rota();
+                    novaRota.setCidadeInicio(destino);
+                    return rotaRepository.save(novaRota);
+                });
+        carga.setRota(rota);
 
         if (dto.getDtSaida() != null) {
             carga.setDtFaturamento(dto.getDtSaida().toLocalDate());

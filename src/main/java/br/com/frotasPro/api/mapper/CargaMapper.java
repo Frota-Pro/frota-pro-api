@@ -131,7 +131,6 @@ public class CargaMapper {
                 .codigoCaminhao(carga.getCaminhao().getCodigo())
                 .placaCaminhao(carga.getCaminhao().getPlaca())
                 .codigoRota(carga.getRota().getCodigo())
-                .nomeRota(carga.getRota().getCidadeInicio())
                 .codigosAjudantes(
                         carga.getAjudantes()
                                 .stream()
