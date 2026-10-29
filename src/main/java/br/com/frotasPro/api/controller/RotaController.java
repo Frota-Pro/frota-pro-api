@@ -3,6 +3,7 @@ package br.com.frotasPro.api.controller;
 import br.com.frotasPro.api.controller.request.RotaRequest;
 import br.com.frotasPro.api.controller.response.ClienteHistoricoRotaResponse;
 import br.com.frotasPro.api.controller.response.RotaResponse;
+import br.com.frotasPro.api.controller.response.UnificarRotasResponse;
 import br.com.frotasPro.api.service.rota.*;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,15 @@ public class RotaController {
     private final AtualizarRotaService atualizarRotaService;
     private final DeletarRotaService deletarRotaService;
     private final BuscarClientesHistoricoRotaService buscarClientesHistoricoRotaService;
+    private final UnificarRotasRepetidasService unificarRotasRepetidasService;
+
+    /** Por segurança o padrão é só simular; a unificação de verdade pede simular=false. */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PostMapping("/unificar-repetidas")
+    public ResponseEntity<UnificarRotasResponse> unificarRepetidas(
+            @RequestParam(defaultValue = "true") boolean simular) {
+        return ResponseEntity.ok(unificarRotasRepetidasService.unificar(simular));
+    }
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/{codigo}")

@@ -49,6 +49,9 @@ public class ParametroSistemaService {
         parametro.setDiasAntecedenciaPrazoMulta(request.getDiasAntecedenciaPrazoMulta());
         parametro.setValidarMotivoAlteracaoPesoValorCarga(request.getValidarMotivoAlteracaoPesoValorCarga());
         parametro.setCodigosDevolucaoPermitidos(request.getCodigosDevolucaoPermitidos());
+        if (request.getSufixosRotaIgnorados() != null) {
+            parametro.setSufixosRotaIgnorados(request.getSufixosRotaIgnorados().trim());
+        }
         parametro.setPermitirAtualizacaoPorTransferencia(request.getPermitirAtualizacaoPorTransferencia());
         parametro.setValidarTempoMinimoCarga(request.getValidarTempoMinimoCarga());
         parametro.setTempoMinimoEntregaPadraoMinutos(request.getTempoMinimoEntregaPadraoMinutos());
@@ -75,6 +78,7 @@ public class ParametroSistemaService {
                 .diasAntecedenciaPrazoMulta(parametro.getDiasAntecedenciaPrazoMulta())
                 .validarMotivoAlteracaoPesoValorCarga(parametro.isValidarMotivoAlteracaoPesoValorCarga())
                 .codigosDevolucaoPermitidos(parametro.getCodigosDevolucaoPermitidos())
+                .sufixosRotaIgnorados(parametro.getSufixosRotaIgnorados())
                 .permitirAtualizacaoPorTransferencia(parametro.isPermitirAtualizacaoPorTransferencia())
                 .validarTempoMinimoCarga(parametro.isValidarTempoMinimoCarga())
                 .tempoMinimoEntregaPadraoMinutos(parametro.getTempoMinimoEntregaPadraoMinutos())
