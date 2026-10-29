@@ -1,5 +1,7 @@
 package br.com.frotasPro.api.util;
 
+import br.com.frotasPro.api.domain.ParametroSistema;
+import br.com.frotasPro.api.service.parametrosistema.ParametroSistemaService;
 import br.com.frotasPro.api.service.usuario.SenhaPadraoPolitica;
 import org.junit.jupiter.api.Test;
 
@@ -11,6 +13,14 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GeradorSenhaTest {
+
+    private SenhaPadraoPolitica politica(boolean bloquear) {
+        ParametroSistema parametro = new ParametroSistema();
+        parametro.setBloquearSenhaPadrao(bloquear);
+        ParametroSistemaService parametros = org.mockito.Mockito.mock(ParametroSistemaService.class);
+        org.mockito.Mockito.when(parametros.buscarOuPadrao()).thenReturn(parametro);
+        return new SenhaPadraoPolitica(parametros);
+    }
 
     @Test
     void geraSenhaDe10CaracteresSemOsQueSeConfundem() {
@@ -32,9 +42,9 @@ class GeradorSenhaTest {
 
     @Test
     void politicaDaSenhaPadraoSoBloqueiaQuandoLigada() {
-        assertFalse(new SenhaPadraoPolitica(false).deveBloquear("padrao123"));
-        assertTrue(new SenhaPadraoPolitica(true).deveBloquear("padrao123"));
-        assertFalse(new SenhaPadraoPolitica(true).deveBloquear("outraSenha1"));
-        assertFalse(new SenhaPadraoPolitica(true).deveBloquear(null));
+        assertFalse(politica(false).deveBloquear("padrao123"));
+        assertTrue(politica(true).deveBloquear("padrao123"));
+        assertFalse(politica(true).deveBloquear("outraSenha1"));
+        assertFalse(politica(true).deveBloquear(null));
     }
 }

@@ -4,10 +4,14 @@ import br.com.frotasPro.api.controller.request.ParametroSistemaUpdateRequest;
 import br.com.frotasPro.api.controller.response.ParametroSistemaResponse;
 import br.com.frotasPro.api.domain.ParametroSistema;
 import br.com.frotasPro.api.repository.ParametroSistemaRepository;
+import br.com.frotasPro.api.service.usuario.UsuarioAutenticadoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
@@ -21,6 +25,7 @@ import java.util.UUID;
 public class ParametroSistemaService {
 
     private final ParametroSistemaRepository repository;
+    private final UsuarioAutenticadoService usuarioAutenticadoService;
 
     @Value("${frotapro.empresa-sync-id}")
     private UUID empresaIdPadrao;
@@ -55,7 +60,30 @@ public class ParametroSistemaService {
         parametro.setDiasRetencaoAuditoria(request.getDiasRetencaoAuditoria());
         parametro.setPercentualLimiteAnomaliaAbastecimento(request.getPercentualLimiteAnomaliaAbastecimento());
 
+        if (request.getBloquearSenhaPadrao() != null) {
+            exigirContaProprioSemSenhaPadraoAoLigar(parametro, request.getBloquearSenhaPadrao());
+            parametro.setBloquearSenhaPadrao(request.getBloquearSenhaPadrao());
+        }
+        if (request.getVincularDispositivo() != null) {
+            parametro.setVincularDispositivo(request.getVincularDispositivo());
+        }
+
         return toResponse(repository.save(parametro));
+    }
+
+    /**
+     * Ligar o bloqueio da senha "padrao123" enquanto a própria conta de quem liga ainda a usa
+     * trancaria o administrador do lado de fora. A conta com a senha padrão fica marcada como
+     * temporária, então basta exigir que quem liga já tenha trocado a sua.
+     */
+    private void exigirContaProprioSemSenhaPadraoAoLigar(ParametroSistema atual, boolean ligar) {
+        if (!ligar || atual.isBloquearSenhaPadrao()) {
+            return;
+        }
+        if (usuarioAutenticadoService.getUsuario().isSenhaTemporaria()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Troque a sua própria senha antes de ligar o bloqueio da senha padrão; senão você ficaria sem acesso.");
+        }
     }
 
     private ParametroSistema ensureExists(UUID empresaId) {
@@ -80,6 +108,8 @@ public class ParametroSistemaService {
                 .tempoMinimoEntregaPadraoMinutos(parametro.getTempoMinimoEntregaPadraoMinutos())
                 .diasRetencaoAuditoria(parametro.getDiasRetencaoAuditoria())
                 .percentualLimiteAnomaliaAbastecimento(parametro.getPercentualLimiteAnomaliaAbastecimento())
+                .bloquearSenhaPadrao(parametro.isBloquearSenhaPadrao())
+                .vincularDispositivo(parametro.isVincularDispositivo())
                 .build();
     }
 }

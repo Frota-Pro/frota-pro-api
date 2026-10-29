@@ -38,6 +38,11 @@ public class ParametroSistemaUpdateRequest {
     @Size(max = 500, message = "Códigos de devolução permitidos deve ter no máximo 500 caracteres")
     private String codigosDevolucaoPermitidos;
 
+    // Opcionais de propósito (cliente antigo não manda): nulo mantém o valor atual.
+    private Boolean bloquearSenhaPadrao;
+
+    private Boolean vincularDispositivo;
+
     @NotNull(message = "Informe se transferência de pedido autoriza a atualização")
     private Boolean permitirAtualizacaoPorTransferencia;
 

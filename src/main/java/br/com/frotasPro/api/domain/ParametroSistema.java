@@ -117,4 +117,19 @@ public class ParametroSistema extends AuditoriaBase {
      */
     @Column(name = "percentual_limite_anomalia_abastecimento", nullable = false)
     private int percentualLimiteAnomaliaAbastecimento = 25;
+
+    /**
+     * Se true, o login com a senha fixa antiga "padrao123" é recusado (a pessoa pede uma senha nova
+     * ao administrador). Desligado por padrão: ligar antes de redefinir essas senhas as tranca.
+     */
+    @Column(name = "bloquear_senha_padrao", nullable = false)
+    private boolean bloquearSenhaPadrao = false;
+
+    /**
+     * Se true, o motorista só entra pelo celular a que ficou vinculado no primeiro login (o
+     * administrador desvincula na tela de usuários). Exige o app 1.8.0 ou maior nos celulares:
+     * o app antigo não envia a identificação do aparelho e seria barrado.
+     */
+    @Column(name = "vincular_dispositivo", nullable = false)
+    private boolean vincularDispositivo = false;
 }

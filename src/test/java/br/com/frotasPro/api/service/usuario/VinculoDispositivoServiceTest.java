@@ -1,6 +1,8 @@
 package br.com.frotasPro.api.service.usuario;
 
 import br.com.frotasPro.api.domain.Acesso;
+import br.com.frotasPro.api.domain.ParametroSistema;
+import br.com.frotasPro.api.service.parametrosistema.ParametroSistemaService;
 import br.com.frotasPro.api.domain.Usuario;
 import br.com.frotasPro.api.repository.UsuarioRepository;
 import br.com.frotasPro.api.service.auditoria.RegistrarLogAuditoriaService;
@@ -33,8 +35,16 @@ class VinculoDispositivoServiceTest {
     @Mock
     private RegistrarLogAuditoriaService auditoria;
 
+    private VinculoDispositivoService servico(boolean vincularDispositivo) {
+        ParametroSistema parametro = new ParametroSistema();
+        parametro.setVincularDispositivo(vincularDispositivo);
+        ParametroSistemaService parametros = org.mockito.Mockito.mock(ParametroSistemaService.class);
+        org.mockito.Mockito.when(parametros.buscarOuPadrao()).thenReturn(parametro);
+        return new VinculoDispositivoService(parametros, usuarioRepository, auditoria);
+    }
+
     private VinculoDispositivoService ligado() {
-        return new VinculoDispositivoService(true, usuarioRepository, auditoria);
+        return servico(true);
     }
 
     private Usuario usuarioCom(String... perfis) {
@@ -56,7 +66,7 @@ class VinculoDispositivoServiceTest {
 
     @Test
     void desligadoNaoFazNadaEDevolveNull() {
-        VinculoDispositivoService desligado = new VinculoDispositivoService(false, usuarioRepository, auditoria);
+        VinculoDispositivoService desligado = servico(false);
         Usuario motorista = usuarioCom("ROLE_MOTORISTA");
 
         assertNull(desligado.validarNoLogin(motorista, null, null, "ip"));
@@ -183,7 +193,7 @@ class VinculoDispositivoServiceTest {
     @Test
     void refreshNaoMexeEmQuemNaoTemOVinculoOuComRecursoDesligado() {
         ligado().validarNoRefresh(usuarioCom("ROLE_ADMIN"), null);
-        new VinculoDispositivoService(false, usuarioRepository, auditoria)
+        servico(false)
                 .validarNoRefresh(usuarioCom("ROLE_MOTORISTA"), null);
     }
 }
