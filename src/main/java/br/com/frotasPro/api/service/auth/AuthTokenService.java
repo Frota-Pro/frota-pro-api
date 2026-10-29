@@ -5,6 +5,7 @@ import br.com.frotasPro.api.domain.Usuario;
 import br.com.frotasPro.api.domain.enums.AcaoAuditoria;
 import br.com.frotasPro.api.service.auditoria.RegistrarLogAuditoriaService;
 import br.com.frotasPro.api.service.usuario.BuscarUsuarioService;
+import br.com.frotasPro.api.service.usuario.VinculoDispositivoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -36,6 +37,7 @@ public class AuthTokenService {
     private final StringRedisTemplate stringRedisTemplate;
     private final BuscarUsuarioService buscarUsuarioService;
     private final RegistrarLogAuditoriaService registrarLogAuditoriaService;
+    private final VinculoDispositivoService vinculoDispositivoService;
 
     @Value("${frotapro.security.jwt.access-token-seconds:900}")
     private long accessTokenSeconds;
@@ -44,8 +46,13 @@ public class AuthTokenService {
     private long refreshTokenSeconds;
 
     public TokenPair generateTokenPair(Usuario usuario) {
+        return generateTokenPair(usuario, (String) null);
+    }
+
+    /** dispositivoHash: aparelho a que a sessão pertence (vai no refresh token); nulo quando o vínculo não se aplica. */
+    public TokenPair generateTokenPair(Usuario usuario, String dispositivoHash) {
         List<String> acessos = usuario.getAcesso().stream().map(Acesso::getNome).toList();
-        return generateTokenPair(usuario, acessos);
+        return generateTokenPair(usuario, acessos, dispositivoHash);
     }
 
     public TokenPair refresh(String refreshToken) {
@@ -61,9 +68,11 @@ public class AuthTokenService {
         }
 
         Usuario usuario = buscarUsuarioService.buscarUsuarioPorlogin(login);
+        String dispositivoDoToken = decoded.getClaimAsString("dev");
+        vinculoDispositivoService.validarNoRefresh(usuario, dispositivoDoToken);
         List<String> acessos = usuario.getAcesso().stream().map(Acesso::getNome).toList();
 
-        return generateTokenPair(usuario, acessos);
+        return generateTokenPair(usuario, acessos, dispositivoDoToken);
     }
 
     public void logout(String refreshToken) {
@@ -77,7 +86,7 @@ public class AuthTokenService {
                 null, "Logout", "POST", "/login/logout", 204, null);
     }
 
-    private TokenPair generateTokenPair(Usuario usuario, List<String> acessos) {
+    private TokenPair generateTokenPair(Usuario usuario, List<String> acessos, String dispositivoHash) {
         Instant now = Instant.now();
         Instant accessExpiresAt = now.plusSeconds(accessTokenSeconds);
         Instant refreshExpiresAt = now.plusSeconds(refreshTokenSeconds);
@@ -97,7 +106,7 @@ public class AuthTokenService {
                 .build();
 
         String refreshJti = UUID.randomUUID().toString();
-        JwtClaimsSet refreshClaims = JwtClaimsSet.builder()
+        JwtClaimsSet.Builder refreshClaimsBuilder = JwtClaimsSet.builder()
                 .issuer("frotaPro-api")
                 .subject(usuario.getNome())
                 .issuedAt(now)
@@ -105,8 +114,11 @@ public class AuthTokenService {
                 .id(refreshJti)
                 .claim("token_type", TOKEN_TYPE_REFRESH)
                 .claim("login", usuario.getLogin())
-                .claim("id", usuario.getId())
-                .build();
+                .claim("id", usuario.getId());
+        if (dispositivoHash != null) {
+            refreshClaimsBuilder.claim("dev", dispositivoHash);
+        }
+        JwtClaimsSet refreshClaims = refreshClaimsBuilder.build();
 
         String accessToken = jwtEncoder.encode(JwtEncoderParameters.from(accessClaims)).getTokenValue();
         String refreshToken = jwtEncoder.encode(JwtEncoderParameters.from(refreshClaims)).getTokenValue();

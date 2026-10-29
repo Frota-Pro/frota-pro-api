@@ -1,5 +1,6 @@
 package br.com.frotasPro.api.config;
 
+import br.com.frotasPro.api.util.ClientIp;
 import br.com.frotasPro.api.domain.enums.AcaoAuditoria;
 import br.com.frotasPro.api.service.auditoria.AuditoriaEntidadeContexto;
 import br.com.frotasPro.api.service.auditoria.RegistrarLogAuditoriaService;
@@ -111,15 +112,6 @@ public class LogAuditoriaFilter extends OncePerRequestFilter {
     }
 
     private String extractClientIp(HttpServletRequest request) {
-        String forwardedFor = request.getHeader("X-Forwarded-For");
-        if (forwardedFor != null && !forwardedFor.isBlank()) {
-            return forwardedFor.split(",")[0].trim();
-        }
-        String realIp = request.getHeader("X-Real-IP");
-        if (realIp != null && !realIp.isBlank()) {
-            return realIp.trim();
-        }
-        String remoteAddr = request.getRemoteAddr();
-        return (remoteAddr == null || remoteAddr.isBlank()) ? "unknown" : remoteAddr;
+        return ClientIp.de(request);
     }
 }

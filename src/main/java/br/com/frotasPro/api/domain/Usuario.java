@@ -63,11 +63,37 @@ public class Usuario extends AuditoriaBase{
     @Column(name = "dispositivo_app_reportado_em")
     private LocalDateTime dispositivoAppReportadoEm;
 
+    /** Hash (SHA-256) do identificador do celular a que o motorista está vinculado; nulo = sem vínculo. */
+    @Column(name = "dispositivo_vinculado_hash", length = 64)
+    private String dispositivoVinculadoHash;
+
+    @Column(name = "dispositivo_vinculado_nome", length = 120)
+    private String dispositivoVinculadoNome;
+
+    @Column(name = "dispositivo_vinculado_em")
+    private LocalDateTime dispositivoVinculadoEm;
+
     @Column(name = "ultimo_login_em")
     private LocalDateTime ultimoLoginEm;
 
     @Column(name = "total_logins", nullable = false)
     private long totalLogins = 0;
+
+    public void vincularDispositivo(String hash, String nome, LocalDateTime em) {
+        this.dispositivoVinculadoHash = hash;
+        this.dispositivoVinculadoNome = nome;
+        this.dispositivoVinculadoEm = em;
+    }
+
+    public void desvincularDispositivo() {
+        this.dispositivoVinculadoHash = null;
+        this.dispositivoVinculadoNome = null;
+        this.dispositivoVinculadoEm = null;
+    }
+
+    public boolean temDispositivoVinculado() {
+        return dispositivoVinculadoHash != null && !dispositivoVinculadoHash.isBlank();
+    }
 
     public void registrarLogin() {
         this.ultimoLoginEm = FusoHorarioUtils.agoraBrasil();

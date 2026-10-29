@@ -8,6 +8,8 @@ import br.com.frotasPro.api.controller.request.UsuarioSenhaSelfRequest;
 import br.com.frotasPro.api.controller.request.UsuarioSenhaUpdateRequest;
 import br.com.frotasPro.api.controller.request.UsuarioUpdateRequest;
 import br.com.frotasPro.api.controller.response.UsuarioResponse;
+import br.com.frotasPro.api.controller.response.UsuariosMotoristasCriadosResponse;
+import br.com.frotasPro.api.util.GeradorSenha;
 import br.com.frotasPro.api.domain.Acesso;
 import br.com.frotasPro.api.domain.Motorista;
 import br.com.frotasPro.api.domain.Usuario;
@@ -150,12 +152,29 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
         hierarquiaAcessoService.exigirPodeGerenciar(usuario);
+        if (SENHA_PADRAO.equals(request.getNovaSenha())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Escolha uma senha diferente da senha padrão.");
+        }
         String actor = getCurrentActorOrSystem();
         usuario.setSenha(passwordEncoder.encode(request.getNovaSenha()));
         // Senha definida por um admin é sempre tratada como temporária: o usuário é obrigado a trocá-la no próximo login.
         usuario.setSenhaTemporaria(true);
         usuarioRepository.save(usuario);
         log.info("security_event=password_changed actor={} target_login={} target_id={}", actor, usuario.getLogin(), usuario.getId());
+    }
+
+    /** O administrador libera o motorista para entrar de outro celular: o próximo login grava o aparelho novo. */
+    public UsuarioResponse desvincularDispositivo(UUID id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
+        hierarquiaAcessoService.exigirPodeGerenciar(usuario);
+
+        String anterior = usuario.getDispositivoVinculadoNome();
+        usuario.desvincularDispositivo();
+        usuarioRepository.save(usuario);
+        log.info("security_event=dispositivo_desvinculado actor={} target_login={} celular='{}'",
+                getCurrentActorOrSystem(), usuario.getLogin(), anterior);
+        return toResponse(usuario);
     }
 
     public void atualizarMinhaSenha(UsuarioSenhaSelfRequest request) {
@@ -183,8 +202,9 @@ public class UsuarioService {
         usuarioRepository.save(usuario);
     }
 
-    public List<String> criarUsuariosPelosMotoristas(List<String> codigos) {
+    public UsuariosMotoristasCriadosResponse criarUsuariosPelosMotoristas(List<String> codigos) {
         List<String> mensagens = new ArrayList<>();
+        List<UsuariosMotoristasCriadosResponse.Credencial> credenciais = new ArrayList<>();
 
         for (String codigo : codigos) {
             try {
@@ -209,7 +229,9 @@ public class UsuarioService {
                 Usuario usuario = new Usuario();
                 usuario.setNome(motorista.getNome());
                 usuario.setLogin(gerarLoginUnico(motorista.getNome()));
-                usuario.setSenha(passwordEncoder.encode(SENHA_PADRAO));
+                // senha aleatória por usuário (nada de senha igual para todos); só aparece na resposta
+                String senhaInicial = GeradorSenha.gerar();
+                usuario.setSenha(passwordEncoder.encode(senhaInicial));
                 usuario.setSenhaTemporaria(true);
                 usuario.setAtivo(true);
 
@@ -221,13 +243,18 @@ public class UsuarioService {
                 motoristaRepository.save(motorista);
 
                 mensagens.add("✅ Usuário criado com sucesso para: " + motorista.getNome());
+                credenciais.add(UsuariosMotoristasCriadosResponse.Credencial.builder()
+                        .nome(motorista.getNome())
+                        .login(usuario.getLogin())
+                        .senhaInicial(senhaInicial)
+                        .build());
 
             } catch (Exception e) {
                 mensagens.add("❌ Erro ao processar código " + codigo + ": " + e.getMessage());
             }
         }
 
-        return mensagens;
+        return UsuariosMotoristasCriadosResponse.builder().mensagens(mensagens).credenciais(credenciais).build();
     }
 
     private String gerarLoginUnico(String nomeCompleto) {

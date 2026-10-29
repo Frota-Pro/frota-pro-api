@@ -5,6 +5,7 @@ import br.com.frotasPro.api.controller.request.UsuarioRequest;
 import br.com.frotasPro.api.controller.request.UsuarioSenhaSelfRequest;
 import br.com.frotasPro.api.controller.request.UsuarioSenhaUpdateRequest;
 import br.com.frotasPro.api.controller.request.UsuarioUpdateRequest;
+import br.com.frotasPro.api.controller.response.UsuariosMotoristasCriadosResponse;
 import br.com.frotasPro.api.domain.Acesso;
 import br.com.frotasPro.api.domain.Motorista;
 import br.com.frotasPro.api.domain.Usuario;
@@ -355,7 +356,7 @@ class UsuarioServiceTest {
     void motoristaInexistenteGeraMensagemDeErroSemInterromperOLote() {
         when(motoristaRepository.findByCodigo("MOT-X")).thenReturn(Optional.empty());
 
-        List<String> msgs = service.criarUsuariosPelosMotoristas(List.of("MOT-X"));
+        List<String> msgs = service.criarUsuariosPelosMotoristas(List.of("MOT-X")).getMensagens();
 
         assertEquals(1, msgs.size());
         assertTrue(msgs.get(0).contains("Motorista não encontrado para código MOT-X"));
@@ -367,26 +368,33 @@ class UsuarioServiceTest {
         when(motoristaRepository.findByCodigo("MOT-1")).thenReturn(Optional.of(motorista("MOT-1", "Jose Felix")));
         when(usuarioRepository.findByNome("Jose Felix")).thenReturn(Optional.of(new Usuario()));
 
-        List<String> msgs = service.criarUsuariosPelosMotoristas(List.of("MOT-1"));
+        List<String> msgs = service.criarUsuariosPelosMotoristas(List.of("MOT-1")).getMensagens();
 
         assertTrue(msgs.get(0).contains("Usuário já existe para motorista: Jose Felix"));
         verify(usuarioRepository, never()).save(any());
     }
 
     @Test
-    void criaUsuarioDoMotoristaComSenhaPadraoTemporariaEVinculaOsDois() {
+    void criaUsuarioDoMotoristaComSenhaAleatoriaTemporariaEVinculaOsDois() {
         Motorista m = motorista("MOT-1", "José Felix de Santana");
         when(motoristaRepository.findByCodigo("MOT-1")).thenReturn(Optional.of(m));
         when(usuarioRepository.findByNome("José Felix de Santana")).thenReturn(Optional.empty());
         when(acessoRepository.findByNome("ROLE_MOTORISTA")).thenReturn(Optional.of(acesso("ROLE_MOTORISTA")));
         when(usuarioRepository.existsByLogin("jose")).thenReturn(false);
 
-        List<String> msgs = service.criarUsuariosPelosMotoristas(List.of("MOT-1"));
+        UsuariosMotoristasCriadosResponse resposta = service.criarUsuariosPelosMotoristas(List.of("MOT-1"));
+        List<String> msgs = resposta.getMensagens();
 
         ArgumentCaptor<Usuario> salvo = ArgumentCaptor.forClass(Usuario.class);
         verify(usuarioRepository).save(salvo.capture());
         assertEquals("jose", salvo.getValue().getLogin());
-        assertEquals("hash(padrao123)", salvo.getValue().getSenha());
+        // a senha mostrada para o administrador é a que foi gravada (com hash), e nunca a padrão
+        UsuariosMotoristasCriadosResponse.Credencial credencial = resposta.getCredenciais().get(0);
+        assertEquals("jose", credencial.getLogin());
+        assertEquals("José Felix de Santana", credencial.getNome());
+        assertEquals(10, credencial.getSenhaInicial().length());
+        assertFalse("padrao123".equals(credencial.getSenhaInicial()));
+        assertEquals("hash(" + credencial.getSenhaInicial() + ")", salvo.getValue().getSenha());
         assertTrue(salvo.getValue().isSenhaTemporaria());
         assertEquals("ROLE_MOTORISTA", salvo.getValue().getAcesso().get(0).getNome());
         assertEquals(salvo.getValue(), m.getUsuario());
@@ -418,7 +426,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.findByNome("Ze")).thenReturn(Optional.empty());
         when(acessoRepository.findByNome("ROLE_MOTORISTA")).thenReturn(Optional.empty());
 
-        List<String> msgs = service.criarUsuariosPelosMotoristas(List.of("MOT-1", "MOT-2"));
+        List<String> msgs = service.criarUsuariosPelosMotoristas(List.of("MOT-1", "MOT-2")).getMensagens();
 
         assertEquals(2, msgs.size());
         assertTrue(msgs.get(0).contains("Erro ao processar código MOT-1"));
@@ -499,5 +507,62 @@ class UsuarioServiceTest {
 
         assertEquals("hash-antigo", admin.getSenha());
         verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    void adminNaoPodeRedefinirParaASenhaPadrao() {
+        UUID id = UUID.randomUUID();
+        Usuario ze = existente(id, "ze", "Ze");
+        when(usuarioRepository.findById(id)).thenReturn(Optional.of(ze));
+        UsuarioSenhaUpdateRequest r = new UsuarioSenhaUpdateRequest();
+        r.setNovaSenha("padrao123");
+
+        ResponseStatusException e = assertThrows(ResponseStatusException.class, () -> service.atualizarSenha(id, r));
+
+        assertEquals(HttpStatus.BAD_REQUEST, e.getStatusCode());
+        assertEquals("hash-antigo", ze.getSenha());
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    // ---- vinculo com o celular
+
+    @Test
+    void desvincularLimpaOCelularEPermiteOProximoLoginGravarOutro() {
+        UUID id = UUID.randomUUID();
+        Usuario ze = existente(id, "ze", "Ze");
+        ze.vincularDispositivo("hash", "Samsung A13", java.time.LocalDateTime.now());
+        when(usuarioRepository.findById(id)).thenReturn(Optional.of(ze));
+
+        var resposta = service.desvincularDispositivo(id);
+
+        assertFalse(ze.temDispositivoVinculado());
+        assertEquals(null, ze.getDispositivoVinculadoNome());
+        assertFalse(resposta.isDispositivoVinculado());
+        verify(hierarquiaAcessoService).exigirPodeGerenciar(ze);
+        verify(usuarioRepository).save(ze);
+    }
+
+    @Test
+    void desvincularUsuarioDeNivelSuperiorEhBloqueado() {
+        UUID id = UUID.randomUUID();
+        Usuario admin = existente(id, "admin", "Administrador");
+        admin.vincularDispositivo("hash", "Pixel", java.time.LocalDateTime.now());
+        when(usuarioRepository.findById(id)).thenReturn(Optional.of(admin));
+        doThrow(proibido()).when(hierarquiaAcessoService).exigirPodeGerenciar(admin);
+
+        assertThrows(ResponseStatusException.class, () -> service.desvincularDispositivo(id));
+
+        assertTrue(admin.temDispositivoVinculado());
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    void desvincularUsuarioInexistenteDa404() {
+        UUID id = UUID.randomUUID();
+        when(usuarioRepository.findById(id)).thenReturn(Optional.empty());
+
+        ResponseStatusException e = assertThrows(ResponseStatusException.class, () -> service.desvincularDispositivo(id));
+
+        assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
     }
 }
