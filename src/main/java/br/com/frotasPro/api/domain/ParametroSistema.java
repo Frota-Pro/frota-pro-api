@@ -111,6 +111,14 @@ public class ParametroSistema extends AuditoriaBase {
     private int diasRetencaoAuditoria = 180;
 
     /**
+     * Palavras (separadas por vírgula, ex.: "FRIOS") que, no fim do destino da
+     * carga vindo do WinThor, não contam pra achar a rota: "SOUSA FRIOS" cai na
+     * rota "SOUSA". Vazio/nulo = nenhuma, cada grafia vira uma rota. Ver NomeCidadeUtils.
+     */
+    @Column(name = "sufixos_rota_ignorados", length = 200)
+    private String sufixosRotaIgnorados = "FRIOS";
+
+    /**
      * Quanto por cento acima da média recente do posto (mesmo combustível,
      * últimos 90 dias) o preço/litro de um abastecimento precisa estar pra
      * ser marcado como anômalo (ver DetectarAnomaliaAbastecimentoService).

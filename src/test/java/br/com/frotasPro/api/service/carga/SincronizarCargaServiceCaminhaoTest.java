@@ -95,7 +95,7 @@ class SincronizarCargaServiceCaminhaoTest {
 
         lenient().when(cargaRepository.findByNumeroCargaExterno("420605")).thenReturn(Optional.of(carga));
         lenient().when(caminhaoRepository.findByCodigoExterno("99")).thenReturn(Optional.of(caminhaoDoWinThor));
-        lenient().when(rotaRepository.findByCidadeInicio(anyString())).thenReturn(Optional.of(new Rota()));
+        lenient().when(rotaRepository.findAll()).thenReturn(List.of(rotaCajazeiras()));
         lenient().when(parametroSistemaService.buscarOuPadrao()).thenReturn(new ParametroSistema());
     }
 
@@ -107,13 +107,29 @@ class SincronizarCargaServiceCaminhaoTest {
         return c;
     }
 
+    private Rota rota(String codigo, String cidadeInicio) {
+        Rota r = new Rota();
+        r.setId(UUID.randomUUID());
+        r.setCodigo(codigo);
+        r.setCidadeInicio(cidadeInicio);
+        return r;
+    }
+
+    private Rota rotaCajazeiras() {
+        return rota("ROT-000090", "CAJAZEIRAS");
+    }
+
     private CargaSyncResponseEvent evento(String codVeiculo) {
+        return evento(codVeiculo, "CAJAZEIRAS");
+    }
+
+    private CargaSyncResponseEvent evento(String codVeiculo, String destino) {
         CargaWinThorDto dto = CargaWinThorDto.builder()
                 .numCar(420605)
                 .numMdfe(1L)
                 .codVeiculo(codVeiculo)
                 .codMotorista(7)
-                .destino("CAJAZEIRAS")
+                .destino(destino)
                 .pesoTotalKg(2218.0)
                 .valorTotal(new BigDecimal("35872.62"))
                 .clientes(new ArrayList<>())
@@ -170,5 +186,55 @@ class SincronizarCargaServiceCaminhaoTest {
         verify(registrarCargaSyncDescartadaService).registrar(any(), any());
         verify(cargaRepository, never()).saveAndFlush(any());
         assertSame(caminhaoErrado, carga.getCaminhao());
+    }
+
+    @Test
+    void destinoComAcentoOuSufixoIgnoradoCaiNaMesmaRota() {
+        Rota sousa = rota("ROT-000004", "SOUSA");
+        Rota poco = rota("ROT-000002", "POÇO DANTAS");
+        when(rotaRepository.findAll()).thenReturn(List.of(sousa, poco, rotaCajazeiras()));
+
+        service.sincronizarCargasWinThor(evento("99", "SOUSA FRIOS"));
+        assertSame(sousa, carga.getRota());
+
+        service.sincronizarCargasWinThor(evento("99", "poco  dantas"));
+        assertSame(poco, carga.getRota());
+
+        verify(rotaRepository, never()).save(any());
+    }
+
+    @Test
+    void comRotasRepetidasUsaADeMenorCodigo() {
+        Rota nova = rota("ROT-000031", "SOUSA FRIOS");
+        Rota antiga = rota("ROT-000004", "SOUSA");
+        when(rotaRepository.findAll()).thenReturn(List.of(nova, antiga));
+
+        service.sincronizarCargasWinThor(evento("99", "SOUSA"));
+
+        assertSame(antiga, carga.getRota());
+    }
+
+    @Test
+    void semRotaCriaComONomeSemOSufixo() {
+        when(rotaRepository.findAll()).thenReturn(List.of(rotaCajazeiras()));
+        when(rotaRepository.save(any(Rota.class))).thenAnswer(i -> i.getArgument(0));
+
+        service.sincronizarCargasWinThor(evento("99", "UIRAUNA FRIOS"));
+
+        assertEquals("UIRAUNA", carga.getRota().getCidadeInicio());
+    }
+
+    @Test
+    void semSufixoConfiguradoFriosViraOutraRota() {
+        ParametroSistema parametro = new ParametroSistema();
+        parametro.setSufixosRotaIgnorados("");
+        when(parametroSistemaService.buscarOuPadrao()).thenReturn(parametro);
+        Rota sousa = rota("ROT-000004", "SOUSA");
+        when(rotaRepository.findAll()).thenReturn(List.of(sousa));
+        when(rotaRepository.save(any(Rota.class))).thenAnswer(i -> i.getArgument(0));
+
+        service.sincronizarCargasWinThor(evento("99", "SOUSA FRIOS"));
+
+        assertEquals("SOUSA FRIOS", carga.getRota().getCidadeInicio());
     }
 }
