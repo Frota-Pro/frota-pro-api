@@ -2,6 +2,7 @@ package br.com.frotasPro.api.controller;
 
 import br.com.frotasPro.api.controller.request.RotaRequest;
 import br.com.frotasPro.api.controller.response.ClienteHistoricoRotaResponse;
+import br.com.frotasPro.api.controller.response.MesclarRotaResponse;
 import br.com.frotasPro.api.controller.response.RotaResponse;
 import br.com.frotasPro.api.service.rota.*;
 import jakarta.validation.Valid;
@@ -27,6 +28,15 @@ public class RotaController {
     private final AtualizarRotaService atualizarRotaService;
     private final DeletarRotaService deletarRotaService;
     private final BuscarClientesHistoricoRotaService buscarClientesHistoricoRotaService;
+    private final MesclarRotaService mesclarRotaService;
+
+    /** Passa as cargas de {codigo} para a rota {codigoDestino} e apaga {codigo}. */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @PostMapping("/{codigo}/mesclar/{codigoDestino}")
+    public ResponseEntity<MesclarRotaResponse> mesclar(@PathVariable String codigo,
+                                                       @PathVariable String codigoDestino) {
+        return ResponseEntity.ok(mesclarRotaService.mesclar(codigo, codigoDestino));
+    }
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
     @GetMapping("/{codigo}")
