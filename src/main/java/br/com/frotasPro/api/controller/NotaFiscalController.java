@@ -4,6 +4,7 @@ import br.com.frotasPro.api.controller.request.EnviarNotaFiscalEmailRequest;
 import br.com.frotasPro.api.controller.response.NotaFiscalResumoResponse;
 import br.com.frotasPro.api.service.notafiscal.NotaFiscalService;
 import jakarta.validation.Valid;
+import br.com.frotasPro.api.service.usuario.AcessoMotoristaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -23,6 +24,7 @@ import java.util.List;
 public class NotaFiscalController {
 
     private final NotaFiscalService notaFiscalService;
+    private final AcessoMotoristaService acessoMotoristaService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_MOTORISTA')")
     @GetMapping
@@ -30,6 +32,7 @@ public class NotaFiscalController {
             @PathVariable String numeroCarga,
             @RequestParam String cliente
     ) {
+        acessoMotoristaService.exigirCargaDoMotorista(numeroCarga);
         return ResponseEntity.ok(notaFiscalService.listar(numeroCarga, cliente));
     }
 
@@ -42,6 +45,7 @@ public class NotaFiscalController {
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_MOTORISTA')")
     @GetMapping("/{numeroNota}/xml")
     public ResponseEntity<String> xml(@PathVariable String numeroCarga, @PathVariable Long numeroNota) {
+        acessoMotoristaService.exigirCargaDoMotorista(numeroCarga);
         String xml = notaFiscalService.buscarXml(numeroCarga, numeroNota);
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_XML)
@@ -52,6 +56,7 @@ public class NotaFiscalController {
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_MOTORISTA')")
     @GetMapping("/{numeroNota}/pdf")
     public ResponseEntity<byte[]> pdf(@PathVariable String numeroCarga, @PathVariable Long numeroNota) {
+        acessoMotoristaService.exigirCargaDoMotorista(numeroCarga);
         byte[] pdf = notaFiscalService.buscarPdf(numeroCarga, numeroNota);
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
@@ -66,6 +71,7 @@ public class NotaFiscalController {
             @PathVariable Long numeroNota,
             @Valid @RequestBody EnviarNotaFiscalEmailRequest request
     ) {
+        acessoMotoristaService.exigirCargaDoMotorista(numeroCarga);
         notaFiscalService.enviarPorEmail(numeroCarga, numeroNota, request.getDestinatario());
         return ResponseEntity.noContent().build();
     }

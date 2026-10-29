@@ -4,6 +4,7 @@ import br.com.frotasPro.api.controller.response.DevolucaoResponse;
 import br.com.frotasPro.api.controller.response.ResumoDescontoCargaResponse;
 import br.com.frotasPro.api.controller.response.TransferenciaResponse;
 import br.com.frotasPro.api.service.notafiscal.DevolucaoTransferenciaService;
+import br.com.frotasPro.api.service.usuario.AcessoMotoristaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,22 +26,26 @@ import java.util.List;
 public class DevolucaoTransferenciaController {
 
     private final DevolucaoTransferenciaService service;
+    private final AcessoMotoristaService acessoMotoristaService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_MOTORISTA')")
     @GetMapping("/devolucoes")
     public ResponseEntity<List<DevolucaoResponse>> devolucoes(@PathVariable String numeroCarga) {
+        acessoMotoristaService.exigirCargaDoMotorista(numeroCarga);
         return ResponseEntity.ok(service.buscarDevolucoes(numeroCarga));
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_MOTORISTA')")
     @GetMapping("/transferencias")
     public ResponseEntity<List<TransferenciaResponse>> transferencias(@PathVariable String numeroCarga) {
+        acessoMotoristaService.exigirCargaDoMotorista(numeroCarga);
         return ResponseEntity.ok(service.buscarTransferencias(numeroCarga));
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_MOTORISTA')")
     @GetMapping("/desconto-resumo")
     public ResponseEntity<ResumoDescontoCargaResponse> descontoResumo(@PathVariable String numeroCarga) {
+        acessoMotoristaService.exigirCargaDoMotorista(numeroCarga);
         return ResponseEntity.ok(service.buscarResumoDesconto(numeroCarga));
     }
 }

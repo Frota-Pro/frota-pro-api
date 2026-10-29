@@ -44,6 +44,7 @@ public class UsuarioService {
     private final PasswordEncoder passwordEncoder;
     private final MotoristaRepository motoristaRepository;
     private final UsuarioAutenticadoService usuarioAutenticadoService;
+    private final HierarquiaAcessoService hierarquiaAcessoService;
 
     public UsuarioResponse registar(UsuarioRequest request) {
 
@@ -65,6 +66,10 @@ public class UsuarioService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Já existe um usuário com esse nome");
         }
 
+        // ninguém concede um perfil acima do próprio (evita um operador criar um ADMIN)
+        List<String> perfis = nomesDosAcessos(request.getAcessos());
+        hierarquiaAcessoService.exigirPodeAtribuir(perfis);
+
         Usuario usuario = new Usuario();
         usuario.setLogin(login);
         usuario.setNome(nome);
@@ -74,7 +79,7 @@ public class UsuarioService {
         usuario.setAtivo(true);
 
         // ✅ acessos: se não vier, aplica padrão e garante que terá role para logar
-        aplicarAcessos(usuario, request.getAcessos());
+        aplicarAcessos(usuario, perfis);
 
         usuarioRepository.save(usuario);
 
@@ -96,6 +101,13 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
 
+        // checagens de permissão antes de qualquer alteração na entidade
+        hierarquiaAcessoService.exigirPodeGerenciar(usuario);
+        List<String> perfis = request.getAcessos() == null ? null : nomesDosAcessos(request.getAcessos());
+        if (perfis != null) {
+            hierarquiaAcessoService.exigirPodeAtribuir(perfis);
+        }
+
         String novoLogin = request.getLogin().trim();
         String novoNome = request.getNome().trim();
 
@@ -115,9 +127,9 @@ public class UsuarioService {
             usuario.setAtivo(request.getAtivo());
         }
 
-        if (request.getAcessos() != null) {
+        if (perfis != null) {
             usuario.getAcesso().clear();
-            aplicarAcessos(usuario, request.getAcessos());
+            aplicarAcessos(usuario, perfis);
         }
 
         usuarioRepository.save(usuario);
@@ -127,6 +139,7 @@ public class UsuarioService {
     public UsuarioResponse atualizarAtivo(UUID id, boolean ativo) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
+        hierarquiaAcessoService.exigirPodeGerenciar(usuario);
 
         usuario.setAtivo(ativo);
         usuarioRepository.save(usuario);
@@ -136,6 +149,7 @@ public class UsuarioService {
     public void atualizarSenha(UUID id, UsuarioSenhaUpdateRequest request) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
+        hierarquiaAcessoService.exigirPodeGerenciar(usuario);
         String actor = getCurrentActorOrSystem();
         usuario.setSenha(passwordEncoder.encode(request.getNovaSenha()));
         // Senha definida por um admin é sempre tratada como temporária: o usuário é obrigado a trocá-la no próximo login.
@@ -235,9 +249,8 @@ public class UsuarioService {
         return login;
     }
 
-    private void aplicarAcessos(Usuario usuario, List<String> acessos) {
-
-        // Normaliza lista recebida
+    /** Normaliza a lista recebida e aplica o perfil padrão (operador) quando nada foi informado. */
+    private List<String> nomesDosAcessos(List<String> acessos) {
         List<String> recebidos = new ArrayList<>();
         if (acessos != null) {
             for (String a : acessos) {
@@ -247,11 +260,10 @@ public class UsuarioService {
             }
         }
 
-        // padrão se não vier nada
-        List<String> nomes = (recebidos.isEmpty())
-                ? List.of("ROLE_OPERADOR_LOGISTICA")
-                : recebidos;
+        return recebidos.isEmpty() ? List.of("ROLE_OPERADOR_LOGISTICA") : recebidos;
+    }
 
+    private void aplicarAcessos(Usuario usuario, List<String> nomes) {
         for (String nomeAcesso : nomes) {
             Acesso acesso = acessoRepository.findByNome(nomeAcesso)
                     .orElseThrow(() -> new ResponseStatusException(INTERNAL_SERVER_ERROR, "Acesso não encontrado: " + nomeAcesso));

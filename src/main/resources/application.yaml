@@ -64,6 +64,8 @@ frotapro:
 
   integracao:
     integradora-base-url: ${INTEGRADORA_BASE_URL:http://localhost:8081}
+    # Segredo que a integradora exige (cabeçalho X-Integradora-Token). Mesmo valor nos dois lados.
+    integradora-token: ${INTEGRADORA_API_TOKEN:}
     timeout-ms: 2000
     nfe:
       timeout-ms: 8000

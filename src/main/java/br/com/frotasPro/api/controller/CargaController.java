@@ -16,6 +16,7 @@ import br.com.frotasPro.api.service.carga.*;
 import br.com.frotasPro.api.service.relatorios.RelatorioCargasNaoSincronizadasService;
 import br.com.frotasPro.api.service.relatorios.RelatorioCargasSumidasWinThorService;
 import jakarta.validation.Valid;
+import br.com.frotasPro.api.service.usuario.AcessoMotoristaService;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
@@ -44,6 +45,7 @@ public class CargaController {
     private final AtualizarCargaService atualizarCargaService;
     private final DeletarCargaService deletarCargaService;
     private final IniciarCargaService iniciarCargaService;
+    private final AcessoMotoristaService acessoMotoristaService;
     private final FinalizarCargaService finalizarCargaService;
     private final BuscarCargaAtualMotoristaService buscarCargaAtualMotoristaService;
     private final BuscarCargasFinalizadasMotoristaService buscarCargasFinalizadasMotoristaService;
@@ -230,6 +232,7 @@ public class CargaController {
             @RequestParam("km") Integer kmInicial,
             @RequestParam(value = "ajudantes", required = false) List<String> ajudanteCodigos
     ) {
+        acessoMotoristaService.exigirCargaDoMotorista(numeroCarga);
         String resposta = iniciarCargaService.iniciarCarga(numeroCarga, kmInicial, ajudanteCodigos);
         return ResponseEntity.ok(resposta);
     }
@@ -267,6 +270,7 @@ public class CargaController {
             @RequestParam("carga") String numeroCarga,
             @RequestParam("km") Integer kmfinal
     ) {
+        acessoMotoristaService.exigirCargaDoMotorista(numeroCarga);
         String resposta = finalizarCargaService.finalizarCarga(numeroCarga, kmfinal);
         return ResponseEntity.ok(resposta);
     }
@@ -311,6 +315,7 @@ public class CargaController {
             @PathVariable String numeroCarga,
             @Valid @RequestBody AtualizarObservacaoMotoristaRequest request
     ) {
+        acessoMotoristaService.exigirCargaDoMotorista(numeroCarga);
         atualizarObservacaoMotoristaService.atualizar(numeroCarga, request.getObservacao());
         return ResponseEntity.noContent().build();
     }

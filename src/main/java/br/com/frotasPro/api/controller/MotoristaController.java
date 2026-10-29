@@ -11,6 +11,7 @@ import br.com.frotasPro.api.service.dispositivo.ListarDispositivosAppMotoristasS
 import br.com.frotasPro.api.service.motorista.*;
 import br.com.frotasPro.api.service.relatorios.RelatorioMetaMensalMotoristaService;
 import jakarta.validation.Valid;
+import br.com.frotasPro.api.service.usuario.AcessoMotoristaService;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
@@ -42,6 +43,7 @@ public class MotoristaController {
     private final RelatorioMetaMensalMotoristaService relatorioMetaMensalMotoristaService;
     private final ListarDocumentoMotoristaService listarDocumentoMotoristaService;
     private final RegistrarDocumentoMotoristaService registrarDocumentoMotoristaService;
+    private final AcessoMotoristaService acessoMotoristaService;
     private final ListarDispositivosAppMotoristasService listarDispositivosAppMotoristasService;
     private final AtualizarFeriasMotoristaService atualizarFeriasMotoristaService;
 
@@ -160,6 +162,7 @@ public class MotoristaController {
             @RequestParam(value = "observacao", required = false) String observacao,
             @RequestPart("arquivo") MultipartFile arquivo
     ) {
+        acessoMotoristaService.exigirMotoristaProprio(motoristaId);
         DocumentoMotoristaResponse response =
                 registrarDocumentoMotoristaService.registrar(motoristaId, tipoDocumento, observacao, arquivo);
 
@@ -177,6 +180,7 @@ public class MotoristaController {
     public ResponseEntity<List<DocumentoMotoristaResponse>> listarDocumentosMotorista(
             @PathVariable UUID motoristaId
     ) {
+        acessoMotoristaService.exigirMotoristaProprio(motoristaId);
         List<DocumentoMotoristaResponse> documentos =
                 listarDocumentoMotoristaService.listarPorMotorista(motoristaId);
 
