@@ -72,7 +72,6 @@ public class CargaResponse {
     private String placaCaminhao;
 
     private String codigoRota;
-    private String nomeRota;
 
     private List<String> codigosAjudantes;
 
