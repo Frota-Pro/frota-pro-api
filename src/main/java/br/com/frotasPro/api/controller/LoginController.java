@@ -1,5 +1,6 @@
 package br.com.frotasPro.api.controller;
 
+import br.com.frotasPro.api.util.ClientIp;
 import br.com.frotasPro.api.controller.request.LoginRequest;
 import br.com.frotasPro.api.controller.request.RefreshTokenRequest;
 import br.com.frotasPro.api.controller.response.LoginResponse;
@@ -47,18 +48,6 @@ public class LoginController {
     }
 
     private String extractClientIp(HttpServletRequest request) {
-        String forwardedFor = request.getHeader("X-Forwarded-For");
-        if (forwardedFor != null && !forwardedFor.isBlank()) {
-            return forwardedFor.split(",")[0].trim();
-        }
-        String realIp = request.getHeader("X-Real-IP");
-        if (realIp != null && !realIp.isBlank()) {
-            return realIp.trim();
-        }
-        String remoteAddr = request.getRemoteAddr();
-        if (remoteAddr == null || remoteAddr.isBlank()) {
-            return "unknown";
-        }
-        return remoteAddr;
+        return ClientIp.de(request);
     }
 }

@@ -56,13 +56,15 @@ class AuthTokenServiceTest {
     private BuscarUsuarioService buscarUsuarioService;
     @Mock
     private RegistrarLogAuditoriaService auditoria;
+    @Mock
+    private br.com.frotasPro.api.service.usuario.VinculoDispositivoService vinculoDispositivo;
 
     private AuthTokenService service;
     private Usuario usuario;
 
     @BeforeEach
     void setUp() {
-        service = new AuthTokenService(jwtEncoder, jwtDecoder, redis, buscarUsuarioService, auditoria);
+        service = new AuthTokenService(jwtEncoder, jwtDecoder, redis, buscarUsuarioService, auditoria, vinculoDispositivo);
         ReflectionTestUtils.setField(service, "accessTokenSeconds", 900L);
         ReflectionTestUtils.setField(service, "refreshTokenSeconds", 604_800L);
 
@@ -265,5 +267,59 @@ class AuthTokenServiceTest {
 
         verifyNoInteractions(auditoria);
         verify(redis, never()).hasKey(anyString());
+    }
+
+    // ---- vinculo do aparelho no refresh token
+
+    @Test
+    void refreshTokenDeSessaoVinculadaCarregaOHashDoAparelho() {
+        service.generateTokenPair(usuario, "hash-do-celular");
+
+        ArgumentCaptor<JwtEncoderParameters> captura = ArgumentCaptor.forClass(JwtEncoderParameters.class);
+        verify(jwtEncoder, org.mockito.Mockito.times(2)).encode(captura.capture());
+        assertEquals("hash-do-celular", captura.getAllValues().get(1).getClaims().getClaimAsString("dev"));
+        assertNull(captura.getAllValues().get(0).getClaims().getClaim("dev"));
+    }
+
+    @Test
+    void semVinculoORefreshTokenNaoTemClaimDeAparelho() {
+        service.generateTokenPair(usuario);
+
+        ArgumentCaptor<JwtEncoderParameters> captura = ArgumentCaptor.forClass(JwtEncoderParameters.class);
+        verify(jwtEncoder, org.mockito.Mockito.times(2)).encode(captura.capture());
+        assertNull(captura.getAllValues().get(1).getClaims().getClaim("dev"));
+    }
+
+    @Test
+    void renovarConsultaOVinculoComOAparelhoDoTokenEMantemEleNoNovoToken() {
+        Jwt.Builder b = Jwt.withTokenValue("r").header("alg", "RS256").claim("token_type", "refresh")
+                .subject("Vanderson Felix").jti("jti-9").claim("login", "vanderson").claim("dev", "hash-do-celular")
+                .expiresAt(Instant.now().plusSeconds(3600)).issuedAt(Instant.now().minusSeconds(10));
+        when(jwtDecoder.decode("refresh-antigo")).thenReturn(b.build());
+        when(redis.hasKey("auth:revoked:jti-9")).thenReturn(false);
+        when(buscarUsuarioService.buscarUsuarioPorlogin("vanderson")).thenReturn(usuario);
+
+        service.refresh("refresh-antigo");
+
+        verify(vinculoDispositivo).validarNoRefresh(usuario, "hash-do-celular");
+        ArgumentCaptor<JwtEncoderParameters> captura = ArgumentCaptor.forClass(JwtEncoderParameters.class);
+        verify(jwtEncoder, org.mockito.Mockito.times(2)).encode(captura.capture());
+        assertEquals("hash-do-celular", captura.getAllValues().get(1).getClaims().getClaimAsString("dev"));
+    }
+
+    @Test
+    void refreshDeAparelhoQueNaoEOVinculadoEhRecusadoSemEmitirNada() {
+        Jwt.Builder b = Jwt.withTokenValue("r").header("alg", "RS256").claim("token_type", "refresh")
+                .subject("Vanderson Felix").jti("jti-9").claim("login", "vanderson").claim("dev", "outro")
+                .expiresAt(Instant.now().plusSeconds(3600)).issuedAt(Instant.now().minusSeconds(10));
+        when(jwtDecoder.decode("refresh-antigo")).thenReturn(b.build());
+        when(redis.hasKey("auth:revoked:jti-9")).thenReturn(false);
+        when(buscarUsuarioService.buscarUsuarioPorlogin("vanderson")).thenReturn(usuario);
+        org.mockito.Mockito.doThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Sessão encerrada."))
+                .when(vinculoDispositivo).validarNoRefresh(usuario, "outro");
+
+        negado(() -> service.refresh("refresh-antigo"));
+
+        verify(jwtEncoder, never()).encode(any());
     }
 }

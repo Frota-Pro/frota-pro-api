@@ -52,6 +52,10 @@ class UsuarioLoginServiceTest {
     private UsuarioRepository usuarioRepository;
     @Mock
     private RegistrarLogAuditoriaService auditoria;
+    @Mock
+    private SenhaPadraoPolitica senhaPadraoPolitica;
+    @Mock
+    private VinculoDispositivoService vinculoDispositivoService;
     @InjectMocks
     private UsuarioLoginService service;
 
@@ -247,5 +251,55 @@ class UsuarioLoginServiceTest {
         when(authTokenService.generateTokenPair(usuario)).thenReturn(new TokenPair("a", 1L, "r", 2L, true));
 
         assertTrue(service.login(request("vanderson", "segredo"), "ip").mustChangePassword());
+    }
+
+    @Test
+    void comOBloqueioLigadoASenhaPadraoNaoGeraTokenENemContaComoFalhaDeSenha() {
+        when(buscarUsuarioService.buscarUsuarioPorlogin("vanderson")).thenReturn(usuario);
+        when(passwordEncoder.matches("padrao123", "$2a$hash")).thenReturn(true);
+        when(senhaPadraoPolitica.deveBloquear("padrao123")).thenReturn(true);
+
+        ResponseStatusException e = assertThrows(ResponseStatusException.class,
+                () -> service.login(request("vanderson", "padrao123"), "10.0.0.5"));
+
+        assertEquals(HttpStatus.FORBIDDEN, e.getStatusCode());
+        assertTrue(e.getReason().contains("administrador"));
+        verify(authTokenService, never()).generateTokenPair(any(Usuario.class));
+        verify(loginProtectionService, never()).registerSuccess(anyString(), anyString());
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    void loginDeMotoristaPassaOAparelhoEPoeOHashNoToken() {
+        when(buscarUsuarioService.buscarUsuarioPorlogin("vanderson")).thenReturn(usuario);
+        when(passwordEncoder.matches("segredo", "$2a$hash")).thenReturn(true);
+        when(vinculoDispositivoService.validarNoLogin(usuario, "android-123", "Samsung SM-A135M", "10.0.0.5"))
+                .thenReturn("hash-do-celular");
+        when(authTokenService.generateTokenPair(usuario, "hash-do-celular")).thenReturn(tokens);
+        LoginRequest r = request("vanderson", "segredo");
+        r.setDispositivoId("android-123");
+        r.setDispositivoNome("Samsung SM-A135M");
+
+        LoginResponse resposta = service.login(r, "10.0.0.5");
+
+        assertEquals("acesso", resposta.accessToken());
+        verify(authTokenService, never()).generateTokenPair(usuario);
+    }
+
+    @Test
+    void aparelhoDiferenteDoVinculadoBarraOLoginSemGerarTokenNemContarComoSenhaErrada() {
+        when(buscarUsuarioService.buscarUsuarioPorlogin("vanderson")).thenReturn(usuario);
+        when(passwordEncoder.matches("segredo", "$2a$hash")).thenReturn(true);
+        when(vinculoDispositivoService.validarNoLogin(any(), any(), any(), anyString()))
+                .thenThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "vinculada a outro celular"));
+
+        ResponseStatusException e = assertThrows(ResponseStatusException.class,
+                () -> service.login(request("vanderson", "segredo"), "10.0.0.5"));
+
+        assertEquals(HttpStatus.FORBIDDEN, e.getStatusCode());
+        verify(authTokenService, never()).generateTokenPair(any(Usuario.class));
+        verify(authTokenService, never()).generateTokenPair(any(Usuario.class), anyString());
+        verify(loginProtectionService, never()).registerFailure(anyString(), anyString());
+        verify(usuarioRepository, never()).save(any());
     }
 }

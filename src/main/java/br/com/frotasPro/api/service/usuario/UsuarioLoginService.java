@@ -29,6 +29,8 @@ public class UsuarioLoginService {
     private final LoginProtectionService loginProtectionService;
     private final UsuarioRepository usuarioRepository;
     private final RegistrarLogAuditoriaService registrarLogAuditoriaService;
+    private final SenhaPadraoPolitica senhaPadraoPolitica;
+    private final VinculoDispositivoService vinculoDispositivoService;
 
     public LoginResponse login(LoginRequest request, String clientIp) {
         String loginNormalizado = normalizeLogin(request.getLogin());
@@ -55,6 +57,14 @@ public class UsuarioLoginService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenciais inválidas");
         }
 
+        if (senhaPadraoPolitica.deveBloquear(request.getSenha())) {
+            log.warn("security_event=login_bloqueado_senha_padrao login={} ip={}", loginNormalizado, ip);
+            registrarLogAuditoriaService.registrar(loginNormalizado, usuario.getNome(), AcaoAuditoria.LOGIN_FALHA, null,
+                    "Login recusado: conta ainda usa a senha padrão", "POST", "/login", 403, ip);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Esta conta ainda usa a senha padrão, que foi desativada. Peça ao administrador para redefinir sua senha.");
+        }
+
         // Detecta contas antigas que nunca trocaram a senha padrão (ex: admin
         // e motoristas criados em massa) e passa a exigir a troca daqui pra frente.
         if (SENHA_PADRAO.equals(request.getSenha()) && !usuario.isSenhaTemporaria()) {
@@ -62,7 +72,13 @@ public class UsuarioLoginService {
             log.warn("security_event=senha_padrao_detectada login={}", loginNormalizado);
         }
 
-        TokenPair tokenPair = authTokenService.generateTokenPair(usuario);
+        // motorista só entra pelo celular vinculado (null = o vínculo não se aplica a esta conta)
+        String dispositivoHash = vinculoDispositivoService.validarNoLogin(
+                usuario, request.getDispositivoId(), request.getDispositivoNome(), ip);
+
+        TokenPair tokenPair = dispositivoHash == null
+                ? authTokenService.generateTokenPair(usuario)
+                : authTokenService.generateTokenPair(usuario, dispositivoHash);
         loginProtectionService.registerSuccess(ip, loginNormalizado);
         log.info("security_event=login_success login={} ip={}", loginNormalizado, ip);
         registrarLogAuditoriaService.registrar(loginNormalizado, usuario.getNome(), AcaoAuditoria.LOGIN_SUCESSO, null,

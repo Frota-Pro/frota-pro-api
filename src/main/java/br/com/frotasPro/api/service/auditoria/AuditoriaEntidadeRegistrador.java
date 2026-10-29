@@ -1,5 +1,6 @@
 package br.com.frotasPro.api.service.auditoria;
 
+import br.com.frotasPro.api.util.ClientIp;
 import br.com.frotasPro.api.config.ApplicationContextProvider;
 import br.com.frotasPro.api.domain.enums.AcaoAuditoria;
 import br.com.frotasPro.api.util.AuditoriaEntidadeResolver;
@@ -94,15 +95,6 @@ public class AuditoriaEntidadeRegistrador {
     }
 
     private static String extrairIp(HttpServletRequest request) {
-        String forwardedFor = request.getHeader("X-Forwarded-For");
-        if (forwardedFor != null && !forwardedFor.isBlank()) {
-            return forwardedFor.split(",")[0].trim();
-        }
-        String realIp = request.getHeader("X-Real-IP");
-        if (realIp != null && !realIp.isBlank()) {
-            return realIp.trim();
-        }
-        String remoteAddr = request.getRemoteAddr();
-        return (remoteAddr == null || remoteAddr.isBlank()) ? "unknown" : remoteAddr;
+        return ClientIp.de(request);
     }
 }

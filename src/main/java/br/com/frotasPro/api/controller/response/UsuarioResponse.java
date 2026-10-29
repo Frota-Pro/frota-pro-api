@@ -19,6 +19,11 @@ public class UsuarioResponse {
     private boolean ativo;
     private List<String> acessos;
 
+    /** Celular a que o motorista está vinculado (só o nome do modelo; o identificador nunca sai da API). */
+    private boolean dispositivoVinculado;
+    private String dispositivoVinculadoNome;
+    private LocalDateTime dispositivoVinculadoEm;
+
     private LocalDateTime criadoEm;
     private LocalDateTime atualizadoEm;
 

@@ -11,6 +11,9 @@ public class UsuarioMapper {
                 .nome(usuario.getNome())
                 .ativo(usuario.isAtivo())
                 .acessos(usuario.getAcesso().stream().map(a -> a.getNome()).toList())
+                .dispositivoVinculado(usuario.temDispositivoVinculado())
+                .dispositivoVinculadoNome(usuario.getDispositivoVinculadoNome())
+                .dispositivoVinculadoEm(usuario.getDispositivoVinculadoEm())
                 .criadoEm(usuario.getCriadoEm())
                 .atualizadoEm(usuario.getAtualizadoEm())
                 .build();

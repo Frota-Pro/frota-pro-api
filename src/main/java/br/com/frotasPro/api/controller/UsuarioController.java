@@ -6,6 +6,7 @@ import br.com.frotasPro.api.controller.request.UsuarioSenhaSelfRequest;
 import br.com.frotasPro.api.controller.request.UsuarioSenhaUpdateRequest;
 import br.com.frotasPro.api.controller.request.UsuarioUpdateRequest;
 import br.com.frotasPro.api.controller.response.UsuarioResponse;
+import br.com.frotasPro.api.controller.response.UsuariosMotoristasCriadosResponse;
 import br.com.frotasPro.api.service.usuario.UsuarioService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -93,6 +94,16 @@ public class UsuarioController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
+    @DeleteMapping("/{id}/dispositivo")
+    @Caching(evict = {
+            @CacheEvict(value = "usuario_listar", allEntries = true),
+            @CacheEvict(value = "usuario_buscar_id", allEntries = true)
+    })
+    public UsuarioResponse desvincularDispositivo(@PathVariable UUID id) {
+        return usuarioService.desvincularDispositivo(id);
+    }
+
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/me/senha")
     @Caching(evict = {
@@ -117,7 +128,7 @@ public class UsuarioController {
             @CacheEvict(value = "usuario_listar", allEntries = true),
             @CacheEvict(value = "usuario_buscar_id", allEntries = true)
     })
-    public ResponseEntity<List<String>> criarUsuariosPelosMotoristas(
+    public ResponseEntity<UsuariosMotoristasCriadosResponse> criarUsuariosPelosMotoristas(
             @RequestParam("matriculas")
             @NotEmpty(message = "Matrículas são obrigatórias")
             List<
@@ -126,7 +137,7 @@ public class UsuarioController {
                             String
                     > codigo
     ) {
-        List<String> resultado = usuarioService.criarUsuariosPelosMotoristas(codigo);
+        UsuariosMotoristasCriadosResponse resultado = usuarioService.criarUsuariosPelosMotoristas(codigo);
         return ResponseEntity.status(HttpStatus.CREATED).body(resultado);
     }
 }
