@@ -1,5 +1,6 @@
 package br.com.frotasPro.api.service.appversao;
 
+import br.com.frotasPro.api.service.arquivo.CategoriaArquivo;
 import br.com.frotasPro.api.domain.Arquivo;
 import br.com.frotasPro.api.domain.AppVersao;
 import br.com.frotasPro.api.excption.BusinessException;
@@ -35,7 +36,7 @@ public class PublicarAppVersaoService {
             throw new BusinessException("Informe o nome/número da versão.");
         }
 
-        Arquivo arquivo = salvarArquivoService.salvar(apk, "app-motorista", versaoNome.trim());
+        Arquivo arquivo = salvarArquivoService.salvar(apk, "app-motorista", versaoNome.trim(), CategoriaArquivo.APK);
 
         appVersaoRepository.desativarTodas();
 

@@ -1,5 +1,6 @@
 package br.com.frotasPro.api.service.carga;
 
+import br.com.frotasPro.api.service.arquivo.CategoriaArquivo;
 import br.com.frotasPro.api.controller.response.CargaResponse;
 import br.com.frotasPro.api.controller.response.ImportarNotaFiscalResponse;
 import br.com.frotasPro.api.domain.Arquivo;
@@ -105,7 +106,7 @@ public class ImportarNotaFiscalCargaService {
                 .findFirst()
                 .orElse(null);
 
-        Arquivo arquivo = salvarArquivoService.salvar(arquivoXml, "CARGA_" + carga.getNumeroCarga(), "NOTA_FISCAL_XML");
+        Arquivo arquivo = salvarArquivoService.salvar(arquivoXml, "CARGA_" + carga.getNumeroCarga(), "NOTA_FISCAL_XML", CategoriaArquivo.XML);
         Cliente clienteCadastrado = clienteService.upsertFromXml(dto, null).orElse(null);
 
         if (existente != null) {

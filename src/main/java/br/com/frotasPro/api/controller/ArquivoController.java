@@ -3,10 +3,12 @@ package br.com.frotasPro.api.controller;
 import br.com.frotasPro.api.domain.Arquivo;
 import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.ArquivoRepository;
+import br.com.frotasPro.api.service.arquivo.TipoArquivoSeguro;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +16,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.MalformedURLException;
-import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -47,49 +50,43 @@ public class ArquivoController {
         }
     }
 
-    private MediaType resolverMediaType(Arquivo arquivo, Resource resource) {
-        try {
-            if (arquivo.getContentType() != null) {
-                return MediaType.parseMediaType(arquivo.getContentType());
-            }
+    /**
+     * O tipo vem do conteúdo do arquivo, não do que o cliente declarou no upload: um HTML ou SVG
+     * enviado como "image/png" e aberto no navegador do administrador rodaria script na origem
+     * do sistema. Só PDF e imagens raster são exibidos; o resto sai como application/octet-stream.
+     */
+    private Optional<MediaType> tipoSeguro(Arquivo arquivo) {
+        return TipoArquivoSeguro.detectar(Paths.get(arquivo.getCaminho()));
+    }
 
-            Path caminho = Paths.get(arquivo.getCaminho());
-            String type = Files.probeContentType(caminho);
-            if (type != null) {
-                return MediaType.parseMediaType(type);
-            }
-        } catch (Exception e) {
-            log.warn("Não foi possível determinar o contentType do arquivo id={}", arquivo.getId(), e);
-        }
+    private ContentDisposition disposicao(boolean exibirNoNavegador, Arquivo arquivo) {
+        ContentDisposition.Builder builder = exibirNoNavegador ? ContentDisposition.inline() : ContentDisposition.attachment();
+        String nome = arquivo.getNomeOriginal() == null || arquivo.getNomeOriginal().isBlank()
+                ? "arquivo" : arquivo.getNomeOriginal();
+        return builder.filename(nome, StandardCharsets.UTF_8).build();
+    }
 
-        return MediaType.APPLICATION_OCTET_STREAM;
+    private ResponseEntity<Resource> responder(Arquivo arquivo, boolean preview) {
+        Resource resource = carregarResource(arquivo);
+        Optional<MediaType> seguro = tipoSeguro(arquivo);
+        boolean exibir = preview && seguro.isPresent();
+
+        return ResponseEntity.ok()
+                .contentType(TipoArquivoSeguro.ouBinario(seguro))
+                .header(HttpHeaders.CONTENT_DISPOSITION, disposicao(exibir, arquivo).toString())
+                .header("X-Content-Type-Options", "nosniff")
+                .body(resource);
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/{id}/preview")
     public ResponseEntity<Resource> preview(@PathVariable UUID id) {
-        Arquivo arquivo = buscarArquivo(id);
-        Resource resource = carregarResource(arquivo);
-        MediaType mediaType = resolverMediaType(arquivo, resource);
-
-        return ResponseEntity.ok()
-                .contentType(mediaType)
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "inline; filename=\"" + arquivo.getNomeOriginal() + "\"")
-                .body(resource);
+        return responder(buscarArquivo(id), true);
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA', 'ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
     @GetMapping("/{id}/download")
     public ResponseEntity<Resource> download(@PathVariable UUID id) {
-        Arquivo arquivo = buscarArquivo(id);
-        Resource resource = carregarResource(arquivo);
-        MediaType mediaType = resolverMediaType(arquivo, resource);
-
-        return ResponseEntity.ok()
-                .contentType(mediaType)
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" + arquivo.getNomeOriginal() + "\"")
-                .body(resource);
+        return responder(buscarArquivo(id), false);
     }
 }

@@ -76,7 +76,10 @@ public class AppVersaoController {
 
         return ResponseEntity.ok()
                 .contentType(APK_MEDIA_TYPE)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + nomeAmigavel + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        org.springframework.http.ContentDisposition.attachment()
+                                .filename(nomeAmigavel, java.nio.charset.StandardCharsets.UTF_8).build().toString())
+                .header("X-Content-Type-Options", "nosniff")
                 .body(resource);
     }
 
