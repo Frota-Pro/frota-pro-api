@@ -35,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -54,6 +55,8 @@ class UsuarioServiceTest {
     private MotoristaRepository motoristaRepository;
     @Mock
     private UsuarioAutenticadoService usuarioAutenticadoService;
+    @Mock
+    private HierarquiaAcessoService hierarquiaAcessoService;
     @InjectMocks
     private UsuarioService service;
 
@@ -421,5 +424,80 @@ class UsuarioServiceTest {
         assertTrue(msgs.get(0).contains("Erro ao processar código MOT-1"));
         assertTrue(msgs.get(0).contains("ROLE_MOTORISTA"));
         assertTrue(msgs.get(1).contains("Motorista não encontrado"));
+    }
+
+    // ---- hierarquia de perfis (escalada de privilégio)
+
+    private ResponseStatusException proibido() {
+        return new ResponseStatusException(HttpStatus.FORBIDDEN, "sem permissão");
+    }
+
+    @Test
+    void cadastroConsultaAHierarquiaComOsPerfisPedidosEOPadrao() {
+        when(acessoRepository.findByNome("ROLE_ADMIN")).thenReturn(Optional.of(acesso("ROLE_ADMIN")));
+        when(acessoRepository.findByNome("ROLE_OPERADOR_LOGISTICA")).thenReturn(Optional.of(acesso("ROLE_OPERADOR_LOGISTICA")));
+        service.registar(cadastro("ze", "Ze", "s", List.of(" ROLE_ADMIN ", "")));
+        verify(hierarquiaAcessoService).exigirPodeAtribuir(List.of("ROLE_ADMIN"));
+
+        service.registar(cadastro("ana", "Ana", "s", null));
+        verify(hierarquiaAcessoService).exigirPodeAtribuir(List.of("ROLE_OPERADOR_LOGISTICA"));
+    }
+
+    @Test
+    void cadastroDePerfilAcimaDoDoAtorNaoSalvaNada() {
+        doThrow(proibido()).when(hierarquiaAcessoService).exigirPodeAtribuir(List.of("ROLE_ADMIN"));
+
+        ResponseStatusException e = assertThrows(ResponseStatusException.class,
+                () -> service.registar(cadastro("ze", "Ze", "s", List.of("ROLE_ADMIN"))));
+
+        assertEquals(HttpStatus.FORBIDDEN, e.getStatusCode());
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    void atualizarUsuarioDeNivelSuperiorNaoAlteraNada() {
+        UUID id = UUID.randomUUID();
+        Usuario admin = existente(id, "admin", "Administrador");
+        when(usuarioRepository.findById(id)).thenReturn(Optional.of(admin));
+        doThrow(proibido()).when(hierarquiaAcessoService).exigirPodeGerenciar(admin);
+
+        assertThrows(ResponseStatusException.class,
+                () -> service.atualizar(id, atualizacao("hacker", "Hacker", false, List.of("ROLE_CONSULTA"))));
+
+        assertEquals("admin", admin.getLogin());
+        assertEquals("Administrador", admin.getNome());
+        assertEquals(1, admin.getAcesso().size());
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    void atualizarPerfisAcimaDoDoAtorNaoApagaOsPerfisAtuais() {
+        UUID id = UUID.randomUUID();
+        Usuario ze = existente(id, "ze", "Ze");
+        when(usuarioRepository.findById(id)).thenReturn(Optional.of(ze));
+        doThrow(proibido()).when(hierarquiaAcessoService).exigirPodeAtribuir(List.of("ROLE_ADMIN"));
+
+        assertThrows(ResponseStatusException.class,
+                () -> service.atualizar(id, atualizacao("ze", "Ze", null, List.of("ROLE_ADMIN"))));
+
+        assertEquals(List.of("ROLE_CONSULTA"), ze.getAcesso().stream().map(Acesso::getNome).toList());
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    void senhaEAtivoDeUsuarioDeNivelSuperiorSaoBloqueados() {
+        UUID id = UUID.randomUUID();
+        Usuario admin = existente(id, "admin", "Administrador");
+        admin.setSenhaTemporaria(false);
+        when(usuarioRepository.findById(id)).thenReturn(Optional.of(admin));
+        doThrow(proibido()).when(hierarquiaAcessoService).exigirPodeGerenciar(admin);
+        UsuarioSenhaUpdateRequest r = new UsuarioSenhaUpdateRequest();
+        r.setNovaSenha("sequestrada");
+
+        assertThrows(ResponseStatusException.class, () -> service.atualizarSenha(id, r));
+        assertThrows(ResponseStatusException.class, () -> service.atualizarAtivo(id, false));
+
+        assertEquals("hash-antigo", admin.getSenha());
+        verify(usuarioRepository, never()).save(any());
     }
 }
