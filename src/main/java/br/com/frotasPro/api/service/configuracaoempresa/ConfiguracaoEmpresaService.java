@@ -1,5 +1,6 @@
 package br.com.frotasPro.api.service.configuracaoempresa;
 
+import br.com.frotasPro.api.service.arquivo.CategoriaArquivo;
 import br.com.frotasPro.api.controller.request.ConfiguracaoEmpresaUpdateRequest;
 import br.com.frotasPro.api.controller.response.ArquivoResponse;
 import br.com.frotasPro.api.controller.response.ConfiguracaoEmpresaResponse;
@@ -58,7 +59,7 @@ public class ConfiguracaoEmpresaService {
     public ConfiguracaoEmpresaResponse atualizarLogo(MultipartFile arquivoMultipart) {
         ConfiguracaoEmpresa config = ensureExists(empresaIdPadrao);
 
-        Arquivo logo = salvarArquivoService.salvar(arquivoMultipart, "CONFIGURACAO_EMPRESA", "LOGO");
+        Arquivo logo = salvarArquivoService.salvar(arquivoMultipart, "CONFIGURACAO_EMPRESA", "LOGO", CategoriaArquivo.IMAGEM);
         config.setLogo(logo);
 
         return toResponse(repository.save(config));
