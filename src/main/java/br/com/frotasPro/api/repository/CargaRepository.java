@@ -19,6 +19,12 @@ import java.util.UUID;
 
 public interface CargaRepository extends JpaRepository<Carga, UUID> {
 
+    long countByRotaId(UUID rotaId);
+
+    @Modifying(flushAutomatically = true)
+    @Query("update Carga c set c.rota.id = :rotaNovaId where c.rota.id = :rotaAntigaId")
+    int trocarRota(@Param("rotaAntigaId") UUID rotaAntigaId, @Param("rotaNovaId") UUID rotaNovaId);
+
     Optional<Carga> findByNumeroCarga(String numero);
 
     Optional<Carga> findByNumeroCargaExterno(String numeroCargaExterno);
