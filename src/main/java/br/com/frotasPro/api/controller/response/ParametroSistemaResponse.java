@@ -27,4 +27,7 @@ public class ParametroSistemaResponse {
     private int diasRetencaoAuditoria;
 
     private int percentualLimiteAnomaliaAbastecimento;
+
+    private boolean bloquearSenhaPadrao;
+    private boolean vincularDispositivo;
 }

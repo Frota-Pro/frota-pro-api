@@ -1,26 +1,25 @@
 package br.com.frotasPro.api.service.usuario;
 
-import org.springframework.beans.factory.annotation.Value;
+import br.com.frotasPro.api.service.parametrosistema.ParametroSistemaService;
 import org.springframework.stereotype.Component;
 
 /**
- * Contas antigas ainda podem ter a senha fixa "padrao123". Ligando BLOQUEAR_SENHA_PADRAO=true o
- * login com ela é recusado e a pessoa precisa pedir uma senha nova ao administrador. Fica
- * desligado por padrão para o deploy não trancar ninguém (inclusive o admin) antes de as senhas
- * serem redefinidas.
+ * Contas antigas ainda podem ter a senha fixa "padrao123". Com o parâmetro "bloquear senha padrão"
+ * ligado (tela Parâmetros do Sistema) o login com ela é recusado e a pessoa precisa pedir uma senha
+ * nova ao administrador. Desligado por padrão: ligar antes de redefinir essas senhas as tranca.
  */
 @Component
 public class SenhaPadraoPolitica {
 
     public static final String SENHA_PADRAO = "padrao123";
 
-    private final boolean bloquear;
+    private final ParametroSistemaService parametros;
 
-    public SenhaPadraoPolitica(@Value("${frotapro.security.bloquear-senha-padrao:false}") boolean bloquear) {
-        this.bloquear = bloquear;
+    public SenhaPadraoPolitica(ParametroSistemaService parametros) {
+        this.parametros = parametros;
     }
 
     public boolean deveBloquear(String senhaDigitada) {
-        return bloquear && SENHA_PADRAO.equals(senhaDigitada);
+        return SENHA_PADRAO.equals(senhaDigitada) && parametros.buscarOuPadrao().isBloquearSenhaPadrao();
     }
 }

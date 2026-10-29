@@ -115,10 +115,6 @@ frotapro:
         - http://localhost:*
         - http://127.0.0.1:*
     prometheus-permit-all: false
-    # true = recusa login com a senha fixa antiga "padrao123" (ligue depois de redefinir as senhas)
-    bloquear-senha-padrao: ${BLOQUEAR_SENHA_PADRAO:false}
-    # true = motorista só entra pelo celular a que está vinculado (ligue depois do app novo estar instalado)
-    vinculo-dispositivo: ${VINCULAR_DISPOSITIVO:false}
     # proxies cujo X-Forwarded-For vale, em CIDR separados por vírgula. Vazio = faixas privadas e loopback.
     trusted-proxies: ${TRUSTED_PROXIES:}
     jwt:

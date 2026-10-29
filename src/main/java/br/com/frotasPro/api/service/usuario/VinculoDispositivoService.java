@@ -5,9 +5,9 @@ import br.com.frotasPro.api.domain.Usuario;
 import br.com.frotasPro.api.domain.enums.AcaoAuditoria;
 import br.com.frotasPro.api.repository.UsuarioRepository;
 import br.com.frotasPro.api.service.auditoria.RegistrarLogAuditoriaService;
+import br.com.frotasPro.api.service.parametrosistema.ParametroSistemaService;
 import br.com.frotasPro.api.util.FusoHorarioUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,8 +23,8 @@ import java.util.Set;
  * de outro aparelho é recusado até um administrador desvincular (UsuarioService.desvincularDispositivo).
  *
  * Vale só para contas que são exclusivamente de motorista (usam o app no celular); quem tem perfil
- * de escritório entra por qualquer aparelho. Desligado por padrão (VINCULAR_DISPOSITIVO=false):
- * ligue depois que o app novo, que envia o identificador do aparelho, estiver instalado nos celulares.
+ * de escritório entra por qualquer aparelho. Desligado por padrão (parâmetro "vincular dispositivo" na tela
+ * Parâmetros do Sistema): ligue depois que o app novo, que envia o identificador do aparelho, estiver instalado nos celulares.
  *
  * Limite honesto: o identificador vem do app. Isso barra quem tem só a senha (roubada, adivinhada
  * ou emprestada), que não sabe o identificador do celular certo; não barra quem controla o
@@ -38,22 +38,22 @@ public class VinculoDispositivoService {
     private static final Set<String> PERFIS_DE_ESCRITORIO = Set.of(
             "ROLE_ADMIN", "ROLE_GERENTE_LOGISTICA", "ROLE_OPERADOR_LOGISTICA", "ROLE_CONSULTA");
 
-    private final boolean ligado;
+    private final ParametroSistemaService parametros;
     private final UsuarioRepository usuarioRepository;
     private final RegistrarLogAuditoriaService auditoria;
 
     public VinculoDispositivoService(
-            @Value("${frotapro.security.vinculo-dispositivo:false}") boolean ligado,
+            ParametroSistemaService parametros,
             UsuarioRepository usuarioRepository,
             RegistrarLogAuditoriaService auditoria) {
-        this.ligado = ligado;
+        this.parametros = parametros;
         this.usuarioRepository = usuarioRepository;
         this.auditoria = auditoria;
     }
 
     /** O vínculo se aplica a este usuário? (recurso ligado e conta só de motorista) */
     public boolean aplicaA(Usuario usuario) {
-        if (!ligado) {
+        if (!parametros.buscarOuPadrao().isVincularDispositivo()) {
             return false;
         }
         List<String> perfis = usuario.getAcesso().stream().map(Acesso::getNome).toList();
