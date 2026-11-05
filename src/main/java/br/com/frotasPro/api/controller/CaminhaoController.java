@@ -3,6 +3,7 @@ package br.com.frotasPro.api.controller;
 import br.com.frotasPro.api.controller.request.CaminhaoRequest;
 import br.com.frotasPro.api.controller.request.CaminhaoTitularRequest;
 import br.com.frotasPro.api.controller.request.VincularCategoriaCaminhaoEmLoteRequest;
+import br.com.frotasPro.api.controller.request.VincularLinhaCaminhaoEmLoteRequest;
 import br.com.frotasPro.api.controller.response.CaminhaoDetalheResponse;
 import br.com.frotasPro.api.controller.response.CaminhaoResponse;
 import br.com.frotasPro.api.controller.response.DocumentoCaminhaoResponse;
@@ -41,6 +42,7 @@ public class CaminhaoController {
     private final RegistrarDocumentoCaminhaoService registrarDocumentoCaminhaoService;
     private final BuscarCaminhaoDetalheService buscarCaminhaoDetalheService;
     private final VincularCategoriaCaminhaoEmLoteService vincularCategoriaCaminhaoEmLoteService;
+    private final VincularLinhaCaminhaoEmLoteService vincularLinhaCaminhaoEmLoteService;
     private final TransferirTitularCaminhaoService transferirTitularCaminhaoService;
     private final RecalcularTitularCaminhaoService recalcularTitularCaminhaoService;
 
@@ -257,6 +259,22 @@ public class CaminhaoController {
             @Valid @RequestBody VincularCategoriaCaminhaoEmLoteRequest request
     ) {
         vincularCategoriaCaminhaoEmLoteService.vincular(request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @PutMapping("/linha")
+    @Caching(evict = {
+            @CacheEvict(value = "caminhao_listar", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_codigo", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_placa", allEntries = true),
+            @CacheEvict(value = "caminhao_buscar_codigo_externo", allEntries = true),
+            @CacheEvict(value = "caminhao_detalhes", allEntries = true)
+    })
+    public ResponseEntity<Void> vincularLinhaEmLote(
+            @Valid @RequestBody VincularLinhaCaminhaoEmLoteRequest request
+    ) {
+        vincularLinhaCaminhaoEmLoteService.vincular(request);
         return ResponseEntity.noContent().build();
     }
 

@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -58,6 +59,9 @@ public class CaminhaoRequest {
 
     @Size(max = 20, message = "Categoria inválida")
     private String categoria;
+
+    /** Linha de transporte (cadastro de linhas); nulo = sem linha. */
+    private UUID linhaId;
 
     @Size(max = 50, message = "Motorista titular inválido")
     private String motoristaTitular;

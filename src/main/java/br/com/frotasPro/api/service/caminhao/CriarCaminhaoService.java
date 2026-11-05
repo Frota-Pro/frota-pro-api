@@ -11,6 +11,7 @@ import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.mapper.CaminhaoMapper;
 import br.com.frotasPro.api.repository.CategoriaCaminhaoRepository;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
+import br.com.frotasPro.api.repository.LinhaTransporteRepository;
 import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.service.meta.MetaCategoriaCaminhaoVinculoService;
 import jakarta.persistence.EntityManager;
@@ -29,6 +30,7 @@ public class CriarCaminhaoService {
     private final CategoriaCaminhaoRepository categoriaCaminhaoRepository;
     private final MotoristaRepository motoristaRepository;
     private final MetaCategoriaCaminhaoVinculoService metaCategoriaCaminhaoVinculoService;
+    private final LinhaTransporteRepository linhaTransporteRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -77,6 +79,10 @@ public class CriarCaminhaoService {
         } else {
             caminhao.setCategoria(null);
         }
+
+        caminhao.setLinhaTransporte(request.getLinhaId() == null ? null
+                : linhaTransporteRepository.findById(request.getLinhaId())
+                        .orElseThrow(() -> new ObjectNotFound("ERRO: Linha de transporte não encontrada.")));
 
         if (hasText(request.getMotoristaTitular())) {
             Motorista motoristaTitular = motoristaRepository

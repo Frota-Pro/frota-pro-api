@@ -43,7 +43,7 @@ class BiOperacaoServiceTest {
         var r = BiOperacaoService.montar(BiPeriodo.resolver(6, null, null, HOJE), AGORA,
                 linha("cargas", 1017L, "entregas", new BigDecimal("21361"), "notas", 35992L, "km", new BigDecimal("263214"), "custo_por_km", new BigDecimal("1.47")),
                 linha("litros", new BigDecimal("58309"), "gasto", new BigDecimal("399194.49"), "preco_medio", new BigDecimal("6.85")),
-                List.of(), List.of(), List.of(), List.of(), List.of());
+                List.of(), List.of(), List.of(), List.of(), List.of(), List.of());
 
         assertEquals(Integer.valueOf(6), r.meses());
         assertEquals(LocalDate.of(2026, 4, 23), r.inicio());
@@ -61,7 +61,7 @@ class BiOperacaoServiceTest {
 
     @Test
     void semDadosOsKpisFicamZeradosOuNulos() {
-        var r = BiOperacaoService.montar(BiPeriodo.resolver(3, null, null, HOJE), AGORA, Map.of(), Map.of(), List.of(), List.of(), List.of(), List.of(), List.of());
+        var r = BiOperacaoService.montar(BiPeriodo.resolver(3, null, null, HOJE), AGORA, Map.of(), Map.of(), List.of(), List.of(), List.of(), List.of(), List.of(), List.of());
 
         assertEquals(0, r.kpis().cargas());
         assertEquals(0, r.kpis().kmRodados());
@@ -80,7 +80,17 @@ class BiOperacaoServiceTest {
                 List.of(linha("rota", "ROT-000004 · SOUSA", "cargas", 73L)),
                 List.of(linha("categoria", "TOCO", "km_por_litro", new BigDecimal("4.10"), "meta_km_por_litro", new BigDecimal("4.15"), "percentual_meta", new BigDecimal("98.8"), "viagens", 24L),
                         linha("categoria", "Sem categoria", "km_por_litro", new BigDecimal("3.50"), "meta_km_por_litro", null, "percentual_meta", null, "viagens", 3L)),
-                List.of(linha("mes", "2026-09", "consumo_pct", new BigDecimal("70.8"), "toneladas_pct", new BigDecimal("12.5"), "sem_dados", 8L)));
+                List.of(linha("mes", "2026-09", "consumo_pct", new BigDecimal("70.8"), "toneladas_pct", new BigDecimal("12.5"), "sem_dados", 8L)),
+                List.of(linha("linha", "Frios", "cargas", 40L, "entregas", 300L, "km", new BigDecimal("12000"), "litros", new BigDecimal("3000"), "km_por_litro", new BigDecimal("4.00"), "toneladas", new BigDecimal("90.5")),
+                        linha("linha", "Sem linha", "cargas", 3L, "entregas", 20L, "km", null, "litros", null, "km_por_litro", null, "toneladas", null)));
+
+        assertEquals(List.of("Frios", "Sem linha"), r.porLinha().stream().map(BiOperacaoResponse.LinhaResumo::linha).toList());
+        assertEquals(40, r.porLinha().get(0).cargas());
+        assertEquals(12000, r.porLinha().get(0).kmRodados());
+        assertEquals(4.0, r.porLinha().get(0).kmPorLitro());
+        assertEquals(90.5, r.porLinha().get(0).toneladas());
+        assertNull(r.porLinha().get(1).kmPorLitro());
+        assertEquals(0, r.porLinha().get(1).kmRodados());
 
         assertEquals(List.of("2026-08", "2026-09"), r.cargasPorMes().stream().map(BiOperacaoResponse.MesCargas::mes).toList());
         assertEquals(160, r.cargasPorMes().get(0).entregas());
@@ -118,7 +128,7 @@ class BiOperacaoServiceTest {
     }
 
     @Test
-    void buscaExecutaAsSeteConsultasComOPeriodoPedido() {
+    void buscaExecutaAsOitoConsultasComOPeriodoPedido() {
         NamedParameterJdbcTemplate jdbc = mock(NamedParameterJdbcTemplate.class);
         when(jdbc.queryForList(anyString(), any(MapSqlParameterSource.class))).thenReturn(List.of());
         var service = new BiOperacaoService(jdbc);
@@ -127,7 +137,7 @@ class BiOperacaoServiceTest {
 
         assertEquals(Integer.valueOf(12), r.meses());
         assertEquals(0, r.kpis().cargas());
-        verify(jdbc, org.mockito.Mockito.times(7)).queryForList(anyString(), org.mockito.ArgumentMatchers.argThat((MapSqlParameterSource p) -> p.getValue("inicio") instanceof LocalDate i && i.isBefore(LocalDate.now().minusMonths(11)) && p.hasValue("fim")));
+        verify(jdbc, org.mockito.Mockito.times(8)).queryForList(anyString(), org.mockito.ArgumentMatchers.argThat((MapSqlParameterSource p) -> p.getValue("inicio") instanceof LocalDate i && i.isBefore(LocalDate.now().minusMonths(11)) && p.hasValue("fim")));
     }
 
     @Test
@@ -139,11 +149,13 @@ class BiOperacaoServiceTest {
                 BiOperacaoService.sqlComBase("_abastecimentos_base", "combustivel_por_mes"),
                 BiOperacaoService.sqlComBase("_cargas_base", "cargas_por_rota"),
                 BiOperacaoService.sql("consumo_por_categoria"),
-                BiOperacaoService.sql("metas_por_mes"));
+                BiOperacaoService.sql("metas_por_mes"),
+                BiOperacaoService.sqlComBase("_cargas_base", "por_linha"));
 
         for (String sql : consultas) {
             String minusculo = sql.toLowerCase();
             assertTrue(sql.contains(":inicio") && sql.contains(":fim"), "toda consulta filtra pelo periodo");
+            assertTrue(sql.contains(":linha"), "toda consulta pode ser recortada por linha de transporte");
             assertTrue(minusculo.trim().startsWith("with"), "consulta de leitura");
             for (String proibido : List.of("insert ", "update ", "delete ", "drop ", "alter ", "truncate ", "create ")) {
                 assertFalse(minusculo.contains(proibido), "consulta do BI nao pode escrever: " + proibido);
@@ -162,8 +174,24 @@ class BiOperacaoServiceTest {
         assertNull(r.meses());
         assertEquals(LocalDate.of(2026, 10, 1), r.inicio());
         assertEquals(LocalDate.of(2026, 10, 15), r.fim());
-        verify(jdbc, org.mockito.Mockito.times(7)).queryForList(anyString(), org.mockito.ArgumentMatchers.argThat((MapSqlParameterSource p) ->
+        verify(jdbc, org.mockito.Mockito.times(8)).queryForList(anyString(), org.mockito.ArgumentMatchers.argThat((MapSqlParameterSource p) ->
                 LocalDate.of(2026, 10, 1).equals(p.getValue("inicio")) && LocalDate.of(2026, 10, 15).equals(p.getValue("fim"))));
+    }
+
+    @Test
+    void recortePorLinhaVaiComoParametroEVazioSignificaTodas() {
+        NamedParameterJdbcTemplate jdbc = mock(NamedParameterJdbcTemplate.class);
+        when(jdbc.queryForList(anyString(), any(MapSqlParameterSource.class))).thenReturn(List.of());
+        var service = new BiOperacaoService(jdbc);
+        java.util.UUID frios = java.util.UUID.randomUUID();
+
+        service.buscar(6, null, null, frios);
+        verify(jdbc, org.mockito.Mockito.times(8)).queryForList(anyString(),
+                org.mockito.ArgumentMatchers.argThat((MapSqlParameterSource p) -> frios.toString().equals(p.getValue("linha"))));
+
+        service.buscar(6, null, null);
+        verify(jdbc, org.mockito.Mockito.times(8)).queryForList(anyString(),
+                org.mockito.ArgumentMatchers.argThat((MapSqlParameterSource p) -> "".equals(p.getValue("linha"))));
     }
 
     @Test

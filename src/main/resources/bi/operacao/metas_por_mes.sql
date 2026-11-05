@@ -1,10 +1,11 @@
 WITH mt AS (
  SELECT m.id meta_id, m.codigo, m.data_inicio, m.data_fim, m.tipo_meta, m.valor_meta, k.id caminhao_id, k.placa, COALESCE(cc.descricao, 'Sem categoria') categoria, 'Individual' origem
  FROM tb_meta m JOIN tb_caminhao k ON k.id = m.caminhao_id LEFT JOIN tb_categoria_caminhao cc ON cc.id = k.categoria_caminhao_id
+ WHERE (:linha = '' OR k.linha_transporte_id::text = :linha)
  UNION ALL
  SELECT m.id, m.codigo, m.data_inicio, m.data_fim, m.tipo_meta, m.valor_meta, k.id, k.placa, COALESCE(cc.descricao, 'Sem categoria'), 'Categoria'
  FROM tb_meta m JOIN tb_caminhao k ON k.categoria_caminhao_id = m.categoria_caminhao_id AND k.ativo LEFT JOIN tb_categoria_caminhao cc ON cc.id = k.categoria_caminhao_id
- WHERE m.caminhao_id IS NULL AND NOT EXISTS (SELECT 1 FROM tb_meta mi WHERE mi.caminhao_id = k.id AND mi.tipo_meta = m.tipo_meta AND mi.data_inicio = m.data_inicio)),
+ WHERE m.caminhao_id IS NULL AND (:linha = '' OR k.linha_transporte_id::text = :linha) AND NOT EXISTS (SELECT 1 FROM tb_meta mi WHERE mi.caminhao_id = k.id AND mi.tipo_meta = m.tipo_meta AND mi.data_inicio = m.data_inicio)),
 cl AS (SELECT p.carga_id, sum(a.qt_litros) litros FROM tb_abastecimento a JOIN tb_parada_carga p ON p.id = a.parada_id GROUP BY 1),
 mr AS (SELECT mt.*,
   CASE WHEN mt.tipo_meta = 'TONELADA' THEN (SELECT sum(c.peso_carga) FROM tb_carga c WHERE c.caminhao_id = mt.caminhao_id AND c.status_carga = 'FINALIZADA' AND COALESCE(c.dt_competencia, c.data_saida) BETWEEN mt.data_inicio AND mt.data_fim)
