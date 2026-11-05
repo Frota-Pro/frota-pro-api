@@ -119,4 +119,18 @@ public class CargaResponse {
     private boolean naoEncontradaNoWinThor;
 
     private LocalDateTime dataVerificacaoWinThor;
+
+    /** O WinThor diz hoje (soma das notas transportadas); difere do valor da carga quando o bloqueio segurou o maior. */
+    private BigDecimal valorWinThor;
+    private BigDecimal pesoWinThor;
+
+    /** "REENTREGA" ou "TRANSFERENCIA": como o carregamento nasceu. Nulo = carga comum. */
+    private String origemCarga;
+    private String origemCargaNumero;
+
+    /** Carregamentos para onde foram as notas desta carga (ela ficou vazia e foi zerada dos totais). */
+    private String transferidaPara;
+
+    /** Motorista de terceiro criado pelo sync: km e abastecimento são lançados à mão. */
+    private boolean motoristaExterno;
 }

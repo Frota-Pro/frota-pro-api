@@ -4,6 +4,7 @@ import br.com.frotasPro.api.util.FusoHorarioUtils;
 
 import br.com.frotasPro.api.domain.Carga;
 import br.com.frotasPro.api.domain.CargaNota;
+import br.com.frotasPro.api.domain.Motorista;
 import br.com.frotasPro.api.domain.Cliente;
 import br.com.frotasPro.api.domain.ParametroSistema;
 import br.com.frotasPro.api.domain.Rota;
@@ -37,6 +38,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -54,6 +56,7 @@ public class SincronizarCargaService {
     private final OrdemEntregaCidadeService ordemEntregaCidadeService;
     private final ParametroSistemaService parametroSistemaService;
     private final ClienteService clienteService;
+    private final jakarta.persistence.EntityManager entityManager;
     private final RegistrarCargaSyncDescartadaService registrarCargaSyncDescartadaService;
 
     @Caching(evict = {
@@ -124,8 +127,14 @@ public class SincronizarCargaService {
         // não deixa o sync do WinThor sobrescrever — o MDF-e/minuta não refletem
         // a troca real, então o dado de lá sempre estaria desatualizado aqui.
         if (!carga.isMotoristaDefinidoManualmente()) {
-            var motoristaOpt = motoristaRepository
+            Optional<Motorista> motoristaOpt = motoristaRepository
                     .findByCodigoExterno(String.valueOf(dto.getCodMotorista()));
+
+            // Manifesto TV10 de cliente de transporte terceirizado, com caminhão da frota: o motorista não tem
+            // cadastro, mas a viagem é da frota. Cria um motorista "externo" para a carga entrar e ficar marcada.
+            if (motoristaOpt.isEmpty() && podeCriarMotoristaExterno(dto)) {
+                motoristaOpt = Optional.of(criarMotoristaExterno(dto));
+            }
 
             if (motoristaOpt.isEmpty()) {
                 log.warn("Motorista WinThor {} não encontrado. Ignorando MDF-e {}",
@@ -283,6 +292,23 @@ public class SincronizarCargaService {
                 ? dto.getValorTotal()
                 : null;
 
+        // O que o WinThor diz HOJE, sempre guardado: é o que mostra "quanto ia diminuir" quando o bloqueio
+        // segura o valor maior, e o que a conferência do transportado compara.
+        carga.setValorWinThor(valorNovo);
+        carga.setPesoWinThor(pesoNovo);
+
+        if (dto.getOrigemCarga() != null) {
+            carga.setOrigemCarga(dto.getOrigemCarga());
+            carga.setOrigemCargaNumero(dto.getOrigemNumCar() == null ? null : String.valueOf(dto.getOrigemNumCar()));
+        }
+
+        // Carga que tinha sido zerada por ficar sem nota e voltou a ter nota: sai da situação de "transferida".
+        if (valorNovo != null && carga.getTransferidaPara() != null) {
+            carga.setTransferidaPara(null);
+            carga.setValorAntesTransferencia(null);
+            carga.setPesoAntesTransferencia(null);
+        }
+
         // Sempre registrado, informativo — independe do gate estar ligado ou não.
         // É o que aparece na tela (badge de devolução/transferência da carga).
         carga.setCodigosDevolucaoEncontrados(
@@ -330,6 +356,36 @@ public class SincronizarCargaService {
         }
 
         carga.setDiminuicaoPesoValorBloqueada(pesoBloqueado || valorBloqueado);
+    }
+
+    /**
+     * Só o caso combinado com a operação: todas as notas transportadas do carregamento são TV10 de cliente de
+     * transporte terceirizado e o caminhão do manifesto é da frota. Qualquer outro motorista sem cadastro continua
+     * indo para a lista de cargas descartadas, como antes.
+     */
+    private boolean podeCriarMotoristaExterno(CargaWinThorDto dto) {
+        return Boolean.TRUE.equals(dto.getSomenteTv10Terceiro())
+                && dto.getCodMotorista() != null
+                && dto.getNomeMotorista() != null && !dto.getNomeMotorista().isBlank()
+                && caminhaoRepository.findByCodigoExterno(String.valueOf(dto.getCodVeiculo())).isPresent();
+    }
+
+    /**
+     * Fica inativo de propósito: não aparece nas listas de motoristas, metas e rankings da frota. A carga mostra
+     * o nome dele e o selo de "motorista de terceiro".
+     */
+    private Motorista criarMotoristaExterno(CargaWinThorDto dto) {
+        Motorista motorista = new Motorista();
+        motorista.setNome(dto.getNomeMotorista().trim().toUpperCase());
+        motorista.setCodigoExterno(String.valueOf(dto.getCodMotorista()));
+        motorista.setExterno(true);
+        motorista.setAtivo(false);
+        motorista.setStatus(Status.DISPONIVEL);
+        motoristaRepository.saveAndFlush(motorista);
+        entityManager.refresh(motorista); // o código MOT-xxxxxx é gerado pelo banco
+        log.info("Motorista de terceiro criado a partir do WinThor. codigoExterno={} nome={} carregamento={}",
+                dto.getCodMotorista(), motorista.getNome(), dto.getNumCar());
+        return motorista;
     }
 
     private boolean isDiminuicao(BigDecimal atual, BigDecimal novo) {
