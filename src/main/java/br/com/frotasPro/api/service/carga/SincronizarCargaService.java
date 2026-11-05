@@ -108,14 +108,15 @@ public class SincronizarCargaService {
 
     private void upsertCargaFromWinThor(CargaWinThorDto dto) {
 
+        String chaveExterna = chaveExterna(dto);
         Carga carga = cargaRepository
-                .findByNumeroCargaExterno(dto.getNumCar().toString())
+                .findByNumeroCargaExterno(chaveExterna)
                 .orElseGet(Carga::new);
 
         boolean nova = carga.getId() == null;
 
         if (nova) {
-            carga.setNumeroCargaExterno(dto.getNumCar().toString());
+            carga.setNumeroCargaExterno(chaveExterna);
         }
 
         // Garanta que a coleção existe e esteja consistente
@@ -139,6 +140,9 @@ public class SincronizarCargaService {
             if (motoristaOpt.isEmpty()) {
                 log.warn("Motorista WinThor {} não encontrado. Ignorando MDF-e {}",
                         dto.getCodMotorista(), dto.getNumMdfe());
+                if (ehManifestoSemNota(dto)) {
+                    return; // manifesto sem nota e sem motorista conhecido: não há o que listar como descartada
+                }
                 boolean caminhaoTambemFalta = caminhaoRepository
                         .findByCodigoExterno(String.valueOf(dto.getCodVeiculo())).isEmpty();
                 registrarCargaSyncDescartadaService.registrar(dto, caminhaoTambemFalta
@@ -159,6 +163,9 @@ public class SincronizarCargaService {
             if (caminhaoOpt.isEmpty()) {
                 log.warn("Caminhão WinThor {} não encontrado. Ignorando MDF-e {}",
                         dto.getCodVeiculo(), dto.getNumMdfe());
+                if (ehManifestoSemNota(dto)) {
+                    return; // caminhão que não é da frota: manifesto sem nota dele não é viagem da frota
+                }
                 registrarCargaSyncDescartadaService.registrar(dto, MotivoCargaSyncDescartada.CAMINHAO_NAO_CADASTRADO);
                 return;
             }
@@ -179,7 +186,9 @@ public class SincronizarCargaService {
         }
 
         // Passou nas checagens: se essa carga estava na lista de descartadas, sai dela.
-        registrarCargaSyncDescartadaService.resolver(dto.getNumCar());
+        if (!ehManifestoSemNota(dto)) {
+            registrarCargaSyncDescartadaService.resolver(dto.getNumCar());
+        }
 
         String destino = dto.getDestino();
         Rota rota = rotaRepository.findByCidadeInicio(destino)
@@ -364,7 +373,7 @@ public class SincronizarCargaService {
      * indo para a lista de cargas descartadas, como antes.
      */
     private boolean podeCriarMotoristaExterno(CargaWinThorDto dto) {
-        return Boolean.TRUE.equals(dto.getSomenteTv10Terceiro())
+        return (Boolean.TRUE.equals(dto.getSomenteTv10Terceiro()) || ehManifestoSemNota(dto))
                 && dto.getCodMotorista() != null
                 && dto.getNomeMotorista() != null && !dto.getNomeMotorista().isBlank()
                 && caminhaoRepository.findByCodigoExterno(String.valueOf(dto.getCodVeiculo())).isPresent();
@@ -386,6 +395,15 @@ public class SincronizarCargaService {
         log.info("Motorista de terceiro criado a partir do WinThor. codigoExterno={} nome={} carregamento={}",
                 dto.getCodMotorista(), motorista.getNome(), dto.getNumCar());
         return motorista;
+    }
+
+    /** Manifesto sem nenhuma nota: a chave da carga é o número do manifesto, não um carregamento. */
+    private static boolean ehManifestoSemNota(CargaWinThorDto dto) {
+        return Boolean.TRUE.equals(dto.getSemNota()) || dto.getNumCar() == null;
+    }
+
+    private static String chaveExterna(CargaWinThorDto dto) {
+        return ehManifestoSemNota(dto) ? "MDFE-" + dto.getNumMdfe() : dto.getNumCar().toString();
     }
 
     private boolean isDiminuicao(BigDecimal atual, BigDecimal novo) {

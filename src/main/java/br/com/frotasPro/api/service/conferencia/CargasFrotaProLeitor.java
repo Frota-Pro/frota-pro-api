@@ -53,7 +53,8 @@ public class CargasFrotaProLeitor {
                 rs.getString("status_carga"),
                 rs.getBoolean("nao_encontrada_no_winthor"),
                 rs.getBoolean("diminuicao_peso_valor_bloqueada"),
-                rs.getBigDecimal("peso_carga"),
+                // Carga.pesoCarga é guardado em TONELADAS; a conferência trabalha em kg
+                rs.getBigDecimal("peso_carga") == null ? null : rs.getBigDecimal("peso_carga").multiply(java.math.BigDecimal.valueOf(1000)),
                 rs.getString("origem_carga"),
                 rs.getString("origem_carga_numero"),
                 rs.getBigDecimal("valor_winthor"),

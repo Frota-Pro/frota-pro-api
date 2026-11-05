@@ -16,7 +16,11 @@ import java.util.List;
 public class CargaWinThorDto {
 
     private Long numMdfe;
+    /** Nulo quando é manifesto sem nota: a chave da carga é então "MDFE-" + numMdfe. */
     private Integer numCar;
+
+    /** Manifesto sem nenhuma nota: viagem sem valor, só com o peso do manifesto. */
+    private Boolean semNota;
 
     private String codVeiculo;
     private Integer codMotorista;
@@ -28,6 +32,7 @@ public class CargaWinThorDto {
     private OffsetDateTime dtSaida;
     private String destino;
 
+    /** Apesar do nome, em TONELADAS (PCCARREG.TOTPESO / 1000): é a unidade de Carga.pesoCarga. */
     private Double pesoTotalKg;
     private BigDecimal valorTotal;
 
