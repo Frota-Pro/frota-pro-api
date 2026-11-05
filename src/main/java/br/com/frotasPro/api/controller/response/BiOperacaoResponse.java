@@ -20,18 +20,8 @@ public record BiOperacaoResponse(
         List<RotaCargas> cargasPorRota,
         List<ConsumoCategoria> consumoPorCategoria,
         List<MesMetas> metasPorMes,
-        List<LinhaResumo> porLinha,
-        Qualidade qualidade
+        List<LinhaResumo> porLinha
 ) {
-
-    /**
-     * Cargas do período que merecem atenção: reentrega e transferência (cargas pequenas que o motorista não
-     * lembra), manifesto sem nota e motorista de terceiro (km e abastecimento à mão), e quantas ainda estão
-     * sem km. "Pequena" = menos de 500 kg.
-     */
-    public record Qualidade(long reentregas, long transferencias, long manifestosSemNota, long motoristasTerceiro,
-                            long cargasPequenas, long lancarKm) {
-    }
 
     /** Números do período separados pela linha de transporte do caminhão (Frios, Linha seca, "Sem linha"...). */
     public record LinhaResumo(String linha, long cargas, long entregas, long kmRodados, Double litros, Double kmPorLitro, Double toneladas) {

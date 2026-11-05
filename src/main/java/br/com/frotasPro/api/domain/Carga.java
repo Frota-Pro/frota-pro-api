@@ -154,34 +154,6 @@ public class Carga extends AuditoriaBase {
     @Column(name = "data_verificacao_winthor")
     private LocalDateTime dataVerificacaoWinThor;
 
-    /**
-     * Valor e peso que o WinThor informa HOJE (soma das notas transportadas). Diferem de valorTotal/pesoCarga
-     * quando o bloqueio de diminuição segurou o número maior: a diferença é o quanto ia diminuir.
-     */
-    @Column(name = "valor_winthor", precision = 15, scale = 3)
-    private BigDecimal valorWinThor;
-
-    @Column(name = "peso_winthor", precision = 15, scale = 3)
-    private BigDecimal pesoWinThor;
-
-    /** "REENTREGA" ou "TRANSFERENCIA" (pelo log do WinThor); nulo = carga comum. */
-    @Column(name = "origem_carga", length = 20)
-    private String origemCarga;
-
-    /** Carregamento de onde veio o primeiro pedido desta carga. */
-    @Column(name = "origem_carga_numero", length = 30)
-    private String origemCargaNumero;
-
-    /** Carregamentos para onde foram as notas desta carga, quando ela ficou vazia e foi zerada dos totais. */
-    @Column(name = "transferida_para", length = 300)
-    private String transferidaPara;
-
-    @Column(name = "valor_antes_transferencia", precision = 15, scale = 3)
-    private BigDecimal valorAntesTransferencia;
-
-    @Column(name = "peso_antes_transferencia", precision = 15, scale = 3)
-    private BigDecimal pesoAntesTransferencia;
-
     @OneToMany(mappedBy = "carga", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CargaNota> notas = new ArrayList<>();
 
