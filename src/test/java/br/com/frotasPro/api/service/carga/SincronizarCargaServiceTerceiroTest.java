@@ -209,4 +209,63 @@ class SincronizarCargaServiceTerceiroTest {
         assertNull(carga.getValorAntesTransferencia());
         assertEquals(0, new BigDecimal("35872.62").compareTo(carga.getValorTotal()));
     }
+
+    // ------------------------------------------------------------------ manifesto sem nota
+
+    private CargaWinThorDto manifestoSemNota() {
+        return CargaWinThorDto.builder()
+                .numCar(null).semNota(true).numMdfe(77L)
+                .codVeiculo("99").codMotorista(7).nomeMotorista("josé da silva")
+                .dtSaida(java.time.OffsetDateTime.parse("2026-10-03T00:00:00-03:00"))
+                .destino("MANIFESTO SEM NOTA").pesoTotalKg(12000.0)
+                .origemCarga("MANIFESTO_SEM_NOTA")
+                .clientes(new ArrayList<>())
+                .build();
+    }
+
+    @Test
+    void manifestoSemNotaComCaminhaoDaFrotaViraCargaPelaChaveDoManifestoEComMotoristaExterno() {
+        lenient().when(cargaRepository.findByNumeroCargaExterno("MDFE-77")).thenReturn(Optional.empty());
+
+        service.sincronizarCargasWinThor(evento(manifestoSemNota()));
+
+        ArgumentCaptor<Carga> salva = ArgumentCaptor.forClass(Carga.class);
+        verify(cargaRepository).saveAndFlush(salva.capture());
+        Carga c = salva.getValue();
+        assertEquals("MDFE-77", c.getNumeroCargaExterno());
+        assertEquals("MANIFESTO_SEM_NOTA", c.getOrigemCarga());
+        assertEquals(Status.SINCRONIZADA, c.getStatusCarga());
+        assertNull(c.getValorTotal(), "manifesto não tem valor");
+        assertEquals(0, new BigDecimal("12000.0").compareTo(c.getPesoCarga()));
+        assertTrue(c.getMotorista().isExterno(), "motorista sem cadastro com caminhão da frota entra como externo");
+        assertSame(caminhaoDaFrota, c.getCaminhao());
+        verify(registrarCargaSyncDescartadaService, never()).registrar(any(), any());
+        verify(registrarCargaSyncDescartadaService, never()).resolver(any());
+    }
+
+    @Test
+    void manifestoSemNotaComCaminhaoDeTerceiroNaoViraCargaNemFicaNaListaDeDescartadas() {
+        lenient().when(caminhaoRepository.findByCodigoExterno("99")).thenReturn(Optional.empty());
+        lenient().when(cargaRepository.findByNumeroCargaExterno("MDFE-77")).thenReturn(Optional.empty());
+
+        service.sincronizarCargasWinThor(evento(manifestoSemNota()));
+
+        verify(cargaRepository, never()).saveAndFlush(any());
+        verify(motoristaRepository, never()).saveAndFlush(any());
+        verify(registrarCargaSyncDescartadaService, never()).registrar(any(), any());
+    }
+
+    @Test
+    void manifestoSemNotaComMotoristaDaFrotaUsaOCadastroENaoCriaExterno() {
+        Motorista daFrota = new Motorista();
+        lenient().when(motoristaRepository.findByCodigoExterno("7")).thenReturn(Optional.of(daFrota));
+        lenient().when(cargaRepository.findByNumeroCargaExterno("MDFE-77")).thenReturn(Optional.empty());
+
+        service.sincronizarCargasWinThor(evento(manifestoSemNota()));
+
+        ArgumentCaptor<Carga> salva = ArgumentCaptor.forClass(Carga.class);
+        verify(cargaRepository).saveAndFlush(salva.capture());
+        assertSame(daFrota, salva.getValue().getMotorista());
+        verify(motoristaRepository, never()).saveAndFlush(any());
+    }
 }
