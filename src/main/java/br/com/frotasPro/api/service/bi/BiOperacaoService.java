@@ -60,8 +60,23 @@ public class BiOperacaoService {
         List<Map<String, Object>> consumo = jdbc.queryForList(sql("consumo_por_categoria"), parametros);
         List<Map<String, Object>> metas = jdbc.queryForList(sql("metas_por_mes"), parametros);
         List<Map<String, Object>> porLinha = jdbc.queryForList(sqlComBase("_cargas_base", "por_linha"), parametros);
+        Map<String, Object> qualidade = primeira(jdbc.queryForList(sqlComBase("_cargas_base", "qualidade_cargas"), parametros));
 
-        return montar(periodo, OffsetDateTime.now(), kpisCargas, kpisCombustivel, cargasPorMes, combustivelPorMes, cargasPorRota, consumo, metas, porLinha);
+        return montar(periodo, OffsetDateTime.now(), kpisCargas, kpisCombustivel, cargasPorMes, combustivelPorMes, cargasPorRota, consumo, metas, porLinha, qualidade);
+    }
+
+    static BiOperacaoResponse montar(BiPeriodo periodo,
+                                     OffsetDateTime geradoEm,
+                                     Map<String, Object> kpisCargas,
+                                     Map<String, Object> kpisCombustivel,
+                                     List<Map<String, Object>> cargasPorMes,
+                                     List<Map<String, Object>> combustivelPorMes,
+                                     List<Map<String, Object>> cargasPorRota,
+                                     List<Map<String, Object>> consumo,
+                                     List<Map<String, Object>> metas,
+                                     List<Map<String, Object>> porLinha) {
+        return montar(periodo, geradoEm, kpisCargas, kpisCombustivel, cargasPorMes, combustivelPorMes, cargasPorRota,
+                consumo, metas, porLinha, Map.of());
     }
 
     /** Converte as linhas do banco no JSON do app (separado da consulta para poder ser testado sem banco). */
@@ -74,7 +89,8 @@ public class BiOperacaoService {
                                      List<Map<String, Object>> cargasPorRota,
                                      List<Map<String, Object>> consumo,
                                      List<Map<String, Object>> metas,
-                                     List<Map<String, Object>> porLinha) {
+                                     List<Map<String, Object>> porLinha,
+                                     Map<String, Object> qualidade) {
 
         Kpis kpis = new Kpis(
                 inteiro(kpisCargas.get("cargas")),
@@ -112,7 +128,14 @@ public class BiOperacaoService {
                 porLinha.stream()
                         .map(l -> new LinhaResumo(texto(l.get("linha")), inteiro(l.get("cargas")), inteiro(l.get("entregas")), inteiro(l.get("km")),
                                 decimal(l.get("litros")), decimal(l.get("km_por_litro")), decimal(l.get("toneladas"))))
-                        .toList()
+                        .toList(),
+                new BiOperacaoResponse.Qualidade(
+                        inteiro(qualidade.get("reentregas")),
+                        inteiro(qualidade.get("transferencias")),
+                        inteiro(qualidade.get("manifestos_sem_nota")),
+                        inteiro(qualidade.get("motoristas_terceiro")),
+                        inteiro(qualidade.get("cargas_pequenas")),
+                        inteiro(qualidade.get("lancar_km")))
         );
     }
 
