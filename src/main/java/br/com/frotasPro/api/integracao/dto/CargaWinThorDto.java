@@ -47,4 +47,14 @@ public class CargaWinThorDto {
      * carregamento no WinThor (PCLOGTRANSFNFCARREG).
      */
     private Boolean temTransferencia;
+
+    /** "REENTREGA", "TRANSFERENCIA" ou nulo (carga comum): como o carregamento nasceu, pelo log do WinThor. */
+    private String origemCarga;
+    /** Carregamento de onde veio o primeiro pedido. */
+    private Integer origemNumCar;
+
+    /** Quantas notas do carregamento são transporte (não canceladas e com MDF-e). */
+    private Integer notasTransportadas;
+    /** Todas as notas transportadas são TV10 de cliente de transporte terceirizado (15575, 10073). */
+    private Boolean somenteTv10Terceiro;
 }

@@ -153,6 +153,12 @@ public class CargaMapper {
                 .teveTransferencia(carga.isTeveTransferencia())
                 .diminuicaoPesoValorBloqueada(carga.isDiminuicaoPesoValorBloqueada())
                 .naoEncontradaNoWinThor(carga.isNaoEncontradaNoWinThor())
+                .valorWinThor(carga.getValorWinThor())
+                .pesoWinThor(carga.getPesoWinThor())
+                .origemCarga(carga.getOrigemCarga())
+                .origemCargaNumero(carga.getOrigemCargaNumero())
+                .transferidaPara(carga.getTransferidaPara())
+                .motoristaExterno(carga.getMotorista().isExterno())
                 .dataVerificacaoWinThor(carga.getDataVerificacaoWinThor())
                 .build();
     }
@@ -181,6 +187,12 @@ public class CargaMapper {
                 .teveTransferencia(carga.isTeveTransferencia())
                 .diminuicaoPesoValorBloqueada(carga.isDiminuicaoPesoValorBloqueada())
                 .naoEncontradaNoWinThor(carga.isNaoEncontradaNoWinThor())
+                .valorWinThor(carga.getValorWinThor())
+                .pesoWinThor(carga.getPesoWinThor())
+                .origemCarga(carga.getOrigemCarga())
+                .origemCargaNumero(carga.getOrigemCargaNumero())
+                .transferidaPara(carga.getTransferidaPara())
+                .motoristaExterno(carga.getMotorista().isExterno())
                 .build();
     }
 

@@ -66,6 +66,13 @@ public class Motorista extends AuditoriaBase{
     @Column(nullable = false)
     private boolean ativo = true;
 
+    /**
+     * Motorista de terceiro criado pelo sync do WinThor (TV10 de cliente de transporte terceirizado, com caminhão
+     * da frota). Não tem acesso ao app: km e abastecimento da carga são lançados à mão por quem administra.
+     */
+    @Column(name = "externo", nullable = false)
+    private boolean externo = false;
+
     @Column(name = "em_ferias", nullable = false)
     private boolean emFerias = false;
 

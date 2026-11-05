@@ -31,6 +31,14 @@ public class CargaScheduled {
     @Value("${frotapro.empresa-sync-id}")
     private UUID empresaIdPadrao;
 
+    /**
+     * Nos primeiros dias do mês o reforço também varre o mês que acabou: nota que só ganha MDF-e,
+     * motorista ou veículo depois da virada (reentrega, minuta refeita) pertence ao mês anterior e,
+     * sem isso, nenhuma rotina a buscava mais. 0 desliga e volta a varrer só o mês corrente.
+     */
+    @Value("${frotapro.sync.reforco-mes-anterior-dias:7}")
+    private int diasReforcoMesAnterior;
+
     @Scheduled(cron = "0 * * * * *")
     public void sincronizarCargasAutomatico() {
         IntegracaoWinThorConfig cfg = configService.getOrDefault(empresaIdPadrao);
@@ -119,7 +127,7 @@ public class CargaScheduled {
             return;
         }
 
-        LocalDate primeiroDiaDoMes = hoje.withDayOfMonth(1);
+        LocalDate primeiroDiaDoMes = inicioDoReforco(hoje, diasReforcoMesAnterior);
         UUID jobId = integracaoCargaService.solicitarSincronizacao(
                 empresaIdPadrao,
                 primeiroDiaDoMes,
@@ -132,8 +140,16 @@ public class CargaScheduled {
         );
 
         ultimaExecucaoReforcoMensal = hoje;
-        log.info("Job de reforço mensal (dia 1 até hoje) disparado. jobId={} periodo={} a {}",
+        log.info("Job de reforço mensal disparado. jobId={} periodo={} a {}",
                 jobId, primeiroDiaDoMes, hoje);
+    }
+
+    /** Dia 1 do mês corrente; nos primeiros {@code diasMesAnterior} dias do mês, dia 1 do mês anterior. */
+    static LocalDate inicioDoReforco(LocalDate hoje, int diasMesAnterior) {
+        LocalDate primeiroDiaDoMes = hoje.withDayOfMonth(1);
+        return diasMesAnterior > 0 && hoje.getDayOfMonth() <= diasMesAnterior
+                ? primeiroDiaDoMes.minusMonths(1)
+                : primeiroDiaDoMes;
     }
 
     private boolean deveRodarNoCronLegado(LocalDateTime agora) {
