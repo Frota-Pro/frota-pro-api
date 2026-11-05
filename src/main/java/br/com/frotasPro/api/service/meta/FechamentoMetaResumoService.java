@@ -110,6 +110,9 @@ public class FechamentoMetaResumoService {
         }
         return switch (situacao) {
             case FechamentoMetaService.SITUACAO_CONFIRMADO -> {
+                if (FechamentoMetaService.ORIGEM_AUTO.equals(origem)) {
+                    yield "Meta do mês FINALIZADA automaticamente (todas as metas batidas)";
+                }
                 String quem = "ADMIN".equals(origem) ? "pelo gerente" : "pelo motorista";
                 yield "Meta do mês FINALIZADA " + quem + (confirmadoEm != null ? " em " + confirmadoEm.format(DATA_HORA) : "");
             }

@@ -22,6 +22,7 @@ public class AuditoriaEntidadeResolver {
             Map.entry("Carga", "Carga"),
             Map.entry("CargaTransferencia", "Transferência de Carga"),
             Map.entry("CategoriaCaminhao", "Categoria de Caminhão"),
+            Map.entry("LinhaTransporte", "Linha de Transporte"),
             Map.entry("Conta", "Conta"),
             Map.entry("ConfiguracaoEmpresa", "Configuração da Empresa"),
             Map.entry("DespesaParada", "Despesa de Parada"),

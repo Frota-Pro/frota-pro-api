@@ -19,8 +19,13 @@ public record BiOperacaoResponse(
         List<MesCombustivel> combustivelPorMes,
         List<RotaCargas> cargasPorRota,
         List<ConsumoCategoria> consumoPorCategoria,
-        List<MesMetas> metasPorMes
+        List<MesMetas> metasPorMes,
+        List<LinhaResumo> porLinha
 ) {
+
+    /** Números do período separados pela linha de transporte do caminhão (Frios, Linha seca, "Sem linha"...). */
+    public record LinhaResumo(String linha, long cargas, long entregas, long kmRodados, Double litros, Double kmPorLitro, Double toneladas) {
+    }
 
     public record Kpis(
             long cargas,

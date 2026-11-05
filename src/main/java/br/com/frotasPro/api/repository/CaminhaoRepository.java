@@ -58,6 +58,8 @@ public interface CaminhaoRepository extends JpaRepository<Caminhao, UUID> {
 
     Optional<Caminhao> findByMotoristaTitularId(UUID motoristaTitularId);
 
+    boolean existsByLinhaTransporteId(UUID linhaTransporteId);
+
     long countByStatusAndAtivoTrue(Status status);
 
     long countByAtivoTrue();

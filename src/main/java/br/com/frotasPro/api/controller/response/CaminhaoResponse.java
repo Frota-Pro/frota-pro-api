@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -30,6 +31,9 @@ public class CaminhaoResponse {
 
     private String categoriaCodigo;
     private String categoriaDescricao;
+
+    private UUID linhaId;
+    private String linhaNome;
 
     private String motoristaTitularCodigo;
     private String motoristaTitularNome;

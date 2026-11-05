@@ -16,6 +16,7 @@ import br.com.frotasPro.api.repository.MotoristaRepository;
 import br.com.frotasPro.api.repository.RoteirizacaoCidadeRepository;
 import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
+import br.com.frotasPro.api.service.meta.FechamentoAutomaticoMetaService;
 import br.com.frotasPro.api.service.meta.FechamentoMetaService;
 import br.com.frotasPro.api.service.parametrosistema.ParametroSistemaService;
 import br.com.frotasPro.api.util.AtualizarMetaCargaTransportadaService;
@@ -47,6 +48,7 @@ public class FinalizarCargaService {
     private final ParametroSistemaService parametroSistemaService;
     private final RoteirizacaoCidadeRepository roteirizacaoCidadeRepository;
     private final FechamentoMetaService fechamentoMetaService;
+    private final FechamentoAutomaticoMetaService fechamentoAutomaticoMetaService;
 
 
     @Transactional
@@ -140,6 +142,12 @@ public class FinalizarCargaService {
         }
 
         cargaRepository.save(carga);
+
+        // Esta carga pode ter feito o motorista (ou o titular do caminhão) bater a última meta que
+        // faltava no mês anterior: se o fechamento automático estiver ligado, o mês fecha sozinho.
+        // Roda depois do commit e nunca derruba a finalização.
+        fechamentoAutomaticoMetaService.avaliarAposFinalizarCarga(java.util.Arrays.asList(
+                motorista, caminhao != null ? caminhao.getMotoristaTitular() : null));
 
         String numeroCargaExibicao = CargaMapper.resolverNumeroExibicao(
                 carga.getNumeroCarga(), carga.getNumeroCargaExterno(), integracaoWinThorConfigService.isCargaIntegracaoAtiva());

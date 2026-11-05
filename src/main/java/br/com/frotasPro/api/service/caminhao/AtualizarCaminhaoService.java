@@ -8,6 +8,7 @@ import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.mapper.CaminhaoMapper;
 import br.com.frotasPro.api.repository.CategoriaCaminhaoRepository;
 import br.com.frotasPro.api.repository.CaminhaoRepository;
+import br.com.frotasPro.api.repository.LinhaTransporteRepository;
 import br.com.frotasPro.api.service.meta.MetaCategoriaCaminhaoVinculoService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class AtualizarCaminhaoService {
     private final CategoriaCaminhaoRepository categoriaCaminhaoRepository;
     private final TransferirTitularCaminhaoService transferirTitularCaminhaoService;
     private final MetaCategoriaCaminhaoVinculoService metaCategoriaCaminhaoVinculoService;
+    private final LinhaTransporteRepository linhaTransporteRepository;
 
     @Transactional
     public CaminhaoResponse atualizar(String codigo, CaminhaoRequest request) {
@@ -70,6 +72,10 @@ public class AtualizarCaminhaoService {
         } else {
             caminhao.setCategoria(null);
         }
+
+        caminhao.setLinhaTransporte(request.getLinhaId() == null ? null
+                : linhaTransporteRepository.findById(request.getLinhaId())
+                        .orElseThrow(() -> new ObjectNotFound("ERRO: Linha de transporte não encontrada.")));
 
         transferirTitularCaminhaoService.aplicarTitular(caminhao, request.getMotoristaTitular());
     }

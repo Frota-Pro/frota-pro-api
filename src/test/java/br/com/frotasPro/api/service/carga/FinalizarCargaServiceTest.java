@@ -14,6 +14,7 @@ import br.com.frotasPro.api.excption.ObjectNotFound;
 import br.com.frotasPro.api.repository.CargaRepository;
 import br.com.frotasPro.api.repository.RoteirizacaoCidadeRepository;
 import br.com.frotasPro.api.service.integracao.IntegracaoWinThorConfigService;
+import br.com.frotasPro.api.service.meta.FechamentoAutomaticoMetaService;
 import br.com.frotasPro.api.service.meta.FechamentoMetaService;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import br.com.frotasPro.api.service.parametrosistema.ParametroSistemaService;
@@ -73,6 +74,8 @@ class FinalizarCargaServiceTest {
     private RoteirizacaoCidadeRepository roteirizacaoCidadeRepository;
     @Mock
     private FechamentoMetaService fechamentoMetaService;
+    @Mock
+    private FechamentoAutomaticoMetaService fechamentoAutomaticoMetaService;
     @InjectMocks
     private FinalizarCargaService service;
 

@@ -3,6 +3,7 @@ package br.com.frotasPro.api.service.bi;
 import br.com.frotasPro.api.controller.response.BiOperacaoResponse;
 import br.com.frotasPro.api.controller.response.BiOperacaoResponse.ConsumoCategoria;
 import br.com.frotasPro.api.controller.response.BiOperacaoResponse.Kpis;
+import br.com.frotasPro.api.controller.response.BiOperacaoResponse.LinhaResumo;
 import br.com.frotasPro.api.controller.response.BiOperacaoResponse.MesCargas;
 import br.com.frotasPro.api.controller.response.BiOperacaoResponse.MesCombustivel;
 import br.com.frotasPro.api.controller.response.BiOperacaoResponse.MesMetas;
@@ -22,6 +23,7 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Números do painel "Operação" do gestor, direto do banco. As consultas são as mesmas do
@@ -36,11 +38,19 @@ public class BiOperacaoService {
 
     @Transactional(readOnly = true)
     public BiOperacaoResponse buscar(Integer meses, LocalDate de, LocalDate ate) {
+        return buscar(meses, de, ate, null);
+    }
+
+    /** {@code linhaId} nulo = todas as linhas; com valor, só os caminhões dessa linha de transporte. */
+    @Transactional(readOnly = true)
+    public BiOperacaoResponse buscar(Integer meses, LocalDate de, LocalDate ate, UUID linhaId) {
         BiPeriodo periodo = BiPeriodo.resolver(meses, de, ate, FusoHorarioUtils.hojeBrasil());
 
+        // Texto vazio = sem filtro: evita parâmetro nulo tipado nas consultas.
         var parametros = new MapSqlParameterSource()
                 .addValue("inicio", periodo.inicio())
-                .addValue("fim", periodo.fimDaConsulta());
+                .addValue("fim", periodo.fimDaConsulta())
+                .addValue("linha", linhaId == null ? "" : linhaId.toString());
 
         Map<String, Object> kpisCargas = primeira(jdbc.queryForList(sqlComBase("_cargas_base", "kpis_cargas"), parametros));
         Map<String, Object> kpisCombustivel = primeira(jdbc.queryForList(sqlComBase("_abastecimentos_base", "kpis_combustivel"), parametros));
@@ -49,8 +59,9 @@ public class BiOperacaoService {
         List<Map<String, Object>> cargasPorRota = jdbc.queryForList(sqlComBase("_cargas_base", "cargas_por_rota"), parametros);
         List<Map<String, Object>> consumo = jdbc.queryForList(sql("consumo_por_categoria"), parametros);
         List<Map<String, Object>> metas = jdbc.queryForList(sql("metas_por_mes"), parametros);
+        List<Map<String, Object>> porLinha = jdbc.queryForList(sqlComBase("_cargas_base", "por_linha"), parametros);
 
-        return montar(periodo, OffsetDateTime.now(), kpisCargas, kpisCombustivel, cargasPorMes, combustivelPorMes, cargasPorRota, consumo, metas);
+        return montar(periodo, OffsetDateTime.now(), kpisCargas, kpisCombustivel, cargasPorMes, combustivelPorMes, cargasPorRota, consumo, metas, porLinha);
     }
 
     /** Converte as linhas do banco no JSON do app (separado da consulta para poder ser testado sem banco). */
@@ -62,7 +73,8 @@ public class BiOperacaoService {
                                      List<Map<String, Object>> combustivelPorMes,
                                      List<Map<String, Object>> cargasPorRota,
                                      List<Map<String, Object>> consumo,
-                                     List<Map<String, Object>> metas) {
+                                     List<Map<String, Object>> metas,
+                                     List<Map<String, Object>> porLinha) {
 
         Kpis kpis = new Kpis(
                 inteiro(kpisCargas.get("cargas")),
@@ -96,6 +108,10 @@ public class BiOperacaoService {
                         .toList(),
                 metas.stream()
                         .map(l -> new MesMetas(texto(l.get("mes")), decimal(l.get("consumo_pct")), decimal(l.get("toneladas_pct")), inteiro(l.get("sem_dados"))))
+                        .toList(),
+                porLinha.stream()
+                        .map(l -> new LinhaResumo(texto(l.get("linha")), inteiro(l.get("cargas")), inteiro(l.get("entregas")), inteiro(l.get("km")),
+                                decimal(l.get("litros")), decimal(l.get("km_por_litro")), decimal(l.get("toneladas"))))
                         .toList()
         );
     }

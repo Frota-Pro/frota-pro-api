@@ -81,6 +81,11 @@ public class Caminhao extends AuditoriaBase{
     @JoinColumn(name = "categoria_caminhao_id")
     private CategoriaCaminhao categoria;
 
+    /** Linha em que o caminhão trabalha (Frios, Linha seca...): o BI separa os números por ela. Pode ser nula. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "linha_transporte_id")
+    private LinhaTransporte linhaTransporte;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "motorista_titular_id")
     private Motorista motoristaTitular;

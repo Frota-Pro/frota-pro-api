@@ -50,6 +50,7 @@ public class MetaController {
     private final FechamentoMetaMotoristaService fechamentoMetaMotoristaService;
     private final FechamentoMetaResumoService fechamentoMetaResumoService;
     private final ProcessarMetasDiariasService processarMetasDiariasService;
+    private final FechamentoAutomaticoMetaService fechamentoAutomaticoMetaService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA')")
     @PostMapping
@@ -222,6 +223,7 @@ public class MetaController {
     @PostMapping("/processar-agora")
     public ResponseEntity<Void> processarAgora() {
         processarMetasDiariasService.processar();
+        fechamentoAutomaticoMetaService.processarTodos();
         return ResponseEntity.noContent().build();
     }
 

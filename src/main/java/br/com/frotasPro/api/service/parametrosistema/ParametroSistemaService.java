@@ -67,6 +67,9 @@ public class ParametroSistemaService {
         if (request.getVincularDispositivo() != null) {
             parametro.setVincularDispositivo(request.getVincularDispositivo());
         }
+        if (request.getFecharMetaAutomaticamente() != null) {
+            parametro.setFecharMetaAutomaticamente(request.getFecharMetaAutomaticamente());
+        }
 
         return toResponse(repository.save(parametro));
     }
@@ -110,6 +113,7 @@ public class ParametroSistemaService {
                 .percentualLimiteAnomaliaAbastecimento(parametro.getPercentualLimiteAnomaliaAbastecimento())
                 .bloquearSenhaPadrao(parametro.isBloquearSenhaPadrao())
                 .vincularDispositivo(parametro.isVincularDispositivo())
+                .fecharMetaAutomaticamente(parametro.isFecharMetaAutomaticamente())
                 .build();
     }
 }

@@ -52,7 +52,7 @@ public class FechamentoMetaMotorista {
     @Column(name = "confirmado_por", length = 100)
     private String confirmadoPor;
 
-    /** APP (o próprio motorista) ou ADMIN. */
+    /** APP (o próprio motorista), ADMIN ou AUTO (o sistema, com todas as metas batidas). */
     @Column(name = "origem", nullable = false, length = 20)
     private String origem = "APP";
 

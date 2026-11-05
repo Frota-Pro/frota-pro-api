@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 /** BI (dashboards do Metabase) para o gerente logístico, no app. */
 @RestController
@@ -44,8 +45,9 @@ public class BiController {
     public ResponseEntity<BiOperacaoResponse> operacao(
             @RequestParam(required = false) Integer meses,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate de,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate ate) {
-        return ResponseEntity.ok(biOperacaoService.buscar(meses, de, ate));
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate ate,
+            @RequestParam(required = false) UUID linha) {
+        return ResponseEntity.ok(biOperacaoService.buscar(meses, de, ate, linha));
     }
 
     /** Dados de todos os cartões de um dashboard, para o app desenhar nativamente. */
