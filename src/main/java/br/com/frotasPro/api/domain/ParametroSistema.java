@@ -132,4 +132,12 @@ public class ParametroSistema extends AuditoriaBase {
      */
     @Column(name = "vincular_dispositivo", nullable = false)
     private boolean vincularDispositivo = false;
+
+    /**
+     * Se true, o mês da meta fecha sozinho para o motorista que já bateu TODAS as metas mensais do
+     * caminhão dele (ver FechamentoAutomaticoMetaService). Só vale com diasUteisFechamentoMeta &gt; 0.
+     * Quem ficou com alguma meta por bater continua com o mês aberto pra finalizar.
+     */
+    @Column(name = "fechar_meta_automaticamente", nullable = false)
+    private boolean fecharMetaAutomaticamente = false;
 }

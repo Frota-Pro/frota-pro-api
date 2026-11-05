@@ -169,6 +169,53 @@ public class FechamentoMetaService {
         return montarStatus(motorista, mes, hoje);
     }
 
+    public static final String ORIGEM_AUTO = "AUTO";
+
+    /**
+     * O mês de {@code mes} ainda pode ser fechado sozinho pelo sistema pra este motorista? Só se o
+     * mês estiver "aberto" (acabou, prazo não venceu) e ninguém tiver mexido nele: nem confirmação
+     * nem reabertura, porque quem reabriu (gerente) fez de propósito e o sistema não refaz.
+     */
+    public boolean podeFecharAutomaticamente(Motorista motorista, YearMonth mes) {
+        return podeFecharAutomaticamente(motorista, mes, FusoHorarioUtils.hojeBrasil());
+    }
+
+    boolean podeFecharAutomaticamente(Motorista motorista, YearMonth mes, LocalDate hoje) {
+        if (!isAtivo() || motorista == null || motorista.getId() == null) {
+            return false;
+        }
+        if (!SITUACAO_ABERTO.equals(situacaoDoMes(diasUteis(), mes, hoje, false))) {
+            return false;
+        }
+        return repository.findByMotoristaIdAndMesReferencia(motorista.getId(), mes.atDay(1)).isEmpty();
+    }
+
+    /**
+     * Fecha o mês do motorista sem ele confirmar (todas as metas batidas). Fica registrado como
+     * confirmado à 00:00 do 1º dia do mês seguinte, qualquer que seja a hora em que o sistema
+     * percebeu: a carga que sair a partir da virada já conta no mês novo.
+     *
+     * @return true se registrou o fechamento agora
+     */
+    @Transactional
+    public boolean confirmarAutomaticamente(Motorista motorista, YearMonth mes) {
+        return confirmarAutomaticamente(motorista, mes, FusoHorarioUtils.hojeBrasil());
+    }
+
+    boolean confirmarAutomaticamente(Motorista motorista, YearMonth mes, LocalDate hoje) {
+        if (!podeFecharAutomaticamente(motorista, mes, hoje)) {
+            return false;
+        }
+        FechamentoMetaMotorista fechamento = new FechamentoMetaMotorista();
+        fechamento.setMotorista(motorista);
+        fechamento.setMesReferencia(mes.atDay(1));
+        fechamento.setConfirmadoEm(mes.plusMonths(1).atDay(1).atStartOfDay());
+        fechamento.setConfirmadoPor("SISTEMA");
+        fechamento.setOrigem(ORIGEM_AUTO);
+        repository.save(fechamento);
+        return true;
+    }
+
     /** Admin desfaz a confirmação. Cargas que já foram pro mês seguinte por causa dela NÃO voltam. */
     @Transactional
     public FechamentoMetaResponse reabrir(Motorista motorista, YearMonth mes, String usuario) {

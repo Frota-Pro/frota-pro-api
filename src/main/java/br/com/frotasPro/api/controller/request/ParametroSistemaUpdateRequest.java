@@ -43,6 +43,8 @@ public class ParametroSistemaUpdateRequest {
 
     private Boolean vincularDispositivo;
 
+    private Boolean fecharMetaAutomaticamente;
+
     @NotNull(message = "Informe se transferência de pedido autoriza a atualização")
     private Boolean permitirAtualizacaoPorTransferencia;
 
