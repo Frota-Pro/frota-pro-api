@@ -3,11 +3,11 @@ dpc AS (SELECT p.carga_id, sum(d.valor) FILTER (WHERE d.tipo_despesa <> 'COMBUST
 en AS (SELECT carga_id, count(*) n FROM tb_carga_ordem_entrega GROUP BY 1),
 nf AS (SELECT carga_id, count(*) n FROM tb_carga_nota GROUP BY 1),
 cg AS (SELECT c.numero_carga carga, COALESCE(c.data_saida, c.data_faturamento) data, c.status_carga status, k.placa, COALESCE(cc.descricao, 'Sem categoria') categoria, COALESCE(lt.nome, 'Sem linha') linha, mo.nome motorista, r.codigo || ' · ' || r.cidade_inicio rota,
-  COALESCE(en.n, 0) entregas, COALESCE(nf.n, 0) notas, c.peso_carga peso_t, c.origem_carga origem, mo.externo terceiro,
+  COALESCE(en.n, 0) entregas, COALESCE(nf.n, 0) notas, c.peso_carga peso_t,
   CASE WHEN c.km_final - c.km_inicial BETWEEN 1 AND 3000 THEN c.km_final - c.km_inicial END km,
   COALESCE(abc.litros, 0) litros, COALESCE(abc.comb, 0) combustivel, COALESCE(dpc.outras, 0) outras
   FROM tb_carga c JOIN tb_caminhao k ON k.id = c.caminhao_id LEFT JOIN tb_categoria_caminhao cc ON cc.id = k.categoria_caminhao_id LEFT JOIN tb_linha_transporte lt ON lt.id = k.linha_transporte_id
   JOIN tb_motorista mo ON mo.id = c.motorista_id JOIN tb_rota r ON r.id = c.rota_id
   LEFT JOIN abc ON abc.carga_id = c.id LEFT JOIN dpc ON dpc.carga_id = c.id LEFT JOIN en ON en.carga_id = c.id LEFT JOIN nf ON nf.carga_id = c.id
-  WHERE 1 = 1 AND c.transferida_para IS NULL AND COALESCE(c.data_saida, c.data_faturamento) BETWEEN :inicio AND :fim
+  WHERE 1 = 1 AND COALESCE(c.data_saida, c.data_faturamento) BETWEEN :inicio AND :fim
   AND (:linha = '' OR k.linha_transporte_id::text = :linha))

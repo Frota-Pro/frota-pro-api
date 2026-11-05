@@ -16,11 +16,7 @@ import java.util.List;
 public class CargaWinThorDto {
 
     private Long numMdfe;
-    /** Nulo quando é manifesto sem nota: a chave da carga é então "MDFE-" + numMdfe. */
     private Integer numCar;
-
-    /** Manifesto sem nenhuma nota: viagem sem valor, só com o peso do manifesto. */
-    private Boolean semNota;
 
     private String codVeiculo;
     private Integer codMotorista;
@@ -32,7 +28,6 @@ public class CargaWinThorDto {
     private OffsetDateTime dtSaida;
     private String destino;
 
-    /** Apesar do nome, em TONELADAS (PCCARREG.TOTPESO / 1000): é a unidade de Carga.pesoCarga. */
     private Double pesoTotalKg;
     private BigDecimal valorTotal;
 
@@ -52,14 +47,4 @@ public class CargaWinThorDto {
      * carregamento no WinThor (PCLOGTRANSFNFCARREG).
      */
     private Boolean temTransferencia;
-
-    /** "REENTREGA", "TRANSFERENCIA" ou nulo (carga comum): como o carregamento nasceu, pelo log do WinThor. */
-    private String origemCarga;
-    /** Carregamento de onde veio o primeiro pedido. */
-    private Integer origemNumCar;
-
-    /** Quantas notas do carregamento são transporte (não canceladas e com MDF-e). */
-    private Integer notasTransportadas;
-    /** Todas as notas transportadas são TV10 de cliente de transporte terceirizado (15575, 10073). */
-    private Boolean somenteTv10Terceiro;
 }
