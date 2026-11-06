@@ -11,10 +11,12 @@ import br.com.frotasPro.api.controller.response.CargaResponse;
 import br.com.frotasPro.api.controller.response.CargaSyncItemResponse;
 import br.com.frotasPro.api.controller.response.ImportarNotaFiscalResponse;
 import br.com.frotasPro.api.controller.response.RelatorioCargasNaoSincronizadasResponse;
+import br.com.frotasPro.api.controller.response.RelatorioCargasReentregaConferirResponse;
 import br.com.frotasPro.api.controller.response.RelatorioCargasSumidasWinThorResponse;
 import br.com.frotasPro.api.controller.response.TransferirNotasCargaResponse;
 import br.com.frotasPro.api.service.carga.*;
 import br.com.frotasPro.api.service.relatorios.RelatorioCargasNaoSincronizadasService;
+import br.com.frotasPro.api.service.relatorios.RelatorioCargasReentregaConferirService;
 import br.com.frotasPro.api.service.relatorios.RelatorioCargasSumidasWinThorService;
 import jakarta.validation.Valid;
 import br.com.frotasPro.api.service.usuario.AcessoMotoristaService;
@@ -57,6 +59,7 @@ public class CargaController {
     private final TransferirCaminhaoCargaService transferirCaminhaoCargaService;
     private final VerificarCargasSumidasWinThorService verificarCargasSumidasWinThorService;
     private final RelatorioCargasSumidasWinThorService relatorioCargasSumidasWinThorService;
+    private final RelatorioCargasReentregaConferirService relatorioCargasReentregaConferirService;
     private final RelatorioCargasNaoSincronizadasService relatorioCargasNaoSincronizadasService;
     private final ImportarNotaFiscalCargaService importarNotaFiscalCargaService;
     private final CargaSyncHistoricoService cargaSyncHistoricoService;
@@ -82,6 +85,21 @@ public class CargaController {
     ) {
         return ResponseEntity.ok(
                 relatorioCargasSumidasWinThorService.gerar(inicio, fim, codigoMotorista, codigoCaminhao));
+    }
+
+    /**
+     * Cantinho de conferência: cargas já iniciadas/finalizadas que, no WinThor, estão num carregamento genérico de
+     * reentrega. Só leitura; quem decide o que fazer é a pessoa.
+     */
+    @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")
+    @GetMapping("/relatorio-reentrega-conferir")
+    public ResponseEntity<RelatorioCargasReentregaConferirResponse> relatorioCargasReentregaConferir(
+            @RequestParam(value = "inicio", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam(value = "fim", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim
+    ) {
+        return ResponseEntity.ok(relatorioCargasReentregaConferirService.gerar(inicio, fim));
     }
 
     /** Cargas que o sync do WinThor descartou (motorista/caminhão do MDF-e sem cadastro no FrotaPRO). */
