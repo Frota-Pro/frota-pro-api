@@ -109,8 +109,9 @@ public class VerificarCargasSumidasWinThorService {
                 TipoNotificacao.ALERTA,
                 "Carga não encontrada no WinThor",
                 "A carga " + numeroCargaExibicao + " foi sincronizada antes, mas não foi mais encontrada no WinThor "
-                        + "(sem nota fiscal vinculada ao carregamento " + carga.getNumeroCargaExterno() + "). "
-                        + "Pode ter sido cancelada ou desvinculada lá — verifique antes de iniciar a viagem.",
+                        + "(sem nota fiscal vinculada ao carregamento " + carga.getNumeroCargaExterno() + ", ou o "
+                        + "carregamento está com o motorista/veículo genéricos de reentrega). "
+                        + "Pode ter sido cancelada, desvinculada ou virado reentrega lá — verifique antes de iniciar a viagem.",
                 "CARGA",
                 carga.getId(),
                 numeroCargaExibicao

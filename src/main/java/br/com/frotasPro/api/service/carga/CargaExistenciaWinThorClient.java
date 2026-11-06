@@ -53,6 +53,22 @@ public class CargaExistenciaWinThorClient {
                 : Set.of();
     }
 
+    /**
+     * Dos códigos perguntados, retorna quais estão num carregamento com motorista/veículo GENÉRICO de reentrega
+     * no WinThor (um "estacionamento" de nota, não uma viagem).
+     */
+    public Set<Integer> filtrarReentregaGenerica(List<Integer> codigosCargas) {
+        String url = baseUrl() + "/winthor/cargas/reentrega-generica";
+
+        Map<String, Object> body = Map.of("codigosCargas", codigosCargas);
+
+        RespostaReentregaGenerica resposta = executar(
+                () -> restTemplate.postForObject(url, body, RespostaReentregaGenerica.class));
+        return resposta != null && resposta.getCodigosReentrega() != null
+                ? Set.copyOf(resposta.getCodigosReentrega())
+                : Set.of();
+    }
+
     private <T> T executar(java.util.function.Supplier<T> chamada) {
         try {
             return chamada.get();
@@ -80,5 +96,11 @@ public class CargaExistenciaWinThorClient {
     @NoArgsConstructor
     private static class RespostaExistencia {
         private List<Integer> codigosExistentes;
+    }
+
+    @Data
+    @NoArgsConstructor
+    private static class RespostaReentregaGenerica {
+        private List<Integer> codigosReentrega;
     }
 }

@@ -441,6 +441,9 @@ public interface CargaRepository extends JpaRepository<Carga, UUID> {
             @Param("status") Status status
     );
 
+    /** Conferência de reentrega: cargas de um status, com número do WinThor, que saíram dentro do período. */
+    List<Carga> findByStatusCargaAndNumeroCargaExternoIsNotNullAndDtSaidaBetween(Status statusCarga, LocalDate inicio, LocalDate fim);
+
     /** Base da página de Analytics — cargas finalizadas no período, pra série de tendência semanal. */
     List<Carga> findByStatusCargaAndDtChegadaBetween(Status statusCarga, LocalDate inicio, LocalDate fim);
 
