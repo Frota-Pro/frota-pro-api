@@ -44,6 +44,29 @@ public class CargaSyncJob {
     @Column(name = "solicitado_por", length = 50)
     private String solicitadoPor;
 
+    /** Período de datas de saída pedido nesta rodada (nulo em jobs anteriores ao histórico de sincronização). */
+    @Column(name = "periodo_inicial")
+    private LocalDate periodoInicial;
+
+    @Column(name = "periodo_final")
+    private LocalDate periodoFinal;
+
+    /** Totais da rodada, gravados depois que as cargas foram processadas (nulos em jobs antigos). */
+    @Column(name = "qtd_novas")
+    private Integer qtdNovas;
+
+    @Column(name = "qtd_atualizadas")
+    private Integer qtdAtualizadas;
+
+    @Column(name = "qtd_sem_mudanca")
+    private Integer qtdSemMudanca;
+
+    @Column(name = "qtd_descartadas")
+    private Integer qtdDescartadas;
+
+    @Column(name = "qtd_diminuicao_bloqueada")
+    private Integer qtdDiminuicaoBloqueada;
+
     @Column(name = "criado_em")
     private OffsetDateTime criadoEm;
 

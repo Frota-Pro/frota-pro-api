@@ -5,6 +5,7 @@ import br.com.frotasPro.api.service.carga.CargaSyncJobService;
 import br.com.frotasPro.api.service.carga.SincronizarCargaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -24,20 +25,23 @@ public class CargaSyncResponseConsumer {
             }
     )
     public void consumir(CargaSyncResponseEvent event) {
-        log.info("📥 [API] Resposta de sync recebida. jobId={} totalCargas={}",
-                event.getJobId(), event.getTotalCargas());
+        // [job=...] em todo log desta rodada (veja logback-spring.xml): dá pra filtrar tudo de uma sincronização.
+        try (MDC.MDCCloseable ignorado = MDC.putCloseable("jobId", String.valueOf(event.getJobId()))) {
+            log.info("📥 [API] Resposta de sync recebida. jobId={} totalCargas={}",
+                    event.getJobId(), event.getTotalCargas());
 
-        try {
-            jobService.marcarProcessando(event.getJobId());
-            cargaService.sincronizarCargasWinThor(event);
+            try {
+                jobService.marcarProcessando(event.getJobId());
+                cargaService.sincronizarCargasWinThor(event);
 
-            jobService.concluirJob(event.getJobId(), event.getTotalCargas());
-            log.info("✅ [API] Job de sync concluído com sucesso. jobId={}", event.getJobId());
-        } catch (Exception e) {
-            log.error("❌ [API] Falha ao processar sync de cargas. jobId={} totalCargas={}",
-                    event.getJobId(), event.getTotalCargas(), e);
-            jobService.marcarErro(event.getJobId(), mensagemErro(e));
-            throw e;
+                jobService.concluirJob(event.getJobId(), event.getTotalCargas());
+                log.info("✅ [API] Job de sync concluído com sucesso. jobId={}", event.getJobId());
+            } catch (Exception e) {
+                log.error("❌ [API] Falha ao processar sync de cargas. jobId={} totalCargas={}",
+                        event.getJobId(), event.getTotalCargas(), e);
+                jobService.marcarErro(event.getJobId(), mensagemErro(e));
+                throw e;
+            }
         }
     }
 

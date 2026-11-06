@@ -45,6 +45,7 @@ public class IntegracaoCargaService {
         List<Integer> codigosCargasTransferencia = buscarCodigosCargasComTransferenciaPendente();
 
         var job = jobService.criarJob(empresaId, fim, origem, solicitadoPor);
+        jobService.registrarPeriodo(job.getId(), inicio, fim);
 
         CargaSyncRequestEvent event = CargaSyncRequestEvent.builder()
                 .jobId(job.getId())

@@ -28,16 +28,29 @@ public class AuditoriaEntidadeRegistrador {
     private AuditoriaEntidadeRegistrador() {
     }
 
-    public static void registrarCriacao(Object entidade) {
-        registrar(entidade, AcaoAuditoria.CRIACAO, null, AuditoriaSnapshotSerializer.serializar(entidade));
+    /**
+     * @return a foto da entidade gravada agora; quem chama deve guardá-la como o novo "antes", senão uma
+     *         nova atualização na mesma transação seria comparada com a foto do carregamento e a mesma
+     *         mudança seria registrada várias vezes.
+     */
+    public static String registrarCriacao(Object entidade) {
+        String atual = AuditoriaSnapshotSerializer.serializar(entidade);
+        registrar(entidade, AcaoAuditoria.CRIACAO, null, atual);
+        return atual;
     }
 
-    public static void registrarAtualizacao(Object entidade, String snapshotAnterior) {
+    /**
+     * Registra só se algum campo simples mudou em relação a {@code snapshotAnterior}.
+     *
+     * @return a foto atual da entidade (para virar o novo "antes"), igual ou não à anterior
+     */
+    public static String registrarAtualizacao(Object entidade, String snapshotAnterior) {
         String atual = AuditoriaSnapshotSerializer.serializar(entidade);
         if (snapshotAnterior != null && snapshotAnterior.equals(atual)) {
-            return; // nenhum campo simples mudou (ex: só uma associação lazy foi tocada)
+            return atual; // nenhum campo simples mudou (ex: só uma associação lazy foi tocada)
         }
         registrar(entidade, AcaoAuditoria.ATUALIZACAO, snapshotAnterior, atual);
+        return atual;
     }
 
     public static void registrarExclusao(Object entidade) {

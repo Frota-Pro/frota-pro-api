@@ -221,6 +221,13 @@ public class IntegracaoWinThorMonitorService {
                 .origem(origemLabel(j.getOrigem(), j.getSolicitadoPor()))
                 .criadoEm(j.getCriadoEm())
                 .atualizadoEm(j.getAtualizadoEm())
+                .periodoInicial(j.getPeriodoInicial())
+                .periodoFinal(j.getPeriodoFinal())
+                .qtdNovas(j.getQtdNovas())
+                .qtdAtualizadas(j.getQtdAtualizadas())
+                .qtdSemMudanca(j.getQtdSemMudanca())
+                .qtdDescartadas(j.getQtdDescartadas())
+                .qtdDiminuicaoBloqueada(j.getQtdDiminuicaoBloqueada())
                 .build();
     }
 

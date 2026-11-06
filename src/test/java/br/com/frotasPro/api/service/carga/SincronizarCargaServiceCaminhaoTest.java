@@ -65,6 +65,8 @@ class SincronizarCargaServiceCaminhaoTest {
     private ClienteService clienteService;
     @Mock
     private RegistrarCargaSyncDescartadaService registrarCargaSyncDescartadaService;
+    @Mock
+    private CargaSyncHistoricoService historicoService;
     @InjectMocks
     private SincronizarCargaService service;
 
