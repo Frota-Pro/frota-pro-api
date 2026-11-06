@@ -18,5 +18,13 @@ public record IntegracaoWinThorJobResponse(
         /** "Automático", "Reforço mensal", "Manual" ou "Reprocessado" — só pra jobs de CARGAS; null pra caminhões/motoristas. */
         String origem,
         OffsetDateTime criadoEm,
-        OffsetDateTime atualizadoEm
+        OffsetDateTime atualizadoEm,
+        /** Só jobs de CARGAS, a partir do histórico de sincronização (nulos em jobs antigos). */
+        LocalDate periodoInicial,
+        LocalDate periodoFinal,
+        Integer qtdNovas,
+        Integer qtdAtualizadas,
+        Integer qtdSemMudanca,
+        Integer qtdDescartadas,
+        Integer qtdDiminuicaoBloqueada
 ) {}

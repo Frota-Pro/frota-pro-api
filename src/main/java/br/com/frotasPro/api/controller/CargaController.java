@@ -8,6 +8,7 @@ import br.com.frotasPro.api.controller.request.TransferirMotoristaCargaRequest;
 import br.com.frotasPro.api.controller.request.TransferirNotasCargaRequest;
 import br.com.frotasPro.api.controller.response.CargaMinResponse;
 import br.com.frotasPro.api.controller.response.CargaResponse;
+import br.com.frotasPro.api.controller.response.CargaSyncItemResponse;
 import br.com.frotasPro.api.controller.response.ImportarNotaFiscalResponse;
 import br.com.frotasPro.api.controller.response.RelatorioCargasNaoSincronizadasResponse;
 import br.com.frotasPro.api.controller.response.RelatorioCargasSumidasWinThorResponse;
@@ -58,6 +59,7 @@ public class CargaController {
     private final RelatorioCargasSumidasWinThorService relatorioCargasSumidasWinThorService;
     private final RelatorioCargasNaoSincronizadasService relatorioCargasNaoSincronizadasService;
     private final ImportarNotaFiscalCargaService importarNotaFiscalCargaService;
+    private final CargaSyncHistoricoService cargaSyncHistoricoService;
 
     // ========= RECONCILIAÇÃO WINTHOR =========
 
@@ -102,6 +104,20 @@ public class CargaController {
     public ResponseEntity<CargaResponse> buscarPorNumero(@PathVariable String numeroCarga) {
         CargaResponse carga = buscarCargaService.porCodigo(numeroCarga);
         return ResponseEntity.ok(carga);
+    }
+
+    /** O que as sincronizações com o WinThor mudaram nesta carga (valor, peso, status, transferências...). */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @GetMapping("/{numeroCarga}/historico-sincronizacao")
+    public ResponseEntity<List<CargaSyncItemResponse>> historicoSincronizacao(@PathVariable String numeroCarga) {
+        CargaResponse carga = buscarCargaService.porCodigo(numeroCarga);
+        String externo = carga.getNumeroCargaExterno();
+        if (externo == null || externo.isBlank()) {
+            return ResponseEntity.ok(List.of());
+        }
+        return ResponseEntity.ok(cargaSyncHistoricoService.listarPorCarga(externo).stream()
+                .map(CargaSyncItemResponse::de)
+                .toList());
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_CONSULTA')")

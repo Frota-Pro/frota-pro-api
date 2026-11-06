@@ -1,31 +1,123 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
+    <!--
+        Logs da API, por assunto. O arquivo frotapro.log continua COMPLETO (a tela de Logs em
+        Integrações > WinThor lê esse arquivo); os outros são recortes para achar as coisas mais rápido:
+
+          frotapro.log     tudo (como sempre foi)
+          sincronizacao.log  sincronização de cargas: lida, nova, atualizada, descartada, diminuição bloqueada
+          integracao.log     conversa com a integradora / WinThor (Kafka, status, configuração)
+          erros.log          só WARN e ERROR de qualquer lugar — o primeiro arquivo a abrir quando algo dá errado
+
+        [job=...] é o código da rodada de sincronização (jobId): filtre por ele para ver tudo de uma rodada.
+        Guarda 30 dias e no máximo 1 GB por arquivo.
+    -->
+
     <property name="LOG_PATH" value="logs" />
     <property name="LOG_FILE" value="${LOG_PATH}/frotapro.log" />
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS} %-5level [%thread] [job=%X{jobId:--}] %logger{36} - %msg%n" />
+    <property name="LOG_DIAS" value="30" />
+    <property name="LOG_TAMANHO_MAXIMO" value="1GB" />
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n</pattern>
+            <pattern>${LOG_PATTERN}</pattern>
         </encoder>
     </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_FILE}</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-
             <fileNamePattern>${LOG_PATH}/frotapro.%d{yyyy-MM-dd}.log</fileNamePattern>
-
-            <maxHistory>7</maxHistory>
+            <maxHistory>${LOG_DIAS}</maxHistory>
+            <totalSizeCap>${LOG_TAMANHO_MAXIMO}</totalSizeCap>
         </rollingPolicy>
         <encoder>
-            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n</pattern>
+            <pattern>${LOG_PATTERN}</pattern>
         </encoder>
     </appender>
+
+    <appender name="SINCRONIZACAO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/sincronizacao.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/sincronizacao.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>${LOG_DIAS}</maxHistory>
+            <totalSizeCap>${LOG_TAMANHO_MAXIMO}</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="INTEGRACAO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/integracao.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/integracao.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>${LOG_DIAS}</maxHistory>
+            <totalSizeCap>${LOG_TAMANHO_MAXIMO}</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ERROS" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <file>${LOG_PATH}/erros.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/erros.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>${LOG_DIAS}</maxHistory>
+            <totalSizeCap>${LOG_TAMANHO_MAXIMO}</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Sincronização de cargas -->
+    <logger name="br.com.frotasPro.api.service.carga.SincronizarCargaService" level="INFO">
+        <appender-ref ref="SINCRONIZACAO" />
+    </logger>
+    <logger name="br.com.frotasPro.api.service.carga.CargaSyncJobService" level="INFO">
+        <appender-ref ref="SINCRONIZACAO" />
+    </logger>
+    <logger name="br.com.frotasPro.api.service.carga.RegistrarCargaSyncDescartadaService" level="INFO">
+        <appender-ref ref="SINCRONIZACAO" />
+    </logger>
+    <logger name="br.com.frotasPro.api.service.carga.VerificarCargasSumidasWinThorService" level="INFO">
+        <appender-ref ref="SINCRONIZACAO" />
+    </logger>
+    <logger name="br.com.frotasPro.api.service.carga.CargaExistenciaWinThorClient" level="INFO">
+        <appender-ref ref="SINCRONIZACAO" />
+    </logger>
+    <logger name="br.com.frotasPro.api.service.integracao.IntegracaoCargaService" level="INFO">
+        <appender-ref ref="SINCRONIZACAO" />
+    </logger>
+    <logger name="br.com.frotasPro.api.scheduler.CargaScheduled" level="INFO">
+        <appender-ref ref="SINCRONIZACAO" />
+    </logger>
+    <logger name="br.com.frotasPro.api.integracao.kafka.CargaSyncResponseConsumer" level="INFO">
+        <appender-ref ref="SINCRONIZACAO" />
+    </logger>
+    <logger name="br.com.frotasPro.api.integracao.kafka.CargaSyncRequestProducer" level="INFO">
+        <appender-ref ref="SINCRONIZACAO" />
+    </logger>
+
+    <!-- Integração com a integradora / WinThor -->
+    <logger name="br.com.frotasPro.api.integracao" level="INFO">
+        <appender-ref ref="INTEGRACAO" />
+    </logger>
+    <logger name="br.com.frotasPro.api.service.integracao" level="INFO">
+        <appender-ref ref="INTEGRACAO" />
+    </logger>
 
     <root level="INFO">
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="FILE" />
+        <appender-ref ref="ERROS" />
     </root>
 
 </configuration>

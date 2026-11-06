@@ -1,6 +1,8 @@
 package br.com.frotasPro.api.controller.integracao;
 
 import br.com.frotasPro.api.controller.integracao.dto.*;
+import br.com.frotasPro.api.controller.response.CargaSyncItemResponse;
+import br.com.frotasPro.api.service.carga.CargaSyncHistoricoService;
 import br.com.frotasPro.api.domain.enums.StatusSincronizacao;
 import br.com.frotasPro.api.service.integracao.*;
 import br.com.frotasPro.api.service.integracao.IntegracaoWinThorMonitorService.TipoJob;
@@ -27,6 +29,7 @@ public class IntegracaoWinThorAdminController {
     private final IntegracaoMotoristaService motoristaIntegracaoService;
     private final IntegracaoCaminhaoService caminhaoIntegracaoService;
     private final IntegracaoCargaService cargaIntegracaoService;
+    private final CargaSyncHistoricoService historicoService;
 
     @org.springframework.beans.factory.annotation.Value("${frotapro.empresa-sync-id}")
     private UUID empresaIdPadrao;
@@ -64,6 +67,15 @@ public class IntegracaoWinThorAdminController {
         TipoJob t = TipoJob.valueOf(tipo.trim().toUpperCase());
         Collection<StatusSincronizacao> st = parseStatus(statusCsv);
         return ResponseEntity.ok(monitorService.listarJobs(empresa(empresaId), t, st, page, size));
+    }
+
+    /** O que uma rodada de sincronização de cargas fez em cada carga (criou, atualizou, reteve, descartou). */
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")
+    @GetMapping("/jobs/CARGAS/{jobId}/itens")
+    public ResponseEntity<List<CargaSyncItemResponse>> itensDoJob(@PathVariable("jobId") UUID jobId) {
+        return ResponseEntity.ok(historicoService.listarPorJob(jobId).stream()
+                .map(CargaSyncItemResponse::de)
+                .toList());
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE_LOGISTICA', 'ROLE_OPERADOR_LOGISTICA')")

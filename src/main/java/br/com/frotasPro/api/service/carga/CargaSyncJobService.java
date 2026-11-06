@@ -9,12 +9,14 @@ import br.com.frotasPro.api.integracao.kafka.CargaSyncRequestProducer;
 import br.com.frotasPro.api.repository.integracao.CargaSyncJobRepository;
 import br.com.frotasPro.api.service.notificacao.NotificacaoService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CargaSyncJobService {
@@ -77,6 +79,19 @@ public class CargaSyncJobService {
         }
 
         return job.getId();
+    }
+
+    /** Guarda no job o período pedido (a tela de sincronizações mostra "de 01/11 a 06/11"). Falha não afeta o sync. */
+    public void registrarPeriodo(UUID jobId, LocalDate inicio, LocalDate fim) {
+        try {
+            repository.findById(jobId).ifPresent(job -> {
+                job.setPeriodoInicial(inicio);
+                job.setPeriodoFinal(fim);
+                repository.save(job);
+            });
+        } catch (RuntimeException e) {
+            log.warn("Não foi possível gravar o período do job {}: {}", jobId, e.getMessage());
+        }
     }
 
     public void marcarProcessando(UUID jobId) {

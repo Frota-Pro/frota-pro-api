@@ -60,7 +60,7 @@ public abstract class AuditoriaBase {
     @PostPersist
     private void auditarCriacao() {
         try {
-            AuditoriaEntidadeRegistrador.registrarCriacao(this);
+            this.snapshotAuditoriaAnterior = AuditoriaEntidadeRegistrador.registrarCriacao(this);
         } catch (Exception ignored) {
             // auditoria nunca pode impedir a gravação de valer
         }
@@ -69,7 +69,10 @@ public abstract class AuditoriaBase {
     @PreUpdate
     private void auditarAtualizacao() {
         try {
-            AuditoriaEntidadeRegistrador.registrarAtualizacao(this, this.snapshotAuditoriaAnterior);
+            // O "antes" passa a ser a foto que acabou de ser gravada: se a entidade for gravada de novo na mesma
+            // transação (vários flush durante um sync) e nada mudou desde o último registro, não repete a linha.
+            this.snapshotAuditoriaAnterior =
+                    AuditoriaEntidadeRegistrador.registrarAtualizacao(this, this.snapshotAuditoriaAnterior);
         } catch (Exception ignored) {
         }
     }

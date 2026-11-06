@@ -55,6 +55,7 @@ public class SincronizarCargaService {
     private final ParametroSistemaService parametroSistemaService;
     private final ClienteService clienteService;
     private final RegistrarCargaSyncDescartadaService registrarCargaSyncDescartadaService;
+    private final CargaSyncHistoricoService historicoService;
 
     @Caching(evict = {
             @CacheEvict(value = "carga_listar", allEntries = true),
@@ -72,15 +73,19 @@ public class SincronizarCargaService {
         log.info("Sincronizando {} cargas da data {} (jobId={})",
                 event.getTotalCargas(), event.getDataReferencia(), event.getJobId());
 
-        event.getCargas().forEach(this::upsertCargaFromWinThorWithRetry);
+        HistoricoRodadaSync rodada = new HistoricoRodadaSync(event.getJobId());
+        event.getCargas().forEach(dto -> upsertCargaFromWinThorWithRetry(dto, rodada));
+
+        // Grava o histórico da rodada DEPOIS do commit, em transação própria: nunca atrapalha o sync.
+        historicoService.registrarAposCommit(rodada);
     }
 
-    private void upsertCargaFromWinThorWithRetry(CargaWinThorDto dto) {
+    private void upsertCargaFromWinThorWithRetry(CargaWinThorDto dto, HistoricoRodadaSync rodada) {
         int maxTentativas = 3;
 
         for (int tentativa = 1; tentativa <= maxTentativas; tentativa++) {
             try {
-                upsertCargaFromWinThor(dto);
+                upsertCargaFromWinThor(dto, rodada);
                 return;
             } catch (ObjectOptimisticLockingFailureException e) {
                 if (tentativa >= maxTentativas) {
@@ -103,7 +108,7 @@ public class SincronizarCargaService {
         }
     }
 
-    private void upsertCargaFromWinThor(CargaWinThorDto dto) {
+    private void upsertCargaFromWinThor(CargaWinThorDto dto, HistoricoRodadaSync rodada) {
 
         Carga carga = cargaRepository
                 .findByNumeroCargaExterno(dto.getNumCar().toString())
@@ -120,6 +125,9 @@ public class SincronizarCargaService {
             carga.setNotas(new ArrayList<>());
         }
 
+        // "Antes" para o histórico da rodada (só leitura; não muda nada na carga)
+        HistoricoRodadaSync.FotoCarga fotoAntes = nova ? null : fotografar(carga);
+
         // Se o motorista já foi trocado manualmente (TransferirMotoristaCargaService),
         // não deixa o sync do WinThor sobrescrever — o MDF-e/minuta não refletem
         // a troca real, então o dado de lá sempre estaria desatualizado aqui.
@@ -135,6 +143,10 @@ public class SincronizarCargaService {
                 registrarCargaSyncDescartadaService.registrar(dto, caminhaoTambemFalta
                         ? MotivoCargaSyncDescartada.MOTORISTA_E_CAMINHAO_NAO_CADASTRADOS
                         : MotivoCargaSyncDescartada.MOTORISTA_NAO_CADASTRADO);
+                rodada.registrarDescartada(dto, (caminhaoTambemFalta
+                        ? MotivoCargaSyncDescartada.MOTORISTA_E_CAMINHAO_NAO_CADASTRADOS
+                        : MotivoCargaSyncDescartada.MOTORISTA_NAO_CADASTRADO).getDescricao()
+                        + " (código do motorista no WinThor: " + dto.getCodMotorista() + ")");
                 return;
             }
             carga.setMotorista(motoristaOpt.get());
@@ -151,6 +163,8 @@ public class SincronizarCargaService {
                 log.warn("Caminhão WinThor {} não encontrado. Ignorando MDF-e {}",
                         dto.getCodVeiculo(), dto.getNumMdfe());
                 registrarCargaSyncDescartadaService.registrar(dto, MotivoCargaSyncDescartada.CAMINHAO_NAO_CADASTRADO);
+                rodada.registrarDescartada(dto, MotivoCargaSyncDescartada.CAMINHAO_NAO_CADASTRADO.getDescricao()
+                        + " (código do veículo no WinThor: " + dto.getCodVeiculo() + ")");
                 return;
             }
 
@@ -257,10 +271,26 @@ public class SincronizarCargaService {
         cargaRepository.saveAndFlush(carga);
         concluirTransferenciaPendenteSeNecessario(carga);
 
+        rodada.registrarProcessada(dto.getNumCar().toString(), carga.getId(), fotoAntes, fotografar(carga), dto);
+
         log.info("Carga {} sincronizada. {} clientes, {} notas",
                 dto.getNumMdfe(),
                 totalClientes,
                 totalNotas);
+    }
+
+    /** Foto dos campos que o histórico da sincronização acompanha. Só lê. */
+    private static HistoricoRodadaSync.FotoCarga fotografar(Carga carga) {
+        return new HistoricoRodadaSync.FotoCarga(
+                carga.getPesoCarga(),
+                carga.getValorTotal(),
+                carga.getStatusCarga() != null ? carga.getStatusCarga().name() : null,
+                carga.getMotorista() != null ? carga.getMotorista().getNome() : null,
+                carga.getCaminhao() != null ? carga.getCaminhao().getPlaca() : null,
+                carga.getDtFaturamento(),
+                carga.getNotas() != null ? carga.getNotas().size() : 0,
+                carga.isDiminuicaoPesoValorBloqueada()
+        );
     }
 
     private static String notaKey(String cliente, String nota) {
