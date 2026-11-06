@@ -362,9 +362,17 @@ public class SincronizarCargaService {
         carga.setDiminuicaoPesoValorBloqueada(pesoBloqueado || valorBloqueado);
     }
 
-    private boolean isDiminuicao(BigDecimal atual, BigDecimal novo) {
-        BigDecimal atualOuZero = atual != null ? atual : BigDecimal.ZERO;
-        BigDecimal novoOuZero = novo != null ? novo : BigDecimal.ZERO;
+    /** Casas guardadas em tb_carga.peso_carga / valor_total (numeric(15,3)). */
+    private static final int CASAS_GUARDADAS = 3;
+
+    /**
+     * Diminuição de verdade. Os dois lados são comparados já com as casas que o banco guarda: o WinThor manda o
+     * peso com várias casas (ex.: 14,5896 t) e o FrotaPRO guarda 14,590; sem arredondar, 14,5896 &lt; 14,590 contava
+     * como "diminuição" (menos de 1 kg) e acendia a marca de diminuição bloqueada à toa.
+     */
+    static boolean isDiminuicao(BigDecimal atual, BigDecimal novo) {
+        BigDecimal atualOuZero = (atual != null ? atual : BigDecimal.ZERO).setScale(CASAS_GUARDADAS, java.math.RoundingMode.HALF_UP);
+        BigDecimal novoOuZero = (novo != null ? novo : BigDecimal.ZERO).setScale(CASAS_GUARDADAS, java.math.RoundingMode.HALF_UP);
         return novoOuZero.compareTo(atualOuZero) < 0;
     }
 
