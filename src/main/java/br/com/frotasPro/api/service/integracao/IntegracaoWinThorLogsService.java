@@ -42,6 +42,9 @@ public class IntegracaoWinThorLogsService {
         List<String> out;
         switch (src) {
             case "INTEGRADORA" -> out = tailIntegradora(n);
+            // recortes da integradora (endpoint /winthor/logs dela, protegido pelo mesmo token)
+            case "INTEGRADORA_SINCRONIZACAO" -> out = tailIntegradoraArquivo("SINCRONIZACAO", n);
+            case "INTEGRADORA_ERROS" -> out = tailIntegradoraArquivo("ERROS", n);
             // recortes da API por assunto (ver logback-spring.xml): ficam na mesma pasta do log completo
             case "API_SINCRONIZACAO" -> out = tailFile(arquivoIrmao("sincronizacao.log"), n);
             case "API_INTEGRACAO" -> out = tailFile(arquivoIrmao("integracao.log"), n);
@@ -88,16 +91,23 @@ public class IntegracaoWinThorLogsService {
         return new ArrayList<>(deque);
     }
 
-    @SuppressWarnings("rawtypes")
     private List<String> tailIntegradora(int n) {
+        return tailIntegradoraUrl(normalizeBaseUrl(integradoraBaseUrl) + integradoraLogfilePath, n);
+    }
+
+    /** Lê um dos arquivos de log por assunto da integradora (SINCRONIZACAO ou ERROS) pelo endpoint dela. */
+    private List<String> tailIntegradoraArquivo(String arquivo, int n) {
+        String url = normalizeBaseUrl(integradoraBaseUrl) + "/winthor/logs?arquivo=" + arquivo + "&linhas=" + n;
+        return tailIntegradoraUrl(url, n);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private List<String> tailIntegradoraUrl(String url, int n) {
         try {
             RestTemplate rt = restTemplateBuilder
                     .setConnectTimeout(Duration.ofMillis(timeoutMs))
                     .setReadTimeout(Duration.ofMillis(timeoutMs))
                     .build();
-
-            String base = normalizeBaseUrl(integradoraBaseUrl);
-            String url = base + integradoraLogfilePath;
 
             // Actuator logfile retorna texto (conteúdo do arquivo).
             ResponseEntity<String> resp = rt.getForEntity(url, String.class);
