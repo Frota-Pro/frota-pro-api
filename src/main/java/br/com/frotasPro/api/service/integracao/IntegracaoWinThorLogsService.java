@@ -40,11 +40,16 @@ public class IntegracaoWinThorLogsService {
         int n = clamp(lines, 10, 2000);
 
         List<String> out;
-        if ("INTEGRADORA".equals(src)) {
-            out = tailIntegradora(n);
-        } else {
-            src = "API";
-            out = tailFile(apiLogFile, n);
+        switch (src) {
+            case "INTEGRADORA" -> out = tailIntegradora(n);
+            // recortes da API por assunto (ver logback-spring.xml): ficam na mesma pasta do log completo
+            case "API_SINCRONIZACAO" -> out = tailFile(arquivoIrmao("sincronizacao.log"), n);
+            case "API_INTEGRACAO" -> out = tailFile(arquivoIrmao("integracao.log"), n);
+            case "API_ERROS" -> out = tailFile(arquivoIrmao("erros.log"), n);
+            default -> {
+                src = "API";
+                out = tailFile(apiLogFile, n);
+            }
         }
 
         return IntegracaoWinThorLogsResponse.builder()
@@ -54,6 +59,10 @@ public class IntegracaoWinThorLogsService {
                 .linesReturned(out.size())
                 .lines(out)
                 .build();
+    }
+
+    private String arquivoIrmao(String nome) {
+        return Paths.get(apiLogFile).resolveSibling(nome).toString();
     }
 
     private List<String> tailFile(String filePath, int n) {
