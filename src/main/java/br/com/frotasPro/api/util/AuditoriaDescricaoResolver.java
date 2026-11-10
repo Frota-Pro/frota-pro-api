@@ -28,6 +28,7 @@ public class AuditoriaDescricaoResolver {
         LABEL_POR_SEGMENTO.put("categorias-caminhao", "Categoria de Caminhão");
         LABEL_POR_SEGMENTO.put("cidades", "Cidade");
         LABEL_POR_SEGMENTO.put("configuracao-empresa", "Configuração da Empresa");
+        LABEL_POR_SEGMENTO.put("conferencia", "Conferência");
         LABEL_POR_SEGMENTO.put("conta", "Conta");
         LABEL_POR_SEGMENTO.put("despesas-parada", "Despesa de Parada");
         LABEL_POR_SEGMENTO.put("eixo", "Eixo");
@@ -67,6 +68,8 @@ public class AuditoriaDescricaoResolver {
         FRASES_POR_SUFIXO.put("/transferir-notas", "Transferiu notas fiscais entre cargas");
         FRASES_POR_SUFIXO.put("/transferir-motorista", "Transferiu o motorista de uma carga");
         FRASES_POR_SUFIXO.put("/transferir-caminhao", "Transferiu o caminhão de uma carga");
+        FRASES_POR_SUFIXO.put("/confirmar-troca", "Confirmou na Conferência a troca de motorista/caminhão de uma carga");
+        FRASES_POR_SUFIXO.put("/ignorar-troca", "Ignorou um item da Conferência (motorista/caminhão de uma carga)");
         FRASES_POR_SUFIXO.put("/ativo", "Ativou ou desativou um usuário");
         FRASES_POR_SUFIXO.put("/senha", "Alterou a senha de um usuário");
         FRASES_POR_SUFIXO.put("/aprovar-orcamento", "Aprovou o orçamento de uma manutenção");
