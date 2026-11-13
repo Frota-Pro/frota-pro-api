@@ -44,6 +44,7 @@ public class AuditoriaDescricaoResolver {
         LABEL_POR_SEGMENTO.put("parada-carga", "Parada de Carga");
         LABEL_POR_SEGMENTO.put("parametro-sistema", "Parâmetros do Sistema");
         LABEL_POR_SEGMENTO.put("planos-manutencao-preventiva", "Plano de Manutenção Preventiva");
+        LABEL_POR_SEGMENTO.put("planejamento", "Planejamento de Cargas");
         LABEL_POR_SEGMENTO.put("pneus", "Pneu");
         LABEL_POR_SEGMENTO.put("postos-abastecimento", "Posto de Abastecimento");
         LABEL_POR_SEGMENTO.put("rota", "Rota");
@@ -70,6 +71,16 @@ public class AuditoriaDescricaoResolver {
         FRASES_POR_SUFIXO.put("/transferir-caminhao", "Transferiu o caminhão de uma carga");
         FRASES_POR_SUFIXO.put("/confirmar-troca", "Confirmou na Conferência a troca de motorista/caminhão de uma carga");
         FRASES_POR_SUFIXO.put("/ignorar-troca", "Ignorou um item da Conferência (motorista/caminhão de uma carga)");
+        FRASES_POR_SUFIXO.put("/atualizar-planilha", "Atualizou a planilha de planejamento com o WinThor");
+        FRASES_POR_SUFIXO.put("/fechar-planilha", "Fechou a planilha de planejamento");
+        FRASES_POR_SUFIXO.put("/reabrir-planilha", "Reabriu a planilha de planejamento");
+        FRASES_POR_SUFIXO.put("/tirar-carregamento", "Tirou um carregamento da planilha de planejamento");
+        FRASES_POR_SUFIXO.put("/tirar-carregamentos", "Tirou vários carregamentos da planilha de planejamento");
+        FRASES_POR_SUFIXO.put("/juntar-carregamentos", "Juntou carregamentos numa rota do planejamento");
+        FRASES_POR_SUFIXO.put("/separar-carregamentos", "Separou carregamentos de uma rota do planejamento");
+        FRASES_POR_SUFIXO.put("/definir-saida", "Escolheu box e saída de uma rota do planejamento");
+        FRASES_POR_SUFIXO.put("/definir-complemento", "Definiu complemento na planilha de planejamento");
+        FRASES_POR_SUFIXO.put("/definir-rota", "Escolheu motorista/ajudante/caminhão de uma rota no planejamento");
         FRASES_POR_SUFIXO.put("/ativo", "Ativou ou desativou um usuário");
         FRASES_POR_SUFIXO.put("/senha", "Alterou a senha de um usuário");
         FRASES_POR_SUFIXO.put("/aprovar-orcamento", "Aprovou o orçamento de uma manutenção");

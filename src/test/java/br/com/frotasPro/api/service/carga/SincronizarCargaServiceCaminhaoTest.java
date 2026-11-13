@@ -40,7 +40,8 @@ import static org.mockito.Mockito.when;
 
 /**
  * Regra do caminhão no sync do WinThor: o MDF-e é a fonte, a não ser que o caminhão
- * da carga tenha sido corrigido manualmente (TransferirCaminhaoCargaService).
+ * da carga tenha sido corrigido manualmente (TransferirCaminhaoCargaService) ou que a
+ * viagem já tenha começado (aí vale o que o app registrou; ver SincronizarCargaViagemIniciadaTest).
  */
 @ExtendWith(MockitoExtension.class)
 class SincronizarCargaServiceCaminhaoTest {
@@ -125,6 +126,10 @@ class SincronizarCargaServiceCaminhaoTest {
 
     @Test
     void semTravaOSyncTrocaOCaminhaoERefazOTitular() {
+        // Carga ainda não iniciada: o MDF-e é a fonte. (Depois que a viagem começa, ver
+        // SincronizarCargaViagemIniciadaTest: a leitura não troca mais caminhão/titular.)
+        carga.setStatusCarga(Status.SINCRONIZADA);
+
         service.sincronizarCargasWinThor(evento("99"));
 
         assertSame(caminhaoDoWinThor, carga.getCaminhao());
@@ -165,6 +170,8 @@ class SincronizarCargaServiceCaminhaoTest {
 
     @Test
     void semTravaUmVeiculoDesconhecidoDescartaACarga() {
+        // Carga ainda não iniciada; numa carga já iniciada a leitura nem consulta o cadastro do manifesto.
+        carga.setStatusCarga(Status.SINCRONIZADA);
         when(caminhaoRepository.findByCodigoExterno("12345")).thenReturn(Optional.empty());
 
         service.sincronizarCargasWinThor(evento("12345"));
