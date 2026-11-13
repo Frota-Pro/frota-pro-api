@@ -128,10 +128,20 @@ public class SincronizarCargaService {
         // "Antes" para o histórico da rodada (só leitura; não muda nada na carga)
         HistoricoRodadaSync.FotoCarga fotoAntes = nova ? null : fotografar(carga);
 
+        // TRAVA: depois que a viagem começou (o motorista iniciou a carga no app) ou terminou, quem dirigiu e com
+        // qual caminhão é o que o app registrou. O manifesto é só um papel que pode mudar depois (ex.: o MDF-e da
+        // viagem é encerrado e sobra um MDF-e aberto de reentrega no mesmo carregamento, que a escolha "aprovado
+        // primeiro" passa a preferir). Então a leitura NÃO troca motorista, caminhão nem titular de uma carga já
+        // iniciada; para mudar, só a troca manual (Transferir motorista/caminhão) ou a Conferência.
+        boolean viagemJaComecou = !nova && viagemJaComecou(carga);
+        if (viagemJaComecou) {
+            registrarManifestoDiferenteIgnorado(carga, dto);
+        }
+
         // Se o motorista já foi trocado manualmente (TransferirMotoristaCargaService),
         // não deixa o sync do WinThor sobrescrever — o MDF-e/minuta não refletem
         // a troca real, então o dado de lá sempre estaria desatualizado aqui.
-        if (!carga.isMotoristaDefinidoManualmente()) {
+        if (!viagemJaComecou && !carga.isMotoristaDefinidoManualmente()) {
             var motoristaOpt = motoristaRepository
                     .findByCodigoExterno(String.valueOf(dto.getCodMotorista()));
 
@@ -155,7 +165,7 @@ public class SincronizarCargaService {
         // Mesma regra do motorista: se o caminhão foi corrigido manualmente
         // (TransferirCaminhaoCargaService), o MDF-e continua com o veículo errado e o
         // sync não pode desfazer a correção nem refazer o titular congelado.
-        if (!carga.isCaminhaoDefinidoManualmente()) {
+        if (!viagemJaComecou && !carga.isCaminhaoDefinidoManualmente()) {
             var caminhaoOpt = caminhaoRepository
                     .findByCodigoExterno(String.valueOf(dto.getCodVeiculo()));
 
@@ -277,6 +287,32 @@ public class SincronizarCargaService {
                 dto.getNumMdfe(),
                 totalClientes,
                 totalNotas);
+    }
+
+    /**
+     * A viagem já começou (ou terminou)? Finalizada, ou em rota com saída/KM inicial registrados pelo motorista.
+     * Uma carga em rota sem nenhum registro de saída ainda não conta: nada no app diz quem está dirigindo.
+     */
+    static boolean viagemJaComecou(Carga carga) {
+        Status status = carga.getStatusCarga();
+        return status == Status.FINALIZADA
+                || (status == Status.EM_ROTA && (carga.getDtSaida() != null || carga.getKmInicial() != null));
+    }
+
+    /** Só registra no log quando o manifesto lido discorda do que a carga tem; nada é alterado. */
+    private void registrarManifestoDiferenteIgnorado(Carga carga, CargaWinThorDto dto) {
+        String motoristaManifesto = String.valueOf(dto.getCodMotorista());
+        String caminhaoManifesto = dto.getCodVeiculo() != null ? dto.getCodVeiculo().trim() : null;
+        String motoristaDaCarga = carga.getMotorista() != null ? carga.getMotorista().getCodigoExterno() : null;
+        String caminhaoDaCarga = carga.getCaminhao() != null ? carga.getCaminhao().getCodigoExterno() : null;
+
+        boolean motoristaDifere = !motoristaManifesto.equals(motoristaDaCarga);
+        boolean caminhaoDifere = caminhaoManifesto != null && !caminhaoManifesto.equals(caminhaoDaCarga);
+        if (motoristaDifere || caminhaoDifere) {
+            log.info("Carga {} (MDF-e {}) já iniciada: mantido o motorista/caminhão do app. Manifesto diz motorista={} veículo={}; "
+                            + "a carga tem motorista={} veículo={}.",
+                    dto.getNumCar(), dto.getNumMdfe(), motoristaManifesto, caminhaoManifesto, motoristaDaCarga, caminhaoDaCarga);
+        }
     }
 
     /** Foto dos campos que o histórico da sincronização acompanha. Só lê. */
